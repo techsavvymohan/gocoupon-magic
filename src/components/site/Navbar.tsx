@@ -1,4 +1,4 @@
-import { MagneticButton } from "./MagneticButton";
+import { MagneticButton } from "../MagneticButton";
 
 const links = [
   { label: "Features", href: "#features" },
