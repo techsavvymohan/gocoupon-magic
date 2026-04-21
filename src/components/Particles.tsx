@@ -1,10 +1,20 @@
-import { useEffect, useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 
-/** 40 lime particles drifting upward via pure CSS keyframes. */
+/** Accent-colored particles drifting upward via pure CSS keyframes. Reduced on mobile. */
 export function Particles({ count = 40 }: { count?: number }) {
+  const [effectiveCount, setEffectiveCount] = useState(count);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const isCoarse = window.matchMedia("(pointer: coarse)").matches;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) setEffectiveCount(0);
+    else if (isCoarse) setEffectiveCount(Math.min(count, 14));
+  }, [count]);
+
   const items = useMemo(
     () =>
-      Array.from({ length: count }).map((_, i) => {
+      Array.from({ length: effectiveCount }).map((_, i) => {
         const left = Math.random() * 100;
         const duration = 15 + Math.random() * 25; // 15-40s
         const delay = -Math.random() * duration;
@@ -13,11 +23,8 @@ export function Particles({ count = 40 }: { count?: number }) {
         const size = Math.random() < 0.15 ? 3 : 2;
         return { i, left, duration, delay, opacity, drift, size };
       }),
-    [count],
+    [effectiveCount],
   );
-
-  // No effect needed — CSS keyframes only.
-  useEffect(() => {}, []);
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>

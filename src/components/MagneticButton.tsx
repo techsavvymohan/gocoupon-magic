@@ -26,6 +26,9 @@ export function MagneticButton({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    if (typeof window === "undefined") return;
+    // Skip magnetic effect on touch devices — saves a global mousemove listener.
+    if (window.matchMedia("(pointer: coarse)").matches) return;
 
     const onMove = (e: MouseEvent) => {
       const rect = el.getBoundingClientRect();

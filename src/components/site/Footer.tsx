@@ -11,12 +11,13 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-12 md:grid-cols-[1.4fr_repeat(4,1fr)]">
         <div>
           <div className="flex items-center gap-2.5">
-            <span
-              className="grid h-8 w-8 place-items-center rounded-md font-display text-sm font-bold"
-              style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
-            >
-              CX
-            </span>
+          <span
+            className="grid h-8 w-8 place-items-center rounded-md font-display text-sm font-bold"
+            style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
+            aria-hidden
+          >
+            gC
+          </span>
             <span className="font-display text-lg font-bold tracking-tight text-foreground">
               goCoupon
             </span>
