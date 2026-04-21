@@ -29,7 +29,7 @@ export function Hero() {
             <MagneticButton
               as="a"
               href="#cta"
-              className="inline-flex items-center gap-3 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-shadow hover:shadow-[0_0_40px_rgba(200,255,0,0.45)]"
+              className="inline-flex items-center gap-3 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-shadow hover:shadow-[var(--shadow-accent)]"
             >
               <ChromeIcon />
               Add to Chrome — Free
@@ -72,15 +72,15 @@ function ExtensionMockup() {
   return (
     <TiltCard
       className="mx-auto w-full max-w-md"
-      innerClassName="relative rounded-2xl border border-border bg-card p-6 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8),0_0_0_1px_rgba(200,255,0,0.05)]"
+      innerClassName="relative rounded-2xl border border-border bg-card p-6 shadow-[0_30px_80px_-20px_rgba(15,23,42,0.18),var(--shadow-accent)]"
     >
       {/* Background glow layer */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-10 -z-10 opacity-50 blur-3xl"
+        className="pointer-events-none absolute -inset-10 -z-10 opacity-60 blur-3xl"
         style={{
           background:
-            "radial-gradient(circle at 30% 20%, rgba(200,255,0,0.18), transparent 60%)",
+            "radial-gradient(circle at 30% 20%, var(--accent-glow), transparent 60%)",
           transform: "translateZ(0px)",
         }}
       />
@@ -165,8 +165,8 @@ function ExtensionMockup() {
           transform: "translateZ(80px)",
           background: "var(--primary)",
           color: "var(--primary-foreground)",
-          borderColor: "rgba(200,255,0,0.5)",
-          boxShadow: "0 10px 40px rgba(200,255,0,0.35)",
+          borderColor: "var(--accent-glow-strong)",
+          boxShadow: "var(--shadow-accent)",
         }}
       >
         ✦ Auto-applied

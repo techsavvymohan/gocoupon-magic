@@ -50,7 +50,7 @@ export function Pricing() {
               style={{
                 transitionDelay: `${i * 0.1}s`,
                 borderColor: t.highlighted ? "var(--primary)" : "var(--border)",
-                background: t.highlighted ? "rgba(200,255,0,0.04)" : undefined,
+                background: t.highlighted ? "var(--accent-tint)" : undefined,
               }}
             >
               {t.highlighted && (
