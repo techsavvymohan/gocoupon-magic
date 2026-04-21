@@ -11,6 +11,7 @@ import { Features } from "@/components/site/Features";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Pricing } from "@/components/site/Pricing";
 import { FAQ } from "@/components/site/FAQ";
+import { Blog } from "@/components/site/Blog";
 import { CTA } from "@/components/site/CTA";
 import { Footer } from "@/components/site/Footer";
 import { useRevealOnScroll } from "@/hooks/use-reveal";
@@ -75,6 +76,7 @@ function Index() {
           <Testimonials />
           <Pricing />
           <FAQ />
+          <Blog />
           <CTA />
         </main>
         <Footer />
