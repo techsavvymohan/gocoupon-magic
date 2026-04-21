@@ -87,10 +87,10 @@ function ExtensionMockup() {
 
       {/* Browser chrome */}
       <div className="layer flex items-center gap-1.5 pb-4" style={{ transform: "translateZ(20px)" }}>
-        <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-        <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-        <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-        <div className="ml-3 flex-1 truncate rounded-md bg-black/40 px-3 py-1 font-mono text-[10px] text-muted-foreground">
+        <span className="h-2.5 w-2.5 rounded-full bg-muted" />
+        <span className="h-2.5 w-2.5 rounded-full bg-muted" />
+        <span className="h-2.5 w-2.5 rounded-full bg-muted" />
+        <div className="ml-3 flex-1 truncate rounded-md bg-secondary px-3 py-1 font-mono text-[10px] text-muted-foreground">
           flipkart.com / checkout
         </div>
       </div>
@@ -108,8 +108,9 @@ function ExtensionMockup() {
             <span
               className="grid h-8 w-8 place-items-center rounded-md font-display text-xs font-bold"
               style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
+              aria-hidden
             >
-              CX
+              gC
             </span>
             <div>
               <div className="text-sm font-semibold text-foreground">goCoupon</div>
@@ -136,7 +137,7 @@ function ExtensionMockup() {
           ].map((c) => (
             <li
               key={c.code}
-              className="flex items-center justify-between rounded-md border border-border/60 bg-black/30 px-3 py-2"
+              className="flex items-center justify-between rounded-md border border-border/60 bg-secondary/60 px-3 py-2"
               style={c.best ? { borderColor: "var(--primary)" } : undefined}
             >
               <span className="text-foreground">{c.code}</span>
