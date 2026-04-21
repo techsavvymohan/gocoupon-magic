@@ -50,11 +50,15 @@ export const Route = createRootRoute({
   notFoundComponent: NotFoundComponent,
 });
 
+// Runs before React hydrates — sets the theme class to prevent flash.
+const noFlickerScript = `(function(){try{var t=localStorage.getItem('theme');if(!t){t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}var r=document.documentElement;r.classList.remove('light','dark');r.classList.add(t);r.style.colorScheme=t;}catch(e){document.documentElement.classList.add('dark');}})();`;
+
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: noFlickerScript }} />
       </head>
       <body>
         {children}

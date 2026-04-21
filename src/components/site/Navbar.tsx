@@ -1,4 +1,5 @@
 import { MagneticButton } from "../MagneticButton";
+import { ThemeToggle } from "../ThemeToggle";
 
 const links = [
   { label: "Features", href: "#features" },
@@ -12,7 +13,7 @@ export function Navbar() {
     <header
       className="sticky top-0 z-[100] w-full border-b border-border/60"
       style={{
-        background: "rgba(8,8,8,0.7)",
+        background: "color-mix(in srgb, var(--background) 70%, transparent)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
       }}
@@ -43,13 +44,16 @@ export function Navbar() {
           ))}
         </ul>
 
-        <MagneticButton
-          as="a"
-          href="#cta"
-          className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-shadow hover:shadow-[0_0_30px_rgba(200,255,0,0.35)]"
-        >
-          Add to Chrome — Free
-        </MagneticButton>
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <MagneticButton
+            as="a"
+            href="#cta"
+            className="hidden items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-shadow hover:shadow-[var(--shadow-accent)] sm:inline-flex"
+          >
+            Add to Chrome — Free
+          </MagneticButton>
+        </div>
       </nav>
     </header>
   );

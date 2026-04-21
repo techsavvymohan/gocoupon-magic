@@ -35,33 +35,71 @@
   --font-mono: "JetBrains Mono", monospace;
 }
 
-:root {
+/* ── LIGHT MODE (default before script runs is dark; html.light overrides) ── */
+:root,
+html.light {
   --radius: 0.5rem;
-  /* Obsidian Minimal palette */
-  --background: oklch(0.12 0 0);                  /* #080808 deep black */
-  --foreground: oklch(0.97 0 0);                  /* near white */
-  --card: oklch(0.16 0 0);                        /* slightly lifted */
+  --background: #FFFFFF;
+  --foreground: #0F172A;
+  --card: #F8FAFC;
+  --card-foreground: #0F172A;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
+  --primary: #2563EB;                         /* blue accent */
+  --primary-hover: #1D4ED8;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F1F5F9;
+  --secondary-foreground: #0F172A;
+  --muted: #F1F5F9;
+  --muted-foreground: rgba(15,23,42,0.65);
+  --muted-foreground-soft: rgba(15,23,42,0.45);
+  --accent: #2563EB;
+  --accent-foreground: #FFFFFF;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --border: rgba(15,23,42,0.08);
+  --input: rgba(15,23,42,0.10);
+  --ring: #2563EB;
+
+  /* Semantic */
+  --accent-glow: rgba(37,99,235,0.18);
+  --accent-glow-strong: rgba(37,99,235,0.35);
+  --accent-tint: rgba(37,99,235,0.06);
+  --shadow-accent: 0 10px 40px rgba(37,99,235,0.18);
+  --cursor-color: #2563EB;
+  --cursor-mix: normal;
+}
+
+/* ── DARK MODE — Obsidian Minimal (lime) ── */
+html.dark {
+  --background: #080808;
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.16 0 0);
   --card-foreground: oklch(0.97 0 0);
   --popover: oklch(0.14 0 0);
   --popover-foreground: oklch(0.97 0 0);
-  --primary: oklch(0.93 0.24 125);                /* electric lime #C8FF00 */
-  --primary-foreground: oklch(0.12 0 0);
+  --primary: #C8FF00;
+  --primary-hover: #B8EF00;
+  --primary-foreground: #080808;
   --secondary: oklch(0.20 0 0);
   --secondary-foreground: oklch(0.97 0 0);
   --muted: oklch(0.18 0 0);
   --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.93 0.24 125);
-  --accent-foreground: oklch(0.12 0 0);
+  --muted-foreground-soft: oklch(0.5 0 0);
+  --accent: #C8FF00;
+  --accent-foreground: #080808;
   --destructive: oklch(0.6 0.22 25);
   --destructive-foreground: oklch(0.97 0 0);
   --border: oklch(1 0 0 / 0.08);
   --input: oklch(1 0 0 / 0.1);
-  --ring: oklch(0.93 0.24 125);
-}
+  --ring: #C8FF00;
 
-.dark {
-  --background: oklch(0.12 0 0);
-  --foreground: oklch(0.97 0 0);
+  --accent-glow: rgba(200,255,0,0.18);
+  --accent-glow-strong: rgba(200,255,0,0.45);
+  --accent-tint: rgba(200,255,0,0.04);
+  --shadow-accent: 0 10px 40px rgba(200,255,0,0.35);
+  --cursor-color: #C8FF00;
+  --cursor-mix: difference;
 }
 
 @layer base {
@@ -74,36 +112,39 @@
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
   }
+  /* Smooth theme switch — only animate color-y props, never layout. */
+  html, body, header, section, footer, article, aside, nav, main, div, span, a, button, summary, li, p, h1, h2, h3, h4, h5, h6, blockquote, figure, figcaption, ul, details {
+    transition: background-color .3s ease, color .3s ease, border-color .3s ease, box-shadow .3s ease;
+  }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     letter-spacing: -0.025em;
     font-weight: 700;
   }
-  /* Hide native cursor on desktop */
   @media (pointer: fine) {
     body { cursor: none; }
     a, button, [role="button"] { cursor: none; }
   }
 }
 
-/* ── Custom cursor ── */
+/* ── Custom cursor (theme-aware) ── */
 .cursor-orb {
   position: fixed;
   top: 0; left: 0;
   width: 20px; height: 20px;
   border-radius: 9999px;
-  background: var(--primary);
+  background: var(--cursor-color);
   pointer-events: none;
   z-index: 9999;
   transform: translate3d(-100px,-100px,0) translate(-50%,-50%);
   transition: width .25s ease, height .25s ease, background .25s ease, border .25s ease;
-  mix-blend-mode: difference;
+  mix-blend-mode: var(--cursor-mix);
   will-change: transform;
 }
 .cursor-orb.is-hover {
   width: 60px; height: 60px;
   background: transparent;
-  border: 1.5px solid var(--primary);
+  border: 1.5px solid var(--cursor-color);
   mix-blend-mode: normal;
 }
 .cursor-orb-label {
@@ -111,7 +152,7 @@
   display: flex; align-items: center; justify-content: center;
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--primary);
+  color: var(--cursor-color);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   opacity: 0;
@@ -123,7 +164,7 @@
   position: fixed; top: 0; left: 0;
   width: 8px; height: 8px;
   border-radius: 9999px;
-  background: var(--primary);
+  background: var(--cursor-color);
   pointer-events: none;
   z-index: 9998;
   transform: translate3d(-100px,-100px,0) translate(-50%,-50%);
@@ -141,11 +182,13 @@
   position: absolute;
   width: 2px; height: 2px;
   border-radius: 9999px;
-  background: var(--primary);
+  background: var(--accent);
   bottom: -10px;
   animation: float-up linear infinite;
   will-change: transform, opacity;
 }
+/* Light mode: dial particles way down — they're noisy on white */
+html.light .particle { opacity: 0; }
 
 /* ── Reveal on scroll ── */
 .reveal {
@@ -167,12 +210,13 @@
 .tilt-shine {
   position: absolute; inset: 0;
   pointer-events: none;
-  background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(200,255,0,0.18), transparent 40%);
+  background: radial-gradient(circle at var(--mx,50%) var(--my,50%), var(--accent-glow), transparent 40%);
   mix-blend-mode: screen;
   border-radius: inherit;
   opacity: 0;
   transition: opacity .3s ease;
 }
+html.light .tilt-shine { mix-blend-mode: multiply; }
 .tilt-card:hover .tilt-shine { opacity: 1; }
 
 /* ── Marquee ── */
@@ -182,22 +226,20 @@
 }
 .marquee-track { animation: marquee 30s linear infinite; }
 
-/* ── Subtle grid backdrop ── */
+/* ── Grid backdrop ── */
 .grid-backdrop {
   background-image:
-    linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
+    linear-gradient(to right, var(--border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
   background-size: 64px 64px;
   mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
 }
 
 .text-balance { text-wrap: balance; }
 
-/* Selection */
 ::selection { background: var(--primary); color: var(--primary-foreground); }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: #080808; }
-::-webkit-scrollbar-thumb { background: #1a1a1a; border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: #2a2a2a; }
+::-webkit-scrollbar-track { background: var(--background); }
+::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground-soft); }

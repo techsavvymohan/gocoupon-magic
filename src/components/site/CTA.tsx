@@ -7,7 +7,7 @@ export function CTA() {
         className="reveal mx-auto max-w-5xl rounded-3xl border border-border p-12 text-center md:p-20"
         style={{
           background:
-            "radial-gradient(circle at 50% 0%, rgba(200,255,0,0.12), transparent 60%), var(--card)",
+            "radial-gradient(circle at 50% 0%, var(--accent-glow), transparent 60%), var(--card)",
         }}
       >
         <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
@@ -25,7 +25,7 @@ export function CTA() {
           <MagneticButton
             as="a"
             href="#"
-            className="inline-flex items-center gap-3 rounded-full bg-primary px-7 py-4 text-sm font-semibold text-primary-foreground transition-shadow hover:shadow-[0_0_50px_rgba(200,255,0,0.5)]"
+            className="inline-flex items-center gap-3 rounded-full bg-primary px-7 py-4 text-sm font-semibold text-primary-foreground transition-shadow hover:shadow-[var(--shadow-accent)]"
           >
             Add to Chrome — Free
           </MagneticButton>
