@@ -1,31 +1,9 @@
-const posts: { tag: string; date: string; title: string; excerpt: string; read: string }[] = [
-  {
-    tag: "Guides",
-    date: "Apr 12, 2026",
-    title: "How to stack coupons and bank offers on Flipkart",
-    excerpt:
-      "A practical walkthrough of combining coupon codes with card discounts to squeeze the maximum off your cart — without the trial-and-error.",
-    read: "5 min read",
-  },
-  {
-    tag: "Deals",
-    date: "Apr 03, 2026",
-    title: "The truth about Amazon India lightning deals",
-    excerpt:
-      "We tracked 1,200 lightning deals over 30 days. Here's when prices actually drop, and how goCoupon catches the best window automatically.",
-    read: "7 min read",
-  },
-  {
-    tag: "Product",
-    date: "Mar 24, 2026",
-    title: "Inside goCoupon 2.4 — faster checkout, smarter codes",
-    excerpt:
-      "Our latest release tests coupons 3× faster and supports Myntra Insider pricing. A short look at what shipped and what's next.",
-    read: "4 min read",
-  },
-];
+import { Link } from "@tanstack/react-router";
+import { posts } from "@/data/posts";
 
 export function Blog() {
+  const featured = posts.slice(0, 3);
+
   return (
     <section id="blog" className="border-t border-border px-6 py-24">
       <div className="mx-auto max-w-7xl">
@@ -38,19 +16,19 @@ export function Blog() {
               Save smarter with guides, deal breakdowns and product updates.
             </h2>
           </div>
-          <a
-            href="#blog"
+          <Link
+            to="/blog"
             className="reveal text-sm font-medium text-primary transition-opacity hover:opacity-80"
             aria-label="View all blog posts"
           >
             View all posts →
-          </a>
+          </Link>
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">
-          {posts.map((p, i) => (
+          {featured.map((p, i) => (
             <article
-              key={p.title}
+              key={p.slug}
               className="reveal group flex flex-col rounded-2xl border border-border bg-card p-6 transition-colors hover:border-primary/40"
               style={{ transitionDelay: `${i * 0.1}s` }}
             >
@@ -61,24 +39,37 @@ export function Blog() {
                 <span>{p.date}</span>
               </div>
               <h3 className="font-display text-xl font-bold leading-snug tracking-tight text-foreground">
-                {p.title}
+                <Link
+                  to="/blog/$slug"
+                  params={{ slug: p.slug }}
+                  className="transition-colors hover:text-primary"
+                >
+                  {p.title}
+                </Link>
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.excerpt}</p>
               <div className="mt-6 flex items-center justify-between border-t border-border pt-4">
                 <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
                   {p.read}
                 </span>
-                <a
-                  href="#blog"
+                <Link
+                  to="/blog/$slug"
+                  params={{ slug: p.slug }}
                   className="text-sm font-medium text-primary transition-opacity group-hover:opacity-80"
                   aria-label={`Read: ${p.title}`}
                 >
                   Read →
-                </a>
+                </Link>
               </div>
             </article>
           ))}
         </div>
+        <p className="mt-8 text-sm text-muted-foreground">
+          Looking for store pages? Visit <Link to="/amazon-coupons" className="text-primary">Amazon coupons</Link>,{" "}
+          <Link to="/flipkart-coupons" className="text-primary">Flipkart coupons</Link>,{" "}
+          <Link to="/myntra-coupons" className="text-primary">Myntra coupons</Link> and{" "}
+          <Link to="/meesho-coupons" className="text-primary">Meesho coupons</Link>.
+        </p>
       </div>
     </section>
   );

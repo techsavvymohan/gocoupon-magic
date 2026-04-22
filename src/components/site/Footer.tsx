@@ -1,27 +1,43 @@
+import { Link } from "@tanstack/react-router";
+
 const cols = [
-  { title: "Product", links: ["Features", "Pricing", "Changelog", "Roadmap"] },
-  { title: "Stores", links: ["Flipkart", "Amazon", "Myntra", "Meesho"] },
-  { title: "Company", links: ["About", "Blog", "Press kit", "Careers"] },
-  { title: "Legal", links: ["Privacy", "Terms", "Cashback policy", "Contact"] },
+  {
+    title: "Product",
+    links: [
+      { label: "How it works", to: "/how-it-works" },
+      { label: "Chrome extension", to: "/extension" },
+      { label: "Cashback rewards", to: "/cashback-rewards" },
+      { label: "FAQ", to: "/faq" },
+    ],
+  },
+  {
+    title: "Stores",
+    links: [
+      { label: "Flipkart coupons", to: "/flipkart-coupons" },
+      { label: "Amazon coupons", to: "/amazon-coupons" },
+      { label: "Myntra coupons", to: "/myntra-coupons" },
+      { label: "Meesho coupons", to: "/meesho-coupons" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "Blog", to: "/blog" },
+      { label: "Home", to: "/" },
+    ],
+  },
 ];
 
 export function Footer() {
   return (
     <footer className="border-t border-border px-6 py-16">
-      <div className="mx-auto grid max-w-7xl gap-12 md:grid-cols-[1.4fr_repeat(4,1fr)]">
+      <div className="mx-auto grid max-w-7xl gap-12 md:grid-cols-[1.4fr_repeat(3,1fr)]">
         <div>
-          <div className="flex items-center gap-2.5">
-          <span
-            className="grid h-8 w-8 place-items-center rounded-md font-display text-sm font-bold"
-            style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
-            aria-hidden
-          >
-            gC
-          </span>
-            <span className="font-display text-lg font-bold tracking-tight text-foreground">
-              goCoupon
+          <Link to="/" className="flex items-center gap-2.5">
+            <span className="inline-flex items-center rounded-lg px-2 py-1 transition-colors dark:bg-white/90 dark:shadow-[0_0_0_1px_rgba(255,255,255,0.25),0_4px_18px_rgba(255,255,255,0.08)] dark:ring-1 dark:ring-white/40">
+              <img src="/gc-logo.png" alt="goCoupon" className="h-7 w-auto" />
             </span>
-          </div>
+          </Link>
           <p className="mt-4 max-w-xs text-sm text-muted-foreground">
             The Chrome extension that finds and applies the best coupon code for you, automatically.
           </p>
@@ -33,13 +49,10 @@ export function Footer() {
             </div>
             <ul className="space-y-2.5">
               {c.links.map((l) => (
-                <li key={l}>
-                  <a
-                    href="#"
-                    className="text-sm text-foreground/80 transition-colors hover:text-foreground"
-                  >
-                    {l}
-                  </a>
+                <li key={l.label}>
+                  <Link to={l.to} className="text-sm text-foreground/80 transition-colors hover:text-foreground">
+                    {l.label}
+                  </Link>
                 </li>
               ))}
             </ul>

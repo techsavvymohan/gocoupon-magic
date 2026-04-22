@@ -1,8 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
-
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -66,8 +65,6 @@ html.light {
   --accent-glow-strong: rgba(37,99,235,0.35);
   --accent-tint: rgba(37,99,235,0.06);
   --shadow-accent: 0 10px 40px rgba(37,99,235,0.18);
-  --cursor-color: #2563EB;
-  --cursor-mix: normal;
 }
 
 /* ── DARK MODE — Obsidian Minimal (lime) ── */
@@ -98,8 +95,6 @@ html.dark {
   --accent-glow-strong: rgba(200,255,0,0.45);
   --accent-tint: rgba(200,255,0,0.04);
   --shadow-accent: 0 10px 40px rgba(200,255,0,0.35);
-  --cursor-color: #C8FF00;
-  --cursor-mix: difference;
 }
 
 @layer base {
@@ -121,54 +116,6 @@ html.dark {
     letter-spacing: -0.025em;
     font-weight: 700;
   }
-  @media (pointer: fine) {
-    body { cursor: none; }
-    a, button, [role="button"] { cursor: none; }
-  }
-}
-
-/* ── Custom cursor (theme-aware) ── */
-.cursor-orb {
-  position: fixed;
-  top: 0; left: 0;
-  width: 20px; height: 20px;
-  border-radius: 9999px;
-  background: var(--cursor-color);
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate3d(-100px,-100px,0) translate(-50%,-50%);
-  transition: width .25s ease, height .25s ease, background .25s ease, border .25s ease;
-  mix-blend-mode: var(--cursor-mix);
-  will-change: transform;
-}
-.cursor-orb.is-hover {
-  width: 60px; height: 60px;
-  background: transparent;
-  border: 1.5px solid var(--cursor-color);
-  mix-blend-mode: normal;
-}
-.cursor-orb-label {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--cursor-color);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  opacity: 0;
-  transition: opacity .2s ease;
-}
-.cursor-orb.is-hover .cursor-orb-label { opacity: 1; }
-
-.cursor-trail {
-  position: fixed; top: 0; left: 0;
-  width: 8px; height: 8px;
-  border-radius: 9999px;
-  background: var(--cursor-color);
-  pointer-events: none;
-  z-index: 9998;
-  transform: translate3d(-100px,-100px,0) translate(-50%,-50%);
-  will-change: transform;
 }
 
 /* ── Floating particles ── */

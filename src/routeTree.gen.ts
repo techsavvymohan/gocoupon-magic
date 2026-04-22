@@ -9,38 +9,228 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as MyntraCouponsRouteImport } from './routes/myntra-coupons'
+import { Route as MeeshoCouponsRouteImport } from './routes/meesho-coupons'
+import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as FlipkartCouponsRouteImport } from './routes/flipkart-coupons'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as ExtensionRouteImport } from './routes/extension'
+import { Route as CashbackRewardsRouteImport } from './routes/cashback-rewards'
+import { Route as AmazonCouponsRouteImport } from './routes/amazon-coupons'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BlogIndexRouteImport } from './routes/blog/index'
+import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 
+const MyntraCouponsRoute = MyntraCouponsRouteImport.update({
+  id: '/myntra-coupons',
+  path: '/myntra-coupons',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MeeshoCouponsRoute = MeeshoCouponsRouteImport.update({
+  id: '/meesho-coupons',
+  path: '/meesho-coupons',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HowItWorksRoute = HowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FlipkartCouponsRoute = FlipkartCouponsRouteImport.update({
+  id: '/flipkart-coupons',
+  path: '/flipkart-coupons',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExtensionRoute = ExtensionRouteImport.update({
+  id: '/extension',
+  path: '/extension',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CashbackRewardsRoute = CashbackRewardsRouteImport.update({
+  id: '/cashback-rewards',
+  path: '/cashback-rewards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AmazonCouponsRoute = AmazonCouponsRouteImport.update({
+  id: '/amazon-coupons',
+  path: '/amazon-coupons',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/amazon-coupons': typeof AmazonCouponsRoute
+  '/cashback-rewards': typeof CashbackRewardsRoute
+  '/extension': typeof ExtensionRoute
+  '/faq': typeof FaqRoute
+  '/flipkart-coupons': typeof FlipkartCouponsRoute
+  '/how-it-works': typeof HowItWorksRoute
+  '/meesho-coupons': typeof MeeshoCouponsRoute
+  '/myntra-coupons': typeof MyntraCouponsRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog/': typeof BlogIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/amazon-coupons': typeof AmazonCouponsRoute
+  '/cashback-rewards': typeof CashbackRewardsRoute
+  '/extension': typeof ExtensionRoute
+  '/faq': typeof FaqRoute
+  '/flipkart-coupons': typeof FlipkartCouponsRoute
+  '/how-it-works': typeof HowItWorksRoute
+  '/meesho-coupons': typeof MeeshoCouponsRoute
+  '/myntra-coupons': typeof MyntraCouponsRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog': typeof BlogIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/amazon-coupons': typeof AmazonCouponsRoute
+  '/cashback-rewards': typeof CashbackRewardsRoute
+  '/extension': typeof ExtensionRoute
+  '/faq': typeof FaqRoute
+  '/flipkart-coupons': typeof FlipkartCouponsRoute
+  '/how-it-works': typeof HowItWorksRoute
+  '/meesho-coupons': typeof MeeshoCouponsRoute
+  '/myntra-coupons': typeof MyntraCouponsRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog/': typeof BlogIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/amazon-coupons'
+    | '/cashback-rewards'
+    | '/extension'
+    | '/faq'
+    | '/flipkart-coupons'
+    | '/how-it-works'
+    | '/meesho-coupons'
+    | '/myntra-coupons'
+    | '/blog/$slug'
+    | '/blog/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/amazon-coupons'
+    | '/cashback-rewards'
+    | '/extension'
+    | '/faq'
+    | '/flipkart-coupons'
+    | '/how-it-works'
+    | '/meesho-coupons'
+    | '/myntra-coupons'
+    | '/blog/$slug'
+    | '/blog'
+  id:
+    | '__root__'
+    | '/'
+    | '/amazon-coupons'
+    | '/cashback-rewards'
+    | '/extension'
+    | '/faq'
+    | '/flipkart-coupons'
+    | '/how-it-works'
+    | '/meesho-coupons'
+    | '/myntra-coupons'
+    | '/blog/$slug'
+    | '/blog/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AmazonCouponsRoute: typeof AmazonCouponsRoute
+  CashbackRewardsRoute: typeof CashbackRewardsRoute
+  ExtensionRoute: typeof ExtensionRoute
+  FaqRoute: typeof FaqRoute
+  FlipkartCouponsRoute: typeof FlipkartCouponsRoute
+  HowItWorksRoute: typeof HowItWorksRoute
+  MeeshoCouponsRoute: typeof MeeshoCouponsRoute
+  MyntraCouponsRoute: typeof MyntraCouponsRoute
+  BlogSlugRoute: typeof BlogSlugRoute
+  BlogIndexRoute: typeof BlogIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/myntra-coupons': {
+      id: '/myntra-coupons'
+      path: '/myntra-coupons'
+      fullPath: '/myntra-coupons'
+      preLoaderRoute: typeof MyntraCouponsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/meesho-coupons': {
+      id: '/meesho-coupons'
+      path: '/meesho-coupons'
+      fullPath: '/meesho-coupons'
+      preLoaderRoute: typeof MeeshoCouponsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how-it-works': {
+      id: '/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/flipkart-coupons': {
+      id: '/flipkart-coupons'
+      path: '/flipkart-coupons'
+      fullPath: '/flipkart-coupons'
+      preLoaderRoute: typeof FlipkartCouponsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/extension': {
+      id: '/extension'
+      path: '/extension'
+      fullPath: '/extension'
+      preLoaderRoute: typeof ExtensionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cashback-rewards': {
+      id: '/cashback-rewards'
+      path: '/cashback-rewards'
+      fullPath: '/cashback-rewards'
+      preLoaderRoute: typeof CashbackRewardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/amazon-coupons': {
+      id: '/amazon-coupons'
+      path: '/amazon-coupons'
+      fullPath: '/amazon-coupons'
+      preLoaderRoute: typeof AmazonCouponsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +238,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AmazonCouponsRoute: AmazonCouponsRoute,
+  CashbackRewardsRoute: CashbackRewardsRoute,
+  ExtensionRoute: ExtensionRoute,
+  FaqRoute: FaqRoute,
+  FlipkartCouponsRoute: FlipkartCouponsRoute,
+  HowItWorksRoute: HowItWorksRoute,
+  MeeshoCouponsRoute: MeeshoCouponsRoute,
+  MyntraCouponsRoute: MyntraCouponsRoute,
+  BlogSlugRoute: BlogSlugRoute,
+  BlogIndexRoute: BlogIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
