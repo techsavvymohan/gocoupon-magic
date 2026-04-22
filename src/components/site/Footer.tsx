@@ -64,7 +64,7 @@ export function Footer() {
           © 2026 goCoupon. Made in India 🇮🇳
         </p>
         <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-          v2.4.1 — all systems operational
+          © 2026 goCoupon. All rights reserved.
         </p>
       </div>
     </footer>
