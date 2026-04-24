@@ -20,9 +20,8 @@ export function Hero() {
             in one click.
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-            goCoupon automatically finds and applies the best coupon code at
-            checkout — on Flipkart, Amazon, Myntra and Meesho. One click.
-            Maximum savings.
+            goCoupon automatically finds and applies the best coupon code at checkout — on Flipkart,
+            Amazon, Myntra and Meesho. One click. Maximum savings.
           </p>
 
           <div className="mt-10 flex flex-wrap items-center gap-4">
@@ -79,14 +78,16 @@ function ExtensionMockup() {
         aria-hidden
         className="pointer-events-none absolute -inset-10 -z-10 opacity-60 blur-3xl"
         style={{
-          background:
-            "radial-gradient(circle at 30% 20%, var(--accent-glow), transparent 60%)",
+          background: "radial-gradient(circle at 30% 20%, var(--accent-glow), transparent 60%)",
           transform: "translateZ(0px)",
         }}
       />
 
       {/* Browser chrome */}
-      <div className="layer flex items-center gap-1.5 pb-4" style={{ transform: "translateZ(20px)" }}>
+      <div
+        className="layer flex items-center gap-1.5 pb-4"
+        style={{ transform: "translateZ(20px)" }}
+      >
         <span className="h-2.5 w-2.5 rounded-full bg-muted" />
         <span className="h-2.5 w-2.5 rounded-full bg-muted" />
         <span className="h-2.5 w-2.5 rounded-full bg-muted" />
@@ -120,8 +121,14 @@ function ExtensionMockup() {
             </div>
           </div>
           <span className="relative flex h-2.5 w-2.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-60" style={{ background: "var(--primary)" }} />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ background: "var(--primary)" }} />
+            <span
+              className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-60"
+              style={{ background: "var(--primary)" }}
+            />
+            <span
+              className="relative inline-flex h-2.5 w-2.5 rounded-full"
+              style={{ background: "var(--primary)" }}
+            />
           </span>
         </div>
 

@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as PressRouteImport } from './routes/press'
 import { Route as MyntraCouponsRouteImport } from './routes/myntra-coupons'
 import { Route as MeeshoCouponsRouteImport } from './routes/meesho-coupons'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
@@ -21,6 +23,16 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 
+const ResourcesRoute = ResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PressRoute = PressRouteImport.update({
+  id: '/press',
+  path: '/press',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MyntraCouponsRoute = MyntraCouponsRouteImport.update({
   id: '/myntra-coupons',
   path: '/myntra-coupons',
@@ -87,6 +99,8 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/meesho-coupons': typeof MeeshoCouponsRoute
   '/myntra-coupons': typeof MyntraCouponsRoute
+  '/press': typeof PressRoute
+  '/resources': typeof ResourcesRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/': typeof BlogIndexRoute
 }
@@ -100,6 +114,8 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/meesho-coupons': typeof MeeshoCouponsRoute
   '/myntra-coupons': typeof MyntraCouponsRoute
+  '/press': typeof PressRoute
+  '/resources': typeof ResourcesRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog': typeof BlogIndexRoute
 }
@@ -114,6 +130,8 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/meesho-coupons': typeof MeeshoCouponsRoute
   '/myntra-coupons': typeof MyntraCouponsRoute
+  '/press': typeof PressRoute
+  '/resources': typeof ResourcesRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/': typeof BlogIndexRoute
 }
@@ -129,6 +147,8 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/meesho-coupons'
     | '/myntra-coupons'
+    | '/press'
+    | '/resources'
     | '/blog/$slug'
     | '/blog/'
   fileRoutesByTo: FileRoutesByTo
@@ -142,6 +162,8 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/meesho-coupons'
     | '/myntra-coupons'
+    | '/press'
+    | '/resources'
     | '/blog/$slug'
     | '/blog'
   id:
@@ -155,6 +177,8 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/meesho-coupons'
     | '/myntra-coupons'
+    | '/press'
+    | '/resources'
     | '/blog/$slug'
     | '/blog/'
   fileRoutesById: FileRoutesById
@@ -169,12 +193,28 @@ export interface RootRouteChildren {
   HowItWorksRoute: typeof HowItWorksRoute
   MeeshoCouponsRoute: typeof MeeshoCouponsRoute
   MyntraCouponsRoute: typeof MyntraCouponsRoute
+  PressRoute: typeof PressRoute
+  ResourcesRoute: typeof ResourcesRoute
   BlogSlugRoute: typeof BlogSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/resources': {
+      id: '/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/press': {
+      id: '/press'
+      path: '/press'
+      fullPath: '/press'
+      preLoaderRoute: typeof PressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/myntra-coupons': {
       id: '/myntra-coupons'
       path: '/myntra-coupons'
@@ -265,6 +305,8 @@ const rootRouteChildren: RootRouteChildren = {
   HowItWorksRoute: HowItWorksRoute,
   MeeshoCouponsRoute: MeeshoCouponsRoute,
   MyntraCouponsRoute: MyntraCouponsRoute,
+  PressRoute: PressRoute,
+  ResourcesRoute: ResourcesRoute,
   BlogSlugRoute: BlogSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
 }

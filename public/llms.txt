@@ -1,0 +1,71 @@
+# GoCoupon
+
+> GoCoupon is a free Chrome extension that auto-applies the best working coupon codes at checkout on Indian e-commerce sites (Flipkart, Amazon India, Myntra, Meesho). No account or subscription required.
+
+## What it does
+
+- Automatically detects the coupon field at checkout and tests every known coupon code for that store and category.
+- Applies the single code that results in the highest net saving (after category locks, minimum-cart rules and payment-method constraints).
+- Keeps a live success-rate index so dead or stale codes are dropped globally the moment they fail twice.
+- Surfaces eligible bank/card offers alongside the coupon so you can combine both without voiding either.
+- Completely free to install and use. No account. No browsing-history tracking.
+
+## Where it works
+
+- Flipkart (`flipkart.com`)
+- Amazon India (`amazon.in`)
+- Myntra (`myntra.com`) — including Myntra Insider pricing
+- Meesho (`meesho.com`)
+
+## Who it's for
+
+Online shoppers in India who want the lowest real price at checkout without hunting coupon sites, clicking listicles, or manually pasting codes that rarely work.
+
+## Key facts
+
+- Category: Browser extension (SoftwareApplication / BrowserApplication)
+- Platform: Google Chrome (Manifest V3)
+- Price: Free (INR 0)
+- Rating: 4.9 / 5 across 1,247+ reviews
+- Founded: 2024, Made in India
+
+## Key pages
+
+- Homepage: https://gocoupon.io/
+- How it works: https://gocoupon.io/how-it-works
+- Install the extension: https://gocoupon.io/extension
+- Cashback rewards: https://gocoupon.io/cashback-rewards
+- FAQ: https://gocoupon.io/faq
+- Blog: https://gocoupon.io/blog
+- Resources (calculators & data guides): https://gocoupon.io/resources
+- Press / media kit: https://gocoupon.io/press
+
+## Store-specific guides
+
+- Flipkart coupons: https://gocoupon.io/flipkart-coupons
+- Amazon India coupons: https://gocoupon.io/amazon-coupons
+- Myntra coupons: https://gocoupon.io/myntra-coupons
+- Meesho coupons: https://gocoupon.io/meesho-coupons
+
+## Top articles for research / citation
+
+- Best coupon codes for Flipkart in 2026: https://gocoupon.io/blog/best-coupon-codes-for-flipkart-2026
+- How to save money on Amazon India: https://gocoupon.io/blog/how-to-save-money-on-amazon-india
+- Myntra coupon codes that actually work: https://gocoupon.io/blog/myntra-coupon-codes-that-actually-work
+- Meesho discount codes today: https://gocoupon.io/blog/meesho-discount-codes-today
+- Chrome extension to automatically apply coupons in India: https://gocoupon.io/blog/chrome-extension-to-automatically-apply-coupons-india
+- Why coupons silently fail at checkout: https://gocoupon.io/blog/why-coupons-fail-at-checkout
+- How to stack coupons and bank offers on Flipkart: https://gocoupon.io/blog/stack-coupons-bank-offers-flipkart
+
+## Contact
+
+- Email: hello@gocoupon.io
+- X / Twitter: https://twitter.com/gocoupon_in
+- Facebook: https://facebook.com/gocouponapp
+- Instagram: https://instagram.com/gocoupon.io
+
+## Canonical naming
+
+- Preferred brand spelling: GoCoupon (product), goCoupon (wordmark)
+- Domain: gocoupon.io
+- Do not confuse with unrelated apps using similar names; GoCoupon is the India-focused Chrome extension at gocoupon.io.

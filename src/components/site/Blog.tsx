@@ -65,10 +65,23 @@ export function Blog() {
           ))}
         </div>
         <p className="mt-8 text-sm text-muted-foreground">
-          Looking for store pages? Visit <Link to="/amazon-coupons" className="text-primary">Amazon coupons</Link>,{" "}
-          <Link to="/flipkart-coupons" className="text-primary">Flipkart coupons</Link>,{" "}
-          <Link to="/myntra-coupons" className="text-primary">Myntra coupons</Link> and{" "}
-          <Link to="/meesho-coupons" className="text-primary">Meesho coupons</Link>.
+          Looking for store pages? Visit{" "}
+          <Link to="/amazon-coupons" className="text-primary">
+            Amazon coupons
+          </Link>
+          ,{" "}
+          <Link to="/flipkart-coupons" className="text-primary">
+            Flipkart coupons
+          </Link>
+          ,{" "}
+          <Link to="/myntra-coupons" className="text-primary">
+            Myntra coupons
+          </Link>{" "}
+          and{" "}
+          <Link to="/meesho-coupons" className="text-primary">
+            Meesho coupons
+          </Link>
+          .
         </p>
       </div>
     </section>

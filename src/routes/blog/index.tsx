@@ -28,7 +28,10 @@ function BlogIndex() {
 
   return (
     <SiteShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
       <section className="border-b border-border px-6 pb-16 pt-20 sm:pt-28">
         <div className="mx-auto max-w-7xl">
           <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
@@ -38,8 +41,8 @@ function BlogIndex() {
             Save smarter. One post at a time.
           </h1>
           <p className="mt-5 max-w-2xl text-base text-muted-foreground sm:text-lg">
-            Practical guides, honest deal breakdowns, and occasional product notes from the
-            goCoupon team.
+            Practical guides, honest deal breakdowns, and occasional product notes from the goCoupon
+            team.
           </p>
 
           <div className="mt-10 flex flex-wrap gap-2">

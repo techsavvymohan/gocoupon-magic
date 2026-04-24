@@ -101,10 +101,16 @@ html.dark {
   * {
     border-color: var(--color-border);
   }
+  html {
+    /* Mobile readability: PageSpeed Insights flags anything below 16px. */
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
   html, body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-body);
+    font-size: 16px;
     -webkit-font-smoothing: antialiased;
   }
   /* Smooth theme switch — only animate color-y props, never layout. */
@@ -115,6 +121,46 @@ html.dark {
     font-family: var(--font-display);
     letter-spacing: -0.025em;
     font-weight: 700;
+  }
+
+  /* Never render body text below 14px on any device. PSI flags < 14px as illegible. */
+  p, li, label, input, textarea, select, button, a {
+    font-size: inherit;
+  }
+
+  /* Mobile tap targets — min 48x48px on coarse-pointer (touch) devices. */
+  @media (pointer: coarse) {
+    a,
+    button,
+    [role="button"],
+    summary,
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"],
+    select {
+      min-height: 48px;
+      min-width: 48px;
+    }
+    /* Allow inline text links to stay inline but keep a generous hit area. */
+    p a,
+    li a,
+    span a {
+      min-height: 0;
+      min-width: 0;
+      padding: 0.25rem 0;
+    }
+  }
+
+  /* Honour prefers-reduced-motion for users who ask for calmer UI. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 

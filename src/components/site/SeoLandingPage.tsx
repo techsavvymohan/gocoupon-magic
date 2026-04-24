@@ -63,7 +63,10 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
           </h2>
           <ul className="mt-8 grid gap-4 md:grid-cols-2">
             {bullets.map((item) => (
-              <li key={item} className="rounded-xl border border-border bg-card p-5 text-muted-foreground">
+              <li
+                key={item}
+                className="rounded-xl border border-border bg-card p-5 text-muted-foreground"
+              >
                 {item}
               </li>
             ))}
@@ -88,7 +91,9 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
                     +
                   </span>
                 </summary>
-                <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">{item.a}</p>
+                <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+                  {item.a}
+                </p>
               </details>
             ))}
           </div>

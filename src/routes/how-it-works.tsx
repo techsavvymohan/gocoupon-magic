@@ -42,8 +42,14 @@ function HowItWorksPage() {
 
   return (
     <SiteShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
+      />
 
       <section className="border-b border-border px-6 pb-16 pt-20 sm:pt-28">
         <div className="mx-auto max-w-5xl">
@@ -77,7 +83,9 @@ function HowItWorksPage() {
             },
           ].map((step) => (
             <article key={step.title} className="rounded-2xl border border-border bg-card p-6">
-              <h2 className="font-display text-2xl font-bold tracking-tight text-foreground">{step.title}</h2>
+              <h2 className="font-display text-2xl font-bold tracking-tight text-foreground">
+                {step.title}
+              </h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{step.text}</p>
             </article>
           ))}
@@ -90,9 +98,19 @@ function HowItWorksPage() {
             Related guides
           </h2>
           <p className="mt-3 text-muted-foreground">
-            Learn more about <Link to="/extension" className="text-primary">installing the extension</Link>,{" "}
-            <Link to="/cashback-rewards" className="text-primary">cashback tracking</Link>, and{" "}
-            <Link to="/faq" className="text-primary">coupon troubleshooting</Link>.
+            Learn more about{" "}
+            <Link to="/extension" className="text-primary">
+              installing the extension
+            </Link>
+            ,{" "}
+            <Link to="/cashback-rewards" className="text-primary">
+              cashback tracking
+            </Link>
+            , and{" "}
+            <Link to="/faq" className="text-primary">
+              coupon troubleshooting
+            </Link>
+            .
           </p>
         </div>
       </section>

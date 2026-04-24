@@ -25,8 +25,14 @@ function FaqPage() {
 
   return (
     <SiteShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
+      />
 
       <section className="border-b border-border px-6 pb-16 pt-20 sm:pt-28">
         <div className="mx-auto max-w-5xl">
@@ -37,8 +43,8 @@ function FaqPage() {
             Coupon, cashback and extension questions answered.
           </h1>
           <p className="mt-5 max-w-3xl text-base text-muted-foreground sm:text-lg">
-            Everything users usually ask before installing a coupon extension: safety, code validity,
-            cashback timings and troubleshooting.
+            Everything users usually ask before installing a coupon extension: safety, code
+            validity, cashback timings and troubleshooting.
           </p>
         </div>
       </section>
@@ -56,16 +62,31 @@ function FaqPage() {
                   +
                 </span>
               </summary>
-              <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">{f.answer}</p>
+              <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+                {f.answer}
+              </p>
             </details>
           ))}
         </div>
 
         <div className="mx-auto mt-10 max-w-5xl text-sm text-muted-foreground">
-          Looking for strategy tips? Explore the <Link to="/blog" className="text-primary">blog</Link> or
-          compare store pages like <Link to="/amazon-coupons" className="text-primary">Amazon coupons</Link>,{" "}
-          <Link to="/flipkart-coupons" className="text-primary">Flipkart coupons</Link> and{" "}
-          <Link to="/myntra-coupons" className="text-primary">Myntra coupons</Link>.
+          Looking for strategy tips? Explore the{" "}
+          <Link to="/blog" className="text-primary">
+            blog
+          </Link>{" "}
+          or compare store pages like{" "}
+          <Link to="/amazon-coupons" className="text-primary">
+            Amazon coupons
+          </Link>
+          ,{" "}
+          <Link to="/flipkart-coupons" className="text-primary">
+            Flipkart coupons
+          </Link>{" "}
+          and{" "}
+          <Link to="/myntra-coupons" className="text-primary">
+            Myntra coupons
+          </Link>
+          .
         </div>
       </section>
     </SiteShell>

@@ -45,14 +45,20 @@ function PostPage() {
 
   return (
     <SiteShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
       <article className="border-b border-border px-6 pb-20 pt-16 sm:pt-24">
         <div className="mx-auto max-w-3xl">
-          <nav aria-label="Breadcrumb" className="mb-8 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+          <nav
+            aria-label="Breadcrumb"
+            className="mb-8 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground"
+          >
             <Link to="/" className="hover:text-foreground">
               Home
             </Link>
@@ -95,7 +101,7 @@ function PostPage() {
 
         <div className="mx-auto mt-14 max-w-3xl">
           <div className="prose-gc space-y-6 text-foreground/90">
-            {post.body.map((section, i) => (
+            {post.body.map((section: PostSection, i: number) => (
               <Section key={i} section={section} />
             ))}
           </div>
@@ -127,10 +133,23 @@ function PostPage() {
             ))}
           </div>
           <p className="mt-10 text-sm text-muted-foreground">
-            Explore more savings pages: <Link to="/amazon-coupons" className="text-primary">Amazon coupons</Link>,{" "}
-            <Link to="/flipkart-coupons" className="text-primary">Flipkart coupons</Link>,{" "}
-            <Link to="/myntra-coupons" className="text-primary">Myntra coupons</Link>, and{" "}
-            <Link to="/meesho-coupons" className="text-primary">Meesho coupon codes</Link>.
+            Explore more savings pages:{" "}
+            <Link to="/amazon-coupons" className="text-primary">
+              Amazon coupons
+            </Link>
+            ,{" "}
+            <Link to="/flipkart-coupons" className="text-primary">
+              Flipkart coupons
+            </Link>
+            ,{" "}
+            <Link to="/myntra-coupons" className="text-primary">
+              Myntra coupons
+            </Link>
+            , and{" "}
+            <Link to="/meesho-coupons" className="text-primary">
+              Meesho coupon codes
+            </Link>
+            .
           </p>
         </div>
       </section>
@@ -174,6 +193,29 @@ function Section({ section }: { section: PostSection }) {
             </cite>
           )}
         </blockquote>
+      );
+    case "link":
+      return (
+        <aside
+          aria-label="Related reading"
+          className="mt-10 rounded-2xl border border-border bg-card/60 p-6"
+        >
+          <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+            Continue reading
+          </div>
+          <ul className="space-y-2">
+            {section.items.map((item) => (
+              <li key={item.to + item.label} className="leading-7">
+                <Link
+                  to={item.to}
+                  className="text-primary underline-offset-4 transition-opacity hover:opacity-80 hover:underline"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </aside>
       );
     default:
       return null;

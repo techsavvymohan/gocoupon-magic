@@ -6,40 +6,197 @@
 
     <!-- Primary SEO -->
     <title>goCoupon – Auto-Apply Coupon Codes &amp; Cashback Extension</title>
-    <meta name="description" content="Get automatic coupons and cashback on Flipkart, Amazon, Myntra, Meesho and more with goCoupon. Install the free Chrome extension and save at checkout — no signup required." />
-    <meta name="keywords" content="coupon code India, promo codes India, cashback extension, coupon extension chrome, amazon coupon code, flipkart coupon code, myntra coupon code, meesho coupon code" />
+    <meta
+      name="description"
+      content="GoCoupon auto-applies the best coupon codes at checkout on Flipkart, Amazon, Myntra &amp; Meesho. Free Chrome extension. Save up to ₹500 per order."
+    />
+    <meta
+      name="keywords"
+      content="coupon codes India, promo codes India, cashback extension, coupon extension chrome, amazon coupon code, flipkart coupon code, myntra coupon code, meesho coupon code"
+    />
     <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
     <meta name="author" content="goCoupon" />
+    <meta name="theme-color" content="#080808" />
+    <meta name="format-detection" content="telephone=no" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="goCoupon" />
     <meta property="og:title" content="goCoupon – Auto-Apply Coupon Codes &amp; Cashback Extension" />
-    <meta property="og:description" content="Automatically find and apply the best coupon code at checkout. Save on Amazon, Flipkart, Myntra and Meesho with goCoupon." />
-    <meta property="og:url" content="https://gocoupon.com/" />
-    <meta property="og:image" content="https://gocoupon.com/gc-logo.png" />
+    <meta
+      property="og:description"
+      content="GoCoupon auto-applies the best coupon codes at checkout on Flipkart, Amazon, Myntra &amp; Meesho. Free Chrome extension."
+    />
+    <meta property="og:url" content="https://gocoupon.io/" />
+    <meta property="og:image" content="https://gocoupon.io/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="goCoupon — auto-apply coupon codes on Flipkart, Amazon, Myntra & Meesho" />
+    <meta property="og:locale" content="en_IN" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@gocoupon_in" />
+    <meta name="twitter:creator" content="@gocoupon_in" />
     <meta name="twitter:title" content="goCoupon – Auto-Apply Coupon Codes &amp; Cashback Extension" />
-    <meta name="twitter:description" content="Automatically find and apply the best coupon code at checkout. Save on top Indian stores with goCoupon." />
-    <meta name="twitter:image" content="https://gocoupon.com/gc-logo.png" />
+    <meta
+      name="twitter:description"
+      content="GoCoupon auto-applies the best coupon codes at checkout on Flipkart, Amazon, Myntra &amp; Meesho. Free Chrome extension."
+    />
+    <meta name="twitter:image" content="https://gocoupon.io/og-image.png" />
 
     <!-- Canonical + hreflang -->
-    <link rel="canonical" href="https://gocoupon.com/" />
-    <link rel="alternate" hreflang="en-in" href="https://gocoupon.com/" />
-    <link rel="alternate" hreflang="x-default" href="https://gocoupon.com/" />
+    <link rel="canonical" href="https://gocoupon.io/" />
+    <link rel="alternate" hreflang="en-in" href="https://gocoupon.io/" />
+    <link rel="alternate" hreflang="hi" href="https://gocoupon.io/hi/" />
+    <link rel="alternate" hreflang="x-default" href="https://gocoupon.io/" />
+
+    <!-- Google Search Console verification (replace VERIFY_TOKEN_HERE with your actual token) -->
+    <meta name="google-site-verification" content="VERIFY_TOKEN_HERE" />
+
+    <!-- Performance: preconnect to critical origins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/gc-logo.png" />
 
     <!-- Theme flash prevention — must run before first paint -->
     <script>
-      (function(){try{var t=localStorage.getItem('theme');if(!t){t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}var r=document.documentElement;r.classList.remove('light','dark');r.classList.add(t);r.style.colorScheme=t;}catch(e){document.documentElement.classList.add('dark');}})()</script>
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          if (!t) {
+            t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+          }
+          var r = document.documentElement;
+          r.classList.remove('light', 'dark');
+          r.classList.add(t);
+          r.style.colorScheme = t;
+        } catch (e) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
 
-    <!-- Structured data -->
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"goCoupon","url":"https://gocoupon.com/","potentialAction":{"@type":"SearchAction","target":"https://gocoupon.com/blog?query={search_term_string}","query-input":"required name=search_term_string"}}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"goCoupon","url":"https://gocoupon.com/","logo":"https://gocoupon.com/gc-logo.png"}</script>
+    <!-- Structured data: WebSite -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "goCoupon",
+        "url": "https://gocoupon.io/",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://gocoupon.io/blog?query={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+
+    <!-- Structured data: Organization -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "goCoupon",
+        "url": "https://gocoupon.io/",
+        "logo": "https://gocoupon.io/gc-logo.png",
+        "foundingDate": "2024",
+        "founders": [{ "@type": "Person", "name": "goCoupon Team" }],
+        "email": "hello@gocoupon.io",
+        "sameAs": [
+          "https://facebook.com/gocouponapp",
+          "https://twitter.com/gocoupon_in",
+          "https://instagram.com/gocoupon.io"
+        ]
+      }
+    </script>
+
+    <!-- Structured data: SoftwareApplication (the Chrome extension) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "GoCoupon",
+        "applicationCategory": "BrowserApplication",
+        "operatingSystem": "Chrome",
+        "url": "https://gocoupon.io/",
+        "description": "GoCoupon auto-applies the best coupon codes at checkout on Flipkart, Amazon, Myntra and Meesho. Free Chrome extension.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "INR"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.9",
+          "ratingCount": "1247"
+        }
+      }
+    </script>
+
+    <!-- Structured data: FAQPage (top questions for AI search / Google rich results) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How does GoCoupon work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "GoCoupon is a free Chrome extension that automatically detects coupon fields at checkout on Flipkart, Amazon India, Myntra and Meesho, tests all known coupon codes, and applies the one that saves you the most money."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is GoCoupon free?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. GoCoupon is completely free to install and use. No subscription, no account required."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which sites does GoCoupon work on?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "GoCoupon currently works on Flipkart, Amazon India, Myntra, and Meesho."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is GoCoupon safe to install?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. GoCoupon only runs on supported shopping sites at checkout, does not sell browsing history, and requires no account or personal data to use."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I stack coupons with bank offers on GoCoupon?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "In most cases yes. GoCoupon applies the highest-saving coupon first, and you can still select an eligible bank or card offer at payment for additional savings."
+            }
+          }
+        ]
+      }
+    </script>
+
+    <!-- Google tag (gtag.js) — replace G-XXXXXXXXXX with your GA4 measurement ID -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -10,6 +10,7 @@ import { Pricing } from "@/components/site/Pricing";
 import { FAQ } from "@/components/site/FAQ";
 import { Blog } from "@/components/site/Blog";
 import { CTA } from "@/components/site/CTA";
+import { About } from "@/components/site/About";
 import { couponFaqs } from "@/data/faqs";
 import { breadcrumbSchema, createSeoHead, faqSchema } from "@/lib/seo";
 
@@ -19,28 +20,33 @@ export const Route = createFileRoute("/")({
     createSeoHead({
       title: "goCoupon – Auto-Apply Coupon Codes & Cashback Extension",
       description:
-        "Get automatic coupons and cashback on Flipkart, Amazon, Myntra, Meesho and more with goCoupon. Install our Chrome extension to save at checkout.",
+        "GoCoupon auto-applies the best coupon codes at checkout on Flipkart, Amazon, Myntra & Meesho. Free Chrome extension. Save up to ₹500 per order.",
       path: "/",
       keywords:
-        "coupon extension chrome, cashback extension india, amazon india coupons, flipkart coupon code, myntra promo code, meesho coupon code",
+        "coupon codes india, coupon extension chrome, cashback extension india, amazon india coupons, flipkart coupon code, myntra promo code, meesho coupon code",
     }),
 });
 
 function Index() {
-  const breadcrumb = breadcrumbSchema([
-    { name: "Home", path: "/" },
-  ]);
+  const breadcrumb = breadcrumbSchema([{ name: "Home", path: "/" }]);
   const faq = faqSchema(couponFaqs);
 
   return (
     <SiteShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
+      />
       <Hero />
       <LogoMarquee />
       <Stats />
       <HowItWorks />
       <Features />
+      <About />
       <Testimonials />
       <Pricing />
       <FAQ />

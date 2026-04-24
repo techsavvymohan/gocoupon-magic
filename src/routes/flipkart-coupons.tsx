@@ -25,7 +25,8 @@ export const Route = createFileRoute("/flipkart-coupons")({
       description:
         "Discover the latest Flipkart coupon codes and cashback offers with goCoupon. Auto-apply valid Flipkart promo codes and maximize checkout savings.",
       path: "/flipkart-coupons",
-      keywords: "flipkart coupon code, flipkart promo code, flipkart discount code, flipkart cashback offers",
+      keywords:
+        "flipkart coupon code, flipkart promo code, flipkart discount code, flipkart cashback offers",
     }),
 });
 
@@ -38,8 +39,14 @@ function FlipkartCouponsPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
+      />
       <SeoLandingPage
         eyebrow="Flipkart coupon codes"
         title="Flipkart coupons, promo codes and cashback offers in one place."

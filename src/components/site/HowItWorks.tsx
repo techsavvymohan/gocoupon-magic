@@ -129,7 +129,9 @@ export function HowItWorks() {
           {steps.map((s, i) => (
             <article
               key={s.n}
-              ref={(el) => { cardRefs.current[i] = el; }}
+              ref={(el) => {
+                cardRefs.current[i] = el;
+              }}
               className="hiw-card relative rounded-2xl border border-border bg-card/40 p-8"
               style={{ transitionDelay: `${STAGGER[i]}s` }}
             >

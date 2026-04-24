@@ -25,7 +25,8 @@ export const Route = createFileRoute("/myntra-coupons")({
       description:
         "Unlock extra savings with Myntra coupon codes on goCoupon. Auto-apply working Myntra promo codes and compare cashback + insider pricing.",
       path: "/myntra-coupons",
-      keywords: "myntra coupon code, myntra promo code, myntra discount coupon, myntra cashback offers",
+      keywords:
+        "myntra coupon code, myntra promo code, myntra discount coupon, myntra cashback offers",
     }),
 });
 
@@ -38,8 +39,14 @@ function MyntraCouponsPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
+      />
       <SeoLandingPage
         eyebrow="Myntra promo codes"
         title="Myntra coupon codes that help you save more on fashion."

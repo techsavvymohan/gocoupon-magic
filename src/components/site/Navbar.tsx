@@ -25,10 +25,26 @@ export function Navbar() {
       }}
     >
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-        <Link to="/" className="flex items-center gap-2.5">
+        <Link to="/" className="flex items-center gap-2.5" aria-label="goCoupon — home">
           <span className="inline-flex items-center rounded-lg px-2 py-1 transition-colors">
-            <img src="/gc-logo.png" alt="goCoupon" className="h-7 w-auto dark:hidden" />
-            <img src="/gc-logo-dark.png" alt="goCoupon" className="hidden h-7 w-auto dark:block" />
+            <img
+              src="/gc-logo.png"
+              alt="goCoupon"
+              className="h-7 w-auto dark:hidden"
+              width={120}
+              height={28}
+              decoding="async"
+              fetchPriority="high"
+            />
+            <img
+              src="/gc-logo-dark.png"
+              alt="goCoupon"
+              className="hidden h-7 w-auto dark:block"
+              width={120}
+              height={28}
+              decoding="async"
+              fetchPriority="high"
+            />
           </span>
         </Link>
 

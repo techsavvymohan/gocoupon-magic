@@ -28,7 +28,8 @@ export const Route = createFileRoute("/cashback-rewards")({
       description:
         "Understand how goCoupon cashback works, how to track reward status, and how to maximize savings with coupons, bank offers and cashback together.",
       path: "/cashback-rewards",
-      keywords: "cashback rewards india, cashback extension, coupon and cashback, earn cashback online",
+      keywords:
+        "cashback rewards india, cashback extension, coupon and cashback, earn cashback online",
     }),
 });
 
@@ -41,8 +42,14 @@ function CashbackRewardsPage() {
 
   return (
     <SiteShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
+      />
 
       <section className="border-b border-border px-6 pb-16 pt-20 sm:pt-28">
         <div className="mx-auto max-w-5xl">
@@ -66,7 +73,10 @@ function CashbackRewardsPage() {
             "Order validation updates status from pending to confirmed.",
             "Confirmed rewards become redeemable per payout rules.",
           ].map((item) => (
-            <article key={item} className="rounded-2xl border border-border bg-card p-6 text-muted-foreground">
+            <article
+              key={item}
+              className="rounded-2xl border border-border bg-card p-6 text-muted-foreground"
+            >
               {item}
             </article>
           ))}
@@ -79,9 +89,19 @@ function CashbackRewardsPage() {
             Keep exploring
           </h2>
           <p className="mt-3 text-muted-foreground">
-            Read <Link to="/how-it-works" className="text-primary">how goCoupon works</Link>, install from{" "}
-            <Link to="/extension" className="text-primary">the extension page</Link>, and compare store pages
-            like <Link to="/amazon-coupons" className="text-primary">Amazon coupons</Link>.
+            Read{" "}
+            <Link to="/how-it-works" className="text-primary">
+              how goCoupon works
+            </Link>
+            , install from{" "}
+            <Link to="/extension" className="text-primary">
+              the extension page
+            </Link>
+            , and compare store pages like{" "}
+            <Link to="/amazon-coupons" className="text-primary">
+              Amazon coupons
+            </Link>
+            .
           </p>
         </div>
       </section>

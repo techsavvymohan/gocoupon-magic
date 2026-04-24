@@ -15,7 +15,11 @@ export function ThemeToggle() {
     >
       {/* Render icons only after mount to avoid SSR flash */}
       {mounted ? (
-        isDark ? <Sun size={16} /> : <Moon size={16} />
+        isDark ? (
+          <Sun size={16} />
+        ) : (
+          <Moon size={16} />
+        )
       ) : (
         <span className="block h-4 w-4" />
       )}

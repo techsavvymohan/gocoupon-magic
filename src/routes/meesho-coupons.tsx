@@ -25,7 +25,8 @@ export const Route = createFileRoute("/meesho-coupons")({
       description:
         "Save more on Meesho with goCoupon. Auto-test and apply valid Meesho coupon codes at checkout and unlock available cashback offers.",
       path: "/meesho-coupons",
-      keywords: "meesho coupon code, meesho promo code, meesho cashback offers, meesho discount code",
+      keywords:
+        "meesho coupon code, meesho promo code, meesho cashback offers, meesho discount code",
     }),
 });
 
@@ -38,8 +39,14 @@ function MeeshoCouponsPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
+      />
       <SeoLandingPage
         eyebrow="Meesho deals and codes"
         title="Meesho coupon codes and cashback offers, automatically applied."

@@ -46,8 +46,7 @@ export function Counter({
     return () => io.disconnect();
   }, [to, duration]);
 
-  const formatted =
-    format === "comma" ? value.toLocaleString("en-IN") : String(value);
+  const formatted = format === "comma" ? value.toLocaleString("en-IN") : String(value);
 
   return (
     <span ref={ref}>

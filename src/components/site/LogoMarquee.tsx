@@ -26,9 +26,13 @@ export function LogoMarquee() {
             >
               <img
                 src={s.src}
-                alt={s.name}
+                alt={`${s.name} — supported by goCoupon`}
                 className="h-8 w-auto max-w-[120px] object-contain"
                 draggable={false}
+                loading="lazy"
+                decoding="async"
+                width={120}
+                height={32}
               />
             </li>
           ))}

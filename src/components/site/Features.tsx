@@ -63,12 +63,8 @@ export function Features() {
                 >
                   <Icon />
                 </div>
-                <h3 className="font-display text-lg font-bold text-foreground">
-                  {f.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {f.body}
-                </p>
+                <h3 className="font-display text-lg font-bold text-foreground">{f.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.body}</p>
               </div>
             );
           })}
@@ -81,7 +77,12 @@ export function Features() {
 function BoltIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path
+        d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -96,21 +97,37 @@ function CoinIcon() {
 function ShieldIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path
+        d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 function BellIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path d="M6 10a6 6 0 1112 0v4l2 3H4l2-3v-4zM10 20a2 2 0 004 0" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path
+        d="M6 10a6 6 0 1112 0v4l2 3H4l2-3v-4zM10 20a2 2 0 004 0"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 function CheckIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path d="M5 12l4 4L19 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M5 12l4 4L19 6"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -118,7 +135,11 @@ function GlobeIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
-      <path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18" stroke="currentColor" strokeWidth="2" />
+      <path
+        d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
     </svg>
   );
 }

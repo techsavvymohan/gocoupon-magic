@@ -10,7 +10,8 @@ const faqs = [
   },
   {
     question: "Is the extension free?",
-    answer: "Yes, goCoupon is free to install and use for automatic coupon application and cashback support.",
+    answer:
+      "Yes, goCoupon is free to install and use for automatic coupon application and cashback support.",
   },
   {
     question: "Will the extension slow Chrome?",
@@ -41,8 +42,14 @@ function ExtensionPage() {
 
   return (
     <SiteShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
+      />
 
       <section className="border-b border-border px-6 pb-16 pt-20 sm:pt-28">
         <div className="mx-auto max-w-5xl">
@@ -85,7 +92,10 @@ function ExtensionPage() {
               "Open Amazon, Flipkart, Myntra or Meesho checkout.",
               "Allow goCoupon to test and apply the best coupon code.",
             ].map((item, index) => (
-              <li key={item} className="rounded-xl border border-border bg-card p-5 text-muted-foreground">
+              <li
+                key={item}
+                className="rounded-xl border border-border bg-card p-5 text-muted-foreground"
+              >
                 <span className="mr-2 font-semibold text-foreground">{index + 1}.</span>
                 {item}
               </li>

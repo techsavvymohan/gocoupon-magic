@@ -1,19 +1,16 @@
 const quotes = [
   {
-    body:
-      "Was buying a ₹14k phone on Flipkart and goCoupon just worked — no clicking around testing 12 expired codes. Saved me ₹1,200 in literally one second.",
+    body: "Was buying a ₹14k phone on Flipkart and goCoupon just worked — no clicking around testing 12 expired codes. Saved me ₹1,200 in literally one second.",
     name: "Aarav Mehta",
     role: "Product designer · Bangalore",
   },
   {
-    body:
-      "I'm cynical about extensions like this — they're usually trash. goCoupon proved me wrong every single time on Myntra. Cashback hit my UPI on the 3rd of every month.",
+    body: "I'm cynical about extensions like this — they're usually trash. goCoupon proved me wrong every single time on Myntra. Cashback hit my UPI on the 3rd of every month.",
     name: "Priya Iyer",
     role: "Software engineer · Pune",
   },
   {
-    body:
-      "Run a small import business and order on Amazon weekly. The savings sound boring until you add them up — goCoupon makes them ridiculous over a year.",
+    body: "Run a small import business and order on Amazon weekly. The savings sound boring until you add them up — goCoupon makes them ridiculous over a year.",
     name: "Rohit Bansal",
     role: "Founder · Jaipur",
   },
