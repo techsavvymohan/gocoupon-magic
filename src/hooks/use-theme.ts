@@ -12,13 +12,13 @@ function getInitialTheme(): Theme {
   if (typeof window !== "undefined") {
     const stored = window.localStorage.getItem(STORAGE_KEY) as Theme | null;
     if (stored === "light" || stored === "dark") return stored;
-    if (window.matchMedia("(prefers-color-scheme: light)").matches) return "light";
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
   }
-  return "dark";
+  return "light";
 }
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<Theme>("dark");
+  const [theme, setThemeState] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
