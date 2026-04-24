@@ -3,7 +3,7 @@ const stores = [
   { name: "Amazon", src: "/Brand logos/Amazon_logo.svg.webp" },
   { name: "Myntra", src: "/Brand logos/myntra.png" },
   { name: "Meesho", src: "/Brand logos/Meesho_logo.png" },
-  { name: "Ajio", src: "/Brand logos/Ajio logo.jpg" },
+  { name: "Ajio", src: "/Brand logos/Ajio.png" },
   { name: "Nykaa", src: "/Brand logos/Nykaa.png" },
   { name: "Tata CLiQ", src: "/Brand logos/Tata-cliq.png" },
   { name: "FirstCry", src: "/Brand logos/FirstCry_logo.svg.png" },
