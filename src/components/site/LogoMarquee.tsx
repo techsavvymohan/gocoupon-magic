@@ -27,7 +27,7 @@ export function LogoMarquee() {
               <img
                 src={s.src}
                 alt={s.name}
-                className="h-8 w-auto max-w-[120px] object-contain dark:brightness-0 dark:invert"
+                className="h-8 w-auto max-w-[120px] object-contain"
                 draggable={false}
               />
             </li>
