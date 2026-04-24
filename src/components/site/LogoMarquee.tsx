@@ -1,12 +1,12 @@
 const stores = [
-  "FLIPKART",
-  "AMAZON",
-  "MYNTRA",
-  "MEESHO",
-  "AJIO",
-  "NYKAA",
-  "TATA CLIQ",
-  "FIRSTCRY",
+  { name: "Flipkart", src: "/Brand logos/flipkart.png" },
+  { name: "Amazon", src: "/Brand logos/Amazon_logo.svg.webp" },
+  { name: "Myntra", src: "/Brand logos/myntra.png" },
+  { name: "Meesho", src: "/Brand logos/Meesho_logo.png" },
+  { name: "Ajio", src: "/Brand logos/Ajio logo.jpg" },
+  { name: "Nykaa", src: "/Brand logos/Nykaa.png" },
+  { name: "Tata CLiQ", src: "/Brand logos/Tata-cliq.png" },
+  { name: "FirstCry", src: "/Brand logos/FirstCry_logo.svg.png" },
 ];
 
 export function LogoMarquee() {
@@ -21,10 +21,15 @@ export function LogoMarquee() {
         <ul className="marquee-track flex shrink-0 items-center gap-16 pr-16">
           {[...stores, ...stores].map((s, i) => (
             <li
-              key={`${s}-${i}`}
-              className="font-display text-2xl font-bold tracking-tight text-muted-foreground/60 transition-colors hover:text-foreground"
+              key={`${s.name}-${i}`}
+              className="flex items-center transition-opacity hover:opacity-100 opacity-60"
             >
-              {s}
+              <img
+                src={s.src}
+                alt={s.name}
+                className="h-8 w-auto max-w-[120px] object-contain dark:brightness-0 dark:invert"
+                draggable={false}
+              />
             </li>
           ))}
         </ul>
