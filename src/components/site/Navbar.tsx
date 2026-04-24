@@ -26,8 +26,9 @@ export function Navbar() {
     >
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         <Link to="/" className="flex items-center gap-2.5">
-          <span className="inline-flex items-center rounded-lg px-2 py-1 transition-colors dark:bg-white/90 dark:shadow-[0_0_0_1px_rgba(255,255,255,0.25),0_4px_18px_rgba(255,255,255,0.08)] dark:ring-1 dark:ring-white/40">
-            <img src="/gc-logo.png" alt="goCoupon" className="h-7 w-auto" />
+          <span className="inline-flex items-center rounded-lg px-2 py-1 transition-colors">
+            <img src="/gc-logo.png" alt="goCoupon" className="h-7 w-auto dark:hidden" />
+            <img src="/gc-logo-dark.png" alt="goCoupon" className="hidden h-7 w-auto dark:block" />
           </span>
         </Link>
 
