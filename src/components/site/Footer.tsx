@@ -25,6 +25,7 @@ const cols = [
       { label: "Blog", to: "/blog" },
       { label: "Resources", to: "/resources" },
       { label: "Press", to: "/press" },
+      { label: "Privacy Policy", to: "/privacy" },
       { label: "Home", to: "/" },
     ],
   },
