@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PressRouteImport } from './routes/press'
 import { Route as MyntraCouponsRouteImport } from './routes/myntra-coupons'
 import { Route as MeeshoCouponsRouteImport } from './routes/meesho-coupons'
@@ -26,6 +27,11 @@ import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 const ResourcesRoute = ResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PressRoute = PressRouteImport.update({
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/meesho-coupons': typeof MeeshoCouponsRoute
   '/myntra-coupons': typeof MyntraCouponsRoute
   '/press': typeof PressRoute
+  '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/': typeof BlogIndexRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/meesho-coupons': typeof MeeshoCouponsRoute
   '/myntra-coupons': typeof MyntraCouponsRoute
   '/press': typeof PressRoute
+  '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog': typeof BlogIndexRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/meesho-coupons': typeof MeeshoCouponsRoute
   '/myntra-coupons': typeof MyntraCouponsRoute
   '/press': typeof PressRoute
+  '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/': typeof BlogIndexRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
     | '/meesho-coupons'
     | '/myntra-coupons'
     | '/press'
+    | '/privacy'
     | '/resources'
     | '/blog/$slug'
     | '/blog/'
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/meesho-coupons'
     | '/myntra-coupons'
     | '/press'
+    | '/privacy'
     | '/resources'
     | '/blog/$slug'
     | '/blog'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/meesho-coupons'
     | '/myntra-coupons'
     | '/press'
+    | '/privacy'
     | '/resources'
     | '/blog/$slug'
     | '/blog/'
@@ -194,6 +206,7 @@ export interface RootRouteChildren {
   MeeshoCouponsRoute: typeof MeeshoCouponsRoute
   MyntraCouponsRoute: typeof MyntraCouponsRoute
   PressRoute: typeof PressRoute
+  PrivacyRoute: typeof PrivacyRoute
   ResourcesRoute: typeof ResourcesRoute
   BlogSlugRoute: typeof BlogSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -206,6 +219,13 @@ declare module '@tanstack/react-router' {
       path: '/resources'
       fullPath: '/resources'
       preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/press': {
@@ -306,6 +326,7 @@ const rootRouteChildren: RootRouteChildren = {
   MeeshoCouponsRoute: MeeshoCouponsRoute,
   MyntraCouponsRoute: MyntraCouponsRoute,
   PressRoute: PressRoute,
+  PrivacyRoute: PrivacyRoute,
   ResourcesRoute: ResourcesRoute,
   BlogSlugRoute: BlogSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
