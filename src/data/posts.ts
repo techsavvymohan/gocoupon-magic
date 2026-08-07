@@ -957,6 +957,99 @@ export const posts: Post[] = [
       },
     ],
   },
+  {
+    slug: "amazon-great-indian-festival-hacks-2026",
+    tag: "Amazon Deals",
+    date: "Aug 07, 2026",
+    title: "Amazon Great Indian Festival 2026: 7 Secret Hacks to Stack SBI Cards + Coupons",
+    excerpt:
+      "Learn how to combine Amazon Instant Coupons, SBI credit card discounts, Prime early access, and goCoupon auto-apply to save up to 60% on electronics and appliances.",
+    read: "6 min read",
+    author: "goCoupon Deal Team",
+    cover: "/amazon-deals-tech.png",
+    body: [
+      {
+        type: "p",
+        text: "The Amazon Great Indian Festival is India's largest shopping event, but most shoppers leave thousands of rupees on the table by missing stackable promotional layers. Combining coupon check-boxes with bank instant discounts and goCoupon auto-apply is the key to unlocked maximum savings.",
+      },
+      { type: "h2", text: "1. Enable 'Apply Coupon' Checkboxes Before Carting" },
+      {
+        type: "p",
+        text: "Amazon frequently hides item-level coupons behind small green check-boxes on product pages. Always check for these tick-boxes before adding items to your cart. These stack directly on top of cart-level promotional codes.",
+      },
+      { type: "h2", text: "2. The Golden Rule of Stacking: Coupon First, Bank Card Second" },
+      {
+        type: "p",
+        text: "Bank discounts (like SBI 10% Instant Discount) apply on the final net subtotal after all promo codes and coupons are applied. Using goCoupon at checkout auto-applies valid promo codes first, reducing the base price before the 10% card discount kicks in.",
+      },
+      { type: "h3", text: "Essential Amazon Savings Checklist" },
+      {
+        type: "ul",
+        items: [
+          "Claim Amazon Pay Reward Cashbacks in your Rewards dashboard.",
+          "Use Prime Early Access to secure limited-stock lightning deals.",
+          "Let goCoupon test all valid Amazon promo codes at checkout.",
+          "Select eligible SBI or ICICI Credit/Debit cards for instant 10% discount at payment.",
+        ],
+      },
+      { type: "h2", text: "3. Auto-Apply Secret Promo Codes" },
+      {
+        type: "p",
+        text: "Many seller-specific promo codes aren't displayed on the main product page. Installing the goCoupon Chrome extension ensures every public and affiliate promotional code is automatically evaluated and applied to your checkout cart in 2 seconds.",
+      },
+      {
+        type: "link",
+        items: [
+          { label: "Explore Amazon Verified Coupons →", to: "/amazon-coupons" },
+          { label: "Install goCoupon Free Extension", to: "/extension" },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "best-amazon-electronics-tech-deals-2026",
+    tag: "Tech Deals",
+    date: "Aug 07, 2026",
+    title: "Top Amazon Electronics & Tech Deals Today: Verified Coupons & Savings Guide",
+    excerpt:
+      "A complete breakdown of active Amazon promo codes, secret coupon check-boxes, and bank cashback offers on headphones, laptops, smartwatches, and smart home tech.",
+    read: "5 min read",
+    author: "goCoupon Deal Team",
+    cover: "/amazon-deals-home.png",
+    body: [
+      {
+        type: "p",
+        text: "Electronics remain the single largest category for discounts on Amazon India. Whether you are upgrading your wireless audio gear, investing in smart home gadgets, or buying a new laptop, knowing how to unlock hidden category coupons makes a massive difference.",
+      },
+      { type: "h2", text: "Where to Find High-Value Electronics Promo Codes" },
+      {
+        type: "p",
+        text: "Tech brands frequently partner with Amazon to run targeted promotional campaigns. These codes range from flat ₹500 off on headphones to 15% discount on smartwatches.",
+      },
+      { type: "h2", text: "Top Tech Categories with Highest Coupon Savings" },
+      {
+        type: "ul",
+        items: [
+          "Audio & Headphones: Up to 50% OFF + Extra ₹300 coupon code.",
+          "Smartwatches & Wearables: Instant 10% Bank Discount + Flat ₹500 voucher.",
+          "Laptops & Workstation Accessories: Exchange Bonus + Zero Cost EMI stack.",
+          "Smart Home & Appliances: Extra 15% off with Amazon Pay ICICI card.",
+        ],
+      },
+      {
+        type: "quote",
+        text: "Never complete an Amazon tech purchase without running an auto-apply check. Over 40% of electronics orders qualify for unadvertised seller coupons.",
+        cite: "goCoupon Tech Savings Benchmark 2026",
+      },
+      {
+        type: "link",
+        items: [
+          { label: "View Curated Amazon Deals & Cards →", to: "/amazon-coupons" },
+          { label: "Get goCoupon Extension for Chrome", to: "/extension" },
+        ],
+      },
+    ],
+  },
 ];
 
 export function getPostBySlug(slug: string): Post | undefined {

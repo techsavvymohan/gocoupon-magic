@@ -9,69 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ResourcesRouteImport } from './routes/resources'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PressRouteImport } from './routes/press'
-import { Route as MyntraCouponsRouteImport } from './routes/myntra-coupons'
-import { Route as MeeshoCouponsRouteImport } from './routes/meesho-coupons'
-import { Route as HowItWorksRouteImport } from './routes/how-it-works'
-import { Route as FlipkartCouponsRouteImport } from './routes/flipkart-coupons'
-import { Route as FaqRouteImport } from './routes/faq'
-import { Route as ExtensionRouteImport } from './routes/extension'
-import { Route as CashbackRewardsRouteImport } from './routes/cashback-rewards'
-import { Route as AmazonCouponsRouteImport } from './routes/amazon-coupons'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AmazonCouponsRouteImport } from './routes/amazon-coupons'
+import { Route as CashbackRewardsRouteImport } from './routes/cashback-rewards'
+import { Route as ExtensionRouteImport } from './routes/extension'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as FlipkartCouponsRouteImport } from './routes/flipkart-coupons'
+import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as MeeshoCouponsRouteImport } from './routes/meesho-coupons'
+import { Route as MyntraCouponsRouteImport } from './routes/myntra-coupons'
+import { Route as PressRouteImport } from './routes/press'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 
-const ResourcesRoute = ResourcesRouteImport.update({
-  id: '/resources',
-  path: '/resources',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PressRoute = PressRouteImport.update({
-  id: '/press',
-  path: '/press',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MyntraCouponsRoute = MyntraCouponsRouteImport.update({
-  id: '/myntra-coupons',
-  path: '/myntra-coupons',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MeeshoCouponsRoute = MeeshoCouponsRouteImport.update({
-  id: '/meesho-coupons',
-  path: '/meesho-coupons',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HowItWorksRoute = HowItWorksRouteImport.update({
-  id: '/how-it-works',
-  path: '/how-it-works',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FlipkartCouponsRoute = FlipkartCouponsRouteImport.update({
-  id: '/flipkart-coupons',
-  path: '/flipkart-coupons',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FaqRoute = FaqRouteImport.update({
-  id: '/faq',
-  path: '/faq',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExtensionRoute = ExtensionRouteImport.update({
-  id: '/extension',
-  path: '/extension',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CashbackRewardsRoute = CashbackRewardsRouteImport.update({
-  id: '/cashback-rewards',
-  path: '/cashback-rewards',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AmazonCouponsRoute = AmazonCouponsRouteImport.update({
@@ -79,9 +34,54 @@ const AmazonCouponsRoute = AmazonCouponsRouteImport.update({
   path: '/amazon-coupons',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const CashbackRewardsRoute = CashbackRewardsRouteImport.update({
+  id: '/cashback-rewards',
+  path: '/cashback-rewards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExtensionRoute = ExtensionRouteImport.update({
+  id: '/extension',
+  path: '/extension',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FlipkartCouponsRoute = FlipkartCouponsRouteImport.update({
+  id: '/flipkart-coupons',
+  path: '/flipkart-coupons',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HowItWorksRoute = HowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MeeshoCouponsRoute = MeeshoCouponsRouteImport.update({
+  id: '/meesho-coupons',
+  path: '/meesho-coupons',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyntraCouponsRoute = MyntraCouponsRouteImport.update({
+  id: '/myntra-coupons',
+  path: '/myntra-coupons',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PressRoute = PressRouteImport.update({
+  id: '/press',
+  path: '/press',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesRoute = ResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
@@ -214,74 +214,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/resources': {
-      id: '/resources'
-      path: '/resources'
-      fullPath: '/resources'
-      preLoaderRoute: typeof ResourcesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/press': {
-      id: '/press'
-      path: '/press'
-      fullPath: '/press'
-      preLoaderRoute: typeof PressRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/myntra-coupons': {
-      id: '/myntra-coupons'
-      path: '/myntra-coupons'
-      fullPath: '/myntra-coupons'
-      preLoaderRoute: typeof MyntraCouponsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/meesho-coupons': {
-      id: '/meesho-coupons'
-      path: '/meesho-coupons'
-      fullPath: '/meesho-coupons'
-      preLoaderRoute: typeof MeeshoCouponsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/how-it-works': {
-      id: '/how-it-works'
-      path: '/how-it-works'
-      fullPath: '/how-it-works'
-      preLoaderRoute: typeof HowItWorksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/flipkart-coupons': {
-      id: '/flipkart-coupons'
-      path: '/flipkart-coupons'
-      fullPath: '/flipkart-coupons'
-      preLoaderRoute: typeof FlipkartCouponsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/faq': {
-      id: '/faq'
-      path: '/faq'
-      fullPath: '/faq'
-      preLoaderRoute: typeof FaqRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/extension': {
-      id: '/extension'
-      path: '/extension'
-      fullPath: '/extension'
-      preLoaderRoute: typeof ExtensionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cashback-rewards': {
-      id: '/cashback-rewards'
-      path: '/cashback-rewards'
-      fullPath: '/cashback-rewards'
-      preLoaderRoute: typeof CashbackRewardsRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/amazon-coupons': {
@@ -291,11 +228,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AmazonCouponsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/cashback-rewards': {
+      id: '/cashback-rewards'
+      path: '/cashback-rewards'
+      fullPath: '/cashback-rewards'
+      preLoaderRoute: typeof CashbackRewardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/extension': {
+      id: '/extension'
+      path: '/extension'
+      fullPath: '/extension'
+      preLoaderRoute: typeof ExtensionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/flipkart-coupons': {
+      id: '/flipkart-coupons'
+      path: '/flipkart-coupons'
+      fullPath: '/flipkart-coupons'
+      preLoaderRoute: typeof FlipkartCouponsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how-it-works': {
+      id: '/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/meesho-coupons': {
+      id: '/meesho-coupons'
+      path: '/meesho-coupons'
+      fullPath: '/meesho-coupons'
+      preLoaderRoute: typeof MeeshoCouponsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/myntra-coupons': {
+      id: '/myntra-coupons'
+      path: '/myntra-coupons'
+      fullPath: '/myntra-coupons'
+      preLoaderRoute: typeof MyntraCouponsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/press': {
+      id: '/press'
+      path: '/press'
+      fullPath: '/press'
+      preLoaderRoute: typeof PressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources': {
+      id: '/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof ResourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/': {

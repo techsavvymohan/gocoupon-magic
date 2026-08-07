@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SeoLandingPage } from "@/components/site/SeoLandingPage";
+import { AmazonAffiliateCards } from "@/components/site/AmazonAffiliateCards";
+import { AnimatedDealsCarousel } from "@/components/site/AnimatedDealsCarousel";
 import { breadcrumbSchema, createSeoHead, faqSchema } from "@/lib/seo";
 
 const faqs = [
@@ -64,7 +66,10 @@ function AmazonCouponsPage() {
           { name: "Home", path: "/" },
           { name: "Amazon Coupons", path: "/amazon-coupons" },
         ]}
-      />
+      >
+        <AnimatedDealsCarousel />
+        <AmazonAffiliateCards />
+      </SeoLandingPage>
     </>
   );
 }

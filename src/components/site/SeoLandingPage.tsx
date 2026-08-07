@@ -10,10 +10,11 @@ type SeoLandingPageProps = {
   bullets: string[];
   faqs: Array<{ q: string; a: string }>;
   breadcrumb: Array<{ name: string; path: string }>;
+  children?: React.ReactNode;
 };
 
 export function SeoLandingPage(props: SeoLandingPageProps) {
-  const { eyebrow, title, description, primaryCtaLabel, primaryCtaTo, bullets, faqs, breadcrumb } =
+  const { eyebrow, title, description, primaryCtaLabel, primaryCtaTo, bullets, faqs, breadcrumb, children } =
     props;
 
   return (
@@ -73,6 +74,8 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
           </ul>
         </div>
       </section>
+
+      {children}
 
       <section className="px-6 py-16">
         <div className="mx-auto max-w-7xl">

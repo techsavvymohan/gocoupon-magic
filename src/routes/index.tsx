@@ -5,6 +5,8 @@ import { LogoMarquee } from "@/components/site/LogoMarquee";
 import { Stats } from "@/components/site/Stats";
 import { HowItWorks } from "@/components/site/HowItWorks";
 import { Features } from "@/components/site/Features";
+import { AnimatedDealsCarousel } from "@/components/site/AnimatedDealsCarousel";
+import { AmazonAffiliateCards } from "@/components/site/AmazonAffiliateCards";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Pricing } from "@/components/site/Pricing";
 import { FAQ } from "@/components/site/FAQ";
@@ -46,6 +48,8 @@ function Index() {
       <Stats />
       <HowItWorks />
       <Features />
+      <AnimatedDealsCarousel />
+      <AmazonAffiliateCards />
       <About />
       <Testimonials />
       <Pricing />

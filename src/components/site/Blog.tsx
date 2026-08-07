@@ -29,9 +29,19 @@ export function Blog() {
           {featured.map((p, i) => (
             <article
               key={p.slug}
-              className="reveal group flex flex-col rounded-2xl border border-border bg-card p-6 transition-colors hover:border-primary/40"
+              className="reveal group flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-6 transition-colors hover:border-primary/40"
               style={{ transitionDelay: `${i * 0.1}s` }}
             >
+              {p.cover && (
+                <div className="-mx-6 -mt-6 mb-5 aspect-[16/9] overflow-hidden bg-muted">
+                  <img
+                    src={p.cover}
+                    alt={p.title}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                </div>
+              )}
               <div className="mb-5 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
                 <span className="rounded-full border border-border px-2 py-0.5 text-foreground/80">
                   {p.tag}
