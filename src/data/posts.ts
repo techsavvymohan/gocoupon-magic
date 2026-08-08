@@ -966,7 +966,7 @@ export const posts: Post[] = [
       "Learn how to combine Amazon Instant Coupons, SBI credit card discounts, Prime early access, and goCoupon auto-apply to save up to 60% on electronics and appliances.",
     read: "6 min read",
     author: "goCoupon Deal Team",
-    cover: "/amazon-deals-tech.png",
+    cover: "/amazon-deals-tech.webp",
     body: [
       {
         type: "p",
@@ -1015,7 +1015,7 @@ export const posts: Post[] = [
       "A complete breakdown of active Amazon promo codes, secret coupon check-boxes, and bank cashback offers on headphones, laptops, smartwatches, and smart home tech.",
     read: "5 min read",
     author: "goCoupon Deal Team",
-    cover: "/amazon-deals-home.png",
+    cover: "/amazon-deals-home.webp",
     body: [
       {
         type: "p",

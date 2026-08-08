@@ -1,12 +1,12 @@
 const stores = [
-  { name: "Flipkart", src: "/Brand logos/flipkart.png" },
+  { name: "Flipkart", src: "/Brand logos/flipkart.webp" },
   { name: "Amazon", src: "/Brand logos/Amazon_logo.svg.webp" },
-  { name: "Myntra", src: "/Brand logos/myntra.png" },
-  { name: "Meesho", src: "/Brand logos/Meesho_logo.png" },
-  { name: "Ajio", src: "/Brand logos/Ajio.png?v=2" },
-  { name: "Nykaa", src: "/Brand logos/Nykaa.png" },
-  { name: "Tata CLiQ", src: "/Brand logos/Tata-cliq.png" },
-  { name: "FirstCry", src: "/Brand logos/FirstCry_logo.svg.png" },
+  { name: "Myntra", src: "/Brand logos/myntra.webp" },
+  { name: "Meesho", src: "/Brand logos/Meesho_logo.webp" },
+  { name: "Ajio", src: "/Brand logos/Ajio.webp?v=2" },
+  { name: "Nykaa", src: "/Brand logos/Nykaa.webp" },
+  { name: "Tata CLiQ", src: "/Brand logos/Tata-cliq.webp" },
+  { name: "FirstCry", src: "/Brand logos/FirstCry_logo.svg.webp" },
 ];
 
 export function LogoMarquee() {

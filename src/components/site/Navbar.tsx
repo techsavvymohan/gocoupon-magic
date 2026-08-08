@@ -28,7 +28,7 @@ export function Navbar() {
         <Link to="/" className="flex items-center gap-2.5" aria-label="goCoupon — home">
           <span className="inline-flex items-center rounded-lg px-2 py-1 transition-colors">
             <img
-              src="/gc-logo.png"
+              src="/gc-logo.webp"
               alt="goCoupon"
               className="h-7 w-auto dark:hidden"
               width={120}
@@ -37,7 +37,7 @@ export function Navbar() {
               fetchPriority="high"
             />
             <img
-              src="/gc-logo-dark.png"
+              src="/gc-logo-dark.webp"
               alt="goCoupon"
               className="hidden h-7 w-auto dark:block"
               width={120}

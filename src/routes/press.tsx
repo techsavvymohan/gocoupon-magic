@@ -75,11 +75,11 @@ function PressPage() {
               Contact press@gocoupon.io
             </a>
             <a
-              href="/gc-logo.png"
+              href="/gc-logo.webp"
               className="inline-flex items-center rounded-full border border-border px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
               download
             >
-              Download logo (PNG)
+              Download logo (WebP)
             </a>
           </div>
         </div>
