@@ -14,8 +14,17 @@ type SeoLandingPageProps = {
 };
 
 export function SeoLandingPage(props: SeoLandingPageProps) {
-  const { eyebrow, title, description, primaryCtaLabel, primaryCtaTo, bullets, faqs, breadcrumb, children } =
-    props;
+  const {
+    eyebrow,
+    title,
+    description,
+    primaryCtaLabel,
+    primaryCtaTo,
+    bullets,
+    faqs,
+    breadcrumb,
+    children,
+  } = props;
 
   return (
     <SiteShell>

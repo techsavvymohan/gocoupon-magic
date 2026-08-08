@@ -114,7 +114,7 @@ const ParticlesMesh = ({ config }: { config?: MedusaeConfig }) => {
       uParticleColorTwo: { value: new THREE.Color(merged.particles.colorTwo) },
       uParticleColorThree: { value: new THREE.Color(merged.particles.colorThree) },
     }),
-    []
+    [],
   );
 
   const material = useMemo(
@@ -258,7 +258,7 @@ const ParticlesMesh = ({ config }: { config?: MedusaeConfig }) => {
         transparent: true,
         depthWrite: false,
       }),
-    [uniforms]
+    [uniforms],
   );
 
   useEffect(() => {
@@ -274,8 +274,8 @@ const ParticlesMesh = ({ config }: { config?: MedusaeConfig }) => {
       for (let x = 0; x < countX; x++) {
         const u = x / (countX - 1);
         const v = y / (countY - 1);
-        let px = (u - 0.5) * gridWidth + (Math.random() - 0.5) * jitter;
-        let py = (v - 0.5) * gridHeight + (Math.random() - 0.5) * jitter;
+        const px = (u - 0.5) * gridWidth + (Math.random() - 0.5) * jitter;
+        const py = (v - 0.5) * gridHeight + (Math.random() - 0.5) * jitter;
         offsets[i * 3] = px;
         offsets[i * 3 + 1] = py;
         offsets[i * 3 + 2] = 0;
@@ -283,8 +283,14 @@ const ParticlesMesh = ({ config }: { config?: MedusaeConfig }) => {
         i++;
       }
     }
-    meshRef.current.geometry.setAttribute("aOffset", new THREE.InstancedBufferAttribute(offsets, 3));
-    meshRef.current.geometry.setAttribute("aRandom", new THREE.InstancedBufferAttribute(randoms, 1));
+    meshRef.current.geometry.setAttribute(
+      "aOffset",
+      new THREE.InstancedBufferAttribute(offsets, 3),
+    );
+    meshRef.current.geometry.setAttribute(
+      "aRandom",
+      new THREE.InstancedBufferAttribute(randoms, 1),
+    );
   }, [count, countX, countY]);
 
   const globalPointer = useRef<{ x: number; y: number } | null>(null);
@@ -310,7 +316,8 @@ const ParticlesMesh = ({ config }: { config?: MedusaeConfig }) => {
     const cursorRadius = (merged.cursor?.radius ?? DEFAULT_CONFIG.cursor.radius) as number;
     const cursorStrength = (merged.cursor?.strength ?? DEFAULT_CONFIG.cursor.strength) as number;
     const dragFactor = (merged.cursor?.dragFactor ?? DEFAULT_CONFIG.cursor.dragFactor) as number;
-    const followStrength = (merged.particles?.cursorFollowStrength ?? DEFAULT_CONFIG.particles.cursorFollowStrength) as number;
+    const followStrength = (merged.particles?.cursorFollowStrength ??
+      DEFAULT_CONFIG.particles.cursorFollowStrength) as number;
 
     const jitterRadius = Math.min(viewport.width, viewport.height) * cursorRadius;
     const jitterX = (Math.sin(t * 0.35) + Math.sin(t * 0.77 + 1.2)) * 0.5;

@@ -58,12 +58,12 @@ Your DNS provider (Cloudflare, GoDaddy, Route 53, etc.) needs these records. All
 
 ### SPF
 
-| Field | Value |
-| --- | --- |
-| Type | `TXT` |
-| Host | `@` |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Type  | `TXT`                                 |
+| Host  | `@`                                   |
 | Value | `v=spf1 include:_spf.google.com ~all` |
-| TTL | `3600` |
+| TTL   | `3600`                                |
 
 If you send transactional email via a provider like SendGrid or Postmark, add their `include:` before `~all`:
 
@@ -73,12 +73,12 @@ v=spf1 include:_spf.google.com include:sendgrid.net ~all
 
 ### DMARC
 
-| Field | Value |
-| --- | --- |
-| Type | `TXT` |
-| Host | `_dmarc` |
+| Field | Value                                            |
+| ----- | ------------------------------------------------ |
+| Type  | `TXT`                                            |
+| Host  | `_dmarc`                                         |
 | Value | `v=DMARC1; p=none; rua=mailto:hello@gocoupon.io` |
-| TTL | `3600` |
+| TTL   | `3600`                                           |
 
 After you're confident reports look clean (1–2 weeks), ratchet policy from `p=none` → `p=quarantine` → `p=reject`.
 
@@ -86,8 +86,8 @@ After you're confident reports look clean (1–2 weeks), ratchet policy from `p=
 
 Add the DKIM TXT record your ESP (Google Workspace, SendGrid, Postmark, etc.) provides. Google Workspace's is usually:
 
-| Host | Value |
-| --- | --- |
+| Host                | Value                                                                                     |
+| ------------------- | ----------------------------------------------------------------------------------------- |
 | `google._domainkey` | Long `v=DKIM1; k=rsa; p=...` string from Google Admin → Apps → Gmail → Authenticate email |
 
 ---
@@ -146,11 +146,11 @@ After the deploy goes live, run these:
 
 Expected score impact after finishing all of the above (per the audit):
 
-| Category | Before | After (target) |
-| --- | --- | --- |
-| Overall | B- (57) | A- (82+) |
-| Links | F (0) | C+ (after 3 months of outreach) |
-| Performance | C+ (51) | B+ (75+) |
-| GEO | C+ (51) | B (70+) |
-| On-Page SEO | A+ (88) | A+ (maintained) |
-| Usability | A- (78) | A (82+) |
+| Category    | Before  | After (target)                  |
+| ----------- | ------- | ------------------------------- |
+| Overall     | B- (57) | A- (82+)                        |
+| Links       | F (0)   | C+ (after 3 months of outreach) |
+| Performance | C+ (51) | B+ (75+)                        |
+| GEO         | C+ (51) | B (70+)                         |
+| On-Page SEO | A+ (88) | A+ (maintained)                 |
+| Usability   | A- (78) | A (82+)                         |

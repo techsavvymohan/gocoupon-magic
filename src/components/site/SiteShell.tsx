@@ -5,7 +5,7 @@ import { Footer } from "@/components/site/Footer";
 import { useRevealOnScroll } from "@/hooks/use-reveal";
 
 const MedusaeCursor = lazy(() =>
-  import("@/components/MedusaeCursor").then((m) => ({ default: m.MedusaeCursor }))
+  import("@/components/MedusaeCursor").then((m) => ({ default: m.MedusaeCursor })),
 );
 
 type SiteShellProps = {

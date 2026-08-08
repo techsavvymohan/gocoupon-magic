@@ -86,7 +86,8 @@ export function AmazonAffiliateCards() {
               Curated Amazon India Deals & Stackable Promo Codes
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-              Handpicked top-rated products eligible for goCoupon auto-apply promos and instant bank card discounts.
+              Handpicked top-rated products eligible for goCoupon auto-apply promos and instant bank
+              card discounts.
             </p>
           </div>
           <Link

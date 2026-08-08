@@ -134,7 +134,8 @@ export function AnimatedDealsCarousel() {
             Featured Amazon Products & Stackable Promos
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Auto-sliding right-to-left deal marquee. Hover any card to pause sliding and copy valid promo codes.
+            Auto-sliding right-to-left deal marquee. Hover any card to pause sliding and copy valid
+            promo codes.
           </p>
         </div>
         <Link
@@ -182,11 +183,7 @@ export function AnimatedDealsCarousel() {
                   </div>
 
                   <h3 className="mt-1.5 font-display text-base font-bold leading-snug text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                    <a
-                      href={deal.affiliateUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                    <a href={deal.affiliateUrl} target="_blank" rel="noopener noreferrer">
                       {deal.title}
                     </a>
                   </h3>
