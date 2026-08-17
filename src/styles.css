@@ -40,25 +40,25 @@
 html.light {
   --radius: 0.5rem;
   --background: #f8fafc; /* Porcelain Slate tint */
-  --foreground: #0f172a; /* Crisp Slate 900 */
+  --foreground: #020617; /* Slate 950 - pitch dark crisp text */
   --card: #ffffff; /* Elevated White Cards */
-  --card-foreground: #0f172a;
+  --card-foreground: #020617;
   --popover: #ffffff;
-  --popover-foreground: #0f172a;
+  --popover-foreground: #020617;
   --primary: #4f46e5; /* Cyber Indigo Accent */
   --primary-hover: #4338ca;
   --primary-foreground: #ffffff;
   --secondary: #f1f5f9;
-  --secondary-foreground: #0f172a;
+  --secondary-foreground: #020617;
   --muted: #f1f5f9;
-  --muted-foreground: #475569;
-  --muted-foreground-soft: #64748b;
+  --muted-foreground: #1e293b; /* Slate 800 - dark, clear secondary text */
+  --muted-foreground-soft: #334155; /* Slate 700 - darker soft text */
   --accent: #4f46e5;
   --accent-foreground: #ffffff;
   --destructive: #e11d48;
   --destructive-foreground: #ffffff;
-  --border: rgba(15, 23, 42, 0.09);
-  --input: rgba(15, 23, 42, 0.12);
+  --border: rgba(15, 23, 42, 0.12);
+  --input: rgba(15, 23, 42, 0.15);
   --ring: #4f46e5;
 
   /* Semantic Light Mode Glows & Shadows */
@@ -71,25 +71,25 @@ html.light {
 /* ── DARK MODE — Obsidian Minimal (lime) ── */
 html.dark {
   --background: #080808;
-  --foreground: oklch(0.97 0 0);
+  --foreground: #f8fafc;
   --card: oklch(0.16 0 0);
-  --card-foreground: oklch(0.97 0 0);
+  --card-foreground: #f8fafc;
   --popover: oklch(0.14 0 0);
-  --popover-foreground: oklch(0.97 0 0);
+  --popover-foreground: #f8fafc;
   --primary: #c8ff00;
   --primary-hover: #b8ef00;
   --primary-foreground: #080808;
   --secondary: oklch(0.2 0 0);
-  --secondary-foreground: oklch(0.97 0 0);
+  --secondary-foreground: #f8fafc;
   --muted: oklch(0.18 0 0);
-  --muted-foreground: oklch(0.65 0 0);
-  --muted-foreground-soft: oklch(0.5 0 0);
+  --muted-foreground: #cbd5e1; /* Slate 300 - clear, high contrast text */
+  --muted-foreground-soft: #94a3b8; /* Slate 400 - clear soft text */
   --accent: #c8ff00;
   --accent-foreground: #080808;
   --destructive: oklch(0.6 0.22 25);
-  --destructive-foreground: oklch(0.97 0 0);
-  --border: oklch(1 0 0 / 0.08);
-  --input: oklch(1 0 0 / 0.1);
+  --destructive-foreground: #f8fafc;
+  --border: oklch(1 0 0 / 0.12);
+  --input: oklch(1 0 0 / 0.15);
   --ring: #c8ff00;
 
   --accent-glow: rgba(200, 255, 0, 0.18);

@@ -5,7 +5,7 @@ export function Hero() {
   return (
     <section className="relative overflow-hidden px-6 pb-32 pt-24 md:pt-32">
       <div className="grid-backdrop absolute inset-0" aria-hidden />
-      <div className="relative mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-[1.1fr_1fr]">
+      <div className="relative mx-auto grid max-w-7xl items-start gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-center">
         {/* Left: copy */}
         <div className="reveal">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
@@ -49,7 +49,7 @@ export function Hero() {
         </div>
 
         {/* Right: 3D tilt mockup */}
-        <div className="reveal" style={{ transitionDelay: "0.15s" }}>
+        <div className="reveal relative lg:-top-6" style={{ transitionDelay: "0.15s" }}>
           <ExtensionMockup />
         </div>
       </div>
@@ -70,114 +70,154 @@ function ChromeIcon() {
 function ExtensionMockup() {
   return (
     <TiltCard
-      className="mx-auto w-full max-w-md"
-      innerClassName="relative rounded-2xl border border-border bg-card p-6 shadow-[0_30px_80px_-20px_rgba(15,23,42,0.18),var(--shadow-accent)]"
+      className="mx-auto w-full max-w-[360px]"
+      innerClassName="relative rounded-2xl border border-foreground/15 bg-card/95 p-5 shadow-[0_25px_70px_-15px_rgba(0,0,0,0.35),var(--shadow-accent)] ring-1 ring-black/10 dark:ring-white/15 backdrop-blur-2xl transition-all duration-300"
     >
-      {/* Background glow layer */}
+      {/* Background radial glow layer */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-10 -z-10 opacity-60 blur-3xl"
+        className="pointer-events-none absolute -inset-10 -z-10 opacity-70 blur-3xl"
         style={{
-          background: "radial-gradient(circle at 30% 20%, var(--accent-glow), transparent 60%)",
+          background:
+            "radial-gradient(circle at 40% 30%, var(--accent-glow-strong), transparent 65%)",
           transform: "translateZ(0px)",
         }}
       />
 
-      {/* Browser chrome */}
+      {/* Browser chrome header */}
       <div
-        className="layer flex items-center gap-1.5 pb-4"
-        style={{ transform: "translateZ(20px)" }}
+        className="layer flex items-center justify-between border-b border-border/60 pb-3"
+        style={{ transform: "translateZ(30px)" }}
       >
-        <span className="h-2.5 w-2.5 rounded-full bg-muted" />
-        <span className="h-2.5 w-2.5 rounded-full bg-muted" />
-        <span className="h-2.5 w-2.5 rounded-full bg-muted" />
-        <div className="ml-3 flex-1 truncate rounded-md bg-secondary px-3 py-1 font-mono text-[10px] text-muted-foreground">
-          flipkart.com / checkout
+        <div className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f56] shadow-xs" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#ffbd2e] shadow-xs" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#27c93f] shadow-xs" />
+        </div>
+        <div className="flex flex-1 items-center justify-center px-3">
+          <div className="flex items-center gap-1.5 rounded-full border border-border/80 bg-secondary/80 px-3 py-1 font-mono text-[10px] font-medium text-foreground shadow-inner">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-muted-foreground opacity-60">https://</span>
+            <span className="font-semibold text-foreground">amazon.in</span>
+            <span className="text-muted-foreground">/ checkout</span>
+          </div>
         </div>
       </div>
 
-      {/* Card body */}
+      {/* Extension popup card body */}
       <div
-        className="layer rounded-xl border border-border bg-background/60 p-5"
-        style={{ transform: "translateZ(20px)" }}
+        className="layer mt-3 rounded-xl border border-border/80 bg-background/90 p-4 shadow-xl ring-1 ring-black/5 dark:ring-white/5"
+        style={{ transform: "translateZ(45px)" }}
       >
+        {/* Header inside popup */}
         <div
-          className="layer flex items-center justify-between"
-          style={{ transform: "translateZ(40px)" }}
+          className="layer flex items-center justify-between border-b border-border/50 pb-3"
+          style={{ transform: "translateZ(60px)" }}
         >
           <div className="flex items-center gap-2.5">
-            <span
-              className="grid h-8 w-8 place-items-center rounded-md font-display text-xs font-bold"
+            <div
+              className="grid h-8 w-8 place-items-center rounded-lg font-display text-xs font-bold shadow-md shadow-primary/25"
               style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
               aria-hidden
             >
               gC
-            </span>
+            </div>
             <div>
-              <div className="text-sm font-semibold text-foreground">goCoupon</div>
-              <div className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                Scanning codes…
+              <div className="text-xs font-bold text-foreground tracking-tight">goCoupon Pro</div>
+              <div className="flex items-center gap-1 font-mono text-[9px] font-semibold text-emerald-600 dark:text-emerald-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
+                Scanning 14 coupons…
               </div>
             </div>
           </div>
-          <span className="relative flex h-2.5 w-2.5">
-            <span
-              className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-60"
-              style={{ background: "var(--primary)" }}
-            />
-            <span
-              className="relative inline-flex h-2.5 w-2.5 rounded-full"
-              style={{ background: "var(--primary)" }}
-            />
+          <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 font-mono text-[9px] font-bold text-primary">
+            LIVE ⚡
           </span>
         </div>
 
+        {/* Tested Coupon list with 3D Pop */}
         <ul
-          className="layer mt-5 space-y-2 font-mono text-[11px]"
-          style={{ transform: "translateZ(40px)" }}
+          className="layer mt-3 space-y-2 font-mono text-[11px]"
+          style={{ transform: "translateZ(70px)" }}
         >
           {[
-            { code: "FLIP200", status: "tested · invalid" },
-            { code: "WELCOME10", status: "tested · –₹120" },
-            { code: "BIGSAVE25", status: "best · –₹486", best: true },
-            { code: "BANK50", status: "tested · –₹250" },
-          ].map((c) => (
-            <li
-              key={c.code}
-              className="flex items-center justify-between rounded-md border border-border/60 bg-secondary/60 px-3 py-2"
-              style={c.best ? { borderColor: "var(--primary)" } : undefined}
-            >
-              <span className="text-foreground">{c.code}</span>
-              <span style={{ color: c.best ? "var(--primary)" : "var(--muted-foreground)" }}>
-                {c.status}
-              </span>
-            </li>
-          ))}
+            { code: "AMZ200", status: "tested · invalid", isInvalid: true },
+            { code: "WELCOME10", status: "tested · –₹120", isSave: true },
+            { code: "BIGSAVE25", status: "BEST DEAL · –₹486", best: true },
+            { code: "BANK50", status: "tested · –₹250", isSave: true },
+          ].map((c) => {
+            if (c.best) {
+              return (
+                <li
+                  key={c.code}
+                  className="relative flex items-center justify-between rounded-lg border-2 border-primary bg-card px-3 py-2 shadow-lg ring-2 ring-primary/20 transition-all"
+                  style={{ transform: "translateZ(85px)" }}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span className="rounded-md bg-primary/15 px-1.5 py-0.5 font-mono font-bold text-primary text-[11px]">
+                      {c.code}
+                    </span>
+                    <span className="rounded-full bg-amber-400/20 px-1.5 py-0.5 text-[9px] font-bold text-amber-600 dark:text-amber-300 border border-amber-400/30">
+                      ★ BEST
+                    </span>
+                  </div>
+                  <span className="font-bold text-primary text-xs tracking-tight">
+                    –₹486 SAVED
+                  </span>
+                </li>
+              );
+            }
+
+            return (
+              <li
+                key={c.code}
+                className="flex items-center justify-between rounded-lg border border-border/70 bg-secondary/50 px-2.5 py-1.5 text-[10px] transition-colors"
+              >
+                <span className="font-semibold text-foreground/90">{c.code}</span>
+                <span
+                  className={
+                    c.isInvalid
+                      ? "text-rose-500 font-medium"
+                      : "text-emerald-600 dark:text-emerald-400 font-medium"
+                  }
+                >
+                  {c.status}
+                </span>
+              </li>
+            );
+          })}
         </ul>
 
+        {/* Savings Footer */}
         <div
-          className="layer mt-5 flex items-center justify-between border-t border-border pt-4"
-          style={{ transform: "translateZ(40px)" }}
+          className="layer mt-3.5 flex items-center justify-between rounded-lg border border-border/60 bg-card px-3 py-2.5 shadow-sm"
+          style={{ transform: "translateZ(75px)" }}
         >
-          <span className="text-xs text-muted-foreground">You saved</span>
-          <span className="font-display text-2xl font-bold" style={{ color: "var(--primary)" }}>
+          <div>
+            <span className="block text-[10px] font-medium text-muted-foreground">
+              Total Discount Applied
+            </span>
+            <span className="font-mono text-[9px] font-bold text-emerald-600 dark:text-emerald-400">
+              ✓ Lowest price unlocked
+            </span>
+          </div>
+          <span className="font-display text-2xl font-extrabold tracking-tight text-primary drop-shadow-sm">
             ₹486
           </span>
         </div>
       </div>
 
-      {/* Floating badge */}
+      {/* Floating 3D Badge */}
       <div
-        className="layer absolute -right-4 -top-4 rounded-full border px-3 py-1.5 text-[11px] font-semibold shadow-2xl"
+        className="layer absolute -right-2.5 -top-2.5 flex items-center gap-1 rounded-full border border-white/40 dark:border-white/20 px-3 py-1.5 text-[10px] font-bold text-primary-foreground shadow-xl transition-transform hover:scale-105"
         style={{
-          transform: "translateZ(80px)",
-          background: "var(--primary)",
-          color: "var(--primary-foreground)",
-          borderColor: "var(--accent-glow-strong)",
-          boxShadow: "var(--shadow-accent)",
+          transform: "translateZ(110px)",
+          background: "linear-gradient(135deg, var(--primary), var(--primary-hover))",
+          boxShadow: "0 8px 24px rgba(79,70,229,0.45)",
         }}
       >
-        ✦ Auto-applied
+        <span className="h-1.5 w-1.5 rounded-full bg-white animate-ping" />
+        ✦ Auto-applied in 0.4s
       </div>
     </TiltCard>
   );

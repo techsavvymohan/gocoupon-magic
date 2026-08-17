@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SeoLandingPage } from "@/components/site/SeoLandingPage";
 import { AmazonAffiliateCards } from "@/components/site/AmazonAffiliateCards";
 import { AnimatedDealsCarousel } from "@/components/site/AnimatedDealsCarousel";
+import { AffiliateDisclosure } from "@/components/affiliate/AffiliateDisclosure";
 import { breadcrumbSchema, createSeoHead, faqSchema } from "@/lib/seo";
+
 
 const faqs = [
   {
@@ -69,6 +71,9 @@ function AmazonCouponsPage() {
       >
         <AnimatedDealsCarousel />
         <AmazonAffiliateCards />
+        <div className="mx-auto max-w-7xl px-6 pb-4">
+          <AffiliateDisclosure providers={["amazon"]} />
+        </div>
       </SeoLandingPage>
     </>
   );

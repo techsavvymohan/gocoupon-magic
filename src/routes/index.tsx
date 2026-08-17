@@ -11,6 +11,7 @@ import { Testimonials } from "@/components/site/Testimonials";
 import { Pricing } from "@/components/site/Pricing";
 import { FAQ } from "@/components/site/FAQ";
 import { Blog } from "@/components/site/Blog";
+import { ContactForm } from "@/components/site/ContactForm";
 import { CTA } from "@/components/site/CTA";
 import { About } from "@/components/site/About";
 import { couponFaqs } from "@/data/faqs";
@@ -55,6 +56,7 @@ function Index() {
       <Pricing />
       <FAQ />
       <Blog />
+      <ContactForm />
       <CTA />
     </SiteShell>
   );

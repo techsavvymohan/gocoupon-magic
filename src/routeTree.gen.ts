@@ -10,23 +10,40 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AmazonCouponsRouteImport } from './routes/amazon-coupons'
 import { Route as CashbackRewardsRouteImport } from './routes/cashback-rewards'
+import { Route as CategoriesRouteImport } from './routes/categories'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DealsRouteImport } from './routes/deals'
+import { Route as DisclosureRouteImport } from './routes/disclosure'
 import { Route as ExtensionRouteImport } from './routes/extension'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as FlipkartCouponsRouteImport } from './routes/flipkart-coupons'
+import { Route as HelpRouteImport } from './routes/help'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as MeeshoCouponsRouteImport } from './routes/meesho-coupons'
 import { Route as MyntraCouponsRouteImport } from './routes/myntra-coupons'
 import { Route as PressRouteImport } from './routes/press'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as SecurityRouteImport } from './routes/security'
+import { Route as SitemapRouteImport } from './routes/sitemap'
+import { Route as StoresRouteImport } from './routes/stores'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as UninstallRouteImport } from './routes/uninstall'
+import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AmazonCouponsRoute = AmazonCouponsRouteImport.update({
@@ -37,6 +54,26 @@ const AmazonCouponsRoute = AmazonCouponsRouteImport.update({
 const CashbackRewardsRoute = CashbackRewardsRouteImport.update({
   id: '/cashback-rewards',
   path: '/cashback-rewards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriesRoute = CategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsRoute = DealsRouteImport.update({
+  id: '/deals',
+  path: '/deals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DisclosureRoute = DisclosureRouteImport.update({
+  id: '/disclosure',
+  path: '/disclosure',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExtensionRoute = ExtensionRouteImport.update({
@@ -52,6 +89,11 @@ const FaqRoute = FaqRouteImport.update({
 const FlipkartCouponsRoute = FlipkartCouponsRouteImport.update({
   id: '/flipkart-coupons',
   path: '/flipkart-coupons',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HowItWorksRoute = HowItWorksRouteImport.update({
@@ -84,6 +126,36 @@ const ResourcesRoute = ResourcesRouteImport.update({
   path: '/resources',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SecurityRoute = SecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapRoute = SitemapRouteImport.update({
+  id: '/sitemap',
+  path: '/sitemap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StoresRoute = StoresRouteImport.update({
+  id: '/stores',
+  path: '/stores',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UninstallRoute = UninstallRouteImport.update({
+  id: '/uninstall',
+  path: '/uninstall',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WelcomeRoute = WelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
@@ -97,50 +169,86 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/amazon-coupons': typeof AmazonCouponsRoute
   '/cashback-rewards': typeof CashbackRewardsRoute
+  '/categories': typeof CategoriesRoute
+  '/contact': typeof ContactRoute
+  '/deals': typeof DealsRoute
+  '/disclosure': typeof DisclosureRoute
   '/extension': typeof ExtensionRoute
   '/faq': typeof FaqRoute
   '/flipkart-coupons': typeof FlipkartCouponsRoute
+  '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
   '/meesho-coupons': typeof MeeshoCouponsRoute
   '/myntra-coupons': typeof MyntraCouponsRoute
   '/press': typeof PressRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
+  '/security': typeof SecurityRoute
+  '/sitemap': typeof SitemapRoute
+  '/stores': typeof StoresRoute
+  '/terms': typeof TermsRoute
+  '/uninstall': typeof UninstallRoute
+  '/welcome': typeof WelcomeRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/': typeof BlogIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/amazon-coupons': typeof AmazonCouponsRoute
   '/cashback-rewards': typeof CashbackRewardsRoute
+  '/categories': typeof CategoriesRoute
+  '/contact': typeof ContactRoute
+  '/deals': typeof DealsRoute
+  '/disclosure': typeof DisclosureRoute
   '/extension': typeof ExtensionRoute
   '/faq': typeof FaqRoute
   '/flipkart-coupons': typeof FlipkartCouponsRoute
+  '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
   '/meesho-coupons': typeof MeeshoCouponsRoute
   '/myntra-coupons': typeof MyntraCouponsRoute
   '/press': typeof PressRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
+  '/security': typeof SecurityRoute
+  '/sitemap': typeof SitemapRoute
+  '/stores': typeof StoresRoute
+  '/terms': typeof TermsRoute
+  '/uninstall': typeof UninstallRoute
+  '/welcome': typeof WelcomeRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog': typeof BlogIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/amazon-coupons': typeof AmazonCouponsRoute
   '/cashback-rewards': typeof CashbackRewardsRoute
+  '/categories': typeof CategoriesRoute
+  '/contact': typeof ContactRoute
+  '/deals': typeof DealsRoute
+  '/disclosure': typeof DisclosureRoute
   '/extension': typeof ExtensionRoute
   '/faq': typeof FaqRoute
   '/flipkart-coupons': typeof FlipkartCouponsRoute
+  '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
   '/meesho-coupons': typeof MeeshoCouponsRoute
   '/myntra-coupons': typeof MyntraCouponsRoute
   '/press': typeof PressRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
+  '/security': typeof SecurityRoute
+  '/sitemap': typeof SitemapRoute
+  '/stores': typeof StoresRoute
+  '/terms': typeof TermsRoute
+  '/uninstall': typeof UninstallRoute
+  '/welcome': typeof WelcomeRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/': typeof BlogIndexRoute
 }
@@ -148,66 +256,114 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/amazon-coupons'
     | '/cashback-rewards'
+    | '/categories'
+    | '/contact'
+    | '/deals'
+    | '/disclosure'
     | '/extension'
     | '/faq'
     | '/flipkart-coupons'
+    | '/help'
     | '/how-it-works'
     | '/meesho-coupons'
     | '/myntra-coupons'
     | '/press'
     | '/privacy'
     | '/resources'
+    | '/security'
+    | '/sitemap'
+    | '/stores'
+    | '/terms'
+    | '/uninstall'
+    | '/welcome'
     | '/blog/$slug'
     | '/blog/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/amazon-coupons'
     | '/cashback-rewards'
+    | '/categories'
+    | '/contact'
+    | '/deals'
+    | '/disclosure'
     | '/extension'
     | '/faq'
     | '/flipkart-coupons'
+    | '/help'
     | '/how-it-works'
     | '/meesho-coupons'
     | '/myntra-coupons'
     | '/press'
     | '/privacy'
     | '/resources'
+    | '/security'
+    | '/sitemap'
+    | '/stores'
+    | '/terms'
+    | '/uninstall'
+    | '/welcome'
     | '/blog/$slug'
     | '/blog'
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/amazon-coupons'
     | '/cashback-rewards'
+    | '/categories'
+    | '/contact'
+    | '/deals'
+    | '/disclosure'
     | '/extension'
     | '/faq'
     | '/flipkart-coupons'
+    | '/help'
     | '/how-it-works'
     | '/meesho-coupons'
     | '/myntra-coupons'
     | '/press'
     | '/privacy'
     | '/resources'
+    | '/security'
+    | '/sitemap'
+    | '/stores'
+    | '/terms'
+    | '/uninstall'
+    | '/welcome'
     | '/blog/$slug'
     | '/blog/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AmazonCouponsRoute: typeof AmazonCouponsRoute
   CashbackRewardsRoute: typeof CashbackRewardsRoute
+  CategoriesRoute: typeof CategoriesRoute
+  ContactRoute: typeof ContactRoute
+  DealsRoute: typeof DealsRoute
+  DisclosureRoute: typeof DisclosureRoute
   ExtensionRoute: typeof ExtensionRoute
   FaqRoute: typeof FaqRoute
   FlipkartCouponsRoute: typeof FlipkartCouponsRoute
+  HelpRoute: typeof HelpRoute
   HowItWorksRoute: typeof HowItWorksRoute
   MeeshoCouponsRoute: typeof MeeshoCouponsRoute
   MyntraCouponsRoute: typeof MyntraCouponsRoute
   PressRoute: typeof PressRoute
   PrivacyRoute: typeof PrivacyRoute
   ResourcesRoute: typeof ResourcesRoute
+  SecurityRoute: typeof SecurityRoute
+  SitemapRoute: typeof SitemapRoute
+  StoresRoute: typeof StoresRoute
+  TermsRoute: typeof TermsRoute
+  UninstallRoute: typeof UninstallRoute
+  WelcomeRoute: typeof WelcomeRoute
   BlogSlugRoute: typeof BlogSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
 }
@@ -219,6 +375,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/amazon-coupons': {
@@ -233,6 +396,34 @@ declare module '@tanstack/react-router' {
       path: '/cashback-rewards'
       fullPath: '/cashback-rewards'
       preLoaderRoute: typeof CashbackRewardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categories': {
+      id: '/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof CategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals': {
+      id: '/deals'
+      path: '/deals'
+      fullPath: '/deals'
+      preLoaderRoute: typeof DealsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/disclosure': {
+      id: '/disclosure'
+      path: '/disclosure'
+      fullPath: '/disclosure'
+      preLoaderRoute: typeof DisclosureRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/extension': {
@@ -254,6 +445,13 @@ declare module '@tanstack/react-router' {
       path: '/flipkart-coupons'
       fullPath: '/flipkart-coupons'
       preLoaderRoute: typeof FlipkartCouponsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/how-it-works': {
@@ -298,6 +496,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/security': {
+      id: '/security'
+      path: '/security'
+      fullPath: '/security'
+      preLoaderRoute: typeof SecurityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap': {
+      id: '/sitemap'
+      path: '/sitemap'
+      fullPath: '/sitemap'
+      preLoaderRoute: typeof SitemapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stores': {
+      id: '/stores'
+      path: '/stores'
+      fullPath: '/stores'
+      preLoaderRoute: typeof StoresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/uninstall': {
+      id: '/uninstall'
+      path: '/uninstall'
+      fullPath: '/uninstall'
+      preLoaderRoute: typeof UninstallRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/welcome': {
+      id: '/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/': {
       id: '/blog/'
       path: '/blog'
@@ -317,17 +557,29 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AmazonCouponsRoute: AmazonCouponsRoute,
   CashbackRewardsRoute: CashbackRewardsRoute,
+  CategoriesRoute: CategoriesRoute,
+  ContactRoute: ContactRoute,
+  DealsRoute: DealsRoute,
+  DisclosureRoute: DisclosureRoute,
   ExtensionRoute: ExtensionRoute,
   FaqRoute: FaqRoute,
   FlipkartCouponsRoute: FlipkartCouponsRoute,
+  HelpRoute: HelpRoute,
   HowItWorksRoute: HowItWorksRoute,
   MeeshoCouponsRoute: MeeshoCouponsRoute,
   MyntraCouponsRoute: MyntraCouponsRoute,
   PressRoute: PressRoute,
   PrivacyRoute: PrivacyRoute,
   ResourcesRoute: ResourcesRoute,
+  SecurityRoute: SecurityRoute,
+  SitemapRoute: SitemapRoute,
+  StoresRoute: StoresRoute,
+  TermsRoute: TermsRoute,
+  UninstallRoute: UninstallRoute,
+  WelcomeRoute: WelcomeRoute,
   BlogSlugRoute: BlogSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
 }

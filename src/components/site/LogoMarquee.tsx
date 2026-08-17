@@ -17,17 +17,17 @@ export function LogoMarquee() {
           Works on the stores you actually shop at
         </p>
       </div>
-      <div className="relative flex overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]">
-        <ul className="marquee-track flex shrink-0 items-center gap-16 pr-16">
+      <div className="relative flex overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+        <ul className="marquee-track flex shrink-0 items-center gap-8 pr-8">
           {[...stores, ...stores].map((s, i) => (
             <li
               key={`${s.name}-${i}`}
-              className="flex items-center transition-opacity hover:opacity-100 opacity-60"
+              className="flex h-12 min-w-[130px] shrink-0 items-center justify-center rounded-xl border border-border/80 bg-white px-5 py-2 shadow-sm transition-all duration-200 hover:scale-105"
             >
               <img
                 src={s.src}
                 alt={`${s.name} — supported by goCoupon`}
-                className="h-8 w-auto max-w-[120px] object-contain"
+                className="h-7 w-auto max-w-[110px] object-contain opacity-100"
                 draggable={false}
                 loading="lazy"
                 decoding="async"

@@ -4,29 +4,45 @@ const cols = [
   {
     title: "Product",
     links: [
-      { label: "How it works", to: "/how-it-works" },
-      { label: "Chrome extension", to: "/extension" },
-      { label: "Cashback rewards", to: "/cashback-rewards" },
+      { label: "How It Works", to: "/how-it-works" },
+      { label: "Chrome Extension", to: "/extension" },
+      { label: "Cashback Rewards", to: "/cashback-rewards" },
+      { label: "Trending Deals", href: "https://deals.gocoupon.io", isExternal: true },
+      { label: "Welcome Guide", to: "/welcome" },
       { label: "FAQ", to: "/faq" },
     ],
   },
   {
-    title: "Stores",
+    title: "Stores & Categories",
     links: [
-      { label: "Flipkart coupons", to: "/flipkart-coupons" },
-      { label: "Amazon coupons", to: "/amazon-coupons" },
-      { label: "Myntra coupons", to: "/myntra-coupons" },
-      { label: "Meesho coupons", to: "/meesho-coupons" },
+      { label: "Flipkart Coupons", to: "/flipkart-coupons" },
+      { label: "Amazon Coupons", to: "/amazon-coupons" },
+      { label: "Myntra Coupons", to: "/myntra-coupons" },
+      { label: "Meesho Coupons", to: "/meesho-coupons" },
+      { label: "All Stores Directory", to: "/stores" },
+      { label: "Browse Categories", to: "/categories" },
     ],
   },
   {
-    title: "Company",
+    title: "Company & Support",
     links: [
+      { label: "About Us", to: "/about" },
       { label: "Blog", to: "/blog" },
-      { label: "Resources", to: "/resources" },
-      { label: "Press", to: "/press" },
+      { label: "Free Resources", to: "/resources" },
+      { label: "Press Kit", to: "/press" },
+      { label: "Help Center", to: "/help" },
+      { label: "Contact Us", to: "/contact" },
+      { label: "HTML Sitemap", to: "/sitemap" },
+    ],
+  },
+  {
+    title: "Legal & Trust",
+    links: [
       { label: "Privacy Policy", to: "/privacy" },
-      { label: "Home", to: "/" },
+      { label: "Terms of Service", to: "/terms" },
+      { label: "Affiliate Disclosure", to: "/disclosure" },
+      { label: "Security & Trust Center", to: "/security" },
+      { label: "Uninstall Survey", to: "/uninstall" },
     ],
   },
 ];
@@ -54,8 +70,8 @@ const socials = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-border px-6 py-16">
-      <div className="mx-auto grid max-w-7xl gap-12 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+    <footer className="border-t border-border px-6 py-16 bg-card/40">
+      <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1.3fr_repeat(4,1fr)]">
         <div>
           <Link to="/" className="flex items-center gap-2.5" aria-label="goCoupon — home">
             <span className="inline-flex items-center rounded-lg px-2 py-1 transition-colors">
@@ -79,9 +95,13 @@ export function Footer() {
               />
             </span>
           </Link>
-          <p className="mt-4 max-w-xs text-sm text-muted-foreground">
-            The Chrome extension that finds and applies the best coupon code for you, automatically.
+          <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
+            The free Chrome extension that automatically finds and applies the best working coupon code at checkout on Indian e-commerce stores.
           </p>
+
+          <div className="mt-4 text-xs text-muted-foreground">
+            Headquartered in Bengaluru, Karnataka, India 🇮🇳
+          </div>
 
           <ul className="mt-6 flex items-center gap-3" aria-label="goCoupon on social media">
             {socials.map(({ href, label, name, icon: Icon }) => (
@@ -92,7 +112,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   aria-label={label}
                   title={name}
-                  className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:border-primary/40 hover:text-primary"
                 >
                   <Icon />
                 </a>
@@ -100,6 +120,7 @@ export function Footer() {
             ))}
           </ul>
         </div>
+
         {cols.map((c) => (
           <div key={c.title}>
             <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
@@ -108,22 +129,36 @@ export function Footer() {
             <ul className="space-y-2.5">
               {c.links.map((l) => (
                 <li key={l.label}>
-                  <Link
-                    to={l.to}
-                    className="inline-flex min-h-11 items-center text-sm text-foreground/80 transition-colors hover:text-foreground"
-                  >
-                    {l.label}
-                  </Link>
+                  {l.isExternal && l.href ? (
+                    <a
+                      href={l.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-h-7 items-center text-sm text-foreground/80 transition-colors hover:text-primary"
+                    >
+                      {l.label}
+                    </a>
+                  ) : (
+                    <Link
+                      to={l.to!}
+                      className="inline-flex min-h-7 items-center text-sm text-foreground/80 transition-colors hover:text-primary"
+                    >
+                      {l.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
           </div>
         ))}
       </div>
+
       <div className="mx-auto mt-16 flex max-w-7xl flex-wrap items-center justify-between gap-4 border-t border-border pt-8">
-        <p className="font-mono text-xs text-muted-foreground">© 2026 goCoupon. Made in India 🇮🇳</p>
-        <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-          © 2026 goCoupon. All rights reserved.
+        <p className="font-mono text-xs text-muted-foreground">
+          © 2026 goCoupon.io • All rights reserved. Made in India 🇮🇳
+        </p>
+        <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-muted-foreground">
+          Manifest V3 Verified • 100% Free
         </p>
       </div>
     </footer>
@@ -133,8 +168,8 @@ export function Footer() {
 function FacebookIcon() {
   return (
     <svg
-      width="18"
-      height="18"
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
       fill="currentColor"
       aria-hidden="true"
@@ -148,8 +183,8 @@ function FacebookIcon() {
 function TwitterIcon() {
   return (
     <svg
-      width="18"
-      height="18"
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
       fill="currentColor"
       aria-hidden="true"
@@ -163,8 +198,8 @@ function TwitterIcon() {
 function InstagramIcon() {
   return (
     <svg
-      width="18"
-      height="18"
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

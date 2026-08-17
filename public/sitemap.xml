@@ -12,9 +12,29 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://gocoupon.io/" />
   </url>
   <url>
+    <loc>https://gocoupon.io/deals</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://gocoupon.io/stores</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://gocoupon.io/categories</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>https://gocoupon.io/blog</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://gocoupon.io/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gocoupon.io/resources</loc>
@@ -53,7 +73,17 @@
   <url>
     <loc>https://gocoupon.io/how-it-works</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://gocoupon.io/extension</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://gocoupon.io/welcome</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://gocoupon.io/cashback-rewards</loc>
@@ -61,17 +91,54 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://gocoupon.io/extension</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://gocoupon.io/faq</loc>
     <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://gocoupon.io/help</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://gocoupon.io/contact</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://gocoupon.io/sitemap</loc>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
 
-  <!-- Blog posts (existing) -->
+  <!-- Trust & Legal pages -->
+  <url>
+    <loc>https://gocoupon.io/privacy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://gocoupon.io/terms</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://gocoupon.io/disclosure</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://gocoupon.io/security</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://gocoupon.io/uninstall</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- Blog posts -->
   <url><loc>https://gocoupon.io/blog/stack-coupons-bank-offers-flipkart</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://gocoupon.io/blog/amazon-india-lightning-deals</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://gocoupon.io/blog/gocoupon-2-4-faster-checkout</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
@@ -82,8 +149,6 @@
   <url><loc>https://gocoupon.io/blog/republic-day-sale-coupons-2026</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://gocoupon.io/blog/diwali-coupons-2026-stack-guide</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://gocoupon.io/blog/best-coupon-extensions-chrome-2026</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-
-  <!-- Blog posts (new, SEO target articles) -->
   <url><loc>https://gocoupon.io/blog/best-coupon-codes-for-flipkart-2026</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
   <url><loc>https://gocoupon.io/blog/how-to-save-money-on-amazon-india</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
   <url><loc>https://gocoupon.io/blog/myntra-coupon-codes-that-actually-work</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>

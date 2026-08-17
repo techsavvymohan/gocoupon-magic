@@ -32,60 +32,97 @@ const tiers = [
 
 export function Pricing() {
   return (
-    <section id="pricing" className="relative px-6 py-32">
+    <section id="pricing" className="relative px-6 py-28 overflow-hidden">
       <div className="mx-auto max-w-5xl">
-        <div className="reveal mb-16 text-center">
-          <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+        {/* Header */}
+        <div className="mb-14 text-center">
+          <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
             Pricing
           </p>
           <h2 className="font-display text-4xl font-bold leading-tight text-foreground md:text-5xl">
             Free forever. Pro if you want more.
           </h2>
         </div>
-        <div className="grid gap-6 md:grid-cols-2">
-          {tiers.map((t, i) => (
+
+        {/* Pricing Cards Grid */}
+        <div className="grid gap-8 md:grid-cols-2 items-stretch">
+          {tiers.map((t) => (
             <div
               key={t.name}
-              className="reveal relative rounded-2xl border bg-card/40 p-8"
-              style={{
-                transitionDelay: `${i * 0.1}s`,
-                borderColor: t.highlighted ? "var(--primary)" : "var(--border)",
-                background: t.highlighted ? "var(--accent-tint)" : undefined,
-              }}
+              className={`relative flex flex-col justify-between rounded-3xl p-8 transition-colors duration-200 ${
+                t.highlighted
+                  ? "border-2 border-primary bg-card shadow-lg ring-2 ring-primary/20"
+                  : "border border-border bg-card shadow-sm hover:border-border/80"
+              }`}
             >
+              {/* Pro Badge */}
               {t.highlighted && (
                 <div
-                  className="absolute -top-3 right-6 rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-wider"
+                  className="absolute -top-3.5 right-6 flex items-center gap-1.5 rounded-full px-3.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wider shadow-sm"
                   style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
                 >
                   Most popular
                 </div>
               )}
-              <div className="font-display text-xl font-bold text-foreground">{t.name}</div>
-              <div className="mt-2 text-sm text-muted-foreground">{t.blurb}</div>
-              <div className="mt-6 flex items-baseline gap-1">
-                <span className="font-display text-5xl font-bold text-foreground">{t.price}</span>
-                <span className="text-sm text-muted-foreground">{t.period}</span>
+
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="font-display text-2xl font-bold text-foreground">
+                    {t.name}
+                  </span>
+                  {t.highlighted && (
+                    <span className="rounded-full border border-primary/40 bg-primary/10 px-2.5 py-0.5 font-mono text-[10px] font-bold text-primary">
+                      PRO ⚡
+                    </span>
+                  )}
+                </div>
+
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground min-h-[40px]">
+                  {t.blurb}
+                </p>
+
+                {/* Price Display */}
+                <div className="mt-6 flex items-baseline gap-1.5">
+                  <span className="font-display text-5xl font-extrabold tracking-tight text-foreground">
+                    {t.price}
+                  </span>
+                  <span className="text-sm font-semibold text-muted-foreground">
+                    {t.period}
+                  </span>
+                </div>
+
+                {/* Feature List */}
+                <ul className="mt-8 space-y-3.5 text-sm">
+                  {t.features.map((f) => (
+                    <li
+                      key={f}
+                      className="flex items-center gap-3 text-foreground font-medium"
+                    >
+                      <span
+                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-bold"
+                        style={{ color: "var(--primary)" }}
+                      >
+                        ✓
+                      </span>
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="mt-8 space-y-3 text-sm">
-                {t.features.map((f) => (
-                  <li key={f} className="flex items-start gap-3 text-foreground/90">
-                    <span style={{ color: "var(--primary)" }}>✓</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                type="button"
-                className="mt-8 w-full rounded-full px-5 py-3 text-sm font-semibold transition-colors"
-                style={
-                  t.highlighted
-                    ? { background: "var(--primary)", color: "var(--primary-foreground)" }
-                    : { background: "var(--secondary)", color: "var(--secondary-foreground)" }
-                }
-              >
-                {t.cta}
-              </button>
+
+              {/* Action CTA Button */}
+              <div className="mt-10">
+                <button
+                  type="button"
+                  className={`w-full rounded-full py-3.5 text-sm font-bold transition-colors duration-200 ${
+                    t.highlighted
+                      ? "bg-primary text-primary-foreground hover:opacity-90"
+                      : "bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground"
+                  }`}
+                >
+                  {t.cta}
+                </button>
+              </div>
             </div>
           ))}
         </div>
