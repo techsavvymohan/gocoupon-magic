@@ -192,8 +192,8 @@ function SecurityPage() {
             </h3>
             <p className="mt-2 text-xs text-muted-foreground">
               Security researchers: If you discover a potential vulnerability in goCoupon, please report it responsibly to{" "}
-              <a href="mailto:security@gocoupon.io" className="text-primary font-medium hover:underline">
-                security@gocoupon.io
+              <a href="mailto:support@gocoupon.io" className="text-primary font-medium hover:underline">
+                support@gocoupon.io
               </a>
               . We review and respond to reports within 24 hours.
             </p>

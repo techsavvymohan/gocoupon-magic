@@ -4,7 +4,7 @@ import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import { ShieldCheck, FileText, Scale, AlertCircle, HelpCircle, CheckCircle2 } from "lucide-react";
 
 const LAST_UPDATED = "April 30, 2026";
-const CONTACT_EMAIL = "legal@gocoupon.io";
+const CONTACT_EMAIL = "support@gocoupon.io";
 
 export const Route = createFileRoute("/terms")({
   component: TermsPage,

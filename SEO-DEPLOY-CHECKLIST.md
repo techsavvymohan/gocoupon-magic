@@ -77,7 +77,7 @@ v=spf1 include:_spf.google.com include:sendgrid.net ~all
 | ----- | ------------------------------------------------ |
 | Type  | `TXT`                                            |
 | Host  | `_dmarc`                                         |
-| Value | `v=DMARC1; p=none; rua=mailto:hello@gocoupon.io` |
+| Value | `v=DMARC1; p=none; rua=mailto:support@gocoupon.io` |
 | TTL   | `3600`                                           |
 
 After you're confident reports look clean (1–2 weeks), ratchet policy from `p=none` → `p=quarantine` → `p=reject`.

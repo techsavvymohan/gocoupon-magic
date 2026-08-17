@@ -69,10 +69,10 @@ function PressPage() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a
-              href="mailto:press@gocoupon.io"
+              href="mailto:support@gocoupon.io"
               className="inline-flex items-center rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-shadow hover:shadow-[var(--shadow-accent)]"
             >
-              Contact press@gocoupon.io
+              Contact support@gocoupon.io
             </a>
             <a
               href="/gc-logo.webp"
@@ -114,10 +114,10 @@ function PressPage() {
             provide quotes, data snapshots, anonymised savings telemetry and engineering interviews.
             Please reach{" "}
             <a
-              href="mailto:press@gocoupon.io"
+              href="mailto:support@gocoupon.io"
               className="text-primary underline-offset-4 hover:underline"
             >
-              press@gocoupon.io
+              support@gocoupon.io
             </a>{" "}
             with your outlet, deadline and the angle you're exploring.
           </p>

@@ -293,10 +293,10 @@ function HelpPage() {
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <a
-                  href="mailto:hello@gocoupon.io"
+                  href="mailto:support@gocoupon.io"
                   className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-2.5 text-sm font-medium text-foreground hover:bg-accent"
                 >
-                  <span>Email: hello@gocoupon.io</span>
+                  <span>Email: support@gocoupon.io</span>
                 </a>
               </div>
             </div>

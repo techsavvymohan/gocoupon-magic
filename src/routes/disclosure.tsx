@@ -163,8 +163,8 @@ function DisclosurePage() {
             <p className="text-base leading-relaxed text-muted-foreground">
               If you have any questions about how our affiliate model operates, or if you represent a merchant
               looking to partner with goCoupon, please contact us at{" "}
-              <a href="mailto:partnerships@gocoupon.io" className="text-primary hover:underline">
-                partnerships@gocoupon.io
+              <a href="mailto:support@gocoupon.io" className="text-primary hover:underline">
+                support@gocoupon.io
               </a>{" "}
               or visit our{" "}
               <Link to="/contact" className="text-primary hover:underline">

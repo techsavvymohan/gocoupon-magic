@@ -85,10 +85,10 @@ export function About() {
             </Link>
             , or contact{" "}
             <a
-              href="mailto:hello@gocoupon.io"
+              href="mailto:support@gocoupon.io"
               className="text-primary underline-offset-4 hover:underline"
             >
-              hello@gocoupon.io
+              support@gocoupon.io
             </a>
             . Journalists: see the{" "}
             <Link to="/press" className="text-primary underline-offset-4 hover:underline">
