@@ -1,26 +1,38 @@
-import { useEffect, useRef, type ReactNode, type CSSProperties } from "react";
+import {
+  useEffect,
+  useRef,
+  type ReactNode,
+  type CSSProperties,
+  type ComponentPropsWithoutRef,
+} from "react";
 
-interface MagneticButtonProps {
+interface BaseMagneticButtonProps {
   children: ReactNode;
   className?: string;
   style?: CSSProperties;
-  onClick?: () => void;
-  as?: "button" | "a";
-  href?: string;
+  onClick?: (e?: any) => void;
 }
+
+type MagneticAsButton = BaseMagneticButtonProps & {
+  as?: "button";
+} & Omit<ComponentPropsWithoutRef<"button">, keyof BaseMagneticButtonProps | "as">;
+
+type MagneticAsAnchor = BaseMagneticButtonProps & {
+  as: "a";
+  href?: string;
+  target?: string;
+  rel?: string;
+  download?: boolean | string;
+} & Omit<ComponentPropsWithoutRef<"a">, keyof BaseMagneticButtonProps | "as">;
+
+export type MagneticButtonProps = MagneticAsButton | MagneticAsAnchor;
 
 /**
  * Magnetic pull within 80px radius, max 12px translate.
  * Spring-like return on mouse leave.
  */
-export function MagneticButton({
-  children,
-  className,
-  style,
-  onClick,
-  as = "button",
-  href,
-}: MagneticButtonProps) {
+export function MagneticButton(props: MagneticButtonProps) {
+  const { children, className, style, onClick, as = "button", ...rest } = props;
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -63,25 +75,29 @@ export function MagneticButton({
   }, []);
 
   if (as === "a") {
+    const anchorProps = rest as ComponentPropsWithoutRef<"a">;
     return (
       <a
         ref={ref as React.RefObject<HTMLAnchorElement>}
-        href={href}
         className={className}
         style={style}
         onClick={onClick}
+        {...anchorProps}
       >
         {children}
       </a>
     );
   }
+
+  const buttonProps = rest as ComponentPropsWithoutRef<"button">;
   return (
     <button
       ref={ref as React.RefObject<HTMLButtonElement>}
       className={className}
       style={style}
       onClick={onClick}
-      type="button"
+      type={buttonProps.type || "button"}
+      {...buttonProps}
     >
       {children}
     </button>
