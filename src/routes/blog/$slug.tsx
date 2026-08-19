@@ -1,7 +1,21 @@
+import { useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { getPostBySlug, posts, type Post, type PostSection } from "@/data/posts";
 import { absoluteUrl, breadcrumbSchema, createSeoHead } from "@/lib/seo";
+import {
+  Copy,
+  Check,
+  Info,
+  ShieldCheck,
+  AlertTriangle,
+  CheckCircle2,
+  Terminal,
+  ArrowLeft,
+  Clock,
+  Calendar,
+  Share2,
+} from "lucide-react";
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: ({ params }) => {
@@ -14,11 +28,11 @@ export const Route = createFileRoute("/blog/$slug")({
     const post = loaderData?.post;
     if (!post) return { meta: [{ title: "Post not found — goCoupon Blog" }] };
     return createSeoHead({
-      title: `${post.title} — goCoupon Blog`,
+      title: `${post.title} — goCoupon Engineering & Deals Blog`,
       description: post.excerpt,
       path: `/blog/${post.slug}`,
       type: "article",
-      keywords: "coupon guide india, cashback tips, promo code strategies, online shopping savings",
+      keywords: "coupon guide, cashback tips, promo code tricks, online shopping savings, amazon discounts",
     });
   },
 });
@@ -26,6 +40,16 @@ export const Route = createFileRoute("/blog/$slug")({
 function PostPage() {
   const { post } = Route.useLoaderData();
   const related = posts.filter((p) => p.slug !== post.slug).slice(0, 3);
+  const [copiedLink, setCopiedLink] = useState(false);
+
+  const handleShare = () => {
+    if (typeof window !== "undefined") {
+      navigator.clipboard.writeText(window.location.href);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    }
+  };
+
   const breadcrumb = breadcrumbSchema([
     { name: "Home", path: "/" },
     { name: "Blog", path: "/blog" },
@@ -53,54 +77,83 @@ function PostPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
+
       <article className="border-b border-border px-6 pb-20 pt-16 sm:pt-24">
         <div className="mx-auto max-w-3xl">
+          {/* Breadcrumb Navigation */}
           <nav
             aria-label="Breadcrumb"
-            className="mb-8 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground"
+            className="mb-8 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground"
           >
-            <Link to="/" className="hover:text-foreground">
-              Home
+            <Link to="/blog" className="inline-flex items-center gap-1 hover:text-foreground transition-colors">
+              <ArrowLeft className="h-3 w-3" />
+              Back to Blog
             </Link>
-            <span className="mx-2">/</span>
-            <Link to="/blog" className="hover:text-foreground">
-              Blog
-            </Link>
+            <span className="opacity-40">/</span>
+            <span className="text-foreground/80 truncate">{post.tag}</span>
           </nav>
 
+          {/* Meta header */}
           <div className="mb-5 flex flex-wrap items-center gap-3 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-            <span className="rounded-full border border-border px-2 py-0.5 text-foreground/80">
+            <span className="rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 font-bold text-primary">
               {post.tag}
             </span>
-            <span>{post.date}</span>
+            <span className="flex items-center gap-1">
+              <Calendar className="h-3 w-3 opacity-60" />
+              {post.date}
+            </span>
             <span>·</span>
-            <span>{post.read}</span>
+            <span className="flex items-center gap-1">
+              <Clock className="h-3 w-3 opacity-60" />
+              {post.read}
+            </span>
           </div>
 
-          <h1 className="font-display text-4xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl">
+          <h1 className="font-display text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl">
             {post.title}
           </h1>
-          <p className="mt-5 text-lg text-muted-foreground">{post.excerpt}</p>
+          <p className="mt-5 text-lg text-muted-foreground leading-relaxed">{post.excerpt}</p>
 
-          <div className="mt-8 flex items-center gap-3 border-t border-border pt-6">
-            <div
-              aria-hidden
-              className="grid h-10 w-10 place-items-center rounded-full font-display text-sm font-bold"
-              style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
-            >
-              gC
-            </div>
-            <div>
-              <div className="text-sm font-medium text-foreground">{post.author}</div>
-              <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                Published {post.date}
+          {/* Author Card & Share Action */}
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6">
+            <div className="flex items-center gap-3">
+              <div
+                aria-hidden
+                className="grid h-10 w-10 place-items-center rounded-xl font-display text-xs font-bold shadow-xs"
+                style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
+              >
+                gC
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-foreground">{post.author}</div>
+                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                  Verified Engineering Post
+                </div>
               </div>
             </div>
+
+            <button
+              onClick={handleShare}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-mono text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors shadow-2xs"
+            >
+              {copiedLink ? (
+                <>
+                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+                  <span className="text-emerald-500 font-semibold">Link Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Share2 className="h-3.5 w-3.5" />
+                  <span>Share Article</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
 
+        {/* Post Body Content */}
         <div className="mx-auto mt-14 max-w-3xl">
-          <div className="prose-gc space-y-6 text-foreground/90">
+          <div className="prose-gc space-y-6 text-foreground/90 leading-relaxed">
             {post.body.map((section: PostSection, i: number) => (
               <Section key={i} section={section} />
             ))}
@@ -108,22 +161,24 @@ function PostPage() {
         </div>
       </article>
 
-      <section className="px-6 py-16">
+      {/* Related Posts Section */}
+      <section className="px-6 py-20 bg-muted/20">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-8 flex items-end justify-between gap-6">
+          <div className="mb-10 flex items-end justify-between gap-6">
             <div>
-              <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                Keep reading
+              <div className="mb-2 font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+                Keep Reading
               </div>
               <h2 className="font-display text-3xl font-bold tracking-tight text-foreground">
-                More from the blog
+                More Engineering &amp; Savings Guides
               </h2>
             </div>
             <Link
               to="/blog"
-              className="text-sm font-medium text-primary transition-opacity hover:opacity-80"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-primary transition-opacity hover:opacity-80"
             >
-              All posts →
+              <span>All Articles</span>
+              <ArrowLeft className="h-4 w-4 rotate-180" />
             </Link>
           </div>
 
@@ -132,25 +187,6 @@ function PostPage() {
               <RelatedCard key={p.slug} post={p} />
             ))}
           </div>
-          <p className="mt-10 text-sm text-muted-foreground">
-            Explore more savings pages:{" "}
-            <Link to="/amazon-coupons" className="text-primary">
-              Amazon coupons
-            </Link>
-            ,{" "}
-            <Link to="/flipkart-coupons" className="text-primary">
-              Flipkart coupons
-            </Link>
-            ,{" "}
-            <Link to="/myntra-coupons" className="text-primary">
-              Myntra coupons
-            </Link>
-            , and{" "}
-            <Link to="/meesho-coupons" className="text-primary">
-              Meesho coupon codes
-            </Link>
-            .
-          </p>
         </div>
       </section>
     </SiteShell>
@@ -161,13 +197,13 @@ function Section({ section }: { section: PostSection }) {
   switch (section.type) {
     case "h2":
       return (
-        <h2 className="mt-10 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+        <h2 className="mt-12 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl border-b border-border/60 pb-3">
           {section.text}
         </h2>
       );
     case "h3":
       return (
-        <h3 className="mt-8 font-display text-xl font-semibold tracking-tight text-foreground">
+        <h3 className="mt-8 font-display text-xl font-bold tracking-tight text-foreground">
           {section.text}
         </h3>
       );
@@ -175,7 +211,7 @@ function Section({ section }: { section: PostSection }) {
       return <p className="text-base leading-7 text-foreground/85">{section.text}</p>;
     case "ul":
       return (
-        <ul className="list-disc space-y-2 pl-6 text-foreground/85 marker:text-primary">
+        <ul className="list-disc space-y-2.5 pl-6 text-foreground/85 marker:text-primary">
           {section.items.map((it, i) => (
             <li key={i} className="leading-7">
               {it}
@@ -185,32 +221,98 @@ function Section({ section }: { section: PostSection }) {
       );
     case "quote":
       return (
-        <blockquote className="border-l-2 border-primary/60 bg-card/60 px-5 py-4 text-foreground/90">
-          <p className="font-display text-lg italic">{section.text}</p>
+        <blockquote className="my-6 border-l-4 border-primary bg-card p-5 text-foreground/90 rounded-r-2xl shadow-2xs">
+          <p className="font-display text-lg italic leading-relaxed text-foreground">{section.text}</p>
           {section.cite && (
-            <cite className="mt-2 block font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground not-italic">
+            <cite className="mt-2.5 block font-mono text-[11px] uppercase tracking-[0.2em] text-primary not-italic">
               — {section.cite}
             </cite>
           )}
         </blockquote>
       );
+    case "callout": {
+      const isWarning = section.variant === "warning";
+      const isSuccess = section.variant === "success";
+
+      const Icon = isWarning ? AlertTriangle : isSuccess ? CheckCircle2 : Info;
+      const borderClass = isWarning
+        ? "border-amber-500/30 bg-amber-500/5 text-foreground"
+        : isSuccess
+        ? "border-emerald-500/30 bg-emerald-500/5 text-foreground"
+        : "border-primary/30 bg-primary/5 text-foreground";
+
+      const iconColor = isWarning
+        ? "text-amber-500"
+        : isSuccess
+        ? "text-emerald-500"
+        : "text-primary";
+
+      return (
+        <aside className={`my-8 rounded-2xl border p-5 shadow-2xs backdrop-blur-xs ${borderClass}`}>
+          <div className="flex items-start gap-3">
+            <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${iconColor}`} />
+            <div>
+              {section.title && (
+                <strong className="block font-display text-sm font-bold text-foreground mb-1">
+                  {section.title}
+                </strong>
+              )}
+              <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-line">
+                {section.text}
+              </p>
+            </div>
+          </div>
+        </aside>
+      );
+    }
+    case "code":
+      return <CodeBlock code={section.code} language={section.language} caption={section.caption} />;
+    case "table":
+      return (
+        <div className="my-8 overflow-hidden rounded-2xl border border-border shadow-xs">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-border bg-muted/60 font-mono text-xs uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  {section.headers.map((h, i) => (
+                    <th key={i} className="px-5 py-3.5 font-semibold">
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border bg-card">
+                {section.rows.map((row, rIdx) => (
+                  <tr key={rIdx} className="hover:bg-muted/30 transition-colors">
+                    {row.map((cell, cIdx) => (
+                      <td key={cIdx} className="px-5 py-3.5 text-foreground/90 font-medium">
+                        {cell}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
     case "link":
       return (
         <aside
           aria-label="Related reading"
-          className="mt-10 rounded-2xl border border-border bg-card/60 p-6"
+          className="mt-10 rounded-2xl border border-border bg-card p-6 shadow-2xs"
         >
-          <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-            Continue reading
+          <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-primary font-bold">
+            Continue Reading &amp; Resources
           </div>
-          <ul className="space-y-2">
+          <ul className="space-y-2.5">
             {section.items.map((item) => (
               <li key={item.to + item.label} className="leading-7">
                 <Link
                   to={item.to}
-                  className="text-primary underline-offset-4 transition-opacity hover:opacity-80 hover:underline"
+                  className="font-medium text-primary underline-offset-4 transition-opacity hover:opacity-80 hover:underline inline-flex items-center gap-1.5"
                 >
-                  {item.label}
+                  <span>{item.label}</span>
                 </Link>
               </li>
             ))}
@@ -222,10 +324,60 @@ function Section({ section }: { section: PostSection }) {
   }
 }
 
+function CodeBlock({ code, language, caption }: { code: string; language?: string; caption?: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="my-8 overflow-hidden rounded-2xl border border-border bg-[#0d1117] text-[#c9d1d9] shadow-xl">
+      <div className="flex items-center justify-between border-b border-white/10 bg-white/5 px-4 py-2.5 text-xs">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f56]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#ffbd2e]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#27c93f]" />
+          </div>
+          <span className="ml-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+            {language || "code"}
+          </span>
+          {caption && (
+            <span className="text-[11px] text-muted-foreground/80 font-mono hidden sm:inline">
+              · {caption}
+            </span>
+          )}
+        </div>
+
+        <button
+          onClick={handleCopy}
+          className="flex items-center gap-1 rounded-md border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-mono text-muted-foreground hover:text-white hover:bg-white/10 transition-colors"
+        >
+          {copied ? (
+            <span className="text-emerald-400 font-bold flex items-center gap-1">
+              <Check size={12} /> Copied!
+            </span>
+          ) : (
+            <span className="flex items-center gap-1">
+              <Copy size={12} /> Copy Code
+            </span>
+          )}
+        </button>
+      </div>
+      <pre className="overflow-x-auto p-5 font-mono text-xs leading-relaxed">
+        <code>{code}</code>
+      </pre>
+    </div>
+  );
+}
+
 function RelatedCard({ post }: { post: Post }) {
   return (
-    <article className="group flex flex-col rounded-2xl border border-border bg-card p-6 transition-colors hover:border-primary/40">
-      <div className="mb-5 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+    <article className="group flex flex-col rounded-2xl border border-border bg-card p-6 transition-all hover:border-primary/40 hover:shadow-md">
+      <div className="mb-4 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
         <span className="rounded-full border border-border px-2 py-0.5 text-foreground/80">
           {post.tag}
         </span>
@@ -240,7 +392,7 @@ function RelatedCard({ post }: { post: Post }) {
           {post.title}
         </Link>
       </h3>
-      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{post.excerpt}</p>
+      <p className="mt-3 text-sm leading-relaxed text-muted-foreground line-clamp-2">{post.excerpt}</p>
       <div className="mt-5 flex items-center justify-between border-t border-border pt-4">
         <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
           {post.read}
@@ -248,7 +400,7 @@ function RelatedCard({ post }: { post: Post }) {
         <Link
           to="/blog/$slug"
           params={{ slug: post.slug }}
-          className="text-sm font-medium text-primary transition-opacity group-hover:opacity-80"
+          className="text-sm font-semibold text-primary transition-opacity group-hover:opacity-80"
         >
           Read →
         </Link>

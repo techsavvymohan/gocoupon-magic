@@ -35,16 +35,16 @@ export function SiteShell({ children, showParticles = true }: SiteShellProps) {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground">
-      <Suspense fallback={null}>
-        <MedusaeCursor />
-      </Suspense>
-      {showParticles && (
-        <div className="pointer-events-none fixed inset-0 z-0">
-          <Particles count={40} />
-        </div>
-      )}
+      {/* Fixed background layer for cursor and ambient particles (z-0 behind all content) */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
+        <Suspense fallback={null}>
+          <MedusaeCursor />
+        </Suspense>
+        {showParticles && <Particles count={30} />}
+      </div>
 
       <Navbar />
+      {/* Main content layer positioned above background particles (z-10) */}
       <div className="relative z-10 overflow-x-hidden">
         <main>{children}</main>
         <Footer />

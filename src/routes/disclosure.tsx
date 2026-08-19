@@ -1,18 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
-import { Info, CheckCircle2, DollarSign, ShieldAlert, Sparkles, HeartHandshake } from "lucide-react";
+import {
+  DollarSign,
+  Sparkles,
+  HeartHandshake,
+  ShieldCheck,
+  CheckCircle2,
+  Lock,
+} from "lucide-react";
 
 export const Route = createFileRoute("/disclosure")({
   component: DisclosurePage,
   head: () =>
     createSeoHead({
-      title: "Affiliate Disclosure & Transparency Statement – goCoupon",
+      title: "Affiliate Disclosure & Transparency Promise – GoCoupon",
       description:
-        "Learn how goCoupon works, how we earn affiliate commissions from Amazon, Flipkart, and other stores at zero extra cost to you, and our commitment to unbiased savings.",
+        "Learn how GoCoupon stays 100% free, how stores pay us a small bonus when we save you money, and our 100% Fair Savings Guarantee.",
       path: "/disclosure",
       keywords:
-        "goCoupon affiliate disclosure, amazon associate disclaimer, how gocoupon makes money, affiliate transparency, coupon extension monetization",
+        "gocoupon affiliate disclosure, how gocoupon makes money, amazon associate disclaimer, free coupon extension disclosure",
     }),
 });
 
@@ -30,53 +37,53 @@ function DisclosurePage() {
       />
 
       {/* Hero Section */}
-      <section className="relative border-b border-border px-6 pb-16 pt-20 sm:pt-28">
+      <section className="relative border-b border-border px-6 pb-16 pt-20 sm:pt-28 overflow-hidden text-center">
         <div className="mx-auto max-w-4xl">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
             <HeartHandshake className="h-3.5 w-3.5" />
-            100% Transparency
+            <span>100% Open &amp; Honest</span>
           </div>
           <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            Affiliate Disclosure
+            Affiliate Disclosure &amp; Transparency
           </h1>
-          <p className="mt-5 text-base text-muted-foreground sm:text-lg">
-            At goCoupon, we believe complete transparency builds lasting trust. This page explains exactly
-            how goCoupon is funded, how our affiliate relationships work, and why you never pay a single rupee for our service.
+          <p className="mt-5 text-base text-muted-foreground sm:text-lg leading-relaxed">
+            We believe in 100% transparency with our users. Here is how GoCoupon makes money, why our extension
+            is completely free for you, and how we guarantee your savings always come first.
           </p>
         </div>
       </section>
 
-      {/* Core Principles */}
+      {/* 3 Core Principles */}
       <section className="border-b border-border px-6 py-16">
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto max-w-5xl">
           <div className="grid gap-6 sm:grid-cols-3">
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-              <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <DollarSign className="h-5 w-5" />
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm text-center">
+              <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-primary/10 text-primary">
+                <DollarSign className="h-6 w-6" />
               </div>
               <h3 className="font-display text-lg font-bold text-foreground">Zero Cost to You</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Using goCoupon is 100% free. You will never pay higher prices or hidden fees by using our extension or website.
+                GoCoupon is 100% free. You will never pay higher prices or hidden fees. Store referral bonuses come from seller marketing budgets.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-              <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
-                <Sparkles className="h-5 w-5" />
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm text-center">
+              <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-500">
+                <Sparkles className="h-6 w-6" />
               </div>
-              <h3 className="font-display text-lg font-bold text-foreground">Algorithmic Integrity</h3>
+              <h3 className="font-display text-lg font-bold text-foreground">100% Fair Promise</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Our code ranking algorithm always selects the coupon that gives you the highest net savings, regardless of commission rates.
+                We always give you the coupon that saves you the most money, even if we earn zero commission from that specific code.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-              <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500/10 text-sky-500">
-                <ShieldAlert className="h-5 w-5" />
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm text-center">
+              <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-sky-500/10 text-sky-500">
+                <ShieldCheck className="h-6 w-6" />
               </div>
-              <h3 className="font-display text-lg font-bold text-foreground">ASCI &amp; FTC Compliant</h3>
+              <h3 className="font-display text-lg font-bold text-foreground">No Hidden Actions</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                We strictly adhere to guidelines from the Advertising Standards Council of India (ASCI) and global FTC disclosure standards.
+                We never hijack your browser or redirect you secretly. Everything we do requires your clear, 1-click consent.
               </p>
             </div>
           </div>
@@ -86,88 +93,102 @@ function DisclosurePage() {
       {/* Main Content */}
       <section className="px-6 py-16">
         <div className="mx-auto max-w-4xl space-y-12 text-foreground/90">
+          {/* Section 1 */}
           <article className="space-y-4">
             <h2 className="font-display text-2xl font-bold text-foreground">
-              1. How Does goCoupon Make Money?
+              1. How Does GoCoupon Stay Free?
             </h2>
             <p className="text-base leading-relaxed text-muted-foreground">
-              When you use goCoupon to find and apply a coupon or click on an affiliate link to a merchant site
-              (such as Flipkart, Amazon India, Myntra, Meesho, Nykaa, etc.), the merchant may pay us a referral
-              commission when you complete a qualifying purchase.
+              When you use GoCoupon to save money on a store like Amazon, Flipkart, or Myntra, the store may pay us a small
+              thank-you bonus (referral commission) when you complete your order.
             </p>
             <p className="text-base leading-relaxed text-muted-foreground">
-              These commissions are paid directly by the retail merchants out of their marketing budgets as a
-              cost of customer acquisition. The price you pay for products is exactly the same (or lower with
-              our working coupons and cashback) as it would be if you shopped without goCoupon.
+              Stores pay this out of their normal customer acquisition budget. The price you pay for products is never marked up — in fact,
+              it is significantly lower because GoCoupon auto-clips green vouchers and applies working promo codes!
             </p>
           </article>
 
+          {/* Section 2: Clear User Choice */}
           <article className="space-y-4">
             <h2 className="font-display text-2xl font-bold text-foreground">
-              2. Amazon Associates Program Disclosure
+              2. Clear &amp; Honest User Choice
             </h2>
-            <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-6 text-foreground">
+            <p className="text-base leading-relaxed text-muted-foreground">
+              We follow Google Chrome&apos;s highest policy standards:
+            </p>
+            <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+              <div className="flex items-start gap-3">
+                <span className="rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 font-mono text-xs font-bold text-primary shrink-0">
+                  Step 1
+                </span>
+                <div>
+                  <strong className="text-foreground text-sm">Clear Labels Before You Click:</strong>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    We clearly explain bonus features before you click, such as <em>&ldquo;Unlock cash back savings on your order · 100% free to activate&rdquo;</em>.
+                  </p>
+                </div>
+              </div>
+
+              <div className="border-t border-border pt-4 flex items-start gap-3">
+                <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 font-mono text-xs font-bold text-emerald-500 shrink-0">
+                  Step 2
+                </span>
+                <div>
+                  <strong className="text-foreground text-sm">Instant Confirmation:</strong>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    A confirmation appears stating <em>&ldquo;✨ Cash Back Bonus Activated!&rdquo;</em> so you always know what happened.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          {/* Section 3: Amazon Associates */}
+          <article className="space-y-4">
+            <h2 className="font-display text-2xl font-bold text-foreground">
+              3. Amazon Associates Program Notice
+            </h2>
+            <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-6 text-foreground space-y-3">
               <p className="text-sm font-medium leading-relaxed">
-                <strong>Mandatory Amazon Disclosure:</strong> goCoupon is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.in and affiliated sites.
+                <strong>Mandatory Amazon Disclosure:</strong> GoCoupon is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com, Amazon.in, and affiliated sites.
               </p>
-              <p className="mt-2 text-xs text-muted-foreground">
-                &ldquo;As an Amazon Associate, goCoupon earns from qualifying purchases.&rdquo; Amazon and the Amazon logo are trademarks of Amazon.com, Inc. or its affiliates.
+              <p className="text-xs text-muted-foreground">
+                &ldquo;As an Amazon Associate, GoCoupon earns from qualifying purchases.&rdquo; Amazon and the Amazon logo are trademarks of Amazon.com, Inc. or its affiliates.
               </p>
             </div>
           </article>
 
+          {/* Section 4: 100% Fair Algorithm */}
           <article className="space-y-4">
             <h2 className="font-display text-2xl font-bold text-foreground">
-              3. Other Merchant &amp; Affiliate Network Partnerships
+              4. Our 100% Fair Savings Guarantee
             </h2>
             <p className="text-base leading-relaxed text-muted-foreground">
-              In addition to Amazon, goCoupon maintains direct and indirect affiliate arrangements with various
-              retailers and affiliate networks operating in India, including:
+              Some coupon websites push discount codes that pay them high commissions, even if they save you less money.
             </p>
-            <ul className="grid gap-2.5 sm:grid-cols-2 text-sm text-muted-foreground">
-              <li className="flex items-center gap-2 rounded-lg border border-border bg-card p-3">
-                <CheckCircle2 className="h-4 w-4 text-primary" />
-                <span>Flipkart Affiliate Program</span>
-              </li>
-              <li className="flex items-center gap-2 rounded-lg border border-border bg-card p-3">
-                <CheckCircle2 className="h-4 w-4 text-primary" />
-                <span>Myntra &amp; AJIO Affiliate Networks</span>
-              </li>
-              <li className="flex items-center gap-2 rounded-lg border border-border bg-card p-3">
-                <CheckCircle2 className="h-4 w-4 text-primary" />
-                <span>Impact, CJ, &amp; vCommission Partners</span>
-              </li>
-              <li className="flex items-center gap-2 rounded-lg border border-border bg-card p-3">
-                <CheckCircle2 className="h-4 w-4 text-primary" />
-                <span>Direct Brand Partnerships</span>
-              </li>
-            </ul>
+            <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-6 space-y-2">
+              <div className="flex items-center gap-2 font-display text-base font-bold text-emerald-600 dark:text-emerald-400">
+                <CheckCircle2 className="h-5 w-5" />
+                <span>Our Unbiased Promise</span>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                GoCoupon ranks coupons strictly by how much money they save you. If Code A saves you $50 (and pays us $0) and Code B saves you $10 (and pays us $5), GoCoupon will apply Code A every single time.
+              </p>
+            </div>
           </article>
 
-          <article className="space-y-4">
-            <h2 className="font-display text-2xl font-bold text-foreground">
-              4. Our Editorial &amp; Code Selection Guarantee
-            </h2>
-            <p className="text-base leading-relaxed text-muted-foreground">
-              Our code selection engine is 100% automated. When you are at checkout, goCoupon runs a test
-              cycle across all eligible candidate promo codes. It ranks the results strictly by the net rupee amount
-              saved on your cart. We do <strong>not</strong> prioritize coupons that yield higher affiliate payouts
-              over coupons that save you more money. Your savings always come first.
-            </p>
-          </article>
-
+          {/* Section 5: Contact */}
           <article className="space-y-4 border-t border-border pt-8">
             <h2 className="font-display text-2xl font-bold text-foreground">
-              5. Questions Regarding Our Disclosures
+              5. Questions Regarding Our Disclosures?
             </h2>
             <p className="text-base leading-relaxed text-muted-foreground">
-              If you have any questions about how our affiliate model operates, or if you represent a merchant
-              looking to partner with goCoupon, please contact us at{" "}
-              <a href="mailto:support@gocoupon.io" className="text-primary hover:underline">
+              If you have any questions about how GoCoupon operates, please reach out to us at{" "}
+              <a href="mailto:support@gocoupon.io" className="text-primary font-medium hover:underline">
                 support@gocoupon.io
               </a>{" "}
               or visit our{" "}
-              <Link to="/contact" className="text-primary hover:underline">
+              <Link to="/contact" className="text-primary font-medium hover:underline">
                 Contact Page
               </Link>
               .

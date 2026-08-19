@@ -55,8 +55,8 @@ const DEFAULT_CONFIG: Required<MedusaeConfig> = {
     scaleY: 1,
   },
   particles: {
-    baseSize: 0.016,
-    activeSize: 0.044,
+    baseSize: 0.014,
+    activeSize: 0.042,
     blobScaleX: 1,
     blobScaleY: 0.6,
     rotationSpeed: 0.1,
@@ -82,7 +82,8 @@ const ParticlesMesh = ({ config }: { config?: MedusaeConfig }) => {
     };
   }, [config]);
 
-  const countX = 90;
+  // Reduced by exactly 20% (72 x 50 = 3600 particles, down from 4500)
+  const countX = 72;
   const countY = 50;
   const count = countX * countY;
 
@@ -250,7 +251,7 @@ const ParticlesMesh = ({ config }: { config?: MedusaeConfig }) => {
                 activeColor = mix(activeColor, cYellow, p2 * 0.5 + 0.5);
                 
                 vec3 finalColor = mix(black, activeColor, smoothstep(0.1, 0.8, vSize));
-                float finalAlpha = alpha * mix(0.2, 0.85, vSize);
+                float finalAlpha = alpha * mix(0.18, 0.85, vSize);
 
                 gl_FragColor = vec4(finalColor, finalAlpha);
             }
@@ -340,7 +341,7 @@ export function MedusaeCursor({ config }: { config?: MedusaeConfig }) {
   }, []);
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[5] overflow-hidden">
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
       <Canvas
         className="h-full w-full pointer-events-none"
         camera={{ position: [0, 0, 5] }}

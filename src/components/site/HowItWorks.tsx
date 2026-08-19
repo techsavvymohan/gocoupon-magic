@@ -4,17 +4,17 @@ const steps = [
   {
     n: "01",
     title: "Install in 10 seconds",
-    body: "Add goCoupon from the Chrome Web Store. No signup required to start saving.",
+    body: "Add GoCoupon to Chrome for free. No signup, no password, and no credit card required.",
   },
   {
     n: "02",
-    title: "Shop like normal",
-    body: "Browse and add items to cart on any supported store. goCoupon watches in the background.",
+    title: "Shop online as usual",
+    body: "Browse Amazon, Flipkart, or your favorite stores. We auto-click hidden green coupon boxes for you.",
   },
   {
     n: "03",
-    title: "We do the math",
-    body: "At checkout, goCoupon tests every code and applies the one that saves you the most.",
+    title: "1-Click savings at checkout",
+    body: "At checkout, click 'Apply Savings'. GoCoupon tests every code and applies the biggest discount.",
   },
 ];
 

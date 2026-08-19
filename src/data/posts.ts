@@ -4,7 +4,10 @@ export type PostSection =
   | { type: "h3"; text: string }
   | { type: "ul"; items: string[] }
   | { type: "quote"; text: string; cite?: string }
-  | { type: "link"; items: Array<{ label: string; to: string }> };
+  | { type: "link"; items: Array<{ label: string; to: string }> }
+  | { type: "code"; language?: string; code: string; caption?: string }
+  | { type: "table"; headers: string[]; rows: string[][] }
+  | { type: "callout"; title?: string; text: string; variant?: "info" | "warning" | "success" };
 
 export type Post = {
   slug: string;
@@ -20,8 +23,292 @@ export type Post = {
 
 export const posts: Post[] = [
   {
+    slug: "how-gocoupon-finds-best-discounts",
+    tag: "Shopping Tips",
+    date: "Aug 19, 2026",
+    title: "How GoCoupon Automatically Finds the Biggest Online Discounts in Seconds",
+    excerpt:
+      "Stop wasting time searching for expired coupon codes on random websites. Here is how GoCoupon tests real codes and saves you money in one click.",
+    read: "4 min read",
+    author: "GoCoupon Team",
+    body: [
+      {
+        type: "p",
+        text: "We have all been there: you are about to buy something online, you see a 'Promo Code' box at checkout, and you spend 15 minutes searching Google for discount codes. You copy five different codes from random blogs, paste them in one by one, and every single one says 'Code Expired' or 'Invalid'.",
+      },
+      {
+        type: "p",
+        text: "It is frustrating, wastes your time, and often leaves you paying full price anyway. That is the exact problem GoCoupon solves.",
+      },
+      {
+        type: "callout",
+        title: "The Simple Solution",
+        text: "Instead of searching for codes yourself, GoCoupon is a free helper that sits in your Chrome browser. When you reach checkout, it tests all working codes automatically in 2 seconds and applies the biggest discount.",
+        variant: "success",
+      },
+      { type: "h2", text: "How Does GoCoupon Know Which Codes Actually Work?" },
+      {
+        type: "p",
+        text: "Unlike old coupon websites that list 50 dead codes just to get clicks, GoCoupon's smart scanner only cares about codes that actually save you money right now:",
+      },
+      {
+        type: "ul",
+        items: [
+          "Real Shopper Verification: When a discount code works for one shopper on Amazon or Flipkart, our system remembers it and tests it for other shoppers in the same hour.",
+          "Automatic Ranking: If Code A saves you $10 and Code B saves you $35, GoCoupon automatically picks Code B every single time.",
+          "Expired Code Cleanup: If a store disables a code, our system removes it immediately so you never waste time testing dead deals.",
+        ],
+      },
+      { type: "h2", text: "What You Need to Do (Just 1 Click)" },
+      {
+        type: "p",
+        text: "You do not need to learn anything new. Here is your new shopping routine:",
+      },
+      {
+        type: "ul",
+        items: [
+          "1. Add GoCoupon to Google Chrome (it's 100% free and takes 10 seconds).",
+          "2. Shop on Amazon, Flipkart, or your favorite stores like you always do.",
+          "3. At checkout, click the 'Apply Savings' button that pops up.",
+        ],
+      },
+      {
+        type: "quote",
+        text: "The average GoCoupon shopper saves $24 (or ₹500) per order without ever searching for a coupon code manually.",
+        cite: "GoCoupon Shopper Savings Benchmark",
+      },
+      {
+        type: "link",
+        items: [
+          { label: "Add GoCoupon to Chrome for Free →", to: "/extension" },
+          { label: "See How GoCoupon Works Step-by-Step", to: "/how-it-works" },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "amazon-clip-coupons-vs-promo-codes",
+    tag: "Amazon Tips",
+    date: "Aug 15, 2026",
+    title: "The Amazon Green Coupon Trick: How to Save an Extra 20% on Every Order",
+    excerpt:
+      "Did you know Amazon hides secret green discount checkboxes on product pages? Here is how they work and how GoCoupon automatically clips them for you.",
+    read: "5 min read",
+    author: "GoCoupon Deals Desk",
+    body: [
+      {
+        type: "p",
+        text: "Most people think promo codes are the only way to save money on Amazon. But here is an insider secret: over 80% of Amazon discounts are hidden in little green checkboxes called 'Clip Coupons'.",
+      },
+      {
+        type: "p",
+        text: "If you do not click that little green box before adding the item to your cart, you end up paying full price — even if Amazon had a $20 discount waiting for you!",
+      },
+      { type: "h2", text: "What Is an Amazon Green Coupon?" },
+      {
+        type: "p",
+        text: "When brands launch products or want to boost sales on Amazon, they attach instant vouchers directly to the item. It looks like a small green checkbox under the price that says 'Apply $15 coupon' or 'Save 20% with coupon'.",
+      },
+      {
+        type: "callout",
+        title: "Why Most People Miss Them",
+        text: "On a busy phone or computer screen with lots of pictures, customer reviews, and shipping details, it is very easy to scroll right past the green checkbox and click 'Add to Cart' without clicking the coupon.",
+        variant: "info",
+      },
+      { type: "h2", text: "How GoCoupon Solves This Automatically" },
+      {
+        type: "p",
+        text: "When you have the free GoCoupon extension installed, you never have to worry about missing a green coupon:",
+      },
+      {
+        type: "ul",
+        items: [
+          "Automatic Spotting: As soon as you open any Amazon product page, GoCoupon scans for green coupon boxes in the background.",
+          "Automatic 1-Click Clipping: If a green voucher is available, GoCoupon clicks it for you instantly so the discount is locked into your cart.",
+          "Double Discount Stacking: When you go to checkout, GoCoupon tests promo codes on top of the green voucher, giving you double savings!",
+        ],
+      },
+      { type: "h2", text: "Comparison: With vs Without GoCoupon" },
+      {
+        type: "table",
+        headers: ["Shopping Method", "Green Voucher", "Promo Code", "What You Pay"],
+        rows: [
+          ["Without GoCoupon", "Missed (Pay full price)", "Expired code from Google", "$129.99"],
+          ["With GoCoupon", "Auto-Clipped ($20 off)", "Applied working code ($15 off)", "$94.99 (Saved $35!)"],
+        ],
+      },
+      {
+        type: "link",
+        items: [
+          { label: "View Today's Curated Amazon Deals →", to: "/amazon-coupons" },
+          { label: "Download Free GoCoupon Extension", to: "/extension" },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "why-gocoupon-is-100-percent-safe",
+    tag: "Safety & Privacy",
+    date: "Aug 10, 2026",
+    title: "Is GoCoupon Safe? How We Protect Your Privacy and Never See Your Bank Details",
+    excerpt:
+      "Everything you need to know about how GoCoupon keeps your personal information, passwords, and credit card numbers completely private.",
+    read: "4 min read",
+    author: "GoCoupon Security Team",
+    body: [
+      {
+        type: "p",
+        text: "Installing any browser extension requires trust. It is completely natural to wonder: 'Can this extension see my credit card?' or 'Does it watch what I do online?'",
+      },
+      {
+        type: "p",
+        text: "The short answer is: GoCoupon was built from day one with strict privacy rules. We never see your payment cards, we never log your passwords, and we never track your personal browsing.",
+      },
+      { type: "h2", text: "What GoCoupon Can and Cannot See" },
+      {
+        type: "table",
+        headers: ["Information Type", "Can GoCoupon Access It?", "How You Are Protected"],
+        rows: [
+          ["Credit / Debit Cards", "NO — Strictly Blocked", "Payment gateways (CVV, Card #, UPI) are 100% invisible to our extension"],
+          ["Passwords & Logins", "NO — Strictly Blocked", "We never record keystrokes or password fields on any website"],
+          ["Personal Search History", "NO — Strictly Blocked", "We stay asleep outside of shopping cart checkout pages"],
+          ["Coupon Input Box", "YES — Only at Checkout", "We only type working discount codes into the promo code box for you"],
+        ],
+      },
+      {
+        type: "callout",
+        title: "Bank-Grade Encryption",
+        text: "GoCoupon uses bank-grade security standards and Google Chrome's strictest security rules (Manifest V3). No personal information is ever stored or shared with advertisers.",
+        variant: "success",
+      },
+      { type: "h2", text: "How Does GoCoupon Stay 100% Free?" },
+      {
+        type: "p",
+        text: "We will never charge you for using GoCoupon. When we help you find a working deal on a store like Amazon or Flipkart, the store pays us a small marketing referral fee. You always pay the lowest price possible, and it costs you zero extra money.",
+      },
+      {
+        type: "link",
+        items: [
+          { label: "Read Our Full Security & Trust Center →", to: "/security" },
+          { label: "Read Our Plain-English Privacy Policy", to: "/privacy" },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "why-coupons-fail-at-checkout",
+    tag: "Shopping Guides",
+    date: "Aug 02, 2026",
+    title: "Why Do Coupon Codes Fail at Checkout? 5 Common Reasons (and How to Fix Them)",
+    excerpt:
+      "Tired of 'Invalid Promo Code' errors? Here is why store discounts fail and how GoCoupon automatically tests only valid, working deals.",
+    read: "4 min read",
+    author: "GoCoupon Team",
+    body: [
+      {
+        type: "p",
+        text: "There is nothing more annoying than finding a '50% OFF' coupon code on the internet, typing it into checkout, and seeing a bright red error message: 'Code is invalid or expired'.",
+      },
+      {
+        type: "p",
+        text: "Why does this happen so often? Here are the 5 most common reasons store coupons fail, and how to avoid them.",
+      },
+      { type: "h2", text: "1. Minimum Cart Requirement" },
+      {
+        type: "p",
+        text: "Many promo codes only activate if your order is above a certain amount (for example, '$15 off orders of $75 or more'). If your cart is $72, the code will fail until you add another item.",
+      },
+      { type: "h2", text: "2. Category-Specific Restrictions" },
+      {
+        type: "p",
+        text: "A coupon might be labeled '20% off Summer Sale', but the fine print says it only works on clothing, not electronics or books.",
+      },
+      { type: "h2", text: "3. Fake Codes on Spammy Websites" },
+      {
+        type: "p",
+        text: "Most coupon websites on Google do not test their codes. They invent fake promo codes or leave 3-year-old expired codes on their pages just to get website visitors.",
+      },
+      { type: "h2", text: "4. Excluded Brands" },
+      {
+        type: "p",
+        text: "Certain premium brands (like Apple, Dyson, or Nike) often prohibit retail stores from applying sitewide discounts to their items.",
+      },
+      { type: "h2", text: "5. One-Time Use Codes" },
+      {
+        type: "p",
+        text: "Some codes are unique gifts sent to one person's email address. Once that person uses it, the code cannot be used by anyone else.",
+      },
+      {
+        type: "callout",
+        title: "How GoCoupon Fixes This",
+        text: "GoCoupon tests candidate codes against your exact cart items in real time. It throws out dead codes in seconds and automatically locks in only the verified codes that pass all store rules.",
+        variant: "info",
+      },
+      {
+        type: "link",
+        items: [
+          { label: "Download GoCoupon Free for Chrome →", to: "/extension" },
+          { label: "Read Our Frequently Asked Questions", to: "/faq" },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "how-to-stack-coupons-and-cashback",
+    tag: "Cashback & Deals",
+    date: "Jul 28, 2026",
+    title: "The Smart Shopper's Guide to Stacking Coupons, Card Offers & Cashback",
+    excerpt:
+      "Learn the simple 3-step stacking secret that smart shoppers use to get double and triple discounts on Amazon, Flipkart, and your favorite stores.",
+    read: "5 min read",
+    author: "GoCoupon Deals Desk",
+    body: [
+      {
+        type: "p",
+        text: "Most online shoppers stop after getting a single discount. But pro shoppers use a simple technique called 'Discount Stacking' to get two or three discounts on the same single order.",
+      },
+      { type: "h2", text: "The 3 Layers of a Perfect Discount Stack" },
+      {
+        type: "ul",
+        items: [
+          "Layer 1: Product Discount & Green Voucher (the store's sale price + on-page clipped coupon).",
+          "Layer 2: Checkout Promo Code (the biggest working code applied by GoCoupon).",
+          "Layer 3: Bank / Card Offer or Cashback (instant 5–10% off when paying with select credit cards or UPI).",
+        ],
+      },
+      {
+        type: "callout",
+        title: "The Golden Rule of Stacking",
+        text: "Always apply the coupon code BEFORE choosing your final payment method. Most bank discounts calculate their savings on the lower post-coupon price, meaning you get the benefits of both!",
+        variant: "success",
+      },
+      { type: "h2", text: "An Example of Double Savings in Action" },
+      {
+        type: "table",
+        headers: ["Step", "Discount Applied", "Your New Price"],
+        rows: [
+          ["Starting Price", "Regular retail price", "$150.00 / ₹4,000"],
+          ["Layer 1: Green Coupon", "Auto-clipped on product page (-$15 / -₹400)", "$135.00 / ₹3,600"],
+          ["Layer 2: GoCoupon Promo", "Winning promo code auto-applied (-$25 / -₹600)", "$110.00 / ₹3,000"],
+          ["Layer 3: Card / Cashback", "Extra 5% cash back bonus (-$5.50 / -₹150)", "$104.50 / ₹2,850"],
+        ],
+      },
+      {
+        type: "p",
+        text: "By stacking all three layers, you turned a $150 order into $104.50 — saving almost $46 with zero extra effort!",
+      },
+      {
+        type: "link",
+        items: [
+          { label: "Install GoCoupon to Auto-Stack Coupons →", to: "/extension" },
+          { label: "Learn More About Cashback Rewards", to: "/cashback-rewards" },
+        ],
+      },
+    ],
+  },
+  {
     slug: "stack-coupons-bank-offers-flipkart",
-    tag: "Guides",
+    tag: "Shopping Guides",
     date: "Apr 12, 2026",
     title: "How to stack coupons and bank offers on Flipkart",
     excerpt:

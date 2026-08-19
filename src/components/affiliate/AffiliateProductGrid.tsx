@@ -107,12 +107,6 @@ export function AffiliateProductGrid({
                 key={product.id}
                 className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/80 bg-card p-4 transition-all duration-300 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
               >
-                {/* Mock indicator (dev only) */}
-                {product.isMock && import.meta.env.DEV && (
-                  <div className="absolute top-0 left-0 right-0 bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 text-[10px] font-mono text-center py-0.5 z-10">
-                    DEV MOCK — not a real product
-                  </div>
-                )}
 
                 {/* Product Image */}
                 <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-muted">

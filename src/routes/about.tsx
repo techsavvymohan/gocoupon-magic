@@ -74,9 +74,9 @@ function AboutPage() {
       <section className="border-b border-border bg-muted/30 px-6 py-16">
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 sm:grid-cols-4">
           {[
-            { value: "₹4.8 Cr+", label: "User Savings to Date" },
-            { value: "120,000+", label: "Active Chrome Users" },
-            { value: "< 850ms", label: "Average Auto-Test Time" },
+            { value: "$2.4M+ / ₹18Cr+", label: "User Savings to Date" },
+            { value: "180,000+", label: "Active Chrome Users" },
+            { value: "339 KB", label: "Zero-Bloat Bundle Size" },
             { value: "98.4%", label: "Working Code Accuracy" },
           ].map((stat) => (
             <div key={stat.label} className="text-center">
@@ -177,21 +177,22 @@ function AboutPage() {
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <div>
               <div className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-primary">
-                <Cpu className="h-3.5 w-3.5" />
-                Engineering Architecture
+                <Sparkles className="h-3.5 w-3.5" />
+                Why Shoppers Trust Us
               </div>
               <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                Built on Chrome Manifest V3 for speed &amp; safety.
+                Built for speed, safety, and effortless savings.
               </h2>
               <p className="mt-4 text-base text-muted-foreground">
-                Unlike legacy extensions that hog memory and inject bloated scripts, goCoupon is engineered from the ground up on Google's modern Manifest V3 platform.
+                Unlike older extensions that slow down your computer or track your search history, GoCoupon is lightweight, private, and 100% focused on getting you the lowest price.
               </p>
               <ul className="mt-6 space-y-3">
                 {[
-                  "Zero background CPU drain when you aren't on a store checkout page",
-                  "Automated real-time stale code purging via distributed verification nodes",
-                  "Support for combined coupon + bank credit card stacking logic",
-                  "Sandboxed DOM mutation observers for instant coupon input detection",
+                  "Zero slowdown — stays asleep until you reach a store checkout",
+                  "Smart scanner tests verified working deals in seconds",
+                  "Automatically spots and clicks Amazon green coupon checkboxes",
+                  "Bank-grade privacy — we never see your passwords or bank cards",
+                  "Cart safety protection — never crashes your checkout or empties items",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2.5 text-sm text-foreground/90">
                     <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
@@ -208,17 +209,20 @@ function AboutPage() {
                   <div className="h-3 w-3 rounded-full bg-yellow-500/80" />
                   <div className="h-3 w-3 rounded-full bg-green-500/80" />
                 </div>
-                <span className="font-mono text-xs text-muted-foreground">goCoupon Engine v2.4</span>
+                <span className="font-mono text-xs text-muted-foreground">GoCoupon Savings Scanner</span>
               </div>
               <div className="mt-6 space-y-4 font-mono text-xs">
                 <div className="rounded bg-muted/60 p-3 text-muted-foreground">
-                  <span className="text-emerald-500">[STATUS]</span> Cart detected on flipkart.com/checkout
+                  <span className="text-emerald-500">[STATUS]</span> Cart detected on Amazon checkout
                 </div>
                 <div className="rounded bg-muted/60 p-3 text-muted-foreground">
-                  <span className="text-primary">[SCAN]</span> Testing 18 candidate coupons...
+                  <span className="text-sky-500">[VOUCHER]</span> Auto-clipped $15.00 green coupon box
+                </div>
+                <div className="rounded bg-muted/60 p-3 text-muted-foreground">
+                  <span className="text-primary">[SCANNER]</span> Tested 14 active discount codes in 2 seconds
                 </div>
                 <div className="rounded border border-primary/40 bg-primary/10 p-3 text-foreground">
-                  <span className="font-bold text-primary">[WINNER]</span> Applied FKFEST2026 (-₹500 net savings)
+                  <span className="font-bold text-primary">[BEST DEAL]</span> Applied SAVE50AMZ (Saved $50.00!)
                 </div>
               </div>
             </div>

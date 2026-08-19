@@ -35,24 +35,24 @@
   --font-mono: "JetBrains Mono", monospace;
 }
 
-/* ── LIGHT MODE — UI/UX Pro Max (Porcelain Slate + Cyber Indigo) ── */
+/* ── LIGHT MODE — Porcelain Slate & Cyber Indigo/Blue ── */
 :root,
 html.light {
   --radius: 0.5rem;
-  --background: #f8fafc; /* Porcelain Slate tint */
+  --background: #f8fafc; /* Crisp Porcelain Slate */
   --foreground: #020617; /* Slate 950 - pitch dark crisp text */
   --card: #ffffff; /* Elevated White Cards */
   --card-foreground: #020617;
   --popover: #ffffff;
   --popover-foreground: #020617;
-  --primary: #4f46e5; /* Cyber Indigo Accent */
+  --primary: #4f46e5; /* Cyber Indigo / Blue */
   --primary-hover: #4338ca;
   --primary-foreground: #ffffff;
   --secondary: #f1f5f9;
   --secondary-foreground: #020617;
   --muted: #f1f5f9;
-  --muted-foreground: #1e293b; /* Slate 800 - dark, clear secondary text */
-  --muted-foreground-soft: #334155; /* Slate 700 - darker soft text */
+  --muted-foreground: #334155; /* Slate 700 - clear, high contrast text */
+  --muted-foreground-soft: #475569; /* Slate 600 */
   --accent: #4f46e5;
   --accent-foreground: #ffffff;
   --destructive: #e11d48;
@@ -61,14 +61,14 @@ html.light {
   --input: rgba(15, 23, 42, 0.15);
   --ring: #4f46e5;
 
-  /* Semantic Light Mode Glows & Shadows */
+  /* Subtle Warm Ambient Glows */
   --accent-glow: rgba(79, 70, 229, 0.14);
-  --accent-glow-strong: rgba(79, 70, 229, 0.3);
-  --accent-tint: rgba(79, 70, 229, 0.05);
+  --accent-glow-strong: rgba(79, 70, 229, 0.28);
+  --accent-tint: rgba(245, 158, 11, 0.06); /* Subtle warm amber tint */
   --shadow-accent: 0 12px 36px rgba(79, 70, 229, 0.22);
 }
 
-/* ── DARK MODE — Obsidian Minimal (lime) ── */
+/* ── DARK MODE — Obsidian Minimal (Lime / Cyber Blue) ── */
 html.dark {
   --background: #080808;
   --foreground: #f8fafc;
@@ -83,7 +83,7 @@ html.dark {
   --secondary-foreground: #f8fafc;
   --muted: oklch(0.18 0 0);
   --muted-foreground: #cbd5e1; /* Slate 300 - clear, high contrast text */
-  --muted-foreground-soft: #94a3b8; /* Slate 400 - clear soft text */
+  --muted-foreground-soft: #94a3b8; /* Slate 400 */
   --accent: #c8ff00;
   --accent-foreground: #080808;
   --destructive: oklch(0.6 0.22 25);
@@ -115,7 +115,32 @@ html.dark {
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    position: relative;
   }
+
+  /* ── Warm Love & Sunset Ambient Background Lighting ── */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 75% 45% at 50% -5%, rgba(254, 205, 211, 0.45), transparent 70%),
+      radial-gradient(ellipse 55% 35% at 90% 30%, rgba(254, 215, 170, 0.35), transparent 60%),
+      radial-gradient(ellipse 65% 45% at 10% 65%, rgba(253, 164, 175, 0.3), transparent 65%),
+      radial-gradient(ellipse 75% 40% at 50% 95%, rgba(254, 240, 138, 0.25), transparent 70%);
+  }
+
+  html.dark body::before {
+    background:
+      radial-gradient(ellipse 75% 45% at 50% -5%, rgba(225, 29, 72, 0.18), transparent 70%),
+      radial-gradient(ellipse 55% 35% at 90% 30%, rgba(245, 158, 11, 0.12), transparent 60%),
+      radial-gradient(ellipse 65% 45% at 10% 65%, rgba(244, 63, 94, 0.14), transparent 65%),
+      radial-gradient(ellipse 75% 40% at 50% 95%, rgba(217, 119, 6, 0.1), transparent 70%);
+  }
+
   /* Smooth theme switch — target major layout containers without dragging down interactive elements */
   html,
   body,
@@ -267,22 +292,22 @@ html:not(.dark) .tilt-shine {
 html.light .grid-backdrop,
 html:not(.dark) .grid-backdrop {
   background-image:
-    linear-gradient(to right, rgba(79, 70, 229, 0.07) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(79, 70, 229, 0.07) 1px, transparent 1px);
+    linear-gradient(to right, rgba(244, 63, 94, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(244, 63, 94, 0.06) 1px, transparent 1px);
 }
 
-/* Light mode card depth */
+/* Light mode warm card depth */
 html.light .bg-card,
 html:not(.dark) .bg-card {
   box-shadow:
-    0 4px 20px -2px rgba(15, 23, 42, 0.05),
-    0 2px 6px -1px rgba(15, 23, 42, 0.02);
+    0 4px 20px -2px rgba(68, 64, 60, 0.06),
+    0 2px 6px -1px rgba(68, 64, 60, 0.03);
 }
 html.light .bg-card:hover,
 html:not(.dark) .bg-card:hover {
   box-shadow:
-    0 12px 32px -4px rgba(79, 70, 229, 0.12),
-    0 4px 12px -2px rgba(15, 23, 42, 0.04);
+    0 14px 34px -4px rgba(244, 63, 94, 0.14),
+    0 4px 12px -2px rgba(245, 158, 11, 0.06);
 }
 
 .text-balance {

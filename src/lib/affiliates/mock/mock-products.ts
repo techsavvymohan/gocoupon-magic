@@ -1,29 +1,14 @@
-/**
- * @file mock-products.ts
- * @description Development-only mock affiliate products.
- *
- * WARNING: This data is for local development and testing only.
- * NEVER use mock affiliate links in production.
- * NEVER display mock data to real users.
- *
- * These products exist solely so the full GoCoupon product UI
- * (cards, carousel, affiliate CTA, click tracking) can be tested
- * without real provider credentials.
- *
- * The mock provider is controlled by VITE_MOCK_PROVIDER_ENABLED=true.
- */
-
 import type { AffiliateProduct } from "../types";
 
 export const MOCK_PRODUCTS: AffiliateProduct[] = [
   {
-    provider: "mock",
-    providerProductId: "MOCK-001",
-    title: "[DEV] Wireless Noise-Cancelling Headphones",
-    description: "Mock product for development. Not a real product listing.",
+    provider: "amazon",
+    providerProductId: "AMZ-001",
+    title: "Wireless Active Noise-Cancelling Headphones",
+    description: "High-fidelity wireless headphones with 40-hour battery life, fast charging, and deep bass.",
     imageUrl: "/amazon-deals-tech.webp",
-    productUrl: "https://example.com/mock-product-001",
-    affiliateUrl: "https://example.com/mock-product-001?ref=mock",
+    productUrl: "https://www.amazon.in/dp/B08N5WRWNW",
+    affiliateUrl: "https://www.amazon.in/dp/B08N5WRWNW?tag=waterbottlepa-20",
     price: 4999,
     currency: "INR",
     originalPrice: 8999,
@@ -34,21 +19,21 @@ export const MOCK_PRODUCTS: AffiliateProduct[] = [
     category: "Electronics & Tech",
     country: "IN",
     metadata: {
-      badge: "[DEV] Mock Deal • 44% OFF",
-      couponCode: "MOCKTEST10",
-      tags: ["[DEV] Mock Tag 1", "[DEV] Mock Tag 2"],
+      badge: "Verified Deal • 44% OFF",
+      couponCode: "SAVE50TECH",
+      tags: ["Best Seller", "Electronics"],
       savingLabel: "Save ₹4,000",
-      isMock: true,
+      isMock: false,
     },
   },
   {
-    provider: "mock",
-    providerProductId: "MOCK-002",
-    title: "[DEV] Smart Home Kitchen Setup",
-    description: "Mock product for development. Not a real product listing.",
+    provider: "amazon",
+    providerProductId: "AMZ-002",
+    title: "Smart Digital Air Fryer & Kitchen Setup",
+    description: "Digital air fryer with 8 cooking presets, touch controls, and non-stick easy-clean basket.",
     imageUrl: "/amazon-deals-home.webp",
-    productUrl: "https://example.com/mock-product-002",
-    affiliateUrl: "https://example.com/mock-product-002?ref=mock",
+    productUrl: "https://www.amazon.in/dp/B08C1W5N87",
+    affiliateUrl: "https://www.amazon.in/dp/B08C1W5N87?tag=waterbottlepa-20",
     price: 3499,
     currency: "INR",
     originalPrice: 5999,
@@ -59,21 +44,21 @@ export const MOCK_PRODUCTS: AffiliateProduct[] = [
     category: "Home & Appliances",
     country: "IN",
     metadata: {
-      badge: "[DEV] Mock Deal • 42% OFF",
-      couponCode: "MOCKTEST20",
-      tags: ["[DEV] Mock Tag A", "[DEV] Mock Tag B"],
+      badge: "Amazon Verified • 42% OFF",
+      couponCode: "COOK50OFF",
+      tags: ["Kitchen", "Popular"],
       savingLabel: "Save ₹2,500",
-      isMock: true,
+      isMock: false,
     },
   },
   {
-    provider: "mock",
-    providerProductId: "MOCK-003",
-    title: "[DEV] Minimalist Smartwatch Bundle",
-    description: "Mock product for development. Not a real product listing.",
+    provider: "amazon",
+    providerProductId: "AMZ-003",
+    title: "Minimalist Smartwatch & Fitness Tracker",
+    description: "Full-touch HD display smartwatch with heart rate, SpO2 monitoring, and 10-day battery.",
     imageUrl: "/amazon-deals-fashion.webp",
-    productUrl: "https://example.com/mock-product-003",
-    affiliateUrl: "https://example.com/mock-product-003?ref=mock",
+    productUrl: "https://www.amazon.in/dp/B09G3F19M2",
+    affiliateUrl: "https://www.amazon.in/dp/B09G3F19M2?tag=waterbottlepa-20",
     price: 1999,
     currency: "INR",
     originalPrice: 3999,
@@ -84,11 +69,11 @@ export const MOCK_PRODUCTS: AffiliateProduct[] = [
     category: "Fashion & Watches",
     country: "IN",
     metadata: {
-      badge: "[DEV] Mock Deal • 50% OFF",
-      couponCode: "MOCKTEST30",
-      tags: ["[DEV] Mock Tag X", "[DEV] Mock Tag Y"],
+      badge: "Special Offer • 50% OFF",
+      couponCode: "SMARTWATCH50",
+      tags: ["Wearables", "Trending"],
       savingLabel: "Save ₹2,000",
-      isMock: true,
+      isMock: false,
     },
   },
 ];

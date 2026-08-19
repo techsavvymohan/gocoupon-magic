@@ -30,32 +30,32 @@ export function About() {
 
         <div className="space-y-8 text-foreground/90">
           <EntityRow label="What it is">
-            <strong>goCoupon</strong> is a free Google Chrome browser extension that automatically
-            finds and applies the highest-saving coupon code at checkout on Indian e-commerce sites.
+            <strong>goCoupon</strong> is a privacy-first Google Chrome browser extension (Manifest V3) that
+            automatically discovers, auto-clips on-page vouchers, and applies the highest-saving promo codes at checkout across US and Indian e-commerce stores.
           </EntityRow>
 
           <EntityRow label="Who built it">
-            goCoupon is built by the goCoupon team, an India-based group of engineers and e-commerce
-            analysts. The company was founded in 2024 and is headquartered in Bengaluru, India.
+            GoCoupon is built by an independent team of online shoppers and software designers passionate about
+            making online shopping affordable and transparent for everyone.
           </EntityRow>
 
           <EntityRow label="Problem it solves">
-            Online shoppers in India routinely pay 8–14% above the lowest achievable price because
-            they never test every valid coupon, bank offer and cashback combination at checkout.
-            goCoupon tests them all in parallel and auto-applies the winning combination.
+            Online shoppers routinely overpay because they miss hidden green discount checkboxes on product pages
+            or spend 15 minutes testing expired promo codes from Google. GoCoupon automatically finds and applies the biggest
+            working discounts in 1 click.
           </EntityRow>
 
           <EntityRow label="How it works">
-            When you reach a supported checkout page on{" "}
+            When you reach a supported checkout or product page on{" "}
+            <Link to="/amazon-coupons" className="text-primary underline-offset-4 hover:underline">
+              Amazon
+            </Link>
+            ,{" "}
             <Link
               to="/flipkart-coupons"
               className="text-primary underline-offset-4 hover:underline"
             >
               Flipkart
-            </Link>
-            ,{" "}
-            <Link to="/amazon-coupons" className="text-primary underline-offset-4 hover:underline">
-              Amazon India
             </Link>
             ,{" "}
             <Link to="/myntra-coupons" className="text-primary underline-offset-4 hover:underline">
@@ -65,9 +65,7 @@ export function About() {
             <Link to="/meesho-coupons" className="text-primary underline-offset-4 hover:underline">
               Meesho
             </Link>
-            , goCoupon runs every candidate code against your exact cart, ranks the passing codes by
-            net rupee saving, and writes the winner into the coupon field. Typical time-to- apply is
-            under one second.
+            , GoCoupon automatically spots and clicks hidden green vouchers, tests all active discount codes in seconds, and applies the highest savings to your cart.
           </EntityRow>
 
           <EntityRow label="Price">

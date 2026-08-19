@@ -154,11 +154,13 @@ export function Footer() {
       </div>
 
       <div className="mx-auto mt-16 flex max-w-7xl flex-wrap items-center justify-between gap-4 border-t border-border pt-8">
-        <p className="font-mono text-xs text-muted-foreground">
-          © 2026 goCoupon.io • All rights reserved. Made in India 🇮🇳
+        <p className="font-mono text-xs text-muted-foreground flex items-center gap-1.5">
+          <span>© 2026 GoCoupon.io • Crafted with</span>
+          <span className="text-rose-500">❤️</span>
+          <span>for smart shoppers • 100% Free</span>
         </p>
         <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-muted-foreground">
-          Manifest V3 Verified • 100% Free
+          Manifest V3 Verified • Safe &amp; Private
         </p>
       </div>
     </footer>

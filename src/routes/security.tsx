@@ -5,13 +5,12 @@ import {
   ShieldCheck,
   Lock,
   EyeOff,
-  Cpu,
   KeyRound,
-  FileCheck2,
   CheckCircle2,
   XCircle,
-  AlertTriangle,
   ArrowRight,
+  Sparkles,
+  HeartHandshake,
 } from "lucide-react";
 import { MagneticButton } from "@/components/MagneticButton";
 
@@ -19,12 +18,12 @@ export const Route = createFileRoute("/security")({
   component: SecurityPage,
   head: () =>
     createSeoHead({
-      title: "Security & Trust Center – How goCoupon Protects Your Privacy",
+      title: "Security & Trust Center – How GoCoupon Protects Your Privacy",
       description:
-        "Learn how goCoupon secures your shopping sessions. We use Chrome Manifest V3, zero keystroke logging, no banking data access, and strict data minimization.",
+        "Learn how GoCoupon protects your privacy with bank-grade encryption, zero password tracking, no card access, and zero data selling.",
       path: "/security",
       keywords:
-        "goCoupon security, is gocoupon safe, chrome extension safety, coupon extension privacy, data protection india",
+        "gocoupon security, is gocoupon safe, chrome extension safety, coupon extension privacy, safe shopping extension",
     }),
 });
 
@@ -42,73 +41,107 @@ function SecurityPage() {
       />
 
       {/* Hero Header */}
-      <section className="relative border-b border-border px-6 pb-16 pt-20 sm:pt-28">
-        <div className="mx-auto max-w-4xl text-center">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3.5 py-1 font-mono text-xs uppercase tracking-[0.2em] text-emerald-500">
+      <section className="relative border-b border-border px-6 pb-16 pt-20 sm:pt-28 overflow-hidden text-center">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[450px] w-[750px] -translate-x-1/2 opacity-25 blur-[120px]"
+          style={{
+            background:
+              "radial-gradient(circle at center, var(--accent-glow-strong), transparent 70%)",
+          }}
+        />
+
+        <div className="mx-auto max-w-4xl">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1 font-mono text-xs uppercase tracking-[0.2em] text-emerald-500">
             <ShieldCheck className="h-4 w-4" />
-            Security &amp; Trust Center
+            <span>Security &amp; Trust Center</span>
           </div>
           <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            Built with Privacy &amp; Security from Day One.
+            Your Privacy &amp; Safety Come First. Always.
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">
-            We understand that installing a browser extension requires trust. Here is the technical breakdown of how we keep your browsing fast, private, and secure.
+          <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg leading-relaxed">
+            We understand that installing a browser extension requires trust. Here is the plain-English
+            breakdown of how we keep your shopping fast, private, and 100% safe.
           </p>
         </div>
       </section>
 
-      {/* Security Architecture Grid */}
-      <section className="border-b border-border px-6 py-16">
+      {/* 3 Core Safety Pillars */}
+      <section className="border-b border-border px-6 py-20">
         <div className="mx-auto max-w-6xl">
-          <div className="grid gap-8 md:grid-cols-3">
-            <div className="rounded-3xl border border-border bg-card p-8 shadow-sm">
-              <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <div className="text-center max-w-2xl mx-auto">
+            <div className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
+              Our Privacy Guarantees
+            </div>
+            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              How GoCoupon Protects You
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Built with zero-knowledge privacy standards so you can shop with total confidence.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-8 md:grid-cols-3">
+            {/* Box 1 */}
+            <div className="rounded-3xl border border-border bg-card p-8 shadow-sm text-center">
+              <div className="mx-auto mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-500">
+                <Lock className="h-6 w-6" />
+              </div>
+              <h3 className="font-display text-xl font-bold text-foreground">
+                Bank-Grade Encryption
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                All saved preferences on your browser use the same high-standard AES encryption trusted by financial apps to keep your device secure.
+              </p>
+              <div className="mt-4 font-mono text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">
+                ✓ 100% Encrypted on Your Device
+              </div>
+            </div>
+
+            {/* Box 2 */}
+            <div className="rounded-3xl border border-border bg-card p-8 shadow-sm text-center">
+              <div className="mx-auto mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-primary/10 text-primary">
                 <EyeOff className="h-6 w-6" />
               </div>
               <h3 className="font-display text-xl font-bold text-foreground">
-                Zero Keystroke Logging
+                Zero Keystroke Tracking
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                goCoupon never intercepts passwords, search queries, personal messages, or emails. We only inspect the coupon code input field on verified checkout pages.
+                We never watch what you type, read your emails, or record your passwords. We only check for the coupon box when you reach checkout.
               </p>
+              <div className="mt-4 font-mono text-[11px] text-primary font-bold">
+                ✓ Passwords &amp; Chats 100% Private
+              </div>
             </div>
 
-            <div className="rounded-3xl border border-border bg-card p-8 shadow-sm">
-              <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500">
-                <Lock className="h-6 w-6" />
+            {/* Box 3 */}
+            <div className="rounded-3xl border border-border bg-card p-8 shadow-sm text-center">
+              <div className="mx-auto mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-sky-500/10 text-sky-500">
+                <ShieldCheck className="h-6 w-6" />
               </div>
               <h3 className="font-display text-xl font-bold text-foreground">
                 No Banking or Card Access
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Payment gateways (UPI, CVV, OTP, Credit Card numbers) are sandboxed and completely invisible to goCoupon. Your financial details remain 100% private.
+                Payment gateways (Credit Card numbers, CVVs, UPI PINs, bank OTPs) are strictly blocked and invisible to GoCoupon.
               </p>
-            </div>
-
-            <div className="rounded-3xl border border-border bg-card p-8 shadow-sm">
-              <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-500/10 text-sky-500">
-                <Cpu className="h-6 w-6" />
+              <div className="mt-4 font-mono text-[11px] text-sky-500 font-bold">
+                ✓ Payments Completely Sandboxed
               </div>
-              <h3 className="font-display text-xl font-bold text-foreground">
-                Chrome Manifest V3
-              </h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Built strictly on Google's modern Manifest V3 platform, which prohibits remotely hosted executable code and guarantees sandboxed execution.
-              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Comparison Table: What we see vs what we don't */}
+      {/* Comparison Table: What we access vs what we don't */}
       <section className="border-b border-border bg-muted/20 px-6 py-20">
         <div className="mx-auto max-w-5xl">
           <div className="text-center">
             <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Data Visibility: Complete Transparency
+              Complete Transparency: What We See vs. What We Don&apos;t
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              A clear comparison of what our extension accesses vs. what is strictly blocked.
+              A clear, honest comparison so you know exactly how GoCoupon operates.
             </p>
           </div>
 
@@ -117,24 +150,24 @@ function SecurityPage() {
             <div className="rounded-3xl border border-border bg-card p-8 shadow-sm">
               <div className="flex items-center gap-2 border-b border-border pb-4 font-display text-lg font-bold text-emerald-500">
                 <CheckCircle2 className="h-5 w-5" />
-                What goCoupon Accesses
+                What GoCoupon Checks
               </div>
               <ul className="mt-6 space-y-4 text-sm text-foreground/90">
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                  <span>The store domain name (e.g. flipkart.com) to fetch relevant active promo codes.</span>
+                  <span>The store website name (e.g. amazon.com or flipkart.com) to find matching discount codes.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                  <span>The coupon input box element on checkout to write candidate promo codes.</span>
+                  <span>The promo code input box and green coupon buttons to apply discounts for you.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                  <span>The cart subtotal before and after coupon tests to compute net rupee savings.</span>
+                  <span>Your cart total before and after testing codes so we can tell you how much money you saved.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                  <span>Aggregated anonymized success/fail metrics for codes to update our global index.</span>
+                  <span>Anonymous code success metrics so other shoppers get working codes.</span>
                 </li>
               </ul>
             </div>
@@ -143,24 +176,24 @@ function SecurityPage() {
             <div className="rounded-3xl border border-destructive/30 bg-destructive/5 p-8 shadow-sm">
               <div className="flex items-center gap-2 border-b border-destructive/20 pb-4 font-display text-lg font-bold text-destructive">
                 <XCircle className="h-5 w-5" />
-                What goCoupon NEVER Accesses
+                What GoCoupon NEVER Sees
               </div>
               <ul className="mt-6 space-y-4 text-sm text-foreground/90">
                 <li className="flex items-start gap-3">
                   <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
-                  <span>Your passwords, OTPs, or login credentials on any website.</span>
+                  <span>Your passwords, 2FA codes, or login details on any website.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
-                  <span>Credit/debit card numbers, CVVs, or UPI PINs.</span>
+                  <span>Credit/debit card numbers, CVVs, or bank payment credentials.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
-                  <span>Your browsing activity, search history, or personal tabs outside store checkout.</span>
+                  <span>Your web browsing history, search queries, or personal tabs.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
-                  <span>Personal identity details (we never sell user data to data brokers or advertisers).</span>
+                  <span>Personal identity data (we never sell user data to brokers or advertisers).</span>
                 </li>
               </ul>
             </div>
@@ -172,30 +205,30 @@ function SecurityPage() {
       <section className="border-b border-border px-6 py-20">
         <div className="mx-auto max-w-4xl space-y-8">
           <div className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
-            Regulatory Compliance
+            Privacy Standards
           </div>
           <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Compliance with Global &amp; Indian Privacy Standards
+            Compliant with Global Privacy Policies
           </h2>
           <div className="space-y-4 text-sm leading-relaxed text-muted-foreground sm:text-base">
             <p>
-              goCoupon complies with the <strong>Digital Personal Data Protection (DPDP) Act 2023</strong> of India, the <strong>General Data Protection Regulation (GDPR)</strong>, and Google Chrome Web Store&apos;s strict <strong>Single Purpose &amp; User Data Policy</strong>.
+              GoCoupon strictly complies with Google Chrome Web Store&apos;s <strong>Single Purpose &amp; User Data Policy</strong>, the <strong>General Data Protection Regulation (GDPR)</strong>, and India&apos;s <strong>Digital Personal Data Protection Act</strong>.
             </p>
             <p>
-              All communications between the extension and our verification servers occur over encrypted TLS 1.3 channels. We do not require you to create an account, enter your email, or provide personal details to start saving.
+              You do not need to create an account, enter your email, or provide personal details to start saving with GoCoupon.
             </p>
           </div>
 
           <div className="rounded-2xl border border-border bg-card p-6">
             <h3 className="font-display text-base font-bold text-foreground">
-              Vulnerability Disclosure &amp; Bug Bounty
+              Questions or Security Reports?
             </h3>
             <p className="mt-2 text-xs text-muted-foreground">
-              Security researchers: If you discover a potential vulnerability in goCoupon, please report it responsibly to{" "}
+              If you have any questions regarding your privacy, please contact us at{" "}
               <a href="mailto:support@gocoupon.io" className="text-primary font-medium hover:underline">
                 support@gocoupon.io
               </a>
-              . We review and respond to reports within 24 hours.
+              . We respond to all inquiries within 24 hours.
             </p>
           </div>
         </div>
@@ -208,7 +241,7 @@ function SecurityPage() {
             Experience 100% safe, automated savings.
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
-            Add goCoupon to Google Chrome in seconds. No account, no credit card, no risk.
+            Add GoCoupon to Google Chrome in 10 seconds. No account, no credit card, no risk.
           </p>
           <div className="mt-8">
             <MagneticButton

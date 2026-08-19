@@ -1,54 +1,77 @@
 import { MagneticButton } from "../MagneticButton";
 import { TiltCard } from "../TiltCard";
+import { Star, ArrowRight } from "lucide-react";
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden px-6 pb-32 pt-24 md:pt-32">
+      {/* Subtle ambient backdrop glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[500px] w-[800px] -translate-x-1/2 opacity-35 blur-[120px]"
+        style={{
+          background:
+            "radial-gradient(circle at center, var(--accent-glow-strong), rgba(245, 158, 11, 0.15), transparent 70%)",
+        }}
+      />
       <div className="grid-backdrop absolute inset-0" aria-hidden />
+
       <div className="relative mx-auto grid max-w-7xl items-start gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-center">
         {/* Left: copy */}
         <div className="reveal">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            v2.4 — now with Meesho support
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-wider text-muted-foreground shadow-2xs">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Live on Amazon.com (US) · Flipkart &amp; Myntra Coming Soon</span>
           </div>
+
           <h1 className="font-display text-5xl font-bold leading-[1.05] text-foreground md:text-6xl lg:text-7xl text-balance">
             Stop overpaying.
             <br />
-            <span style={{ color: "var(--primary)" }}>Apply every coupon</span>
+            <span className="text-primary">Apply every coupon</span>
             <br />
             in one click.
           </h1>
+
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-            goCoupon automatically finds and applies the best coupon code at checkout — on Flipkart,
-            Amazon, Myntra and Meesho. One click. Maximum savings.
+            GoCoupon automatically tests all working promo codes and auto-clips green discount vouchers at checkout on Amazon.com. One click. Maximum savings.
           </p>
 
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <MagneticButton
               as="a"
-              href="#cta"
-              className="inline-flex items-center gap-3 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-shadow hover:shadow-[var(--shadow-accent)]"
+              href="https://chromewebstore.google.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2.5 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-md transition-all hover:scale-105 hover:bg-primary-hover hover:shadow-[var(--shadow-accent)]"
             >
               <ChromeIcon />
-              Add to Chrome — Free
+              <span>Add to Chrome — Free</span>
             </MagneticButton>
             <a
               href="#how"
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
-              See how it works →
+              <span>See how it works</span>
+              <ArrowRight className="h-4 w-4 text-primary" />
             </a>
           </div>
 
-          <div className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">
-            <span>★ 4.9 / 5 — 12k+ reviews</span>
+          {/* Social Proof */}
+          <div className="mt-12 flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">
+            <div className="flex items-center gap-1 text-amber-500 font-bold">
+              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+              <span className="ml-1 text-foreground">4.9 / 5</span>
+            </div>
             <span>·</span>
-            <span>180,000+ active users</span>
+            <span>180,000+ active shoppers</span>
           </div>
         </div>
 
-        {/* Right: 3D tilt mockup */}
+        {/* Right: Clean, Simplistic 3D tilt mockup */}
         <div className="reveal relative lg:-top-6" style={{ transitionDelay: "0.15s" }}>
           <ExtensionMockup />
         </div>
@@ -59,7 +82,7 @@ export function Hero() {
 
 function ChromeIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
       <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
       <circle cx="12" cy="12" r="3.5" stroke="currentColor" strokeWidth="2" />
       <path d="M12 2v6M21 8.5l-5.2 3M3 8.5l5.2 3" stroke="currentColor" strokeWidth="2" />
@@ -71,153 +94,72 @@ function ExtensionMockup() {
   return (
     <TiltCard
       className="mx-auto w-full max-w-[360px]"
-      innerClassName="relative rounded-2xl border border-foreground/15 bg-card/95 p-5 shadow-[0_25px_70px_-15px_rgba(0,0,0,0.35),var(--shadow-accent)] ring-1 ring-black/10 dark:ring-white/15 backdrop-blur-2xl transition-all duration-300"
+      innerClassName="relative rounded-2xl border border-border bg-card p-5 shadow-xl transition-all duration-300"
     >
-      {/* Background radial glow layer */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -inset-10 -z-10 opacity-70 blur-3xl"
-        style={{
-          background:
-            "radial-gradient(circle at 40% 30%, var(--accent-glow-strong), transparent 65%)",
-          transform: "translateZ(0px)",
-        }}
-      />
-
-      {/* Browser chrome header */}
-      <div
-        className="layer flex items-center justify-between border-b border-border/60 pb-3"
-        style={{ transform: "translateZ(30px)" }}
-      >
+      {/* Browser address bar header */}
+      <div className="flex items-center justify-between border-b border-border/60 pb-3">
         <div className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f56] shadow-xs" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[#ffbd2e] shadow-xs" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[#27c93f] shadow-xs" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f56]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#ffbd2e]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#27c93f]" />
         </div>
         <div className="flex flex-1 items-center justify-center px-3">
-          <div className="flex items-center gap-1.5 rounded-full border border-border/80 bg-secondary/80 px-3 py-1 font-mono text-[10px] font-medium text-foreground shadow-inner">
+          <div className="flex items-center gap-1 rounded-full border border-border bg-secondary px-3 py-1 font-mono text-[10px] font-medium text-foreground">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-muted-foreground opacity-60">https://</span>
-            <span className="font-semibold text-foreground">amazon.in</span>
-            <span className="text-muted-foreground">/ checkout</span>
+            <span className="text-muted-foreground">https://</span>
+            <span className="font-semibold text-foreground">amazon.com</span>
+            <span className="text-muted-foreground">/cart</span>
           </div>
         </div>
       </div>
 
-      {/* Extension popup card body */}
-      <div
-        className="layer mt-3 rounded-xl border border-border/80 bg-background/90 p-4 shadow-xl ring-1 ring-black/5 dark:ring-white/5"
-        style={{ transform: "translateZ(45px)" }}
-      >
-        {/* Header inside popup */}
-        <div
-          className="layer flex items-center justify-between border-b border-border/50 pb-3"
-          style={{ transform: "translateZ(60px)" }}
-        >
-          <div className="flex items-center gap-2.5">
-            <div
-              className="grid h-8 w-8 place-items-center rounded-lg font-display text-xs font-bold shadow-md shadow-primary/25"
-              style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
-              aria-hidden
-            >
+      {/* Clean extension popup container */}
+      <div className="mt-3 rounded-xl border border-border bg-background p-4 shadow-sm">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-border/60 pb-3">
+          <div className="flex items-center gap-2">
+            <div className="grid h-7 w-7 place-items-center rounded-lg bg-primary font-display text-[11px] font-bold text-primary-foreground">
               gC
             </div>
             <div>
-              <div className="text-xs font-bold text-foreground tracking-tight">goCoupon Pro</div>
-              <div className="flex items-center gap-1 font-mono text-[9px] font-semibold text-emerald-600 dark:text-emerald-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
-                Scanning 14 coupons…
+              <div className="text-xs font-bold text-foreground">GoCoupon</div>
+              <div className="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                Auto-Saved $40.00 at Checkout
               </div>
             </div>
           </div>
-          <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 font-mono text-[9px] font-bold text-primary">
-            LIVE ⚡
+          <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+            Active
           </span>
         </div>
 
-        {/* Tested Coupon list with 3D Pop */}
-        <ul
-          className="layer mt-3 space-y-2 font-mono text-[11px]"
-          style={{ transform: "translateZ(70px)" }}
-        >
-          {[
-            { code: "AMZ200", status: "tested · invalid", isInvalid: true },
-            { code: "WELCOME10", status: "tested · –₹120", isSave: true },
-            { code: "BIGSAVE25", status: "BEST DEAL · –₹486", best: true },
-            { code: "BANK50", status: "tested · –₹250", isSave: true },
-          ].map((c) => {
-            if (c.best) {
-              return (
-                <li
-                  key={c.code}
-                  className="relative flex items-center justify-between rounded-lg border-2 border-primary bg-card px-3 py-2 shadow-lg ring-2 ring-primary/20 transition-all"
-                  style={{ transform: "translateZ(85px)" }}
-                >
-                  <div className="flex items-center gap-1.5">
-                    <span className="rounded-md bg-primary/15 px-1.5 py-0.5 font-mono font-bold text-primary text-[11px]">
-                      {c.code}
-                    </span>
-                    <span className="rounded-full bg-amber-400/20 px-1.5 py-0.5 text-[9px] font-bold text-amber-600 dark:text-amber-300 border border-amber-400/30">
-                      ★ BEST
-                    </span>
-                  </div>
-                  <span className="font-bold text-primary text-xs tracking-tight">
-                    –₹486 SAVED
-                  </span>
-                </li>
-              );
-            }
+        {/* Amazon Green Voucher Item */}
+        <div className="mt-3 flex items-center justify-between rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-[11px] text-emerald-700 dark:text-emerald-300 font-mono">
+          <span>🎟️ Green Voucher Clipped</span>
+          <span className="font-bold">-$15.00</span>
+        </div>
 
-            return (
-              <li
-                key={c.code}
-                className="flex items-center justify-between rounded-lg border border-border/70 bg-secondary/50 px-2.5 py-1.5 text-[10px] transition-colors"
-              >
-                <span className="font-semibold text-foreground/90">{c.code}</span>
-                <span
-                  className={
-                    c.isInvalid
-                      ? "text-rose-500 font-medium"
-                      : "text-emerald-600 dark:text-emerald-400 font-medium"
-                  }
-                >
-                  {c.status}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-
-        {/* Savings Footer */}
-        <div
-          className="layer mt-3.5 flex items-center justify-between rounded-lg border border-border/60 bg-card px-3 py-2.5 shadow-sm"
-          style={{ transform: "translateZ(75px)" }}
-        >
-          <div>
-            <span className="block text-[10px] font-medium text-muted-foreground">
-              Total Discount Applied
+        {/* Applied Best Promo Code Item */}
+        <div className="mt-2 flex items-center justify-between rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-[11px] font-mono">
+          <div className="flex items-center gap-2">
+            <span className="rounded bg-primary/15 px-1.5 py-0.5 font-bold text-primary">
+              SAVE25NOW
             </span>
-            <span className="font-mono text-[9px] font-bold text-emerald-600 dark:text-emerald-400">
-              ✓ Lowest price unlocked
-            </span>
+            <span className="text-[10px] text-muted-foreground">Best Promo Code</span>
           </div>
-          <span className="font-display text-2xl font-extrabold tracking-tight text-primary drop-shadow-sm">
-            ₹486
+          <span className="font-bold text-primary">-$25.00</span>
+        </div>
+
+        {/* Price drop summary */}
+        <div className="mt-3 flex items-center justify-between rounded-lg border border-border bg-muted/30 p-2.5 font-mono text-xs">
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground line-through">$149.99</span>
+            <span className="font-bold text-foreground">$109.99</span>
+          </div>
+          <span className="font-bold text-emerald-600 dark:text-emerald-400">
+            Saved $40.00 (27% OFF)
           </span>
         </div>
-      </div>
-
-      {/* Floating 3D Badge */}
-      <div
-        className="layer absolute -right-2.5 -top-2.5 flex items-center gap-1 rounded-full border border-white/40 dark:border-white/20 px-3 py-1.5 text-[10px] font-bold text-primary-foreground shadow-xl transition-transform hover:scale-105"
-        style={{
-          transform: "translateZ(110px)",
-          background: "linear-gradient(135deg, var(--primary), var(--primary-hover))",
-          boxShadow: "0 8px 24px rgba(79,70,229,0.45)",
-        }}
-      >
-        <span className="h-1.5 w-1.5 rounded-full bg-white animate-ping" />
-        ✦ Auto-applied in 0.4s
       </div>
     </TiltCard>
   );

@@ -121,7 +121,7 @@ export function Navbar() {
             href="https://chromewebstore.google.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden items-center gap-2 rounded-full bg-primary px-4.5 py-2 text-xs font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-[0_8px_25px_var(--accent-glow-strong)] sm:inline-flex group"
+            className="hidden items-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 px-5 py-2 text-xs font-bold text-white shadow-md transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-rose-500/25 sm:inline-flex group"
           >
             <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
             <span>Add to Chrome — Free</span>
