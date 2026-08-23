@@ -375,16 +375,34 @@ for (const route of allRoutes) {
   // Update Title
   pageHtml = pageHtml.replace(/<title>.*?<\/title>/i, `<title>${route.title}</title>`);
 
-  // Update Meta Description
+  // Update Meta Description (handles multiline)
   pageHtml = pageHtml.replace(
-    /<meta name="description" content=".*?"\s*\/?>/i,
+    /<meta\s+name="description"[\s\S]*?>/i,
     `<meta name="description" content="${route.description}">`
   );
 
-  // Update Canonical URL
+  // Update Canonical URL (handles multiline)
   pageHtml = pageHtml.replace(
-    /<link rel="canonical" href=".*?"\s*\/?>/i,
+    /<link\s+rel="canonical"[\s\S]*?>/i,
     `<link rel="canonical" href="${canonicalUrl}">`
+  );
+
+  // Update OpenGraph Title
+  pageHtml = pageHtml.replace(
+    /<meta\s+property="og:title"[\s\S]*?>/i,
+    `<meta property="og:title" content="${route.title}">`
+  );
+
+  // Update OpenGraph Description
+  pageHtml = pageHtml.replace(
+    /<meta\s+property="og:description"[\s\S]*?>/i,
+    `<meta property="og:description" content="${route.description}">`
+  );
+
+  // Update OpenGraph URL
+  pageHtml = pageHtml.replace(
+    /<meta\s+property="og:url"[\s\S]*?>/i,
+    `<meta property="og:url" content="${canonicalUrl}">`
   );
 
   if (route.path === "") {
