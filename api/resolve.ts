@@ -6,8 +6,8 @@
  */
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { resolveProduct } from "@/lib/services/product-resolver";
-import { resolveLiveUrlAndCompetitors } from "@/lib/services/url-metadata-extractor";
+import { resolveProduct } from "../src/lib/services/product-resolver";
+import { resolveLiveUrlAndCompetitors } from "../src/lib/services/url-metadata-extractor";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "GET") {

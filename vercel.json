@@ -18,9 +18,14 @@
     }
   ],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/api/:path*", "destination": "/api/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "@vercel/node@7"
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",

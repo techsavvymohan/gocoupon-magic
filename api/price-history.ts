@@ -6,9 +6,9 @@
  */
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { resolveProduct } from "@/lib/services/product-resolver";
-import { getHistoricalPriceSeries } from "@/lib/services/price-tracking-storage";
-import { getProductPriceHistory, calculatePriceMetrics } from "@/lib/services/price-history";
+import { resolveProduct } from "../src/lib/services/product-resolver";
+import { getHistoricalPriceSeries } from "../src/lib/services/price-tracking-storage";
+import { getProductPriceHistory, calculatePriceMetrics } from "../src/lib/services/price-history";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "GET") {

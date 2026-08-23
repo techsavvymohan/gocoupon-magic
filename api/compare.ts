@@ -14,16 +14,16 @@
  */
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { resolveProduct } from "@/lib/services/product-resolver";
+import { resolveProduct } from "../src/lib/services/product-resolver";
 import {
   compareProductOffers,
   type ComparisonRow,
   type ProductComparisonSummary,
-} from "@/lib/services/comparison-engine";
-import type { MerchantOffer } from "@/lib/services/canonical-types";
-import { searchAllStoresConcurrent } from "@/lib/services/multi-store-connectors";
-import { resolveLiveUrlAndCompetitors } from "@/lib/services/url-metadata-extractor";
-import { recordPriceSnapshot } from "@/lib/services/price-tracking-storage";
+} from "../src/lib/services/comparison-engine";
+import type { MerchantOffer } from "../src/lib/services/canonical-types";
+import { searchAllStoresConcurrent } from "../src/lib/services/multi-store-connectors";
+import { resolveLiveUrlAndCompetitors } from "../src/lib/services/url-metadata-extractor";
+import { recordPriceSnapshot } from "../src/lib/services/price-tracking-storage";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // 1. Handle CORS Preflight

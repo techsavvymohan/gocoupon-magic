@@ -6,7 +6,7 @@
  */
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { CANONICAL_COUPONS } from "@/data/canonicalCatalogData";
+import { CANONICAL_COUPONS } from "../src/data/canonicalCatalogData";
 
 export default function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "GET") {
