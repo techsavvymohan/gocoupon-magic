@@ -22,9 +22,11 @@ const allTags = [
   "All",
   "Shopping Tips",
   "Amazon Tips",
-  "Safety & Privacy",
-  "Shopping Guides",
+  "Store Guides",
   "Cashback & Deals",
+  "Comparisons",
+  "Shopping Guides",
+  "Safety & Privacy",
 ] as const;
 
 function BlogIndex() {
@@ -34,7 +36,10 @@ function BlogIndex() {
   const filteredPosts = useMemo(() => {
     return posts.filter((post) => {
       const matchesTag =
-        selectedTag === "All" || post.tag.toLowerCase() === selectedTag.toLowerCase();
+        selectedTag === "All" ||
+        post.tag.toLowerCase() === selectedTag.toLowerCase() ||
+        post.tag.toLowerCase().includes(selectedTag.toLowerCase()) ||
+        selectedTag.toLowerCase().includes(post.tag.toLowerCase());
       const matchesSearch =
         searchQuery.trim() === "" ||
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
