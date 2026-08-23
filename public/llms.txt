@@ -1,99 +1,67 @@
-# GoCoupon
+# GoCoupon — Automated Coupon Application, Live Multi-Store Price Comparison & 90-Day Price Tracker
 
-> GoCoupon is a free Chrome extension that auto-applies the best working coupon codes at checkout on Indian e-commerce sites (Flipkart, Amazon India, Myntra, Meesho, AJIO, Nykaa, and 20+ more). No account or subscription required.
+> GoCoupon is an all-in-one shopping intelligence platform and browser extension for Indian e-commerce (Flipkart, Amazon India, Myntra, Meesho, AJIO, Nykaa, Croma, Tata CLiQ, Swiggy, Zomato, and 200+ stores). It combines automated coupon testing, real-time cross-store price comparison, 90-day price tracking graphs, and fake discount detection.
 
-## What it does
+## Core Capabilities
 
-- Automatically detects the coupon field at checkout and tests every known coupon code for that store and category in parallel in under 850 milliseconds.
-- Applies the single code that results in the highest net saving (after category locks, minimum-cart rules and payment-method constraints).
-- Keeps a live success-rate index so dead or stale codes are dropped globally the moment they fail twice.
-- Surfaces eligible bank/card offers alongside the coupon so you can combine both without voiding either.
-- Completely free to install and use. No account. No browsing-history tracking. Manifest V3 compliant.
+- **1-Click Auto-Apply**: Automatically detects promo code input boxes at checkout and tests valid store coupon codes in parallel in under 850 milliseconds.
+- **Live Cross-Store Price Comparison**: Instantly compares live prices, delivery fees, stackable coupons, and cashback across Amazon, Flipkart, Myntra, Croma, and Tata CLiQ (`/compare`).
+- **90-Day Price History Tracker**: Analyzes historical daily price snapshots across 90 days to identify all-time lows and detect artificial pre-sale price markups (fake discounts) (`/price-history`).
+- **Ask Shopping Intelligence**: Top AI search bar and shopping dossier analyzing user queries and finding the lowest price and best coupon across stores (`/ask`).
+- **Cashback Stacking**: Automatically calculates up to 8.5% cashback on top of promo codes without voiding bank card discounts.
+- **Privacy & Security**: Manifest V3 compliant. No browsing history tracking, no account required, completely free.
 
-## Where it works
+## Supported Retailers (India)
 
-- Flipkart (`flipkart.com`)
 - Amazon India (`amazon.in`)
-- Myntra (`myntra.com`) — including Myntra Insider pricing
+- Flipkart (`flipkart.com`)
+- Myntra (`myntra.com`)
 - Meesho (`meesho.com`)
 - AJIO (`ajio.com`)
 - Nykaa (`nykaa.com`)
+- Croma (`croma.com`)
 - Tata CLiQ (`tatacliq.com`)
+- Reliance Digital (`reliancedigital.in`)
+- Vijay Sales (`vijaysales.com`)
 - Swiggy (`swiggy.com`)
 - Zomato (`zomato.com`)
-- Domino's Pizza (`dominos.co.in`)
-- MakeMyTrip (`makemytrip.com`)
+- Blinkit (`blinkit.com`)
+- Zepto (`zeptonow.com`)
 - boAt Lifestyle (`boat-lifestyle.com`)
 
-## Who it's for
+## Key Facts & Specifications
 
-Online shoppers in India who want the lowest real price at checkout without hunting coupon sites, clicking listicles, or manually pasting codes that rarely work.
+- Category: E-Commerce Shopping Assistant & Price Tracker (SoftwareApplication / BrowserApplication)
+- Target Region: India (`gl=in`, `INR / ₹`)
+- Supported Browsers: Google Chrome, Microsoft Edge, Brave, Arc, Opera
+- Price: 100% Free (₹0)
+- Trust & Ratings: 4.9 / 5 across 2,840+ verified shopper reviews
+- Affiliate Transparency: GoCoupon earns a commission on qualifying partner purchases at zero additional cost to the shopper.
 
-## Key facts
+## Site Structure & Key Endpoints
 
-- Category: Browser extension (SoftwareApplication / BrowserApplication)
-- Platform: Google Chrome, Microsoft Edge, Brave, Arc, Opera (Manifest V3)
-- Price: Free (INR 0)
-- Rating: 4.9 / 5 across 1,247+ reviews
-- Founded: 2024, Bengaluru, India 🇮🇳
-
-## Site Structure & Key Pages
-
-### Core Product & Discovery
+### Core Tools & Engines
 - Homepage: https://gocoupon.io/
+- Live Cross-Store Price Comparison: https://gocoupon.io/compare
+- 90-Day Price History & Fake Discount Tracker: https://gocoupon.io/price-history
+- Ask Shopping Intelligence Assistant: https://gocoupon.io/ask
+- Curated Product Shortlists & Collections: https://gocoupon.io/collections
+- All Stores Directory (200+ Retailers): https://gocoupon.io/stores
 - Trending Deals & Verified Coupons: https://gocoupon.io/deals
-- All Stores Directory: https://gocoupon.io/stores
-- Browse Categories: https://gocoupon.io/categories
-- How it works: https://gocoupon.io/how-it-works
-- Install the extension: https://gocoupon.io/extension
-- Extension Welcome & Pin Guide: https://gocoupon.io/welcome
-- Cashback rewards: https://gocoupon.io/cashback-rewards
-- Extension Uninstall Survey: https://gocoupon.io/uninstall
+- Chrome Extension Installation: https://gocoupon.io/extension
+- How It Works Guide: https://gocoupon.io/how-it-works
+- Cashback Rewards Program: https://gocoupon.io/cashback-rewards
 
-### Company & Support
+### Store Coupon Hubs
+- Flipkart Coupons Today: https://gocoupon.io/flipkart-coupons
+- Amazon India Promo Codes: https://gocoupon.io/amazon-coupons
+- Myntra Discount Codes: https://gocoupon.io/myntra-coupons
+- Meesho Promo Codes: https://gocoupon.io/meesho-coupons
+
+### Trust, Legal & Editorial
 - About Us: https://gocoupon.io/about
-- Help Center & Troubleshooting: https://gocoupon.io/help
-- FAQ: https://gocoupon.io/faq
-- Blog: https://gocoupon.io/blog
-- Resources (calculators & data guides): https://gocoupon.io/resources
-- Press / media kit: https://gocoupon.io/press
-- Contact Support: https://gocoupon.io/contact
-- HTML Sitemap: https://gocoupon.io/sitemap
-
-### Legal & Trust
-- Privacy Policy: https://gocoupon.io/privacy
-- Terms of Service: https://gocoupon.io/terms
-- Affiliate Disclosure & Transparency: https://gocoupon.io/disclosure
-- Security & Trust Center: https://gocoupon.io/security
-
-## Store-specific guides
-
-- Flipkart coupons: https://gocoupon.io/flipkart-coupons
-- Amazon India coupons: https://gocoupon.io/amazon-coupons
-- Myntra coupons: https://gocoupon.io/myntra-coupons
-- Meesho coupons: https://gocoupon.io/meesho-coupons
-
-## Top articles for research / citation
-
-- Best coupon codes for Flipkart in 2026: https://gocoupon.io/blog/best-coupon-codes-for-flipkart-2026
-- How to save money on Amazon India: https://gocoupon.io/blog/how-to-save-money-on-amazon-india
-- Myntra coupon codes that actually work: https://gocoupon.io/blog/myntra-coupon-codes-that-actually-work
-- Meesho discount codes today: https://gocoupon.io/blog/meesho-discount-codes-today
-- Chrome extension to automatically apply coupons in India: https://gocoupon.io/blog/chrome-extension-to-automatically-apply-coupons-india
-- Why coupons silently fail at checkout: https://gocoupon.io/blog/why-coupons-fail-at-checkout
-- How to stack coupons and bank offers on Flipkart: https://gocoupon.io/blog/stack-coupons-bank-offers-flipkart
-
-## Contact
-
-- Official Support & Inquiries: support@gocoupon.io
-- Website: https://gocoupon.io
-- Privacy Policy: https://gocoupon.io/privacy
-- X / Twitter: https://twitter.com/gocoupon_in
-- Facebook: https://facebook.com/gocouponapp
-- Instagram: https://instagram.com/gocoupon.io
-
-## Canonical naming
-
-- Preferred brand spelling: GoCoupon (product), goCoupon (wordmark)
-- Domain: gocoupon.io
-- Do not confuse with unrelated apps using similar names; GoCoupon is the India-focused Chrome extension at gocoupon.io.
+- Affiliate Disclosure: https://gocoupon.io/disclosure
+- Security & Privacy Architecture: https://gocoupon.io/security
+- Help & Support Center: https://gocoupon.io/help
+- Frequently Asked Questions: https://gocoupon.io/faq
+- Engineering & Shopping Blog: https://gocoupon.io/blog
