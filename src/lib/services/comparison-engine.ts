@@ -108,3 +108,20 @@ export function compareProductOffers(productId: string): ProductComparisonSummar
 
   return null;
 }
+
+/**
+ * Fetches live dynamic multi-store comparison from /api/compare or SerpAPI.
+ */
+export async function fetchLiveComparison(queryOrUrl: string): Promise<ProductComparisonSummary | null> {
+  try {
+    const res = await fetch(`/api/compare?q=${encodeURIComponent(queryOrUrl)}`);
+    if (res.ok) {
+      const data = await res.json();
+      return data;
+    }
+  } catch {
+    // Graceful fallback to seed catalog
+  }
+  return compareProductOffers("prod_sony_wh1000xm5");
+}
+

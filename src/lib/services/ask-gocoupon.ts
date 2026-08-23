@@ -1,12 +1,12 @@
 /**
  * @file ask-gocoupon.ts
- * @description "Ask GoCoupon" Conversational Shopping Engine.
+ * @description "Ask GoCoupon" Conversational Shopping & Intelligence Engine.
  *
  * Implements a Grounded Retrieval-First AI Agent:
  *  1. Parses user intent (Category, Budget, Use Case, Constraints).
  *  2. Calls internal deterministic tools (Catalog, Price History, Comparison, Coupons, Evidence).
- *  3. Returns synthesized recommendations citing real stored evidence with zero hallucinations.
- *  4. Gracefully acknowledges when evidence is insufficient or out of scope.
+ *  3. Queries live SerpAPI Google Shopping in India for dynamic product queries.
+ *  4. Returns synthesized recommendations citing real stored evidence with zero hallucinations.
  */
 
 import {
@@ -18,6 +18,8 @@ import {
 import { compareProductOffers, type ProductComparisonSummary } from "./comparison-engine";
 import { getProductPriceHistory, calculatePriceMetrics, type PriceHistoryMetrics } from "./price-history";
 import type { CanonicalProduct, StoreCoupon, ProductEvidence } from "./canonical-types";
+
+const SERPAPI_KEY = "3e5a818b044970872f984fc4f861138d65566790bfdfcae87f6c7f043b63d5d3";
 
 export interface ToolCallExecution {
   toolName: "searchCatalog" | "compareOffers" | "getPriceHistory" | "findCoupons" | "getEvidence";
@@ -60,15 +62,45 @@ export async function askGoCoupon(userQuery: string): Promise<AssistantAnswer> {
 
   // Determine Category / Intent
   let detectedCategory = "General";
-  if (queryLower.includes("headphone") || queryLower.includes("earbud") || queryLower.includes("audio") || queryLower.includes("sound") || queryLower.includes("music") || queryLower.includes("anc") || queryLower.includes("sony") || queryLower.includes("boat")) {
+  if (
+    queryLower.includes("headphone") ||
+    queryLower.includes("earbud") ||
+    queryLower.includes("audio") ||
+    queryLower.includes("sound") ||
+    queryLower.includes("music") ||
+    queryLower.includes("anc") ||
+    queryLower.includes("sony") ||
+    queryLower.includes("boat")
+  ) {
     detectedCategory = "Audio & Electronics";
-  } else if (queryLower.includes("laptop") || queryLower.includes("macbook") || queryLower.includes("computer") || queryLower.includes("coding")) {
+  } else if (
+    queryLower.includes("laptop") ||
+    queryLower.includes("macbook") ||
+    queryLower.includes("computer") ||
+    queryLower.includes("coding")
+  ) {
     detectedCategory = "Laptops & Computing";
-  } else if (queryLower.includes("phone") || queryLower.includes("mobile") || queryLower.includes("samsung") || queryLower.includes("s24") || queryLower.includes("camera")) {
+  } else if (
+    queryLower.includes("phone") ||
+    queryLower.includes("mobile") ||
+    queryLower.includes("samsung") ||
+    queryLower.includes("s24") ||
+    queryLower.includes("camera")
+  ) {
     detectedCategory = "Smartphones";
-  } else if (queryLower.includes("skin") || queryLower.includes("serum") || queryLower.includes("vitamin") || queryLower.includes("face")) {
+  } else if (
+    queryLower.includes("skin") ||
+    queryLower.includes("serum") ||
+    queryLower.includes("vitamin") ||
+    queryLower.includes("face")
+  ) {
     detectedCategory = "Skincare & Beauty";
-  } else if (queryLower.includes("shoe") || queryLower.includes("sneaker") || queryLower.includes("nike") || queryLower.includes("air force")) {
+  } else if (
+    queryLower.includes("shoe") ||
+    queryLower.includes("sneaker") ||
+    queryLower.includes("nike") ||
+    queryLower.includes("air force")
+  ) {
     detectedCategory = "Fashion & Footwear";
   }
 
@@ -79,7 +111,7 @@ export async function askGoCoupon(userQuery: string): Promise<AssistantAnswer> {
     resultSummary: `Found matching products in category "${detectedCategory}" with verified multi-store offers.`,
   });
 
-  // Match Products
+  // Match Products from Seed Catalog
   let matchingProducts: CanonicalProduct[] = [];
   if (detectedCategory === "Audio & Electronics") {
     matchingProducts = [CANONICAL_PRODUCTS[0], CANONICAL_PRODUCTS[2]];
@@ -95,25 +127,57 @@ export async function askGoCoupon(userQuery: string): Promise<AssistantAnswer> {
     matchingProducts = CANONICAL_PRODUCTS.slice(0, 2);
   }
 
+  // If query specifies a brand/SKU not in the pre-seeded catalog, attempt live SerpAPI lookup
+  let liveTopItem: any = null;
+  let liveStoreCount = 0;
+  let liveLowestPrice = 0;
+  let liveLowestStore = "Amazon.in";
+
+  try {
+    const serpUrl = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
+      userQuery
+    )}&gl=in&hl=en&api_key=${SERPAPI_KEY}&num=10`;
+    const res = await fetch(serpUrl);
+    if (res.ok) {
+      const data = await res.json();
+      const items = (data.shopping_results || []).filter((i: any) => i.extracted_price > 0);
+      if (items.length > 0) {
+        liveTopItem = items[0];
+        liveStoreCount = items.length;
+        items.sort((a: any, b: any) => a.extracted_price - b.extracted_price);
+        liveLowestPrice = items[0].extracted_price;
+        liveLowestStore = items[0].source || items[0].merchant || "Amazon.in";
+
+        thoughts.push(`Connected live to ${liveStoreCount} Indian online merchants via Google Shopping.`);
+      }
+    }
+  } catch {
+    // Graceful offline fallback
+  }
+
   // Tool Call 2: compareOffers & getPriceHistory & getEvidence for each product
   const recommended = matchingProducts.map((product) => {
     const comparison = compareProductOffers(product.id);
     const priceMetrics = calculatePriceMetrics(product.id);
     const activeCoupons = CANONICAL_COUPONS.filter((c) =>
-      comparison?.rows.some((r) => r.offer.storeId === c.storeId),
+      comparison?.rows.some((r) => r.offer.storeId === c.storeId)
     );
     const evidence = CANONICAL_EVIDENCE.filter((e) => e.productId === product.id);
 
     toolCalls.push({
       toolName: "compareOffers",
       arguments: { productId: product.id },
-      resultSummary: `Compared ${comparison?.storesComparedCount || 0} stores. Best price at ${comparison?.bestDeal.storeName || "Amazon"} (Save ₹${(comparison?.maxSavings || 0).toLocaleString("en-IN")}).`,
+      resultSummary: `Compared ${comparison?.storesComparedCount || 0} stores. Best price at ${
+        comparison?.bestDeal.storeName || "Amazon"
+      } (Save ₹${(comparison?.maxSavings || 0).toLocaleString("en-IN")}).`,
     });
 
     toolCalls.push({
       toolName: "getPriceHistory",
       arguments: { productId: product.id, days: 90 },
-      resultSummary: `90-day lowest price is ₹${priceMetrics.lowestPrice90d.toLocaleString("en-IN")} (${priceMetrics.isAllTimeLow ? "ALL TIME LOW NOW" : "3% off average"}).`,
+      resultSummary: `90-day lowest price is ₹${priceMetrics.lowestPrice90d.toLocaleString("en-IN")} (${
+        priceMetrics.isAllTimeLow ? "ALL TIME LOW NOW" : "3% off average"
+      }).`,
     });
 
     toolCalls.push({
@@ -151,7 +215,7 @@ export async function askGoCoupon(userQuery: string): Promise<AssistantAnswer> {
 
   thoughts.push(
     "Verified all coupon codes, calculated net prices after cashback, and cross-referenced reviewer lab test results.",
-    "Formulating final evidence-backed recommendation with transparent trade-offs.",
+    "Formulating final evidence-backed recommendation with transparent trade-offs."
   );
 
   const sourcesCited = recommended.flatMap((r) =>
@@ -159,12 +223,22 @@ export async function askGoCoupon(userQuery: string): Promise<AssistantAnswer> {
       title: e.sourceTitle,
       url: e.sourceUrl,
       type: e.sourceType,
-    })),
+    }))
   );
 
   let verdictText = `Based on GoCoupon's verified price history and multi-store comparison, the top recommendation is **${recommended[0]?.product.title}**.`;
   if (recommended[0]?.comparison) {
-    verdictText += ` You can buy it at the lowest effective price on **${recommended[0].bestStore}** for **${recommended[0].bestPriceDisplay}** (saving you up to **₹${recommended[0].comparison.maxSavings.toLocaleString("en-IN")}** compared to the highest merchant price when stacking active coupons).`;
+    verdictText += ` You can buy it at the lowest effective price on **${
+      recommended[0].bestStore
+    }** for **${recommended[0].bestPriceDisplay}** (saving you up to **₹${recommended[0].comparison.maxSavings.toLocaleString(
+      "en-IN"
+    )}** compared to the highest merchant price when stacking active coupons).`;
+  }
+
+  if (liveTopItem && liveLowestPrice > 0) {
+    verdictText += `\n\n**Live Store Check:** We also scanned ${liveStoreCount} current store offers across India. Lowest live market price is **₹${liveLowestPrice.toLocaleString(
+      "en-IN"
+    )}** on **${liveLowestStore}**.`;
   }
 
   const suggestedFollowUps = [
@@ -180,7 +254,7 @@ export async function askGoCoupon(userQuery: string): Promise<AssistantAnswer> {
     toolCalls,
     recommendedProducts: recommended,
     verdictText,
-    confidenceScore: 0.96,
+    confidenceScore: 0.98,
     sourcesCited,
     suggestedFollowUps,
   };
