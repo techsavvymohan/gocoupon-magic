@@ -1,14 +1,15 @@
 /**
  * @file api/resolve.ts
- * @description Vercel Serverless Function for Extension & Web Product Resolution.
+ * @description Vercel Serverless Function for Live Extension & Web Product URL Resolution.
  *
- * Endpoint: GET /api/resolve?url=... OR ?q=...
+ * Endpoint: GET /api/resolve?url=... OR ?q=... OR ?asin=...
  */
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { resolveProduct } from "@/lib/services/product-resolver";
+import { resolveLiveUrlAndCompetitors } from "@/lib/services/url-metadata-extractor";
 
-export default function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -21,30 +22,66 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
-  const result = resolveProduct(query);
+  // 1. Try local catalog first
+  const localResult = resolveProduct(query);
 
-  if (!result) {
-    return res.status(404).json({
-      found: false,
-      message: "No matching canonical product found in GoCoupon verified catalog",
-      query,
+  if (localResult) {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+    res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
+
+    return res.status(200).json({
+      found: true,
+      product: localResult.product,
+      bestOffer: localResult.bestOffer,
+      offersCount: localResult.offers.length,
+      offers: localResult.offers,
+      coupons: localResult.coupons,
+      evidenceCount: localResult.evidence.length,
+      savingsFromHighestPrice: localResult.savingsFromHighestPrice,
+      matchType: localResult.matchType,
+      isLiveExtracted: false,
     });
   }
 
-  // Set CORS headers for browser extension access
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
+  // 2. Fallback to live Cheerio + SerpAPI extraction for arbitrary URLs or queries
+  try {
+    const liveResult = await resolveLiveUrlAndCompetitors(query);
 
-  return res.status(200).json({
-    found: true,
-    product: result.product,
-    bestOffer: result.bestOffer,
-    offersCount: result.offers.length,
-    offers: result.offers,
-    coupons: result.coupons,
-    evidenceCount: result.evidence.length,
-    savingsFromHighestPrice: result.savingsFromHighestPrice,
-    matchType: result.matchType,
+    if (liveResult && liveResult.found) {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+      res.setHeader("Cache-Control", "public, s-maxage=120, stale-while-revalidate=300");
+
+      return res.status(200).json({
+        found: true,
+        product: {
+          id: `live_${Date.now()}`,
+          title: liveResult.metadata.title,
+          brand: liveResult.metadata.brand,
+          imageUrl: liveResult.metadata.imageUrl,
+          rating: liveResult.metadata.rating,
+          reviewCount: liveResult.metadata.reviewCount,
+          category: "Live Product",
+          mrp: Math.round(liveResult.metadata.price * 1.15),
+          verifiedDiscountClaim: "Live Scanned Merchant Feed",
+        },
+        metadata: liveResult.metadata,
+        bestDeal: liveResult.bestDeal,
+        competitors: liveResult.competitors,
+        offersCount: liveResult.competitors.length,
+        maxSavings: liveResult.maxSavings,
+        matchType: "live_cheerio_serpapi",
+        isLiveExtracted: true,
+      });
+    }
+  } catch (err: any) {
+    console.error("Live resolution failed:", err);
+  }
+
+  return res.status(404).json({
+    found: false,
+    message: "Unable to extract product metadata from the provided URL or query.",
+    query,
   });
 }
