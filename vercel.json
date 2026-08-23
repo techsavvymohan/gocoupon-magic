@@ -6,12 +6,6 @@
   "trailingSlash": false,
   "redirects": [
     {
-      "source": "/:path*",
-      "has": [{ "type": "host", "value": "www.gocoupon.io" }],
-      "destination": "https://gocoupon.io/:path*",
-      "permanent": true
-    },
-    {
       "source": "/home",
       "destination": "/",
       "permanent": true
