@@ -33,7 +33,7 @@ type NavLink = {
 const primaryLinks: NavLink[] = [
   { label: "Compare", to: "/compare", badge: "NEW", badgeColor: "bg-primary/10 text-primary" },
   { label: "Price Tracker", to: "/price-history" },
-  { label: "Ask AI", to: "/ask", badge: "AI", badgeColor: "bg-amber-500/15 text-amber-500" },
+  { label: "Ask", to: "/ask" },
   { label: "Shortlists", to: "/collections" },
   { label: "Watchlist", to: "/watchlist" },
   { label: "Stores", to: "/stores" },
@@ -274,7 +274,7 @@ export function Navbar() {
             aria-label="Shopping Assistant"
           >
             <Bot className="h-4 w-4" aria-hidden="true" />
-            <span className="text-[10px] font-medium">Assistant</span>
+            <span className="text-[10px] font-medium">Ask</span>
           </Link>
 
           <Link

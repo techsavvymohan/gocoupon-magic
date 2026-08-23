@@ -46,7 +46,7 @@ export function ShoppingIntelligenceSpotlight() {
           ))}
         </div>
 
-        {/* Split Banner: Flash.co Shortlists + Ask AI Assistant */}
+        {/* Split Banner: Shortlists + Shopping Assistant */}
         <div className="mt-16 grid gap-8 lg:grid-cols-2">
           {/* Flash.co-Style Curated Shortlist Banner */}
           <div className="group relative flex flex-col justify-between rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/5 via-card to-card p-8 shadow-sm transition-all hover:border-primary/40 hover:shadow-xl">
@@ -131,8 +131,8 @@ export function ShoppingIntelligenceSpotlight() {
                 to="/ask"
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-primary group-hover:underline"
               >
-                <span>Launch AI Assistant</span>
-                <ArrowRight className="h-4 w-4" />
+                <span>Launch Assistant</span>
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
           </div>
