@@ -16,12 +16,12 @@ export const Route = createFileRoute("/price-history")({
   component: PriceHistoryHubPage,
   head: () =>
     createSeoHead({
-      title: "90-Day Price History Tracker & Fake Discount Detector – goCoupon",
+      title: "Price History Tracker India – Amazon & Flipkart 90-Day Graph Tracker",
       description:
-        "Check 90-day price history graphs, all-time lows, and detect fake sale price hikes on Amazon India, Flipkart and Myntra with goCoupon.",
+        "Track 90-day price history graphs on Amazon & Flipkart. Spot fake pre-sale discount hikes, set instant price drop alerts, and buy at the all-time lowest price in India.",
       path: "/price-history",
       keywords:
-        "price history tracker india, amazon price graph, flipkart price tracker, fake discount detector, 90 day lowest price",
+        "price history tracker india, amazon price tracker, flipkart price graph, buyhatke alternative, fake discount detector, 90 day lowest price india",
     }),
 });
 

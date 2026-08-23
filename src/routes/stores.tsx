@@ -10,9 +10,9 @@ export const Route = createFileRoute("/stores")({
   component: StoresPage,
   head: () =>
     createSeoHead({
-      title: "All Stores & Brands Coupons Directory – goCoupon",
+      title: "Top 200+ Indian Stores Coupons & Deals Directory (Feb 2026) – goCoupon",
       description:
-        "Browse verified coupon codes, discounts, and cashback offers across 25+ top Indian online shopping stores including Flipkart, Amazon, Myntra, Meesho, Nykaa, and Swiggy.",
+        "Browse verified working coupon codes, promo codes, and up to 10% cashback across 200+ top Indian shopping stores including Flipkart, Amazon, Myntra, Meesho, Nykaa, and Swiggy.",
       path: "/stores",
       keywords:
         "all stores coupons, indian online store deals, flipkart amazon myntra coupons, store directory, brand promo codes india",
@@ -165,7 +165,7 @@ function StoresPage() {
           <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:items-center">
             <div>
               <div className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-primary">
-                <Sparkles className="h-3.5 w-3.5" />
+                <Tag className="h-3.5 w-3.5" aria-hidden="true" />
                 Never Copy Codes Manually
               </div>
               <h2 className="mt-3 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">

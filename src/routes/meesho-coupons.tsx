@@ -21,12 +21,12 @@ export const Route = createFileRoute("/meesho-coupons")({
   component: MeeshoCouponsPage,
   head: () =>
     createSeoHead({
-      title: "Meesho Coupon Codes – Meesho Cashback & Offers",
+      title: "Meesho Promo Codes (Working Feb 2026) – ₹100 Off Coupon Codes",
       description:
-        "Save more on Meesho with goCoupon. Auto-test and apply valid Meesho coupon codes at checkout and unlock available cashback offers.",
+        "Save more on Meesho with goCoupon. Auto-test and apply valid Meesho coupon codes at checkout and unlock available cashback offers on fashion, home & daily essentials.",
       path: "/meesho-coupons",
       keywords:
-        "meesho coupon code, meesho promo code, meesho cashback offers, meesho discount code",
+        "meesho coupon code, meesho promo code today, meesho 100 off coupon, meesho cashback offers, meesho discount code",
     }),
 });
 

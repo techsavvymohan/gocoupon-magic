@@ -21,12 +21,12 @@ export const Route = createFileRoute("/myntra-coupons")({
   component: MyntraCouponsPage,
   head: () =>
     createSeoHead({
-      title: "Myntra Coupons & Promo Codes – Myntra Sale Deals 2026",
+      title: "Myntra Coupon Codes (Verified Today, Feb 2026) – Flat ₹400 Off Codes",
       description:
-        "Unlock extra savings with Myntra coupon codes on goCoupon. Auto-apply working Myntra promo codes and compare cashback + insider pricing.",
+        "Get 100% verified working Myntra promo codes, first order discounts, and 6.2% cashback on fashion, shoes, and beauty products with goCoupon.",
       path: "/myntra-coupons",
       keywords:
-        "myntra coupon code, myntra promo code, myntra discount coupon, myntra cashback offers",
+        "myntra coupon code, myntra coupon code today, myntra 400 off coupon, myntra promo code, myntra cashback offers",
     }),
 });
 

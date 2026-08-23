@@ -25,12 +25,12 @@ export const Route = createFileRoute("/amazon-coupons")({
   component: AmazonCouponsPage,
   head: () =>
     createSeoHead({
-      title: "Amazon India Coupons & Promo Codes – Save on Electronics and Fashion",
+      title: "Amazon India Coupon Codes (Verified Feb 2026) – Promo Codes & Deals",
       description:
-        "Find verified Amazon India coupon codes with goCoupon. Auto-apply the best Amazon promo code at checkout and save more on every order.",
+        "Verified Amazon India coupon codes, lighting deals, and credit card promo discounts. Auto-apply the best working promo codes and get up to 7% cashback with goCoupon.",
       path: "/amazon-coupons",
       keywords:
-        "amazon india coupons, amazon promo code, amazon discount code, amazon cashback offers india",
+        "amazon india coupons, amazon coupon code today, amazon promo code, amazon discount code, amazon cashback offers india",
     }),
 });
 

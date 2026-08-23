@@ -21,12 +21,12 @@ export const Route = createFileRoute("/flipkart-coupons")({
   component: FlipkartCouponsPage,
   head: () =>
     createSeoHead({
-      title: "Flipkart Coupons & Cashback Offers – Flipkart Promo Codes",
+      title: "Flipkart Coupon Codes (Working Today, Feb 2026) – Flat ₹500 Off & Cashback",
       description:
-        "Discover the latest Flipkart coupon codes and cashback offers with goCoupon. Auto-apply valid Flipkart promo codes and maximize checkout savings.",
+        "Looking for 100% verified working Flipkart coupon codes? Find active promo codes, instant bank discounts, and up to 8.5% cashback on fashion, mobiles, and electronics with goCoupon.",
       path: "/flipkart-coupons",
       keywords:
-        "flipkart coupon code, flipkart promo code, flipkart discount code, flipkart cashback offers",
+        "flipkart coupon code, flipkart coupon code today, flipkart promo code, flipkart 500 off coupon, flipkart cashback offers",
     }),
 });
 

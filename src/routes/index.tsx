@@ -16,24 +16,26 @@ import { ContactForm } from "@/components/site/ContactForm";
 import { CTA } from "@/components/site/CTA";
 import { About } from "@/components/site/About";
 import { couponFaqs } from "@/data/faqs";
-import { breadcrumbSchema, createSeoHead, faqSchema } from "@/lib/seo";
+import { breadcrumbSchema, createSeoHead, faqSchema, organizationSchema, softwareAppSchema } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   component: Index,
   head: () =>
     createSeoHead({
-      title: "goCoupon – Auto-Apply Coupon Codes & Cashback Extension",
+      title: "goCoupon™ – Auto-Apply Working Coupons & Live Price Tracker (Save Up to 40%)",
       description:
-        "GoCoupon auto-applies the best coupon codes at checkout on Flipkart, Amazon, Myntra & Meesho. Free Chrome extension. Save up to ₹500 per order.",
+        "Never search for coupon codes again. goCoupon automatically tests and applies the best working promo codes, tracks 90-day price drops, and unlocks cashback on Amazon, Flipkart, Myntra & 200+ stores.",
       path: "/",
       keywords:
-        "coupon codes india, coupon extension chrome, cashback extension india, amazon india coupons, flipkart coupon code, myntra promo code, meesho coupon code",
+        "coupon codes india, coupon extension chrome, cashback extension india, amazon india coupons, flipkart coupon code, myntra promo code, meesho coupon code, price tracker india",
     }),
 });
 
 function Index() {
   const breadcrumb = breadcrumbSchema([{ name: "Home", path: "/" }]);
   const faq = faqSchema(couponFaqs);
+  const org = organizationSchema();
+  const app = softwareAppSchema();
 
   return (
     <SiteShell>
@@ -44,6 +46,14 @@ function Index() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(org) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(app) }}
       />
       <Hero />
       <LogoMarquee />
