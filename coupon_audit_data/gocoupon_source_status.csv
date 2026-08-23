@@ -1,0 +1,9 @@
+url,status,location,bytes,content_type
+https://www.gocoupon.io/,200,,9594,text/html; charset=utf-8
+https://gocoupon.io/,307,https://www.gocoupon.io/,15,text/plain
+https://www.gocoupon.io/robots.txt,308,https://gocoupon.io/robots.txt,15,text/plain
+https://gocoupon.io/robots.txt,307,https://www.gocoupon.io/robots.txt,15,text/plain
+https://www.gocoupon.io/sitemap.xml,308,https://gocoupon.io/sitemap.xml,15,text/plain
+https://gocoupon.io/sitemap.xml,307,https://www.gocoupon.io/sitemap.xml,15,text/plain
+https://www.gocoupon.io/sitemap-index.xml,308,https://gocoupon.io/sitemap-index.xml,15,text/plain
+https://gocoupon.io/sitemap-index.xml,307,https://www.gocoupon.io/sitemap-index.xml,15,text/plain

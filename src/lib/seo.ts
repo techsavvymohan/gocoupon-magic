@@ -68,11 +68,6 @@ export function createSeoHead(input: SeoInput) {
     links: [
       { rel: "canonical", href: url },
       { rel: "alternate", hrefLang: "en-in", href: url },
-      {
-        rel: "alternate",
-        hrefLang: "hi",
-        href: absoluteUrl(path === "/" ? "/hi/" : `/hi${path.startsWith("/") ? path : `/${path}`}`),
-      },
       { rel: "alternate", hrefLang: "x-default", href: url },
     ],
   };
