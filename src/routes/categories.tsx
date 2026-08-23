@@ -33,7 +33,7 @@ export const Route = createFileRoute("/categories")({
 interface CategoryItem {
   id: string;
   name: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   tagline: string;
   avgSavings: string;
   popularStores: Array<{ name: string; to?: string; href?: string }>;
@@ -261,7 +261,7 @@ function CategoriesPage() {
                       st.to ? (
                         <Link
                           key={st.name}
-                          to={st.to}
+                          to={st.to as any}
                           className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-primary hover:text-primary"
                         >
                           <span>{st.name}</span>

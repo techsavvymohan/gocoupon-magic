@@ -12,7 +12,7 @@
 import { useState } from "react";
 import { type CategoryRecommendation, type ProductEvidence } from "@/lib/services/canonical-types";
 import { EvidenceDrawer } from "./EvidenceDrawer";
-import { ShieldCheck, AlertCircle, FileText, CheckCircle2, Award, ChevronRight } from "lucide-react";
+import { AlertCircle, FileText, CheckCircle2, Award, ChevronRight } from "lucide-react";
 
 interface FlashVerdictBadgeProps {
   recommendation?: CategoryRecommendation;
@@ -31,27 +31,35 @@ export function FlashVerdictBadge({
 
   const displayScore = recommendation ? recommendation.overallScore : score;
   const targetUser =
-    recommendation?.targetUserLabel ||
+    recommendation?.bestFor ||
     "Value seekers, tech enthusiasts, and smart shoppers looking for the best price-to-performance ratio.";
   const editorialSummary =
-    recommendation?.editorialSummary ||
+    recommendation?.verdictSummary ||
     "Thoroughly vetted through certified lab teardowns and acoustic analysis. Represents the top tier in its price category with proven durability.";
 
-  const rubric = recommendation?.rubricScores || [
-    { label: "Performance & Quality", score: 9.6 },
-    { label: "Build & Durability", score: 9.3 },
-    { label: "Battery / Efficiency", score: 9.5 },
-    { label: "Comfort & Ergonomics", score: 9.1 },
-    { label: "Value for Money", score: 9.7 },
-  ];
+  const rubric: Array<{ label: string; score: number }> = recommendation?.rubricBreakdown
+    ? [
+        { label: recommendation.rubricBreakdown.pillar1.label, score: recommendation.rubricBreakdown.pillar1.score },
+        { label: recommendation.rubricBreakdown.pillar2.label, score: recommendation.rubricBreakdown.pillar2.score },
+        { label: recommendation.rubricBreakdown.pillar3.label, score: recommendation.rubricBreakdown.pillar3.score },
+        { label: recommendation.rubricBreakdown.pillar4.label, score: recommendation.rubricBreakdown.pillar4.score },
+        { label: recommendation.rubricBreakdown.pillar5.label, score: recommendation.rubricBreakdown.pillar5.score },
+      ]
+    : [
+        { label: "Performance & Quality", score: 9.6 },
+        { label: "Build & Durability", score: 9.3 },
+        { label: "Battery / Efficiency", score: 9.5 },
+        { label: "Comfort & Ergonomics", score: 9.1 },
+        { label: "Value for Money", score: 9.7 },
+      ];
 
-  const strengths = recommendation?.verifiedStrengths || [
+  const strengths: string[] = recommendation?.keyPros || [
     "Class-leading performance across comprehensive benchmark tests",
     "Fast charging with exceptional standby power efficiency",
     "Seamless multi-device connectivity and high buyer satisfaction",
   ];
 
-  const limitations = recommendation?.honestLimitations || [
+  const limitations: string[] = recommendation?.keyCons || [
     "Premium pricing during non-festival shopping windows",
     "Companion app setup requires 2-3 minutes of initial pairing",
   ];
@@ -67,7 +75,7 @@ export function FlashVerdictBadge({
           <div>
             <div className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-primary uppercase tracking-wider">
               <Award className="h-3.5 w-3.5" />
-              Flash.co Evidence Score
+              Flash Evidence Score
             </div>
             <h3 className="font-display text-lg sm:text-xl font-bold text-foreground">
               {targetUser}
@@ -99,7 +107,7 @@ export function FlashVerdictBadge({
           Weighted Rubric Criteria Breakdown:
         </span>
         <div className="space-y-3">
-          {rubric.map((item) => (
+          {rubric.map((item: { label: string; score: number }) => (
             <div key={item.label}>
               <div className="flex items-center justify-between text-xs font-medium mb-1">
                 <span className="text-foreground">{item.label}</span>
@@ -125,7 +133,7 @@ export function FlashVerdictBadge({
             Verified Strengths
           </div>
           <ul className="space-y-2 text-xs text-muted-foreground leading-relaxed">
-            {strengths.map((st, i) => (
+            {strengths.map((st: string, i: number) => (
               <li key={i} className="flex items-start gap-2">
                 <span className="text-emerald-500 font-bold shrink-0 mt-0.5">✓</span>
                 <span>{st}</span>
@@ -141,7 +149,7 @@ export function FlashVerdictBadge({
             Honest Limitations
           </div>
           <ul className="space-y-2 text-xs text-muted-foreground leading-relaxed">
-            {limitations.map((lim, i) => (
+            {limitations.map((lim: string, i: number) => (
               <li key={i} className="flex items-start gap-2">
                 <span className="text-amber-500 font-bold shrink-0 mt-0.5">⚠</span>
                 <span>{lim}</span>
@@ -155,7 +163,7 @@ export function FlashVerdictBadge({
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         evidence={evidence}
-        productTitle={productTitle}
+        productTitle={productTitle || recommendation?.product?.title || "Product"}
       />
     </div>
   );

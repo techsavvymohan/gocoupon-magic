@@ -15,7 +15,12 @@
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { resolveProduct } from "@/lib/services/product-resolver";
-import { compareProductOffers, type ProductComparisonSummary } from "@/lib/services/comparison-engine";
+import {
+  compareProductOffers,
+  type ComparisonRow,
+  type ProductComparisonSummary,
+} from "@/lib/services/comparison-engine";
+import type { MerchantOffer } from "@/lib/services/canonical-types";
 import { searchAllStoresConcurrent } from "@/lib/services/multi-store-connectors";
 import { resolveLiveUrlAndCompetitors } from "@/lib/services/url-metadata-extractor";
 import { recordPriceSnapshot } from "@/lib/services/price-tracking-storage";
@@ -75,35 +80,44 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (urlResolution && urlResolution.competitors.length > 0) {
         const canonicalId = `url_${encodeURIComponent(urlResolution.metadata.title).slice(0, 30)}`;
 
-        const formattedRows = urlResolution.competitors.map((c, idx) => ({
-          offer: {
+        const formattedRows: ComparisonRow[] = urlResolution.competitors.map((c, idx) => {
+          const merchantOffer: MerchantOffer = {
             id: `url_offer_${idx}`,
+            productId: canonicalId,
             storeId: c.storeName.toLowerCase().replace(/[^a-z0-9]/g, "_"),
             storeName: c.storeName,
             storeLogo: c.storeLogo || undefined,
-            productId: canonicalId,
-            itemPrice: c.price,
-            currency: "INR",
-            inStock: true,
+            rawUrl: c.affiliateUrl,
             affiliateUrl: c.affiliateUrl,
+            itemPrice: c.price,
             shippingFee: 0,
+            currency: "INR",
+            stockStatus: "In Stock",
             deliveryTime: "Free Standard Delivery",
-            badgeText: c.isBestDeal ? "BEST DEAL" : undefined,
-          },
-          storeName: c.storeName,
-          storeLogo: c.storeLogo || undefined,
-          cashbackRate: c.cashbackRate,
-          cashbackAmount: c.cashbackAmount,
-          bestCouponCode: c.bestCouponCode || undefined,
-          couponSavings: c.couponSavings,
-          shippingFee: 0,
-          itemPrice: c.price,
-          effectiveNetPrice: c.effectiveNetPrice,
-          isBestDeal: c.isBestDeal,
-          savingsVsWorst: c.savingsVsOriginal,
-          deliveryEstimate: "Free Standard Delivery",
-          affiliateUrl: c.affiliateUrl,
-        }));
+            lastCheckedAt: Date.now(),
+            isBestPrice: c.isBestDeal,
+            couponSavings: c.couponSavings,
+            cashbackEstimated: c.cashbackAmount,
+            effectiveNetPrice: c.effectiveNetPrice,
+          };
+
+          return {
+            offer: merchantOffer,
+            storeName: c.storeName,
+            storeLogo: c.storeLogo || undefined,
+            cashbackRate: c.cashbackRate,
+            cashbackAmount: c.cashbackAmount,
+            bestCouponCode: c.bestCouponCode || undefined,
+            couponSavings: c.couponSavings,
+            shippingFee: 0,
+            itemPrice: c.price,
+            effectiveNetPrice: c.effectiveNetPrice,
+            isBestDeal: c.isBestDeal,
+            savingsVsWorst: c.savingsVsOriginal,
+            deliveryEstimate: "Free Standard Delivery",
+            affiliateUrl: c.affiliateUrl,
+          };
+        });
 
         const responsePayload: ProductComparisonSummary = {
           productId: canonicalId,
@@ -159,38 +173,48 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ).catch(() => {});
     }
 
-    const formattedRows = offers.map((offer, idx) => ({
-      offer: {
+    const formattedRows: ComparisonRow[] = offers.map((offer, idx) => {
+      const isBest = offer.effectiveNetPrice === bestDeal?.effectiveNetPrice;
+      const merchantOffer: MerchantOffer = {
         id: `offer_${idx}`,
+        productId: canonicalId,
         storeId: offer.storeId,
         storeName: offer.storeName,
-        storeLogo: offer.storeLogo,
-        productId: canonicalId,
-        itemPrice: offer.itemPrice,
-        currency: "INR",
-        inStock: offer.inStock,
+        storeLogo: offer.storeLogo || undefined,
+        rawUrl: offer.affiliateUrl,
         affiliateUrl: offer.affiliateUrl,
+        itemPrice: offer.itemPrice,
         shippingFee: 0,
+        currency: "INR",
+        stockStatus: offer.inStock ? "In Stock" : "Out of Stock",
         deliveryTime: offer.deliveryEstimate,
-        badgeText: offer.effectiveNetPrice === bestDeal?.effectiveNetPrice ? "BEST DEAL" : undefined,
-      },
-      storeName: offer.storeName,
-      storeLogo: offer.storeLogo,
-      cashbackRate: offer.cashbackRate,
-      cashbackAmount: offer.cashbackAmount,
-      bestCouponCode: offer.couponCode || undefined,
-      couponSavings: offer.couponSavings,
-      shippingFee: 0,
-      itemPrice: offer.itemPrice,
-      effectiveNetPrice: offer.effectiveNetPrice,
-      isBestDeal: offer.effectiveNetPrice === bestDeal?.effectiveNetPrice,
-      savingsVsWorst: Math.max(
-        0,
-        Math.max(...offers.map((o) => o.itemPrice)) - offer.effectiveNetPrice
-      ),
-      deliveryEstimate: offer.deliveryEstimate,
-      affiliateUrl: offer.affiliateUrl,
-    }));
+        lastCheckedAt: Date.now(),
+        isBestPrice: isBest,
+        couponSavings: offer.couponSavings,
+        cashbackEstimated: offer.cashbackAmount,
+        effectiveNetPrice: offer.effectiveNetPrice,
+      };
+
+      return {
+        offer: merchantOffer,
+        storeName: offer.storeName,
+        storeLogo: offer.storeLogo || undefined,
+        cashbackRate: offer.cashbackRate,
+        cashbackAmount: offer.cashbackAmount,
+        bestCouponCode: offer.couponCode || undefined,
+        couponSavings: offer.couponSavings,
+        shippingFee: 0,
+        itemPrice: offer.itemPrice,
+        effectiveNetPrice: offer.effectiveNetPrice,
+        isBestDeal: isBest,
+        savingsVsWorst: Math.max(
+          0,
+          Math.max(...offers.map((o) => o.itemPrice)) - offer.effectiveNetPrice
+        ),
+        deliveryEstimate: offer.deliveryEstimate,
+        affiliateUrl: offer.affiliateUrl,
+      };
+    });
 
     const responsePayload: ProductComparisonSummary = {
       productId: canonicalId,

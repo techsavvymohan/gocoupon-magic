@@ -174,7 +174,7 @@ export function MerchantComparisonTable({ comparison, productTitle }: MerchantCo
                       ? "bg-primary text-primary-foreground hover:scale-[1.02] shadow-primary/25"
                       : "border border-border bg-card text-foreground hover:border-primary/40 hover:bg-muted"
                   }`}
-                  aria-label={`Buy ${row.productTitle || "product"} on ${row.storeName}`}
+                  aria-label={`Buy ${productTitle || "product"} on ${row.storeName}`}
                 >
                   <span>{row.isBestDeal ? `Shop on ${row.storeName}` : `Buy on ${row.storeName}`}</span>
                   <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />

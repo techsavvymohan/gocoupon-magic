@@ -44,7 +44,7 @@ function SitemapPage() {
 
   const siteSections: Array<{
     title: string;
-    icon: React.ElementType;
+    icon: React.ComponentType<{ className?: string }>;
     links: SiteLink[];
   }> = [
     {
@@ -173,7 +173,7 @@ function SitemapPage() {
                   return (
                     <Link
                       key={link.to}
-                      to={link.to!}
+                      to={link.to as any}
                       className="group rounded-2xl border border-border/80 bg-background p-4 transition-all hover:border-primary hover:shadow-md"
                     >
                       <div className="flex items-center justify-between font-display text-sm font-bold text-foreground group-hover:text-primary">
@@ -222,7 +222,7 @@ function SitemapPage() {
                     {post.excerpt}
                   </p>
                   <div className="mt-2 flex items-center justify-between text-[10px] font-mono text-muted-foreground">
-                    <span>{post.readTime}</span>
+                    <span>{post.read}</span>
                     <span className="text-primary group-hover:underline">Read article →</span>
                   </div>
                 </Link>

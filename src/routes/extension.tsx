@@ -352,7 +352,7 @@ function ExtensionPage() {
                 {activeTab === "result" && (
                   <div className="space-y-4 text-center">
                     <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-500">
-                      <Sparkles className="h-6 w-6" />
+                      <CheckCircle2 className="h-6 w-6" />
                     </div>
 
                     <div>

@@ -128,7 +128,7 @@ function PrivacyPage() {
           {/* Single Purpose Summary Banner */}
           <div className="mt-8 rounded-2xl border border-primary/20 bg-primary/5 p-5 text-foreground">
             <div className="flex items-start gap-3.5">
-              <Sparkles className="h-5 w-5 shrink-0 text-primary mt-0.5" />
+              <ShieldCheck className="h-5 w-5 shrink-0 text-primary mt-0.5" />
               <div>
                 <h2 className="text-sm font-bold uppercase tracking-wider text-primary">
                   Single Purpose Statement
