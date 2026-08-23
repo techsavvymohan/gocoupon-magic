@@ -127,19 +127,20 @@ function UninstallPage() {
                   </label>
                   <textarea
                     rows={4}
+                    name="customFeedback"
                     value={customFeedback}
                     onChange={(e) => setCustomFeedback(e.target.value)}
-                    placeholder="Tell us what we could have done better or which stores were missing..."
-                    className="mt-2 w-full rounded-2xl border border-border bg-background p-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="Tell us what we could have done better or which stores were missing…"
+                    className="mt-2 w-full rounded-2xl border border-border bg-background p-4 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 touch-manipulation"
                   />
                 </div>
 
                 <div className="pt-2">
                   <button
                     type="submit"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition-transform hover:scale-[1.02]"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 min-h-[44px] text-sm font-semibold text-primary-foreground shadow-sm transition-transform hover:scale-[1.02] active:scale-[0.98] touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   >
-                    <Send className="h-4 w-4" />
+                    <Send className="h-4 w-4" aria-hidden="true" />
                     <span>Submit Feedback</span>
                   </button>
                 </div>

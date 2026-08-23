@@ -35,8 +35,8 @@ export function SiteShell({ children, showParticles = true }: SiteShellProps) {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground">
-      {/* Fixed background layer for cursor and ambient particles (z-0 behind all content) */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
+      {/* Fixed background layer for cursor and ambient particles (desktop only, disabled on mobile screens) */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden hidden md:block" aria-hidden>
         <Suspense fallback={null}>
           <MedusaeCursor />
         </Suspense>

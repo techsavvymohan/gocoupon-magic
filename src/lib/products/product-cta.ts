@@ -45,8 +45,8 @@ const CTA_MAP: Record<string, CTAConfig> = {
     rel: "noopener noreferrer sponsored",
   },
   mock: {
-    label: "View Demo Deal",
-    ariaLabel: "View demo deal (development only)",
+    label: "Check Live Price",
+    ariaLabel: "Check live price on store — opens in a new tab",
     rel: "noopener noreferrer",
   },
 };

@@ -7,6 +7,7 @@ import { HowItWorks } from "@/components/site/HowItWorks";
 import { Features } from "@/components/site/Features";
 import { AnimatedDealsCarousel } from "@/components/site/AnimatedDealsCarousel";
 import { AmazonAffiliateCards } from "@/components/site/AmazonAffiliateCards";
+import { ShoppingIntelligenceSpotlight } from "@/components/shopping/ShoppingIntelligenceSpotlight";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Pricing } from "@/components/site/Pricing";
 import { FAQ } from "@/components/site/FAQ";
@@ -51,6 +52,7 @@ function Index() {
       <Features />
       <AnimatedDealsCarousel />
       <AmazonAffiliateCards />
+      <ShoppingIntelligenceSpotlight />
       <About />
       <Testimonials />
       <Pricing />

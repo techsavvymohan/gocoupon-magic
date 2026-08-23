@@ -8,7 +8,6 @@ import {
   Zap,
   Lock,
   CheckCircle2,
-  Sparkles,
   ArrowRight,
   RefreshCw,
   Layers,
@@ -109,13 +108,13 @@ function ExtensionPage() {
 
         <div className="mx-auto max-w-5xl">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.2em] text-primary shadow-xs">
-            <Sparkles className="h-4 w-4" />
+            <ShieldCheck className="h-4 w-4" />
             <span>100% Free · Safe &amp; Private · 1-Click Savings</span>
           </div>
 
           <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl">
             Never Pay Full Price Online Again.{" "}
-            <span className="bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
+            <span className="text-primary font-extrabold">
               Auto-Apply Coupons in 1 Click
             </span>
           </h1>

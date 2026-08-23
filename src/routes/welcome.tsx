@@ -140,19 +140,19 @@ function WelcomePage() {
         </div>
       </section>
 
-      {/* Interactive Simulator Demo */}
+      {/* Interactive Simulator Card */}
       <section className="border-b border-border bg-muted/20 px-6 py-20">
         <div className="mx-auto max-w-4xl">
           <div className="text-center">
             <div className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-primary">
-              <Sparkles className="h-3.5 w-3.5" />
+              <Zap className="h-3.5 w-3.5" aria-hidden="true" />
               Interactive Simulation
             </div>
-            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              See how goCoupon works right now
+            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl text-balance">
+              See How goCoupon Works on Your Favorite Stores
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Try this interactive checkout preview to see how fast goCoupon finds savings.
+              Try this interactive checkout preview to see how fast goCoupon finds and applies savings.
             </p>
           </div>
 
@@ -167,7 +167,7 @@ function WelcomePage() {
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <div className="flex justify-between">
                     <span>Noise Wireless ANC Earbuds</span>
-                    <span className="font-mono text-foreground font-medium">₹3,499</span>
+                    <span className="font-mono text-foreground font-medium tabular-nums">₹3,499</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Delivery Charge</span>
@@ -176,13 +176,13 @@ function WelcomePage() {
                   {demoState === "done" && (
                     <div className="flex justify-between text-emerald-500 font-medium animate-fade-in">
                       <span>goCoupon Discount (FKFEST2026)</span>
-                      <span className="font-mono">- ₹500</span>
+                      <span className="font-mono tabular-nums">- ₹500</span>
                     </div>
                   )}
                 </div>
                 <div className="flex justify-between border-t border-border pt-3 font-display font-bold text-foreground">
                   <span>Total Payable:</span>
-                  <span className="font-mono text-lg text-primary">
+                  <span className="font-mono text-lg text-primary tabular-nums">
                     {demoState === "done" ? "₹2,999" : "₹3,499"}
                   </span>
                 </div>
@@ -191,7 +191,7 @@ function WelcomePage() {
               {/* Extension Simulator Widget */}
               <div className="flex flex-col items-center justify-center rounded-2xl border border-primary/30 bg-primary/5 p-6 text-center">
                 <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-3">
-                  <Zap className="h-5 w-5" />
+                  <Zap className="h-5 w-5" aria-hidden="true" />
                 </div>
                 <h3 className="font-display text-lg font-bold text-foreground">goCoupon Extension</h3>
 
@@ -201,11 +201,12 @@ function WelcomePage() {
                       5 coupons found for this cart. Ready to test?
                     </p>
                     <button
+                      type="button"
                       onClick={runDemo}
-                      className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs font-semibold text-primary-foreground shadow-sm transition-transform hover:scale-105"
+                      className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 min-h-[40px] text-xs font-semibold text-primary-foreground shadow-sm transition-transform hover:scale-105 active:scale-95 touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     >
                       <span>Simulate Auto-Apply</span>
-                      <ArrowRight className="h-3.5 w-3.5" />
+                      <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                     </button>
                   </div>
                 )}
@@ -228,18 +229,19 @@ function WelcomePage() {
                 {demoState === "done" && (
                   <div className="mt-4 space-y-3 animate-fade-in">
                     <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 font-mono text-xs font-bold text-emerald-500">
-                      <Check className="h-3.5 w-3.5" />
+                      <Check className="h-3.5 w-3.5" aria-hidden="true" />
                       Saved ₹500!
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Applied best code <strong className="text-foreground">FKFEST2026</strong> automatically.
                     </p>
                     <button
+                      type="button"
                       onClick={resetDemo}
-                      className="inline-flex items-center gap-1 text-xs font-mono text-primary hover:underline"
+                      className="inline-flex items-center gap-1 text-xs font-mono text-primary hover:underline touch-manipulation min-h-[32px] px-2"
                     >
-                      <RotateCcw className="h-3 w-3" />
-                      Try demo again
+                      <RotateCcw className="h-3 w-3" aria-hidden="true" />
+                      Test Auto-Apply Again
                     </button>
                   </div>
                 )}

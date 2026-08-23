@@ -94,17 +94,17 @@ function CarouselCard({
           {/* Price Row */}
           <div className="mt-3 flex items-baseline gap-2">
             {product.dealPriceDisplay && (
-              <span className="font-display text-xl font-bold text-foreground">
+              <span className="font-display text-xl font-bold text-foreground tabular-nums">
                 {product.dealPriceDisplay}
               </span>
             )}
             {product.originalPriceDisplay && (
-              <span className="text-xs text-muted-foreground line-through">
+              <span className="text-xs text-muted-foreground line-through tabular-nums">
                 {product.originalPriceDisplay}
               </span>
             )}
             {product.savingLabel && (
-              <span className="text-[11px] font-medium text-emerald-500 font-mono">
+              <span className="text-[11px] font-medium text-emerald-500 font-mono tabular-nums">
                 {product.savingLabel}
               </span>
             )}

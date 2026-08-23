@@ -86,18 +86,24 @@ function BlogIndex() {
           <div className="mt-10 space-y-5 max-w-3xl">
             {/* Search Input */}
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
               <input
-                type="text"
-                placeholder="Search money-saving guides (e.g. Amazon, Green Coupons, Cash Back, Discounts)..."
+                type="search"
+                name="blogSearch"
+                placeholder="Search money-saving guides (e.g. Amazon, Green Coupons, Cash Back, Discounts)…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-2xl border border-border bg-card/80 py-3.5 pl-11 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-hidden focus:ring-2 focus:ring-primary/20 transition-all shadow-xs backdrop-blur-xs"
+                autoComplete="off"
+                spellCheck={false}
+                aria-label="Search money-saving blog articles"
+                className="w-full rounded-2xl border border-border bg-card/80 py-3.5 pl-11 pr-16 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 transition-colors shadow-xs backdrop-blur-xs touch-manipulation"
               />
               {searchQuery && (
                 <button
+                  type="button"
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-mono text-muted-foreground hover:text-foreground"
+                  aria-label="Clear search input"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-mono text-muted-foreground hover:text-foreground touch-manipulation min-h-[32px] px-2"
                 >
                   Clear
                 </button>

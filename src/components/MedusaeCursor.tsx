@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -335,17 +335,31 @@ const ParticlesMesh = ({ config }: { config?: MedusaeConfig }) => {
 };
 
 export function MedusaeCursor({ config }: { config?: MedusaeConfig }) {
+  const [isEnabled, setIsEnabled] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.innerWidth >= 768 && window.matchMedia("(pointer: fine)").matches;
+  });
+
   useEffect(() => {
-    // Touch device bypass
-    if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) return;
+    const checkEnabled = () => {
+      const isFinePointer = window.matchMedia("(pointer: fine)").matches;
+      const isDesktopWidth = window.innerWidth >= 768;
+      setIsEnabled(isFinePointer && isDesktopWidth);
+    };
+
+    checkEnabled();
+    window.addEventListener("resize", checkEnabled);
+    return () => window.removeEventListener("resize", checkEnabled);
   }, []);
 
+  if (!isEnabled) return null;
+
   return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden hidden md:block">
       <Canvas
         className="h-full w-full pointer-events-none"
         camera={{ position: [0, 0, 5] }}
-        gl={{ alpha: true, antialias: true }}
+        gl={{ alpha: true, antialias: true, powerPreference: "low-power" }}
       >
         <ParticlesMesh config={config} />
       </Canvas>

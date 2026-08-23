@@ -1,11 +1,17 @@
+/**
+ * @file Hero.tsx
+ * @description Hero section with mobile-first search resolver card on top and desktop side-by-side layout.
+ */
+
+import { Link } from "@tanstack/react-router";
 import { MagneticButton } from "../MagneticButton";
-import { TiltCard } from "../TiltCard";
-import { Star, ArrowRight } from "lucide-react";
+import { UrlResolverSearch } from "../shopping/UrlResolverSearch";
+import { Star, ArrowRight, Search, ShieldCheck, Layers, TrendingDown, Clock } from "lucide-react";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden px-6 pb-32 pt-24 md:pt-32">
-      {/* Subtle ambient backdrop glow */}
+    <section className="relative overflow-hidden px-4 sm:px-6 pb-20 sm:pb-32 pt-20 sm:pt-24 md:pt-28">
+      {/* Ambient backdrop glow */}
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[500px] w-[800px] -translate-x-1/2 opacity-35 blur-[120px]"
@@ -14,50 +20,117 @@ export function Hero() {
             "radial-gradient(circle at center, var(--accent-glow-strong), rgba(245, 158, 11, 0.15), transparent 70%)",
         }}
       />
-      <div className="grid-backdrop absolute inset-0" aria-hidden />
 
-      <div className="relative mx-auto grid max-w-7xl items-start gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-center">
-        {/* Left: copy */}
-        <div className="reveal">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-wider text-muted-foreground shadow-2xs">
+      <div className="relative mx-auto grid max-w-7xl items-center gap-8 lg:gap-12 lg:grid-cols-[1.05fr_1.1fr]">
+        {/* URL Resolver & Scanner Card (Top on Mobile with order-1, Right on Desktop with order-2) */}
+        <div className="reveal relative order-1 lg:order-2" style={{ transitionDelay: "0.1s" }}>
+          <div className="rounded-3xl border border-border/80 bg-card/95 p-5 sm:p-8 shadow-2xl backdrop-blur-xl">
+            {/* Card Header */}
+            <div className="mb-4 sm:mb-5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
+                  <Search className="h-4 w-4 sm:h-5 sm:w-5" />
+                </div>
+                <div>
+                  <h3 className="font-display text-sm sm:text-lg font-bold text-foreground">
+                    Instant Product &amp; URL Resolver
+                  </h3>
+                  <span className="font-mono text-[10px] text-emerald-500 flex items-center gap-1 font-semibold">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Live Price &amp; 90d Low Scanner Active
+                  </span>
+                </div>
+              </div>
+
+              <span className="rounded-full bg-primary/10 border border-primary/20 px-2 sm:px-2.5 py-0.5 font-mono text-[9px] sm:text-[10px] font-bold text-primary">
+                GoCoupon Engine
+              </span>
+            </div>
+
+            <p className="text-xs text-muted-foreground mb-4 sm:mb-5 leading-relaxed">
+              Paste any Amazon, Flipkart, Myntra, or Croma link to compare live prices, check 90-day history, and grab stackable coupons:
+            </p>
+
+            {/* Prominent URL Resolver Input Component */}
+            <UrlResolverSearch
+              size="large"
+              placeholder="Paste Amazon, Flipkart URL or search product..."
+            />
+
+            {/* Quick Live Preview Bar */}
+            <div className="mt-4 sm:mt-5 rounded-2xl border border-border/60 bg-muted/20 p-3 sm:p-3.5 text-xs font-mono">
+              <div className="flex items-center justify-between text-muted-foreground mb-1.5">
+                <span className="text-[11px] flex items-center gap-1 text-muted-foreground">
+                  <Clock className="h-3 w-3 text-primary" /> Live Comparison Preview:
+                </span>
+                <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-emerald-600 dark:text-emerald-400 font-bold text-[10px]">
+                  Save up to ₹4,354
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-foreground">
+                <span className="font-bold truncate pr-2 text-xs">Sony WH-1000XM5</span>
+                <span className="font-bold text-primary text-xs">
+                  ₹24,636{" "}
+                  <span className="text-[10px] text-muted-foreground font-normal">on Amazon</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Copy & CTAs (Below Search on Mobile with order-2, Left on Desktop with order-1) */}
+        <div className="reveal order-2 lg:order-1">
+          <div className="mb-4 sm:mb-5 inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1.5 font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground shadow-2xs">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Live on Amazon.com (US) · Flipkart &amp; Myntra Coming Soon</span>
+            <span>Multi-Store Comparison • 90-Day Tracker • Auto Coupons</span>
           </div>
 
-          <h1 className="font-display text-5xl font-bold leading-[1.05] text-foreground md:text-6xl lg:text-7xl text-balance">
+          <h1 className="font-display text-3xl font-bold leading-[1.1] text-foreground sm:text-5xl md:text-6xl text-balance">
             Stop overpaying.
             <br />
-            <span className="text-primary">Apply every coupon</span>
+            <span className="text-primary">Compare prices &amp; coupons</span>
             <br />
             in one click.
           </h1>
 
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-            GoCoupon automatically tests all working promo codes and auto-clips green discount vouchers at checkout on Amazon.com. One click. Maximum savings.
+          <p className="mt-4 sm:mt-5 max-w-xl text-sm sm:text-lg leading-relaxed text-muted-foreground">
+            GoCoupon scans live prices across Amazon, Flipkart, Myntra &amp; Croma, detects fake pre-sale discounts, and automatically applies working promo codes.
           </p>
 
-          <div className="mt-10 flex flex-wrap items-center gap-4">
+          <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
+            {/* Desktop Only: Add to Chrome extension button (hidden on mobile devices) */}
             <MagneticButton
               as="a"
               href="https://chromewebstore.google.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2.5 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-md transition-all hover:scale-105 hover:bg-primary-hover hover:shadow-[var(--shadow-accent)]"
+              className="hidden sm:inline-flex items-center gap-2.5 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-md transition-all hover:scale-105 hover:bg-primary-hover hover:shadow-[var(--shadow-accent)] active:scale-95"
             >
               <ChromeIcon />
               <span>Add to Chrome — Free</span>
             </MagneticButton>
-            <a
-              href="#how"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+
+            {/* Mobile Primary Action */}
+            <Link
+              to="/compare"
+              className="sm:hidden inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-xs font-bold text-primary-foreground shadow-md w-full active:scale-95"
             >
-              <span>See how it works</span>
+              <span>Explore Multi-Store Comparisons</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+
+            {/* Secondary Action on Desktop */}
+            <Link
+              to="/compare"
+              className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <span>Explore Comparisons</span>
               <ArrowRight className="h-4 w-4 text-primary" />
-            </a>
+            </Link>
           </div>
 
           {/* Social Proof */}
-          <div className="mt-12 flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">
+          <div className="mt-8 sm:mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-[11px] sm:text-xs uppercase tracking-wider text-muted-foreground">
             <div className="flex items-center gap-1 text-amber-500 font-bold">
               <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
               <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
@@ -67,13 +140,8 @@ export function Hero() {
               <span className="ml-1 text-foreground">4.9 / 5</span>
             </div>
             <span>·</span>
-            <span>180,000+ active shoppers</span>
+            <span>180,000+ shoppers saving daily</span>
           </div>
-        </div>
-
-        {/* Right: Clean, Simplistic 3D tilt mockup */}
-        <div className="reveal relative lg:-top-6" style={{ transitionDelay: "0.15s" }}>
-          <ExtensionMockup />
         </div>
       </div>
     </section>
@@ -87,80 +155,5 @@ function ChromeIcon() {
       <circle cx="12" cy="12" r="3.5" stroke="currentColor" strokeWidth="2" />
       <path d="M12 2v6M21 8.5l-5.2 3M3 8.5l5.2 3" stroke="currentColor" strokeWidth="2" />
     </svg>
-  );
-}
-
-function ExtensionMockup() {
-  return (
-    <TiltCard
-      className="mx-auto w-full max-w-[360px]"
-      innerClassName="relative rounded-2xl border border-border bg-card p-5 shadow-xl transition-all duration-300"
-    >
-      {/* Browser address bar header */}
-      <div className="flex items-center justify-between border-b border-border/60 pb-3">
-        <div className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f56]" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[#ffbd2e]" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[#27c93f]" />
-        </div>
-        <div className="flex flex-1 items-center justify-center px-3">
-          <div className="flex items-center gap-1 rounded-full border border-border bg-secondary px-3 py-1 font-mono text-[10px] font-medium text-foreground">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-muted-foreground">https://</span>
-            <span className="font-semibold text-foreground">amazon.com</span>
-            <span className="text-muted-foreground">/cart</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Clean extension popup container */}
-      <div className="mt-3 rounded-xl border border-border bg-background p-4 shadow-sm">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-border/60 pb-3">
-          <div className="flex items-center gap-2">
-            <div className="grid h-7 w-7 place-items-center rounded-lg bg-primary font-display text-[11px] font-bold text-primary-foreground">
-              gC
-            </div>
-            <div>
-              <div className="text-xs font-bold text-foreground">GoCoupon</div>
-              <div className="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
-                Auto-Saved $40.00 at Checkout
-              </div>
-            </div>
-          </div>
-          <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-            Active
-          </span>
-        </div>
-
-        {/* Amazon Green Voucher Item */}
-        <div className="mt-3 flex items-center justify-between rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-[11px] text-emerald-700 dark:text-emerald-300 font-mono">
-          <span>🎟️ Green Voucher Clipped</span>
-          <span className="font-bold">-$15.00</span>
-        </div>
-
-        {/* Applied Best Promo Code Item */}
-        <div className="mt-2 flex items-center justify-between rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-[11px] font-mono">
-          <div className="flex items-center gap-2">
-            <span className="rounded bg-primary/15 px-1.5 py-0.5 font-bold text-primary">
-              SAVE25NOW
-            </span>
-            <span className="text-[10px] text-muted-foreground">Best Promo Code</span>
-          </div>
-          <span className="font-bold text-primary">-$25.00</span>
-        </div>
-
-        {/* Price drop summary */}
-        <div className="mt-3 flex items-center justify-between rounded-lg border border-border bg-muted/30 p-2.5 font-mono text-xs">
-          <div className="flex items-center gap-2">
-            <span className="text-muted-foreground line-through">$149.99</span>
-            <span className="font-bold text-foreground">$109.99</span>
-          </div>
-          <span className="font-bold text-emerald-600 dark:text-emerald-400">
-            Saved $40.00 (27% OFF)
-          </span>
-        </div>
-      </div>
-    </TiltCard>
   );
 }

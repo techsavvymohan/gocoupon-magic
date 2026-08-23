@@ -19,7 +19,7 @@ export function CTA() {
         <h2 className="font-display text-4xl font-bold leading-[1.05] text-foreground md:text-6xl text-balance">
           Fall in love with saving money.
           <br />
-          <span className="bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 bg-clip-text text-transparent">
+          <span className="text-primary block mt-1">
             Get GoCoupon for Free.
           </span>
         </h2>

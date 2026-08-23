@@ -59,7 +59,7 @@ export function MagneticButton(props: MagneticButtonProps) {
       }
     };
     const onLeave = () => {
-      el.style.transition = "transform .5s cubic-bezier(.2,.9,.3,1.4)";
+      el.style.transition = "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)";
       el.style.transform = "translate(0,0)";
       window.setTimeout(() => {
         if (el) el.style.transition = "";

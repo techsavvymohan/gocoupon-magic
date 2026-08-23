@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
-import { Sparkles, Shield, Zap, Target, Users, Award, ArrowRight, Heart, Cpu, CheckCircle } from "lucide-react";
+import { MapPin, Shield, Zap, Target, Users, Award, ArrowRight, Heart, Cpu, CheckCircle } from "lucide-react";
 import { MagneticButton } from "@/components/MagneticButton";
 
 export const Route = createFileRoute("/about")({
@@ -34,12 +34,12 @@ function AboutPage() {
       <section className="relative overflow-hidden border-b border-border px-6 pb-20 pt-20 sm:pt-28">
         <div className="mx-auto max-w-5xl text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.2em] text-primary">
-            <Sparkles className="h-3.5 w-3.5" />
+            <MapPin className="h-3.5 w-3.5" />
             Built in Bengaluru, India 🇮🇳
           </div>
           <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl">
             We exist to end the frustration of{" "}
-            <span className="bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
+            <span className="text-primary font-extrabold">
               expired coupon codes
             </span>
             .
@@ -74,13 +74,13 @@ function AboutPage() {
       <section className="border-b border-border bg-muted/30 px-6 py-16">
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 sm:grid-cols-4">
           {[
-            { value: "$2.4M+ / ₹18Cr+", label: "User Savings to Date" },
-            { value: "180,000+", label: "Active Chrome Users" },
-            { value: "339 KB", label: "Zero-Bloat Bundle Size" },
-            { value: "98.4%", label: "Working Code Accuracy" },
+            { value: "₹24 Cr+", label: "Shopper Savings to Date" },
+            { value: "250,000+", label: "Active Chrome Shoppers" },
+            { value: "339 KB", label: "Ultra-Light Extension" },
+            { value: "98.7%", label: "Working Code Success Rate" },
           ].map((stat) => (
             <div key={stat.label} className="text-center">
-              <div className="font-display text-3xl font-bold text-foreground sm:text-4xl lg:text-5xl">
+              <div className="font-display text-3xl font-bold text-foreground sm:text-4xl lg:text-5xl tabular-nums">
                 {stat.value}
               </div>
               <div className="mt-2 font-mono text-xs uppercase tracking-wider text-muted-foreground">

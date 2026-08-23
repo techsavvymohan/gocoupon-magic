@@ -160,18 +160,24 @@ function HelpPage() {
           {/* Search Box */}
           <div className="mx-auto mt-8 max-w-xl">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
               <input
-                type="text"
+                type="search"
+                name="helpSearch"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by keyword (e.g. pin extension, cashback, code failed)..."
-                className="w-full rounded-full border border-border bg-card py-3.5 pl-12 pr-4 text-sm text-foreground shadow-sm placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                placeholder="Search by keyword (e.g. pin extension, cashback, code failed)…"
+                autoComplete="off"
+                spellCheck={false}
+                aria-label="Search help center questions and guides"
+                className="w-full rounded-full border border-border bg-card py-3.5 pl-12 pr-16 text-sm text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 touch-manipulation"
               />
               {searchQuery && (
                 <button
+                  type="button"
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-mono text-muted-foreground hover:text-foreground"
+                  aria-label="Clear search query"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-mono text-muted-foreground hover:text-foreground touch-manipulation min-h-[32px] px-2"
                 >
                   CLEAR
                 </button>

@@ -16,7 +16,6 @@ import {
   Trash2,
   Layers,
   Server,
-  Sparkles,
 } from "lucide-react";
 
 const LAST_UPDATED = "August 18, 2026";

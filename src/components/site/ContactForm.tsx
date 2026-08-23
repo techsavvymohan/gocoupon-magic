@@ -122,7 +122,7 @@ export function ContactForm() {
           <div className="rounded-3xl border border-border bg-card p-8 shadow-md">
             {isSubmitted ? (
               <div className="py-12 text-center">
-                <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-500/15 text-emerald-500 mb-4 animate-bounce">
+                <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-500/15 text-emerald-500 mb-4 animate-in zoom-in-50 duration-300">
                   <CheckCircle size={36} />
                 </div>
                 <h3 className="font-display text-2xl font-bold text-foreground">

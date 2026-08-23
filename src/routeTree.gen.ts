@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AmazonCouponsRouteImport } from './routes/amazon-coupons'
+import { Route as AskRouteImport } from './routes/ask'
 import { Route as CashbackRewardsRouteImport } from './routes/cashback-rewards'
 import { Route as CategoriesRouteImport } from './routes/categories'
+import { Route as CompareRouteImport } from './routes/compare'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DealsRouteImport } from './routes/deals'
 import { Route as DisclosureRouteImport } from './routes/disclosure'
@@ -25,6 +27,7 @@ import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as MeeshoCouponsRouteImport } from './routes/meesho-coupons'
 import { Route as MyntraCouponsRouteImport } from './routes/myntra-coupons'
 import { Route as PressRouteImport } from './routes/press'
+import { Route as PriceHistoryRouteImport } from './routes/price-history'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as SecurityRouteImport } from './routes/security'
@@ -32,9 +35,13 @@ import { Route as SitemapRouteImport } from './routes/sitemap'
 import { Route as StoresRouteImport } from './routes/stores'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as UninstallRouteImport } from './routes/uninstall'
+import { Route as WatchlistRouteImport } from './routes/watchlist'
 import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
+import { Route as CollectionsIndexRouteImport } from './routes/collections/index'
+import { Route as CollectionsSlugRouteImport } from './routes/collections/$slug'
+import { Route as ProductProductIdRouteImport } from './routes/product/$productId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -51,6 +58,11 @@ const AmazonCouponsRoute = AmazonCouponsRouteImport.update({
   path: '/amazon-coupons',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AskRoute = AskRouteImport.update({
+  id: '/ask',
+  path: '/ask',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CashbackRewardsRoute = CashbackRewardsRouteImport.update({
   id: '/cashback-rewards',
   path: '/cashback-rewards',
@@ -59,6 +71,11 @@ const CashbackRewardsRoute = CashbackRewardsRouteImport.update({
 const CategoriesRoute = CategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -116,6 +133,11 @@ const PressRoute = PressRouteImport.update({
   path: '/press',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PriceHistoryRoute = PriceHistoryRouteImport.update({
+  id: '/price-history',
+  path: '/price-history',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -151,6 +173,11 @@ const UninstallRoute = UninstallRouteImport.update({
   path: '/uninstall',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WatchlistRoute = WatchlistRouteImport.update({
+  id: '/watchlist',
+  path: '/watchlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
   path: '/welcome',
@@ -166,13 +193,30 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CollectionsIndexRoute = CollectionsIndexRouteImport.update({
+  id: '/collections/',
+  path: '/collections/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CollectionsSlugRoute = CollectionsSlugRouteImport.update({
+  id: '/collections/$slug',
+  path: '/collections/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductProductIdRoute = ProductProductIdRouteImport.update({
+  id: '/product/$productId',
+  path: '/product/$productId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/amazon-coupons': typeof AmazonCouponsRoute
+  '/ask': typeof AskRoute
   '/cashback-rewards': typeof CashbackRewardsRoute
   '/categories': typeof CategoriesRoute
+  '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/deals': typeof DealsRoute
   '/disclosure': typeof DisclosureRoute
@@ -184,6 +228,7 @@ export interface FileRoutesByFullPath {
   '/meesho-coupons': typeof MeeshoCouponsRoute
   '/myntra-coupons': typeof MyntraCouponsRoute
   '/press': typeof PressRoute
+  '/price-history': typeof PriceHistoryRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
   '/security': typeof SecurityRoute
@@ -191,16 +236,22 @@ export interface FileRoutesByFullPath {
   '/stores': typeof StoresRoute
   '/terms': typeof TermsRoute
   '/uninstall': typeof UninstallRoute
+  '/watchlist': typeof WatchlistRoute
   '/welcome': typeof WelcomeRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/collections/$slug': typeof CollectionsSlugRoute
+  '/product/$productId': typeof ProductProductIdRoute
   '/blog/': typeof BlogIndexRoute
+  '/collections/': typeof CollectionsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/amazon-coupons': typeof AmazonCouponsRoute
+  '/ask': typeof AskRoute
   '/cashback-rewards': typeof CashbackRewardsRoute
   '/categories': typeof CategoriesRoute
+  '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/deals': typeof DealsRoute
   '/disclosure': typeof DisclosureRoute
@@ -212,6 +263,7 @@ export interface FileRoutesByTo {
   '/meesho-coupons': typeof MeeshoCouponsRoute
   '/myntra-coupons': typeof MyntraCouponsRoute
   '/press': typeof PressRoute
+  '/price-history': typeof PriceHistoryRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
   '/security': typeof SecurityRoute
@@ -219,17 +271,23 @@ export interface FileRoutesByTo {
   '/stores': typeof StoresRoute
   '/terms': typeof TermsRoute
   '/uninstall': typeof UninstallRoute
+  '/watchlist': typeof WatchlistRoute
   '/welcome': typeof WelcomeRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/collections/$slug': typeof CollectionsSlugRoute
+  '/product/$productId': typeof ProductProductIdRoute
   '/blog': typeof BlogIndexRoute
+  '/collections': typeof CollectionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/amazon-coupons': typeof AmazonCouponsRoute
+  '/ask': typeof AskRoute
   '/cashback-rewards': typeof CashbackRewardsRoute
   '/categories': typeof CategoriesRoute
+  '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/deals': typeof DealsRoute
   '/disclosure': typeof DisclosureRoute
@@ -241,6 +299,7 @@ export interface FileRoutesById {
   '/meesho-coupons': typeof MeeshoCouponsRoute
   '/myntra-coupons': typeof MyntraCouponsRoute
   '/press': typeof PressRoute
+  '/price-history': typeof PriceHistoryRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
   '/security': typeof SecurityRoute
@@ -248,9 +307,13 @@ export interface FileRoutesById {
   '/stores': typeof StoresRoute
   '/terms': typeof TermsRoute
   '/uninstall': typeof UninstallRoute
+  '/watchlist': typeof WatchlistRoute
   '/welcome': typeof WelcomeRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/collections/$slug': typeof CollectionsSlugRoute
+  '/product/$productId': typeof ProductProductIdRoute
   '/blog/': typeof BlogIndexRoute
+  '/collections/': typeof CollectionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -258,8 +321,10 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/amazon-coupons'
+    | '/ask'
     | '/cashback-rewards'
     | '/categories'
+    | '/compare'
     | '/contact'
     | '/deals'
     | '/disclosure'
@@ -271,6 +336,7 @@ export interface FileRouteTypes {
     | '/meesho-coupons'
     | '/myntra-coupons'
     | '/press'
+    | '/price-history'
     | '/privacy'
     | '/resources'
     | '/security'
@@ -278,16 +344,22 @@ export interface FileRouteTypes {
     | '/stores'
     | '/terms'
     | '/uninstall'
+    | '/watchlist'
     | '/welcome'
     | '/blog/$slug'
+    | '/collections/$slug'
+    | '/product/$productId'
     | '/blog/'
+    | '/collections/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/amazon-coupons'
+    | '/ask'
     | '/cashback-rewards'
     | '/categories'
+    | '/compare'
     | '/contact'
     | '/deals'
     | '/disclosure'
@@ -299,6 +371,7 @@ export interface FileRouteTypes {
     | '/meesho-coupons'
     | '/myntra-coupons'
     | '/press'
+    | '/price-history'
     | '/privacy'
     | '/resources'
     | '/security'
@@ -306,16 +379,22 @@ export interface FileRouteTypes {
     | '/stores'
     | '/terms'
     | '/uninstall'
+    | '/watchlist'
     | '/welcome'
     | '/blog/$slug'
+    | '/collections/$slug'
+    | '/product/$productId'
     | '/blog'
+    | '/collections'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/amazon-coupons'
+    | '/ask'
     | '/cashback-rewards'
     | '/categories'
+    | '/compare'
     | '/contact'
     | '/deals'
     | '/disclosure'
@@ -327,6 +406,7 @@ export interface FileRouteTypes {
     | '/meesho-coupons'
     | '/myntra-coupons'
     | '/press'
+    | '/price-history'
     | '/privacy'
     | '/resources'
     | '/security'
@@ -334,17 +414,23 @@ export interface FileRouteTypes {
     | '/stores'
     | '/terms'
     | '/uninstall'
+    | '/watchlist'
     | '/welcome'
     | '/blog/$slug'
+    | '/collections/$slug'
+    | '/product/$productId'
     | '/blog/'
+    | '/collections/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AmazonCouponsRoute: typeof AmazonCouponsRoute
+  AskRoute: typeof AskRoute
   CashbackRewardsRoute: typeof CashbackRewardsRoute
   CategoriesRoute: typeof CategoriesRoute
+  CompareRoute: typeof CompareRoute
   ContactRoute: typeof ContactRoute
   DealsRoute: typeof DealsRoute
   DisclosureRoute: typeof DisclosureRoute
@@ -356,6 +442,7 @@ export interface RootRouteChildren {
   MeeshoCouponsRoute: typeof MeeshoCouponsRoute
   MyntraCouponsRoute: typeof MyntraCouponsRoute
   PressRoute: typeof PressRoute
+  PriceHistoryRoute: typeof PriceHistoryRoute
   PrivacyRoute: typeof PrivacyRoute
   ResourcesRoute: typeof ResourcesRoute
   SecurityRoute: typeof SecurityRoute
@@ -363,9 +450,13 @@ export interface RootRouteChildren {
   StoresRoute: typeof StoresRoute
   TermsRoute: typeof TermsRoute
   UninstallRoute: typeof UninstallRoute
+  WatchlistRoute: typeof WatchlistRoute
   WelcomeRoute: typeof WelcomeRoute
   BlogSlugRoute: typeof BlogSlugRoute
+  CollectionsSlugRoute: typeof CollectionsSlugRoute
+  ProductProductIdRoute: typeof ProductProductIdRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  CollectionsIndexRoute: typeof CollectionsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -391,6 +482,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AmazonCouponsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ask': {
+      id: '/ask'
+      path: '/ask'
+      fullPath: '/ask'
+      preLoaderRoute: typeof AskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cashback-rewards': {
       id: '/cashback-rewards'
       path: '/cashback-rewards'
@@ -403,6 +501,13 @@ declare module '@tanstack/react-router' {
       path: '/categories'
       fullPath: '/categories'
       preLoaderRoute: typeof CategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -482,6 +587,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/price-history': {
+      id: '/price-history'
+      path: '/price-history'
+      fullPath: '/price-history'
+      preLoaderRoute: typeof PriceHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -531,6 +643,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UninstallRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/watchlist': {
+      id: '/watchlist'
+      path: '/watchlist'
+      fullPath: '/watchlist'
+      preLoaderRoute: typeof WatchlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/welcome': {
       id: '/welcome'
       path: '/welcome'
@@ -552,6 +671,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/collections/': {
+      id: '/collections/'
+      path: '/collections'
+      fullPath: '/collections/'
+      preLoaderRoute: typeof CollectionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collections/$slug': {
+      id: '/collections/$slug'
+      path: '/collections/$slug'
+      fullPath: '/collections/$slug'
+      preLoaderRoute: typeof CollectionsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/$productId': {
+      id: '/product/$productId'
+      path: '/product/$productId'
+      fullPath: '/product/$productId'
+      preLoaderRoute: typeof ProductProductIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -559,8 +699,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AmazonCouponsRoute: AmazonCouponsRoute,
+  AskRoute: AskRoute,
   CashbackRewardsRoute: CashbackRewardsRoute,
   CategoriesRoute: CategoriesRoute,
+  CompareRoute: CompareRoute,
   ContactRoute: ContactRoute,
   DealsRoute: DealsRoute,
   DisclosureRoute: DisclosureRoute,
@@ -572,6 +714,7 @@ const rootRouteChildren: RootRouteChildren = {
   MeeshoCouponsRoute: MeeshoCouponsRoute,
   MyntraCouponsRoute: MyntraCouponsRoute,
   PressRoute: PressRoute,
+  PriceHistoryRoute: PriceHistoryRoute,
   PrivacyRoute: PrivacyRoute,
   ResourcesRoute: ResourcesRoute,
   SecurityRoute: SecurityRoute,
@@ -579,9 +722,13 @@ const rootRouteChildren: RootRouteChildren = {
   StoresRoute: StoresRoute,
   TermsRoute: TermsRoute,
   UninstallRoute: UninstallRoute,
+  WatchlistRoute: WatchlistRoute,
   WelcomeRoute: WelcomeRoute,
   BlogSlugRoute: BlogSlugRoute,
+  CollectionsSlugRoute: CollectionsSlugRoute,
+  ProductProductIdRoute: ProductProductIdRoute,
   BlogIndexRoute: BlogIndexRoute,
+  CollectionsIndexRoute: CollectionsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

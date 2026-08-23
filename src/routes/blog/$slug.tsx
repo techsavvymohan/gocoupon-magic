@@ -221,10 +221,10 @@ function Section({ section }: { section: PostSection }) {
       );
     case "quote":
       return (
-        <blockquote className="my-6 border-l-4 border-primary bg-card p-5 text-foreground/90 rounded-r-2xl shadow-2xs">
-          <p className="font-display text-lg italic leading-relaxed text-foreground">{section.text}</p>
+        <blockquote className="my-6 border border-border/80 bg-muted/20 p-6 text-foreground/90 rounded-2xl">
+          <p className="font-display text-lg italic leading-relaxed text-foreground">“{section.text}”</p>
           {section.cite && (
-            <cite className="mt-2.5 block font-mono text-[11px] uppercase tracking-[0.2em] text-primary not-italic">
+            <cite className="mt-3 block font-mono text-[11px] uppercase tracking-[0.2em] text-primary not-italic">
               — {section.cite}
             </cite>
           )}

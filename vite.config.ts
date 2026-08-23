@@ -12,7 +12,7 @@ export default defineConfig({
     }),
     react(),
     tailwindcss(),
-    tsconfigPaths(),
+    tsconfigPaths({ projects: ["./tsconfig.json"] }),
   ],
   server: {
     port: 8080,

@@ -3,7 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, createSeoHead, faqSchema } from "@/lib/seo";
 import {
-  Sparkles,
   ShoppingBag,
   CheckCircle2,
   ArrowRight,
@@ -177,13 +176,13 @@ function HowItWorksPage() {
 
         <div className="mx-auto max-w-4xl">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.2em] text-primary">
-            <Sparkles className="h-4 w-4" />
+            <Zap className="h-4 w-4" />
             <span>Effortless Savings in 3 Easy Steps</span>
           </div>
 
           <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl">
             How GoCoupon Saves You Money{" "}
-            <span className="bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
+            <span className="text-primary font-extrabold">
               in 1 Click
             </span>
           </h1>
@@ -295,14 +294,14 @@ function HowItWorksPage() {
         <div className="mx-auto max-w-5xl">
           <div className="text-center">
             <div className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-primary">
-              <MousePointerClick className="h-3.5 w-3.5" />
-              Interactive Demo
+              <MousePointerClick className="h-3.5 w-3.5" aria-hidden="true" />
+              Live Savings Simulator
             </div>
-            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl text-balance">
               See How Much You Can Save Right Now
             </h2>
             <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
-              Pick a store below and click &ldquo;Test GoCoupon&rdquo; to watch how our smart scanner lowers your total bill.
+              Pick a store below and click “Test GoCoupon” to watch how our smart scanner lowers your total bill.
             </p>
 
             {/* Store Picker Pills */}
@@ -471,19 +470,20 @@ function HowItWorksPage() {
                     </div>
                     <div className="border-t border-border pt-2 flex justify-between font-bold text-foreground text-base">
                       <span>Your Final Price:</span>
-                      <span className="text-primary">
+                      <span className="text-primary tabular-nums">
                         {selectedStore.currency}
                         {finalPrice.toLocaleString()}
                       </span>
                     </div>
                   </div>
 
-                  {/* Reset Demo Button */}
+                  {/* Reset Simulation Button */}
                   <button
+                    type="button"
                     onClick={handleResetSimulation}
-                    className="w-full rounded-xl border border-border bg-card py-2.5 text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer"
+                    className="w-full rounded-xl border border-border bg-card py-3 min-h-[44px] text-xs font-semibold text-foreground hover:bg-muted transition-colors cursor-pointer touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   >
-                    Try Another Store or Reset
+                    Try Another Store
                   </button>
                 </div>
               )}
