@@ -290,7 +290,6 @@ const blogRoutes = [
 ];
 
 const allRoutes = [...routeConfigs, ...collectionRoutes, ...productRoutes, ...blogRoutes];
-
 console.log(`Generating high-SEO pre-rendered static routes in ${distDir}...`);
 
 let generatedCount = 0;
@@ -366,10 +365,35 @@ for (const route of allRoutes) {
   </div>
   `;
 
-  // Inject pre-rendered HTML into <div id="root">
+  // Inject pre-rendered HTML — hidden from users (opacity:0), visible to crawlers.
+  // A MutationObserver script instantly removes the SSR shell and fades in React
+  // the moment the real app mounts, preventing any Flash of Pre-rendered Content (FOPC).
   let pageHtml = baseIndexHtml.replace(
     '<div id="root"></div>',
-    `<div id="root">${preRenderedContent}</div>`
+    `<div id="root" style="opacity:0;transition:opacity 0.15s ease"><div class="gocoupon-ssr-shell" aria-hidden="true" style="pointer-events:none">${preRenderedContent}</div></div>
+<script>
+(function(){
+  var root=document.getElementById('root');
+  var observer=new MutationObserver(function(mutations){
+    for(var m of mutations){
+      if(m.type==='childList'){
+        var added=Array.from(m.addedNodes);
+        var isReact=added.some(function(n){return n.nodeType===1&&!n.classList.contains('gocoupon-ssr-shell');});
+        if(isReact){
+          var shell=root.querySelector('.gocoupon-ssr-shell');
+          if(shell) shell.remove();
+          root.style.opacity='1';
+          observer.disconnect();
+          return;
+        }
+      }
+    }
+  });
+  observer.observe(root,{childList:true,subtree:false});
+  // Fallback: reveal after 800ms if React hasn't mounted yet (slow connection)
+  setTimeout(function(){root.style.opacity='1';observer.disconnect();},800);
+})();
+</script>`
   );
 
   // Update Title
