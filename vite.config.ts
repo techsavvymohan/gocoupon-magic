@@ -17,6 +17,13 @@ export default defineConfig({
   server: {
     port: 8080,
     host: true,
+    watch: {
+      ignored: ["**/docs/**"],
+    },
+  },
+  optimizeDeps: {
+    entries: ["index.html", "src/**/*.{ts,tsx}"],
+    exclude: ["solid-js", "svelte", "vue", "caramel-ui"],
   },
   build: {
     outDir: "dist",
