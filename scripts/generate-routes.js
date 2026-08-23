@@ -297,137 +297,72 @@ let generatedCount = 0;
 for (const route of allRoutes) {
   const canonicalUrl = `https://gocoupon.io/${route.path ? route.path : ""}`;
 
-  // Build semantic pre-rendered HTML to populate <div id="root">
-  const preRenderedContent = `
-  <div class="gocoupon-ssr-shell" style="min-height: 100vh; background-color: #090d16; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif;">
-    <header style="border-bottom: 1px solid rgba(255,255,255,0.1); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
-      <a href="/" style="font-weight: 800; font-size: 20px; color: #38bdf8; text-decoration: none;">goCoupon<span style="color: #f59e0b;">.io</span></a>
-      <nav style="display: flex; gap: 20px; font-size: 14px;">
-        <a href="/stores" style="color: #cbd5e1; text-decoration: none;">Stores</a>
-        <a href="/compare" style="color: #cbd5e1; text-decoration: none;">Compare</a>
-        <a href="/price-history" style="color: #cbd5e1; text-decoration: none;">Price Tracker</a>
-        <a href="/ask" style="color: #cbd5e1; text-decoration: none;">Ask</a>
-        <a href="/deals" style="color: #cbd5e1; text-decoration: none;">Deals</a>
-        <a href="/extension" style="color: #38bdf8; text-decoration: none; font-weight: bold;">Install Extension</a>
-      </nav>
-    </header>
+  // 1. Update Title
+  let pageHtml = baseIndexHtml.replace(/<title>.*?<\/title>/i, `<title>${route.title}</title>`);
 
-    <main style="max-width: 1200px; margin: 40px auto; padding: 0 24px;">
-      <h1 style="font-size: 32px; font-weight: 800; line-height: 1.25; margin-bottom: 16px; color: #ffffff;">${route.h1}</h1>
-      <p style="font-size: 18px; color: #94a3b8; line-height: 1.6; margin-bottom: 32px; max-width: 800px;">${route.lead}</p>
-
-      <section style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; margin-bottom: 40px;">
-        <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 12px; color: #38bdf8;">Verified Savings & Live Intelligence</h2>
-        <p style="color: #cbd5e1; line-height: 1.6;">goCoupon is India's leading automated shopping assistant. We continuously scan and verify promo codes across <strong>Amazon India, Flipkart, Myntra, Meesho, Croma, and Tata CLiQ</strong> to ensure every deal is tested, active, and guaranteed to lower your checkout total.</p>
-        <div style="margin-top: 20px; display: flex; gap: 16px; flex-wrap: wrap;">
-          <a href="/extension" style="background: #2563eb; color: #ffffff; padding: 12px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-block;">Add to Chrome — It's Free</a>
-          <a href="/compare" style="background: rgba(255,255,255,0.1); color: #ffffff; padding: 12px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-block;">Compare Store Prices</a>
-        </div>
-      </section>
-
-      <section style="margin-bottom: 40px;">
-        <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 16px;">Popular Store Coupons & Deals in India</h2>
-        <ul style="list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
-          <li style="background: #1e293b; padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);"><a href="/flipkart-coupons" style="color: #38bdf8; text-decoration: none; font-weight: 600;">Flipkart Coupons</a><p style="font-size: 13px; color: #94a3b8; margin-top: 4px;">Flat ₹500 off & 8.5% cashback</p></li>
-          <li style="background: #1e293b; padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);"><a href="/amazon-coupons" style="color: #38bdf8; text-decoration: none; font-weight: 600;">Amazon India Promo Codes</a><p style="font-size: 13px; color: #94a3b8; margin-top: 4px;">Lightning deals & credit card discounts</p></li>
-          <li style="background: #1e293b; padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);"><a href="/myntra-coupons" style="color: #38bdf8; text-decoration: none; font-weight: 600;">Myntra Discount Codes</a><p style="font-size: 13px; color: #94a3b8; margin-top: 4px;">₹400 off codes & 6.2% cashback</p></li>
-          <li style="background: #1e293b; padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);"><a href="/meesho-coupons" style="color: #38bdf8; text-decoration: none; font-weight: 600;">Meesho Discount Coupons</a><p style="font-size: 13px; color: #94a3b8; margin-top: 4px;">First order ₹100 off codes</p></li>
-        </ul>
-      </section>
-    </main>
-
-    <footer style="border-top: 1px solid rgba(255,255,255,0.1); padding: 40px 24px; max-width: 1200px; margin: 60px auto 0; font-size: 13px; color: #64748b;">
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; margin-bottom: 32px;">
-        <div>
-          <h3 style="color: #ffffff; font-size: 14px; margin-bottom: 12px;">Top Stores</h3>
-          <p><a href="/flipkart-coupons" style="color: #94a3b8; text-decoration: none;">Flipkart Coupons</a></p>
-          <p><a href="/amazon-coupons" style="color: #94a3b8; text-decoration: none;">Amazon India Coupons</a></p>
-          <p><a href="/myntra-coupons" style="color: #94a3b8; text-decoration: none;">Myntra Coupons</a></p>
-          <p><a href="/meesho-coupons" style="color: #94a3b8; text-decoration: none;">Meesho Coupons</a></p>
-        </div>
-        <div>
-          <h3 style="color: #ffffff; font-size: 14px; margin-bottom: 12px;">Tools & Features</h3>
-          <p><a href="/compare" style="color: #94a3b8; text-decoration: none;">Live Price Comparison</a></p>
-          <p><a href="/price-history" style="color: #94a3b8; text-decoration: none;">90-Day Price Tracker</a></p>
-          <p><a href="/ask" style="color: #94a3b8; text-decoration: none;">Ask Shopping Assistant</a></p>
-          <p><a href="/extension" style="color: #94a3b8; text-decoration: none;">Chrome Extension</a></p>
-        </div>
-        <div>
-          <h3 style="color: #ffffff; font-size: 14px; margin-bottom: 12px;">Company & Trust</h3>
-          <p><a href="/about" style="color: #94a3b8; text-decoration: none;">About Us</a></p>
-          <p><a href="/disclosure" style="color: #94a3b8; text-decoration: none;">Affiliate Disclosure</a></p>
-          <p><a href="/security" style="color: #94a3b8; text-decoration: none;">Security & Privacy</a></p>
-          <p><a href="/faq" style="color: #94a3b8; text-decoration: none;">FAQ & Support</a></p>
-        </div>
-      </div>
-      <p>© 2026 goCoupon.io. All rights reserved. Built for smart Indian online shoppers.</p>
-    </footer>
-  </div>
-  `;
-
-  // Inject pre-rendered HTML — hidden from users (opacity:0), visible to crawlers.
-  // A MutationObserver script instantly removes the SSR shell and fades in React
-  // the moment the real app mounts, preventing any Flash of Pre-rendered Content (FOPC).
-  let pageHtml = baseIndexHtml.replace(
-    '<div id="root"></div>',
-    `<div id="root" style="opacity:0;transition:opacity 0.15s ease"><div class="gocoupon-ssr-shell" aria-hidden="true" style="pointer-events:none">${preRenderedContent}</div></div>
-<script>
-(function(){
-  var root=document.getElementById('root');
-  var observer=new MutationObserver(function(mutations){
-    for(var m of mutations){
-      if(m.type==='childList'){
-        var added=Array.from(m.addedNodes);
-        var isReact=added.some(function(n){return n.nodeType===1&&!n.classList.contains('gocoupon-ssr-shell');});
-        if(isReact){
-          var shell=root.querySelector('.gocoupon-ssr-shell');
-          if(shell) shell.remove();
-          root.style.opacity='1';
-          observer.disconnect();
-          return;
-        }
-      }
-    }
-  });
-  observer.observe(root,{childList:true,subtree:false});
-  // Fallback: reveal after 800ms if React hasn't mounted yet (slow connection)
-  setTimeout(function(){root.style.opacity='1';observer.disconnect();},800);
-})();
-</script>`
-  );
-
-  // Update Title
-  pageHtml = pageHtml.replace(/<title>.*?<\/title>/i, `<title>${route.title}</title>`);
-
-  // Update Meta Description (handles multiline)
+  // 2. Update Meta Description (handles multiline)
   pageHtml = pageHtml.replace(
     /<meta\s+name="description"[\s\S]*?>/i,
     `<meta name="description" content="${route.description}">`
   );
 
-  // Update Canonical URL (handles multiline)
+  // 3. Update Canonical URL (handles multiline)
   pageHtml = pageHtml.replace(
     /<link\s+rel="canonical"[\s\S]*?>/i,
     `<link rel="canonical" href="${canonicalUrl}">`
   );
 
-  // Update OpenGraph Title
+  // 4. Update OpenGraph Title
   pageHtml = pageHtml.replace(
     /<meta\s+property="og:title"[\s\S]*?>/i,
     `<meta property="og:title" content="${route.title}">`
   );
 
-  // Update OpenGraph Description
+  // 5. Update OpenGraph Description
   pageHtml = pageHtml.replace(
     /<meta\s+property="og:description"[\s\S]*?>/i,
     `<meta property="og:description" content="${route.description}">`
   );
 
-  // Update OpenGraph URL
+  // 6. Update OpenGraph URL
   pageHtml = pageHtml.replace(
     /<meta\s+property="og:url"[\s\S]*?>/i,
     `<meta property="og:url" content="${canonicalUrl}">`
   );
+
+  // 7. Inject Route-Specific JSON-LD Structured Data in <head>
+  const routeSchema = `
+    <!-- Per-Route Structured Data for Googlebot & Rich Results -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "${route.title.replace(/"/g, '\\"')}",
+        "description": "${route.description.replace(/"/g, '\\"')}",
+        "url": "${canonicalUrl}",
+        "publisher": {
+          "@type": "Organization",
+          "name": "goCoupon",
+          "url": "https://gocoupon.io/",
+          "logo": "https://gocoupon.io/gc-logo.webp"
+        }
+      }
+    </script>
+  `;
+  pageHtml = pageHtml.replace("</head>", `${routeSchema}\n  </head>`);
+
+  // 8. Add Crawler-friendly <noscript> fallback after <div id="root"></div>
+  // This is completely invisible to real users (JS enabled), but fully parsed by text-only bots & search engines.
+  const noscriptFallback = `
+    <noscript>
+      <div style="background-color: #090d16; color: #f1f5f9; padding: 32px; font-family: system-ui, sans-serif;">
+        <h1>${route.h1}</h1>
+        <p>${route.lead}</p>
+        <p>Visit <a href="https://gocoupon.io/" style="color: #38bdf8;">goCoupon.io</a> to access working coupon codes, auto-apply discounts, and live 90-day price tracking across Amazon, Flipkart, Myntra, and 200+ stores in India.</p>
+      </div>
+    </noscript>
+  `;
+  pageHtml = pageHtml.replace('<div id="root"></div>', `<div id="root"></div>\n${noscriptFallback}`);
 
   if (route.path === "") {
     // Write root index.html
