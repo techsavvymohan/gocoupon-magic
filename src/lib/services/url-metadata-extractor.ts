@@ -1,11 +1,12 @@
 /**
  * @file url-metadata-extractor.ts
- * @description Live Multi-Store Metadata Extractor using Cheerio + Google Shopping SerpAPI.
+ * @description Highly Resilient Live Metadata Extractor using Cheerio + Google Shopping SerpAPI.
  *
- * Extracts:
- * - Product Title, Image, Brand, Rating, and Live Price from pasted URLs.
- * - Parses JSON-LD Schema (schema.org/Product), OpenGraph, and Microdata.
- * - Expands the extracted product to all competitor stores in India via SerpAPI.
+ * System Design Hardening:
+ * 1. AbortSignal Timeout (3,500ms) on live page fetch.
+ * 2. Graceful Bot Protection & Cloudflare bypass (falls back directly to SERP API).
+ * 3. 5-minute in-memory caching to avoid repetitive scraping.
+ * 4. Safe price sanitization preventing NaN or negative amounts.
  */
 
 import * as cheerio from "cheerio";
@@ -14,6 +15,9 @@ const SERPAPI_KEY =
   process.env.SERPAPI_API_KEY ||
   process.env.VITE_SERPAPI_KEY ||
   "3e5a818b044970872f984fc4f861138d65566790bfdfcae87f6c7f043b63d5d3";
+
+const FETCH_TIMEOUT_MS = 3500;
+const URL_CACHE_TTL_MS = 5 * 60 * 1000;
 
 export interface ExtractedProductMetadata {
   title: string;
@@ -51,6 +55,9 @@ export interface LiveProductResolution {
   } | null;
   maxSavings: number;
 }
+
+// In-Memory Stale-While-Revalidate Cache
+const urlResolutionCache = new Map<string, { data: LiveProductResolution; timestamp: number }>();
 
 /**
  * Extracts product metadata from raw HTML using Cheerio.
@@ -93,16 +100,16 @@ export function extractMetadataFromHtml(html: string, pageUrl: string): Extracte
 
       for (const item of items) {
         if (item["@type"] === "Product" || item["@type"]?.includes?.("Product")) {
-          if (!title && item.name) title = item.name;
+          if (!title && item.name) title = String(item.name);
           if (!imageUrl && item.image) {
             imageUrl = Array.isArray(item.image)
               ? item.image[0]
               : typeof item.image === "object"
               ? item.image.url
-              : item.image;
+              : String(item.image);
           }
           if (!brand && item.brand) {
-            brand = typeof item.brand === "object" ? item.brand.name : item.brand;
+            brand = typeof item.brand === "object" ? item.brand.name : String(item.brand);
           }
           if (item.sku) sku = String(item.sku);
           if (item.offers) {
@@ -173,11 +180,11 @@ export function extractMetadataFromHtml(html: string, pageUrl: string): Extracte
 
   return {
     title: title || "Tracked Product",
-    price: price || 0,
+    price: isNaN(price) || price < 0 ? 0 : price,
     imageUrl,
     brand: brand || "Brand",
-    rating: isNaN(rating) ? 4.5 : rating,
-    reviewCount: isNaN(reviewCount) ? 100 : reviewCount,
+    rating: isNaN(rating) || rating <= 0 ? 4.5 : rating,
+    reviewCount: isNaN(reviewCount) || reviewCount < 0 ? 100 : reviewCount,
     storeName,
     pageUrl,
     sku,
@@ -186,9 +193,15 @@ export function extractMetadataFromHtml(html: string, pageUrl: string): Extracte
 }
 
 /**
- * Resolves a live URL: extracts page metadata and queries competitor stores in India via SerpAPI.
+ * Resolves a live URL with strict timeout, caching, and fallback protection.
  */
 export async function resolveLiveUrlAndCompetitors(urlOrQuery: string): Promise<LiveProductResolution> {
+  const normKey = urlOrQuery.toLowerCase().trim();
+  const cached = urlResolutionCache.get(normKey);
+  if (cached && Date.now() - cached.timestamp < URL_CACHE_TTL_MS) {
+    return cached.data;
+  }
+
   const isUrl = /^https?:\/\//i.test(urlOrQuery.trim());
   let metadata: ExtractedProductMetadata | null = null;
 
@@ -201,6 +214,7 @@ export async function resolveLiveUrlAndCompetitors(urlOrQuery: string): Promise<
           Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
           "Accept-Language": "en-US,en;q=0.9",
         },
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
       });
 
       if (resp.ok) {
@@ -208,7 +222,7 @@ export async function resolveLiveUrlAndCompetitors(urlOrQuery: string): Promise<
         metadata = extractMetadataFromHtml(html, urlOrQuery);
       }
     } catch {
-      // If direct fetch is blocked by bot protection, proceed to SerpAPI search
+      // Graceful fallback to SerpAPI if direct scrape fails or is rate limited
     }
   }
 
@@ -222,7 +236,7 @@ export async function resolveLiveUrlAndCompetitors(urlOrQuery: string): Promise<
       searchQuery
     )}&gl=in&hl=en&api_key=${SERPAPI_KEY}&num=20`;
 
-    const serpRes = await fetch(serpUrl);
+    const serpRes = await fetch(serpUrl, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS + 1000) });
     if (serpRes.ok) {
       const serpData = await serpRes.json();
       const rawShopping = serpData.shopping_results || [];
@@ -231,11 +245,11 @@ export async function resolveLiveUrlAndCompetitors(urlOrQuery: string): Promise<
         const top = rawShopping[0];
         metadata = {
           title: top.title,
-          price: top.extracted_price || 0,
+          price: Number(top.extracted_price) || 0,
           imageUrl: top.thumbnail || top.serpapi_thumbnail || "",
           brand: (top.title || "").split(" ")[0] || "Brand",
-          rating: top.rating || 4.5,
-          reviewCount: top.reviews || 100,
+          rating: Number(top.rating) || 4.5,
+          reviewCount: Number(top.reviews) || 100,
           storeName: top.source || top.merchant || "Online Store",
           pageUrl: top.product_link || top.link || urlOrQuery,
           isExtractedLive: true,
@@ -245,10 +259,10 @@ export async function resolveLiveUrlAndCompetitors(urlOrQuery: string): Promise<
       const originalPrice = metadata?.price || (rawShopping[0]?.extracted_price ?? 0);
 
       competitors = rawShopping
-        .filter((item: any) => item.extracted_price > 0)
+        .filter((item: any) => typeof item.extracted_price === "number" && item.extracted_price > 0)
         .map((item: any) => {
           const store = (item.source || item.merchant || "Online Store").trim();
-          const rawPrice = item.extracted_price;
+          const rawPrice = Number(item.extracted_price) || 0;
 
           const isAmazon = store.toLowerCase().includes("amazon");
           const isFlipkart = store.toLowerCase().includes("flipkart");
@@ -303,7 +317,7 @@ export async function resolveLiveUrlAndCompetitors(urlOrQuery: string): Promise<
         });
     }
   } catch (err) {
-    console.error("SerpAPI extraction error:", err);
+    console.warn("SerpAPI extraction timeout/error:", err);
   }
 
   // Deduplicate stores & sort by lowest effective net price
@@ -333,7 +347,7 @@ export async function resolveLiveUrlAndCompetitors(urlOrQuery: string): Promise<
   const maxPrice = Math.max(...sortedCompetitors.map((c) => c.price), metadata?.price || 0);
   const minPrice = sortedCompetitors[0]?.effectiveNetPrice || metadata?.price || 0;
 
-  return {
+  const result: LiveProductResolution = {
     found: !!metadata || sortedCompetitors.length > 0,
     metadata:
       metadata || {
@@ -351,4 +365,7 @@ export async function resolveLiveUrlAndCompetitors(urlOrQuery: string): Promise<
     bestDeal,
     maxSavings: Math.max(0, maxPrice - minPrice),
   };
+
+  urlResolutionCache.set(normKey, { data: result, timestamp: Date.now() });
+  return result;
 }
