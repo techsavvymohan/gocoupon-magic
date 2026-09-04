@@ -43,7 +43,7 @@ export function createSeoHead(input: SeoInput) {
         name: "keywords",
         content:
           keywords ??
-          "coupon codes, promo codes, cashback, chrome extension, price tracker, price history india, Amazon coupon codes, Flipkart coupon codes",
+          "deals, discounts, coupons, coupon codes, promo codes, price tracking, price tracker india, price comparison, compare prices, cheaper products, lowest price online, amazon coupon codes, flipkart coupon codes, auto apply coupons, fake discount detector",
       },
       { property: "og:type", content: type },
       { property: "og:site_name", content: SITE_NAME },
@@ -55,7 +55,7 @@ export function createSeoHead(input: SeoInput) {
       { property: "og:image:height", content: "630" },
       {
         property: "og:image:alt",
-        content: `${SITE_NAME} — Verified Working Coupons, 90-Day Price Tracker & Cashback`,
+        content: `${SITE_NAME} — Deals, Discounts, Coupons, 90-Day Price Tracker & Live Cross-Store Comparison`,
       },
       { property: "og:locale", content: "en_IN" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -148,13 +148,24 @@ export function softwareAppSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "goCoupon - Auto-Apply Coupons & Price History Tracker",
-    operatingSystem: "Windows, macOS, Linux, ChromeOS",
+    name: "goCoupon - Deals, Discounts, Auto Coupons & Price Tracker",
+    operatingSystem: "Windows, macOS, Linux, ChromeOS, Android",
     applicationCategory: "ShoppingApplication",
+    applicationSubCategory: "Price Comparison, Price Tracking, Coupon Automation",
+    url: SITE_URL,
+    description:
+      "goCoupon automatically tests and applies valid promo codes at checkout, tracks 90-day price drop graphs, and compares real-time prices across Amazon, Flipkart, Myntra, and Croma.",
+    featureList: [
+      "1-Click Automated Coupon Testing at Checkout",
+      "Live Cross-Store Price Comparison (Amazon, Flipkart, Croma)",
+      "90-Day Price Drop Tracker & Historical Low Checker",
+      "Fake Discount & Pre-Sale Markup Detection",
+      "Instant Price Drop Watchlist & Target Price Alerts",
+    ],
     offers: {
       "@type": "Offer",
       price: "0",
-      priceCurrency: "USD",
+      priceCurrency: "INR",
     },
     aggregateRating: {
       "@type": "AggregateRating",

@@ -25,4 +25,13 @@ Allow: /
 User-agent: anthropic-ai
 Allow: /
 
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
 Sitemap: https://gocoupon.io/sitemap.xml
+# Generative Engine Optimization (GEO) direct context for LLMs:
+# https://gocoupon.io/llms.txt
+# https://gocoupon.io/llms-full.txt

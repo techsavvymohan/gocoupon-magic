@@ -22,12 +22,12 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () =>
     createSeoHead({
-      title: "goCoupon™ – Auto-Apply Working Coupons & Live Price Tracker (Save Up to 40%)",
+      title: "goCoupon: Deals, Discounts, Coupons, Price Tracking & Comparison India – Find Cheaper Products",
       description:
-        "Never search for coupon codes again. goCoupon automatically tests and applies the best working promo codes, tracks 90-day price drops, and unlocks cashback on Amazon, Flipkart, Myntra & 200+ stores.",
+        "Find cheaper products instantly with goCoupon. Compare live prices across Amazon, Flipkart & Croma, auto-apply 100% working discount coupons, track 90-day price drops, and grab today's best online shopping deals in India.",
       path: "/",
       keywords:
-        "coupon codes india, coupon extension chrome, cashback extension india, amazon india coupons, flipkart coupon code, myntra promo code, meesho coupon code, price tracker india",
+        "deals, discounts, coupons, coupon codes, promo codes, price tracking, price tracker india, price comparison, compare prices, cheaper products, lowest price online, amazon vs flipkart price, auto apply coupons, fake discount detector, online shopping savings",
     }),
 });
 

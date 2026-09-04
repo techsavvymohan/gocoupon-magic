@@ -48,12 +48,12 @@ export const Route = createFileRoute("/compare")({
   }),
   head: () =>
     createSeoHead({
-      title: "Search & Compare Products Across All Stores – goCoupon",
+      title: "Price Comparison India: Compare Prices & Find Cheaper Products Across Stores – goCoupon",
       description:
-        "Search any product and compare live prices, delivery times, stackable coupons, and cashback across Amazon, Flipkart, Myntra, Croma, and Tata CLiQ.",
+        "Compare live prices, stackable coupons, delivery fees, and cashback across Amazon, Flipkart, Myntra, Croma, and Tata CLiQ. Find cheaper products and save up to 40% instantly.",
       path: "/compare",
       keywords:
-        "product price search india, amazon vs flipkart price comparison, compare online shopping stores, lowest price tracker india",
+        "price comparison india, compare prices, cheaper products, find cheapest price, amazon vs flipkart price comparison, lowest price online shopping, cross store comparison, product price checker, online price tracker",
     }),
 });
 

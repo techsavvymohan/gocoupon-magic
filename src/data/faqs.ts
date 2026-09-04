@@ -30,6 +30,16 @@ export const couponFaqs = [
       "Yes. goCoupon identifies both instant merchant promo codes and eligible credit/debit card cashback offers (e.g., HDFC, ICICI, SBI, Axis), allowing you to stack store coupons with bank discounts for maximum total savings.",
   },
   {
+    question: "How do I find cheaper products across online stores with goCoupon?",
+    answer:
+      "Go to our Live Price Comparison page (/compare) and search for any smartphone, laptop, sneaker, or appliance. goCoupon benchmarks real-time prices across Amazon India, Flipkart, Myntra, Croma, and Tata CLiQ, factoring in delivery charges and active promo codes to show you the absolute cheapest store to buy from.",
+  },
+  {
+    question: "Where can I find today's verified deals and shopping discounts in India?",
+    answer:
+      "Visit goCoupon's Deals Hub (/deals) to explore hand-verified lightning deals, flash discounts, and all-time low price drops updated daily across electronics, smartphones, laptops, audio, and fashion.",
+  },
+  {
     question: "Is goCoupon safe and private?",
     answer:
       "Absolutely. goCoupon operates with a strict zero-cross-site-profiling policy. We never track your personal browsing history, read private messages, or store payment information. We only activate on e-commerce shopping pages to help you save.",
