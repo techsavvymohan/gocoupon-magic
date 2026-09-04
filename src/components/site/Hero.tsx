@@ -28,10 +28,10 @@ export function Hero() {
             {/* Clean Professional Header */}
             <div className="mb-5 sm:mb-6">
               <h3 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-                Compare Prices &amp; Track Drops
+                Search Products or Paste Any Link
               </h3>
               <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground">
-                Paste any product link or search to find the lowest price across 100+ stores.
+                Compare live prices across Amazon India, Flipkart, Croma, Myntra &amp; 25+ stores.
               </p>
             </div>
 
@@ -47,19 +47,19 @@ export function Hero() {
         <div className="reveal order-2 lg:order-1">
           <div className="mb-4 sm:mb-5 inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1.5 font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground shadow-2xs">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Multi-Store Comparison • 90-Day Tracker • Auto Coupons</span>
+            <span>Live Multi-Store Comparison • 90-Day Price Tracker • Verified Coupons</span>
           </div>
 
           <h1 className="font-display text-3xl font-bold leading-[1.1] text-foreground sm:text-5xl md:text-6xl text-balance">
-            Stop overpaying.
+            Stop overpaying online.
             <br />
-            <span className="text-primary">Compare prices &amp; coupons</span>
+            <span className="text-primary">Compare prices &amp; trends</span>
             <br />
-            in one click.
+            across India&apos;s top stores.
           </h1>
 
           <p className="mt-4 sm:mt-5 max-w-xl text-sm sm:text-lg leading-relaxed text-muted-foreground">
-            GoCoupon scans live prices across Amazon, Flipkart, Myntra &amp; Croma, detects fake pre-sale discounts, and automatically applies working promo codes.
+            Search any product or paste any store link. GoCoupon scans real-time prices across Amazon India, Flipkart, Croma, Myntra &amp; Tata CLiQ, tracks 90-day price drops to expose fake discounts, and auto-applies verified coupon codes at checkout.
           </p>
 
           <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
@@ -105,7 +105,7 @@ export function Hero() {
               <span className="ml-1 text-foreground">4.9 / 5</span>
             </div>
             <span>·</span>
-            <span>180,000+ shoppers saving daily</span>
+            <span>180,000+ Indian shoppers saving daily</span>
           </div>
         </div>
       </div>

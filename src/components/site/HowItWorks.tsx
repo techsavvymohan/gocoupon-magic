@@ -3,18 +3,18 @@ import { useEffect, useRef } from "react";
 const steps = [
   {
     n: "01",
-    title: "Install in 10 seconds",
-    body: "Add GoCoupon to Chrome for free. No signup, no password, and no credit card required.",
+    title: "Search or paste any link",
+    body: "Search for any phone, laptop, shoe, or appliance — or paste a link from Amazon India, Flipkart, or Myntra to compare prices across stores instantly.",
   },
   {
     n: "02",
-    title: "Shop online as usual",
-    body: "Browse Amazon, Flipkart, or your favorite stores. We auto-click hidden green coupon boxes for you.",
+    title: "Verify 90-day price history",
+    body: "View interactive 90-day price charts with lowest-ever price benchmarks to expose artificial pre-sale price hikes and verify genuine deals.",
   },
   {
     n: "03",
-    title: "1-Click savings at checkout",
-    body: "At checkout, click 'Apply Savings'. GoCoupon tests every code and applies the biggest discount.",
+    title: "Auto-apply best coupons",
+    body: "At checkout, goCoupon automatically discovers, tests, and applies the highest-saving discount codes and clips hidden on-page vouchers in 1 click.",
   },
 ];
 
@@ -121,7 +121,7 @@ export function HowItWorks() {
             How it works
           </p>
           <h2 className="font-display text-4xl font-bold leading-tight text-foreground md:text-5xl">
-            Three steps. Then never think about it again.
+            Three simple steps to never overpay again.
           </h2>
         </div>
 

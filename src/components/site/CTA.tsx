@@ -20,12 +20,12 @@ export function CTA() {
           Fall in love with saving money.
           <br />
           <span className="text-primary block mt-1">
-            Get GoCoupon for Free.
+            Get GoCoupon 100% Free.
           </span>
         </h2>
 
         <p className="mx-auto mt-6 max-w-xl text-base text-muted-foreground sm:text-lg leading-relaxed">
-          Takes only 10 seconds to install. No account, no credit card, and no personal data needed. Works on Amazon.com (US) — with Flipkart, Myntra &amp; Target support coming soon!
+          Compare prices across Amazon India, Flipkart, Myntra, Croma &amp; 25+ stores, track 90-day price drops, and auto-apply working coupons in 1 click. Zero signup, no credit card, and completely free.
         </p>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-5">
@@ -42,7 +42,7 @@ export function CTA() {
           <div className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
             <span className="text-amber-500">★★★★★</span>
             <span className="font-semibold text-foreground">4.9 / 5</span>
-            <span>(12k+ reviews)</span>
+            <span>(18k+ reviews)</span>
           </div>
         </div>
       </div>

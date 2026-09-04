@@ -30,25 +30,22 @@ export function About() {
 
         <div className="space-y-8 text-foreground/90">
           <EntityRow label="What it is">
-            <strong>goCoupon</strong> is a privacy-first Google Chrome browser extension (Manifest V3) that
-            automatically discovers, auto-clips on-page vouchers, and applies the highest-saving promo codes at checkout across US and Indian e-commerce stores.
+            <strong>goCoupon</strong> is India&apos;s leading shopping intelligence platform and browser utility
+            that provides real-time multi-store price comparison, interactive 90-day price history tracking, and 1-click verified coupon code auto-application across major Indian e-commerce stores.
           </EntityRow>
 
           <EntityRow label="Who built it">
-            GoCoupon is built by an independent team of online shoppers and software designers passionate about
-            making online shopping affordable and transparent for everyone.
+            GoCoupon is built by an independent team of engineers and smart online shoppers in Bengaluru, dedicated to eliminating artificial pre-sale price hikes and making online shopping pricing completely transparent.
           </EntityRow>
 
           <EntityRow label="Problem it solves">
-            Online shoppers routinely overpay because they miss hidden green discount checkboxes on product pages
-            or spend 15 minutes testing expired promo codes from Google. GoCoupon automatically finds and applies the biggest
-            working discounts in 1 click.
+            Online shoppers routinely overpay due to artificial discount claims, unannounced merchant price differences between Amazon, Flipkart, Croma, and Myntra, and expired promo codes from search engines. GoCoupon reveals the true lowest price and applies real working discounts in 1 click.
           </EntityRow>
 
           <EntityRow label="How it works">
-            When you reach a supported checkout or product page on{" "}
+            Search any product or paste a link to compare live prices across{" "}
             <Link to="/amazon-coupons" className="text-primary underline-offset-4 hover:underline">
-              Amazon
+              Amazon India
             </Link>
             ,{" "}
             <Link
@@ -60,16 +57,12 @@ export function About() {
             ,{" "}
             <Link to="/myntra-coupons" className="text-primary underline-offset-4 hover:underline">
               Myntra
-            </Link>{" "}
-            or{" "}
-            <Link to="/meesho-coupons" className="text-primary underline-offset-4 hover:underline">
-              Meesho
             </Link>
-            , GoCoupon automatically spots and clicks hidden green vouchers, tests all active discount codes in seconds, and applies the highest savings to your cart.
+            , and Croma. When shopping in your browser, the free extension checks 90-day price drops, auto-clips on-page vouchers, and tests working promo codes at checkout.
           </EntityRow>
 
           <EntityRow label="Price">
-            Completely free. No subscription, no account, no personal data required.
+            100% free forever. No subscriptions, no paid plans, no account or credit card required.
           </EntityRow>
 
           <EntityRow label="Where to learn more">

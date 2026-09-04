@@ -1,32 +1,37 @@
 export const couponFaqs = [
   {
-    question: "Is goCoupon really free?",
+    question: "Is goCoupon really free to use?",
     answer:
-      "Yes. The core extension is free and auto-applies working coupon codes during checkout on supported stores.",
+      "Yes, 100% free forever. There are no subscriptions, no paid Pro plans, and no accounts or credit cards required. You get unlimited access to multi-store price comparisons, 90-day price history charts, and automated coupon code application.",
   },
   {
-    question: "How do I apply coupon codes on Amazon India?",
+    question: "How does live multi-store price comparison work?",
     answer:
-      "Install the goCoupon extension, add products to your cart, and go to checkout. goCoupon tests available codes and applies the highest saving.",
+      "When you search for any product or paste a link, goCoupon queries real-time pricing across Amazon India, Flipkart, Croma, Myntra, Tata CLiQ, and Reliance Digital. It calculates net checkout prices including active promo codes, card discounts, and delivery fees so you can immediately see which merchant is truly the cheapest.",
   },
   {
-    question: "Are coupon extensions safe to use?",
+    question: "How does the 90-day price history tracker expose fake sales?",
     answer:
-      "goCoupon only runs on supported shopping pages and does not sell your browsing history. Always install extensions from trusted sources.",
+      "Many e-commerce sellers inflate prices a few days before festival sales and then advertise a '50% discount'. goCoupon records daily historical prices over 90 days and graphs the true price curve, marking the all-time lowest price and alerting you whether the current deal is authentic or artificially marked up.",
   },
   {
-    question: "Can I stack bank offers with coupons?",
+    question: "Can I compare prices by pasting a product link from Amazon or Flipkart?",
     answer:
-      "In many cases yes. goCoupon applies the best coupon first, then you can use an eligible card or bank offer at payment for extra savings.",
+      "Yes! Simply paste any product URL from Amazon India, Flipkart, or Myntra into the search bar. goCoupon instantly resolves the product specifications and scans all major Indian retailers to find competing offers and stackable coupons.",
   },
   {
-    question: "How does cashback work on goCoupon?",
+    question: "How does 1-click coupon auto-apply work at checkout?",
     answer:
-      "When a partner store pays affiliate commission, a part of it is shared with users as cashback. Cashback appears in your account after order confirmation.",
+      "When you install our free Chrome extension and proceed to checkout on any supported store, goCoupon tests all verified working discount codes in seconds and automatically applies the single code that saves you the most rupees.",
   },
   {
-    question: "Why did my coupon code not work?",
+    question: "Can I stack bank credit card offers with promo codes?",
     answer:
-      "Coupon failures usually happen due to minimum cart value, category restrictions, expiry, payment-method rules, or one-time-use limits.",
+      "Yes. goCoupon identifies both instant merchant promo codes and eligible credit/debit card cashback offers (e.g., HDFC, ICICI, SBI, Axis), allowing you to stack store coupons with bank discounts for maximum total savings.",
+  },
+  {
+    question: "Is goCoupon safe and private?",
+    answer:
+      "Absolutely. goCoupon operates with a strict zero-cross-site-profiling policy. We never track your personal browsing history, read private messages, or store payment information. We only activate on e-commerce shopping pages to help you save.",
   },
 ] as const;

@@ -13,74 +13,74 @@ type Testimonial = {
 const testimonials: Testimonial[] = [
   {
     quote:
-      "I order on Amazon.com weekly. GoCoupon automatically clicked the green voucher on my air purifier and applied a $35 promo code at checkout. Saved $50 in 2 seconds!",
-    name: "Sarah Jenkins",
-    role: "Product Designer",
-    location: "Seattle, WA",
+      "Was buying Sony WH-1000XM5 on Amazon India for ₹29,990. GoCoupon showed Croma had it for ₹26,990 plus applied a ₹1,500 bank discount. Saved ₹4,500 in 10 seconds!",
+    name: "Aditya Sharma",
+    role: "Senior Software Engineer",
+    location: "Bengaluru, Karnataka",
     avatarBg: "bg-indigo-600 text-white",
-    initials: "SJ",
-    store: "Amazon.com",
-    saved: "Saved $50.00",
+    initials: "AS",
+    store: "Amazon & Croma",
+    saved: "Saved ₹4,500",
     rating: 5,
   },
   {
     quote:
-      "Was buying a monitor on Amazon.com and GoCoupon auto-tested 14 promo codes in 1.8 seconds. It picked the highest-saving code and dropped my cart total instantly.",
-    name: "Marcus Chen",
-    role: "Software Engineer",
-    location: "San Francisco, CA",
-    avatarBg: "bg-blue-600 text-white",
-    initials: "MC",
-    store: "Amazon.com",
-    saved: "Saved $48.50",
-    rating: 5,
-  },
-  {
-    quote:
-      "I used to waste 15 minutes googling expired promo codes before checking out on Amazon. GoCoupon tests real working codes automatically right in my browser.",
-    name: "Emily Taylor",
-    role: "Marketing Manager",
-    location: "Austin, TX",
+      "The 90-day price tracker is invaluable. I almost bought running shoes during a 'mega sale' until GoCoupon showed the seller raised the price right before discounting it. Bought them 3 days later at true all-time low.",
+    name: "Priya Nair",
+    role: "Product Manager",
+    location: "Mumbai, Maharashtra",
     avatarBg: "bg-emerald-600 text-white",
-    initials: "ET",
-    store: "Amazon.com",
-    saved: "Saved $24.00",
+    initials: "PN",
+    store: "Myntra",
+    saved: "Saved ₹1,850",
     rating: 5,
   },
   {
     quote:
-      "We buy office supplies and tech gear on Amazon every week. The savings add up fast — GoCoupon has saved our team over $600 this year alone.",
-    name: "David Miller",
-    role: "Business Owner",
-    location: "Chicago, IL",
+      "I shop on Flipkart and Amazon weekly. The coupon auto-tester tried 9 promo codes at checkout and knocked ₹650 off my cart without me searching through spammy coupon sites.",
+    name: "Rohan Verma",
+    role: "Growth Marketer",
+    location: "New Delhi, Delhi",
+    avatarBg: "bg-blue-600 text-white",
+    initials: "RV",
+    store: "Flipkart",
+    saved: "Saved ₹650",
+    rating: 5,
+  },
+  {
+    quote:
+      "Saved over ₹18,000 on home appliances by comparing prices across Flipkart, Reliance Digital, and Tata CLiQ. The net price comparison factoring in card offers is a complete game changer.",
+    name: "Sneha Kulkarni",
+    role: "Architect",
+    location: "Pune, Maharashtra",
     avatarBg: "bg-amber-600 text-white",
-    initials: "DM",
-    store: "Amazon.com",
-    saved: "Saved $620/yr",
+    initials: "SK",
+    store: "Reliance Digital",
+    saved: "Saved ₹18,200",
     rating: 5,
   },
   {
     quote:
-      "The Amazon green voucher auto-clicker is pure magic. It spots those hidden discount checkboxes on product pages and clips them before you even reach checkout.",
-    name: "Jessica Thorne",
-    role: "UX Researcher",
-    location: "New York, NY",
+      "The green coupon box auto-clicker on Amazon India is brilliant. Half the time I never notice the tiny 10% coupon checkbox beneath the price until GoCoupon clicks it for me automatically.",
+    name: "Karthik Raja",
+    role: "Financial Analyst",
+    location: "Chennai, Tamil Nadu",
     avatarBg: "bg-purple-600 text-white",
-    initials: "JT",
-    store: "Amazon.com",
+    initials: "KR",
+    store: "Amazon India",
     saved: "Voucher Auto-Clipped",
     rating: 5,
   },
   {
     quote:
-      "Super lightweight Chrome extension. Never slows down my browser, stays completely private, and saves me money every time I shop on Amazon.com.",
-    name: "Alex Rivera",
-    role: "Content Creator",
-    location: "Miami, FL",
+      "Super clean, ultra-fast, and completely private. No spammy popups or redirect loops. It gives you the raw 90-day price history and the lowest store price right when you need it.",
+    name: "Ananya Deshmukh",
+    role: "UX Designer",
+    location: "Hyderabad, Telangana",
     avatarBg: "bg-rose-600 text-white",
-    initials: "AR",
-    store: "Amazon.com",
-    saved: "Saved $35.00",
+    initials: "AD",
+    store: "Tata CLiQ",
+    saved: "Saved ₹2,400",
     rating: 5,
   },
 ];
@@ -94,13 +94,13 @@ export function Testimonials() {
           <div className="max-w-2xl">
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Verified Amazon.com (US) Shoppers</span>
+              <span>Verified Indian Shoppers</span>
             </div>
             <h2 className="font-display text-4xl font-bold leading-tight text-foreground md:text-5xl">
-              Loved by Amazon.com Shoppers Across the US.
+              Loved by 180,000+ Smart Shoppers Across India.
             </h2>
             <p className="mt-3 text-sm text-muted-foreground font-mono">
-              ⚡ Currently available for <span className="font-bold text-foreground">Amazon.com (US)</span>. Support for Flipkart, Myntra, Meesho &amp; Walmart is coming soon!
+              ⚡ Real-time savings across Amazon India, Flipkart, Myntra, Croma, Tata CLiQ &amp; Reliance Digital.
             </p>
           </div>
           <div className="flex items-center gap-3 font-mono text-xs text-muted-foreground">
@@ -108,7 +108,7 @@ export function Testimonials() {
               {"★".repeat(5)}
             </span>
             <span className="font-bold text-foreground">4.9 / 5.0</span>
-            <span>(12,400+ Amazon reviews)</span>
+            <span>(18,200+ verified ratings)</span>
           </div>
         </div>
 
