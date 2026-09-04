@@ -8,12 +8,12 @@ import { UrlResolverSearch } from "../shopping/UrlResolverSearch";
 export function Hero() {
   return (
     <section className="relative overflow-hidden pb-16 sm:pb-24">
-      {/* Full-Width Edge-to-Edge Top Banner (50% compact height) */}
-      <div className="relative w-full overflow-hidden bg-[#F6C34C] dark:bg-[#b88520]">
+      {/* Top Banner Container - Curved design fully visible with transparent background */}
+      <div className="relative w-full flex justify-center bg-transparent">
         <img
           src="/hero-top-banner.webp"
           alt="GoCoupon — Shop Smarter, Pay Less"
-          className="w-full h-[130px] sm:h-[170px] md:h-[200px] lg:h-[220px] object-cover object-center"
+          className="w-full h-auto object-contain object-top"
           width={1263}
           height={379}
           loading="eager"
