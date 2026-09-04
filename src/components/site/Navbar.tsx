@@ -54,7 +54,7 @@ export function Navbar() {
           WebkitBackdropFilter: "blur(24px) saturate(160%)",
         }}
       >
-        <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+        <nav className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
           {/* Logo */}
           <Link
             to="/"
@@ -83,6 +83,19 @@ export function Navbar() {
               />
             </span>
           </Link>
+
+          {/* Mobile Screen Centered Business Name */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:hidden">
+            <Link
+              to="/"
+              className="font-display text-lg sm:text-xl font-extrabold tracking-tight transition-opacity hover:opacity-85"
+              aria-label="GoCoupon"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <span className="text-black dark:text-white">Go</span>
+              <span className="text-blue-600 dark:text-blue-400">Coupon</span>
+            </Link>
+          </div>
 
           {/* Desktop Nav Links (Compact & Responsive) */}
           <ul className="hidden items-center gap-5 lg:gap-6 md:flex">
