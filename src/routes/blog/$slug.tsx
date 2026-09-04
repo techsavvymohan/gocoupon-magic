@@ -32,7 +32,7 @@ export const Route = createFileRoute("/blog/$slug")({
       description: post.excerpt,
       path: `/blog/${post.slug}`,
       type: "article",
-      keywords: "coupon guide, cashback tips, promo code tricks, online shopping savings, amazon discounts",
+      keywords: `${post.tag.toLowerCase()}, buyhatke alternative, flash.co alternative, price tracker india, auto apply coupon extension, ${post.slug.split("-").join(" ")}`,
     });
   },
 });
@@ -67,6 +67,39 @@ function PostPage() {
     dateModified: post.date,
   };
 
+  const faqItems = post.body
+    .filter(
+      (sec): sec is Extract<PostSection, { type: "callout" }> =>
+        sec.type === "callout" &&
+        Boolean(
+          sec.title &&
+            (sec.title.endsWith("?") ||
+              sec.title.toLowerCase().startsWith("can") ||
+              sec.title.toLowerCase().startsWith("how") ||
+              sec.title.toLowerCase().startsWith("is") ||
+              sec.title.toLowerCase().startsWith("does") ||
+              sec.title.toLowerCase().startsWith("which") ||
+              sec.title.toLowerCase().startsWith("what"))
+        )
+    )
+    .map((sec) => ({
+      "@type": "Question",
+      name: sec.title,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: sec.text,
+      },
+    }));
+
+  const faqSchema =
+    faqItems.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faqItems,
+        }
+      : null;
+
   return (
     <SiteShell>
       <script
@@ -77,6 +110,12 @@ function PostPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
 
       <article className="border-b border-border px-6 pb-20 pt-16 sm:pt-24">
         <div className="mx-auto max-w-3xl">
