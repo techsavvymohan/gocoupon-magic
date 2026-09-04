@@ -60,7 +60,29 @@ export const Route = createFileRoute("/product/$productId")({
 
 function ProductDetailsPage() {
   const { productId } = Route.useParams();
-  const product = CANONICAL_PRODUCTS.find((p) => p.id === productId) || CANONICAL_PRODUCTS[0];
+  const product = CANONICAL_PRODUCTS.find((p) => p.id === productId);
+
+  if (!product) {
+    return (
+      <SiteShell>
+        <div className="mx-auto max-w-4xl px-4 py-24 text-center">
+          <h1 className="text-3xl font-display font-bold text-foreground">Product Not Found</h1>
+          <p className="mt-3 text-sm text-muted-foreground">
+            The requested product is not in the verified catalog. Search live stores or paste a direct product link on the home page.
+          </p>
+          <div className="mt-6 flex justify-center">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-xs hover:bg-primary/90"
+            >
+              Return to Home
+            </Link>
+          </div>
+        </div>
+      </SiteShell>
+    );
+  }
+
   const comparison = compareProductOffers(product.id);
   const evidence = CANONICAL_EVIDENCE.filter((e) => e.productId === product.id);
   const coupons = CANONICAL_COUPONS.filter((c) =>

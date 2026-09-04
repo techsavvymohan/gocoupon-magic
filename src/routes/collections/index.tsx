@@ -79,19 +79,21 @@ function CollectionsIndexPage() {
                   </p>
 
                   {/* Top Item Preview */}
-                  <div className="mt-6 rounded-2xl border border-border/80 bg-muted/20 p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-amber-500 font-display text-sm font-bold text-white">
-                        #1
-                      </div>
-                      <div className="min-w-0">
-                        <span className="text-xs font-mono text-muted-foreground block">Top Recommendation:</span>
-                        <h4 className="truncate text-xs font-bold text-foreground">
-                          {col.items[0]?.product.title}
-                        </h4>
+                  {col.items[0]?.product && (
+                    <div className="mt-6 rounded-2xl border border-border/80 bg-muted/20 p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-amber-500 font-display text-sm font-bold text-white">
+                          #1
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-xs font-mono text-muted-foreground block">Top Recommendation:</span>
+                          <h4 className="truncate text-xs font-bold text-foreground">
+                            {col.items[0].product.title}
+                          </h4>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 <div className="mt-8 flex items-center justify-between border-t border-border pt-4">

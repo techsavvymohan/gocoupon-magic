@@ -4,8 +4,116 @@ import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import tailwindcss from "@tailwindcss/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
+function searxngDevPlugin() {
+  return {
+    name: "vite-plugin-searxng-dev",
+    configureServer(server: any) {
+      server.middlewares.use(async (req: any, res: any, next: any) => {
+        if (req.url?.startsWith("/api/shopping")) {
+          try {
+            const urlObj = new URL(req.url, "http://localhost:8080");
+            const q = urlObj.searchParams.get("q");
+            if (!q) {
+              res.statusCode = 400;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Query 'q' is required" }));
+              return;
+            }
+
+            const serpUrl = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
+              q
+            )}&gl=in&hl=en&api_key=3e5a818b044970872f984fc4f861138d65566790bfdfcae87f6c7f043b63d5d3&num=20`;
+
+            const upstream = await fetch(serpUrl, { signal: AbortSignal.timeout(6000) });
+            if (upstream.ok) {
+              const data = await upstream.json();
+              res.statusCode = 200;
+              res.setHeader("Content-Type", "application/json");
+              res.setHeader("Access-Control-Allow-Origin", "*");
+              res.end(JSON.stringify(data));
+              return;
+            }
+          } catch (err: any) {
+            console.warn("Shopping dev proxy error:", err.message);
+          }
+
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.setHeader("Access-Control-Allow-Origin", "*");
+          res.end(JSON.stringify({ shopping_results: [] }));
+          return;
+        }
+
+        if (!req.url?.startsWith("/api/searxng")) {
+          return next();
+        }
+        try {
+          const urlObj = new URL(req.url, "http://localhost:8080");
+          const q = urlObj.searchParams.get("q");
+          if (!q) {
+            res.statusCode = 400;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Query 'q' is required" }));
+            return;
+          }
+
+          const categories = urlObj.searchParams.get("categories") || "general";
+          const language = urlObj.searchParams.get("language") || "en";
+          const pageno = urlObj.searchParams.get("pageno") || "1";
+
+          const instances = [
+            process.env.SEARXNG_URL,
+            "https://search.mectov.my.id",
+            "https://etsi.me",
+            "https://sx.xo.st",
+          ].filter(Boolean) as string[];
+
+          for (const instance of instances) {
+            try {
+              const target = new URL(`${instance.replace(/\/+$/, "")}/search`);
+              target.searchParams.set("q", q);
+              target.searchParams.set("format", "json");
+              target.searchParams.set("categories", categories);
+              target.searchParams.set("language", language);
+              target.searchParams.set("pageno", pageno);
+
+              const upstream = await fetch(target.toString(), {
+                headers: {
+                  Accept: "application/json",
+                  "User-Agent": "Mozilla/5.0 (compatible; goCoupon/2.0)",
+                },
+                signal: AbortSignal.timeout(4500),
+              });
+
+              if (upstream.ok && upstream.headers.get("content-type")?.includes("json")) {
+                const data = await upstream.json();
+                res.statusCode = 200;
+                res.setHeader("Content-Type", "application/json");
+                res.setHeader("Access-Control-Allow-Origin", "*");
+                res.end(JSON.stringify(data));
+                return;
+              }
+            } catch {
+              // Try next instance
+            }
+          }
+
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify({ query: q, number_of_results: 0, results: [], suggestions: [], fallback: true }));
+        } catch (err: any) {
+          res.statusCode = 500;
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify({ error: err.message }));
+        }
+      });
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
+    searxngDevPlugin(),
     TanStackRouterVite({
       routesDirectory: "./src/routes",
       generatedRouteTree: "./src/routeTree.gen.ts",

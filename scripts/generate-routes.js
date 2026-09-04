@@ -197,51 +197,8 @@ const collectionRoutes = [
   },
 ];
 
-// Add product routes
-const productRoutes = [
-  {
-    path: "product/prod_sony_wh1000xm5",
-    title: "Sony WH-1000XM5 Price History & Live Best Deal – goCoupon",
-    description: "Track Sony WH-1000XM5 90-day price trends in India. Compare Amazon, Flipkart, Croma & Tata CLiQ prices and auto-apply AMZSAVE promo code.",
-    h1: "Sony WH-1000XM5 Wireless Headphones Price Comparison & 90-Day History",
-    lead: "Compare live prices, delivery times, and coupon savings for Sony WH-1000XM5 across Amazon, Flipkart, Croma, and Tata CLiQ.",
-  },
-  {
-    path: "product/prod_apple_macbook_air_m3",
-    title: "Apple MacBook Air M3 (13-inch) Lowest Price & History – goCoupon",
-    description: "Compare MacBook Air M3 prices across Flipkart, Amazon India, and Croma. Check 90-day price drops and active bank offers.",
-    h1: "Apple MacBook Air M3 Price Comparison & 90-Day Price Tracker",
-    lead: "Live cross-store price comparison and discount analysis for Apple MacBook Air M3 (13-inch, 8GB, 256GB SSD).",
-  },
-  {
-    path: "product/prod_boat_airdopes_141",
-    title: "boAt Airdopes 141 Price Tracker & Coupon Codes – goCoupon",
-    description: "Compare boAt Airdopes 141 true wireless earbuds prices on Amazon, Flipkart, and boAt Lifestyle with working promo codes.",
-    h1: "boAt Airdopes 141 True Wireless Earbuds Price History & Coupons",
-    lead: "Find the lowest verified price and auto-apply active coupon codes for boAt Airdopes 141 TWS Earbuds.",
-  },
-  {
-    path: "product/prod_samsung_s24_ultra",
-    title: "Samsung Galaxy S24 Ultra 5G Price History & Deals – goCoupon",
-    description: "Track Samsung Galaxy S24 Ultra 5G prices in India across Amazon and Flipkart with instant bank discount calculations.",
-    h1: "Samsung Galaxy S24 Ultra 5G Live Price Comparison & Tracker",
-    lead: "Monitor real-time prices, exchange bonuses, and bank card offers for Samsung Galaxy S24 Ultra 5G in India.",
-  },
-  {
-    path: "product/prod_minimalist_vit_c",
-    title: "Minimalist 10% Vitamin C Serum Price & Coupons – goCoupon",
-    description: "Compare Minimalist 10% Vitamin C Face Serum prices across Nykaa, Amazon, and Myntra with instant coupon application.",
-    h1: "Minimalist 10% Vitamin C Serum Price Comparison & Discounts",
-    lead: "Live discount comparison and coupon codes for Minimalist 10% Vitamin C Face Serum.",
-  },
-  {
-    path: "product/prod_nike_air_force_1",
-    title: "Nike Air Force 1 '07 Sneakers Price & Offers – goCoupon",
-    description: "Compare Nike Air Force 1 '07 prices across Myntra, Ajio, and Nike India with verified promo codes and cashback.",
-    h1: "Nike Air Force 1 '07 Sneakers Price Comparison & Offers",
-    lead: "Check verified prices and available promo codes for Nike Air Force 1 '07 Classic White Sneakers.",
-  },
-];
+// Add product routes (dynamic at runtime)
+const productRoutes = [];
 
 // Add blog routes
 const blogRoutes = [

@@ -21,12 +21,12 @@ export const Route = createFileRoute("/price-history")({
         "Track 90-day price history graphs on Amazon & Flipkart. Spot fake pre-sale discount hikes, set instant price drop alerts, and buy at the all-time lowest price in India.",
       path: "/price-history",
       keywords:
-        "price history tracker india, amazon price tracker, flipkart price graph, buyhatke alternative, fake discount detector, 90 day lowest price india",
+        "price history tracker india, amazon price tracker, flipkart price graph, multi-store price comparison, fake discount detector, 90 day lowest price india",
     }),
 });
 
 function PriceHistoryHubPage() {
-  const [activeProductId, setActiveProductId] = useState<string>("prod_sony_wh1000xm5");
+  const [activeProductId, setActiveProductId] = useState<string>("");
   const activeProduct = CANONICAL_PRODUCTS.find((p) => p.id === activeProductId) || CANONICAL_PRODUCTS[0];
 
   const breadcrumb = breadcrumbSchema([
@@ -42,23 +42,23 @@ function PriceHistoryHubPage() {
       />
 
       {/* Hero Header */}
-      <section className="relative border-b border-border px-6 pb-16 pt-20 sm:pt-28">
-        <div className="mx-auto max-w-5xl text-center">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 font-mono text-xs uppercase tracking-[0.2em] text-primary">
-            <Clock className="h-3.5 w-3.5" />
-            90-Day Historical Price Intelligence
+      <section className="relative border-b border-border/70 bg-gradient-to-b from-background via-background/95 to-muted/20 px-4 sm:px-6 pb-16 pt-16 sm:pt-24">
+        <div className="mx-auto max-w-4xl text-center">
+          <div className="mb-3 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            PRICE HISTORY &amp; TRACKER
           </div>
-          <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            Spot Fake Discounts. Know the All-Time Low.
+          <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-indigo-600 dark:text-indigo-400 text-balance">
+            Compare prices &amp; track drops across 100+ stores
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">
-            Paste any Amazon or Flipkart product URL to see true 90-day price trends, historical lows, and detect inflated prices right before sale festivals.
+          <p className="mx-auto mt-3 max-w-2xl text-base sm:text-xl font-normal text-foreground/80 dark:text-muted-foreground text-balance">
+            Save instantly, everytime you shop!
           </p>
 
-          <div className="mx-auto mt-8 max-w-2xl">
+          <div className="mx-auto mt-8 sm:mt-10 max-w-3xl">
             <UrlResolverSearch
               size="large"
-              placeholder="Paste Amazon / Flipkart product URL to inspect price graph…"
+              showTrustBadges={true}
+              showPopularChips={false}
             />
           </div>
         </div>
@@ -67,60 +67,78 @@ function PriceHistoryHubPage() {
       {/* Featured Price Tracker Showcase */}
       <section className="px-4 sm:px-6 py-12 sm:py-16 pb-28 sm:pb-20">
         <div className="mx-auto max-w-7xl">
-          {/* Product Switcher Pills */}
-          <div className="mb-6 flex flex-wrap items-center gap-2">
-            <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground mr-2">
-              Popular Tracked Products:
-            </span>
-            {CANONICAL_PRODUCTS.slice(0, 4).map((prod) => (
-              <button
-                key={prod.id}
-                type="button"
-                onClick={() => setActiveProductId(prod.id)}
-                className={`rounded-xl px-3.5 py-2 min-h-[36px] text-xs font-semibold transition-colors touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                  activeProductId === prod.id
-                    ? "bg-primary text-primary-foreground shadow-xs"
-                    : "border border-border bg-card text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {prod.brand} {prod.title.slice(0, 18)}…
-              </button>
-            ))}
-          </div>
+          {activeProduct ? (
+            <>
+              {/* Product Switcher Pills */}
+              {CANONICAL_PRODUCTS.length > 0 && (
+                <div className="mb-6 flex flex-wrap items-center gap-2">
+                  <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground mr-2">
+                    Popular Tracked Products:
+                  </span>
+                  {CANONICAL_PRODUCTS.slice(0, 4).map((prod) => (
+                    <button
+                      key={prod.id}
+                      type="button"
+                      onClick={() => setActiveProductId(prod.id)}
+                      className={`rounded-xl px-3.5 py-2 min-h-[36px] text-xs font-semibold transition-colors touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                        activeProductId === prod.id
+                          ? "bg-primary text-primary-foreground shadow-xs"
+                          : "border border-border bg-card text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {prod.brand} {prod.title.slice(0, 18)}…
+                    </button>
+                  ))}
+                </div>
+              )}
 
-          {/* Interactive Chart Component */}
-          <PriceHistoryChart
-            productId={activeProduct.id}
-            productTitle={activeProduct.title}
-          />
-
-          {/* Product Quick View Card */}
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-border bg-card p-6 shadow-sm">
-            <div className="flex items-center gap-4">
-              <img
-                src={activeProduct.imageUrl}
-                alt={activeProduct.title}
-                className="h-16 w-16 rounded-2xl object-cover border border-border"
+              {/* Interactive Chart Component */}
+              <PriceHistoryChart
+                productId={activeProduct.id}
+                productTitle={activeProduct.title}
               />
-              <div>
-                <h3 className="font-display text-lg font-bold text-foreground">
-                  {activeProduct.title}
-                </h3>
-                <span className="font-mono text-xs text-muted-foreground">
-                  {activeProduct.category} • {activeProduct.brand}
-                </span>
-              </div>
-            </div>
 
-            <Link
-              to="/product/$productId"
-              params={{ productId: activeProduct.id }}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-sm hover:scale-105 transition-transform"
-            >
-              <span>View Multi-Store Deals &amp; Coupons</span>
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
+              {/* Product Quick View Card */}
+              <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-border bg-card p-6 shadow-sm">
+                <div className="flex items-center gap-4">
+                  <img
+                    src={activeProduct.imageUrl}
+                    alt={activeProduct.title}
+                    className="h-16 w-16 rounded-2xl object-cover border border-border"
+                  />
+                  <div>
+                    <h3 className="font-display text-lg font-bold text-foreground">
+                      {activeProduct.title}
+                    </h3>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {activeProduct.category} • {activeProduct.brand}
+                    </span>
+                  </div>
+                </div>
+
+                <Link
+                  to="/product/$productId"
+                  params={{ productId: activeProduct.id }}
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-sm hover:scale-105 transition-transform"
+                >
+                  <span>View Multi-Store Deals &amp; Coupons</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </>
+          ) : (
+            <div className="rounded-3xl border border-border/80 bg-card p-8 sm:p-14 text-center max-w-3xl mx-auto shadow-sm">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-5">
+                <TrendingDown className="h-7 w-7" />
+              </div>
+              <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground text-balance">
+                Live Price Tracking Engine Ready
+              </h2>
+              <p className="mt-3 text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed text-balance">
+                Search above by product name or paste any product link from Amazon, Flipkart, Myntra, or Croma to generate real-time 90-day price trends, fake inflation checks, and instant drop alerts.
+              </p>
+            </div>
+          )}
         </div>
       </section>
     </SiteShell>

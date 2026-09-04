@@ -39,12 +39,14 @@ export function ShoppingIntelligenceSpotlight() {
           </Link>
         </div>
 
-        {/* 3 Featured Canonical Products */}
-        <div className="grid gap-8 md:grid-cols-3">
-          {featuredProducts.map((product) => (
-            <ProductHeroCard key={product.id} product={product} />
-          ))}
-        </div>
+        {/* Featured Products */}
+        {featuredProducts.length > 0 && (
+          <div className="grid gap-8 md:grid-cols-3">
+            {featuredProducts.map((product) => (
+              <ProductHeroCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
 
         {/* Split Banner: Shortlists + Shopping Assistant */}
         <div className="mt-16 grid gap-8 lg:grid-cols-2">
@@ -53,7 +55,7 @@ export function ShoppingIntelligenceSpotlight() {
             <div>
               <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-primary">
                 <Award className="h-3.5 w-3.5" />
-                Flash.co-Style Rubric Shortlist
+                Curated Buying Guide
               </div>
               <h3 className="mt-4 font-display text-2xl font-bold text-foreground">
                 {featuredCollection.title}
@@ -62,19 +64,21 @@ export function ShoppingIntelligenceSpotlight() {
                 {featuredCollection.subtitle}
               </p>
 
-              <div className="mt-6 space-y-2 rounded-2xl border border-border/80 bg-background p-4">
-                <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider block">
-                  Rank #1 Champion:
-                </span>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-foreground truncate pr-2">
-                    {featuredCollection.items[0]?.product.title}
+              {featuredCollection?.items[0]?.product && (
+                <div className="mt-6 space-y-2 rounded-2xl border border-border/80 bg-background p-4">
+                  <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider block">
+                    Rank #1 Champion:
                   </span>
-                  <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 font-mono text-xs font-bold text-emerald-500">
-                    ★ {featuredCollection.items[0]?.overallScore.toFixed(1)} / 10
-                  </span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-foreground truncate pr-2">
+                      {featuredCollection.items[0]?.product.title}
+                    </span>
+                    <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 font-mono text-xs font-bold text-emerald-500">
+                      ★ {featuredCollection.items[0]?.overallScore.toFixed(1)} / 10
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div className="mt-8 flex items-center justify-between border-t border-border pt-4">

@@ -18,6 +18,8 @@ interface ProductHeroCardProps {
 }
 
 export function ProductHeroCard({ product }: ProductHeroCardProps) {
+  if (!product) return null;
+
   const comparison = compareProductOffers(product.id);
   const metrics = calculatePriceMetrics(product.id);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);

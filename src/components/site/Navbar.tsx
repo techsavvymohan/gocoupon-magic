@@ -34,8 +34,6 @@ const primaryLinks: NavLink[] = [
   { label: "Compare", to: "/compare", badge: "NEW", badgeColor: "bg-primary/10 text-primary" },
   { label: "Price Tracker", to: "/price-history" },
   { label: "Ask", to: "/ask" },
-  { label: "Shortlists", to: "/collections" },
-  { label: "Watchlist", to: "/watchlist" },
   { label: "Stores", to: "/stores" },
   { label: "Deals", href: "https://deals.gocoupon.io", isExternal: true, badge: "HOT", badgeColor: "bg-rose-500/15 text-rose-500" },
   { label: "Extension", to: "/extension" },
@@ -278,13 +276,13 @@ export function Navbar() {
           </Link>
 
           <Link
-            to="/watchlist"
+            to="/stores"
             className="flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 px-3 py-1 text-muted-foreground hover:text-foreground active:scale-95 touch-manipulation"
             activeProps={{ className: "text-primary font-bold" }}
-            aria-label="Watchlist & Price Drops"
+            aria-label="Stores Directory"
           >
-            <Bell className="h-4 w-4" aria-hidden="true" />
-            <span className="text-[10px] font-medium">Watchlist</span>
+            <ShoppingBag className="h-4 w-4" aria-hidden="true" />
+            <span className="text-[10px] font-medium">Stores</span>
           </Link>
         </div>
       </nav>

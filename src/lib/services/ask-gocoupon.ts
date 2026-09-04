@@ -113,18 +113,20 @@ export async function askGoCoupon(userQuery: string): Promise<AssistantAnswer> {
 
   // Match Products from Seed Catalog
   let matchingProducts: CanonicalProduct[] = [];
-  if (detectedCategory === "Audio & Electronics") {
-    matchingProducts = [CANONICAL_PRODUCTS[0], CANONICAL_PRODUCTS[2]];
-  } else if (detectedCategory === "Laptops & Computing") {
-    matchingProducts = [CANONICAL_PRODUCTS[1]];
-  } else if (detectedCategory === "Smartphones") {
-    matchingProducts = [CANONICAL_PRODUCTS[3]];
-  } else if (detectedCategory === "Skincare & Beauty") {
-    matchingProducts = [CANONICAL_PRODUCTS[4]];
-  } else if (detectedCategory === "Fashion & Footwear") {
-    matchingProducts = [CANONICAL_PRODUCTS[5]];
-  } else {
-    matchingProducts = CANONICAL_PRODUCTS.slice(0, 2);
+  if (CANONICAL_PRODUCTS.length > 0) {
+    if (detectedCategory === "Audio & Electronics") {
+      matchingProducts = [CANONICAL_PRODUCTS[0], CANONICAL_PRODUCTS[2]].filter(Boolean);
+    } else if (detectedCategory === "Laptops & Computing") {
+      matchingProducts = [CANONICAL_PRODUCTS[1]].filter(Boolean);
+    } else if (detectedCategory === "Smartphones") {
+      matchingProducts = [CANONICAL_PRODUCTS[3]].filter(Boolean);
+    } else if (detectedCategory === "Skincare & Beauty") {
+      matchingProducts = [CANONICAL_PRODUCTS[4]].filter(Boolean);
+    } else if (detectedCategory === "Fashion & Footwear") {
+      matchingProducts = [CANONICAL_PRODUCTS[5]].filter(Boolean);
+    } else {
+      matchingProducts = CANONICAL_PRODUCTS.slice(0, 2);
+    }
   }
 
   // If query specifies a brand/SKU not in the pre-seeded catalog, attempt live SerpAPI lookup
@@ -226,13 +228,18 @@ export async function askGoCoupon(userQuery: string): Promise<AssistantAnswer> {
     }))
   );
 
-  let verdictText = `Based on GoCoupon's verified price history and multi-store comparison, the top recommendation is **${recommended[0]?.product.title}**.`;
-  if (recommended[0]?.comparison) {
-    verdictText += ` You can buy it at the lowest effective price on **${
-      recommended[0].bestStore
-    }** for **${recommended[0].bestPriceDisplay}** (saving you up to **₹${recommended[0].comparison.maxSavings.toLocaleString(
-      "en-IN"
-    )}** compared to the highest merchant price when stacking active coupons).`;
+  let verdictText = "";
+  if (recommended.length > 0 && recommended[0]?.product) {
+    verdictText = `Based on GoCoupon's verified price history and multi-store comparison, the top recommendation is **${recommended[0].product.title}**.`;
+    if (recommended[0]?.comparison) {
+      verdictText += ` You can buy it at the lowest effective price on **${
+        recommended[0].bestStore
+      }** for **${recommended[0].bestPriceDisplay}** (saving you up to **₹${recommended[0].comparison.maxSavings.toLocaleString(
+        "en-IN"
+      )}** compared to the highest merchant price when stacking active coupons).`;
+    }
+  } else {
+    verdictText = `Searched for "${userQuery}". You can paste any direct product link from Amazon, Flipkart, Myntra, or Croma to extract real-time price history and stackable store discounts.`;
   }
 
   if (liveTopItem && liveLowestPrice > 0) {

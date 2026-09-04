@@ -30,14 +30,15 @@ import { AlertTriangle, TrendingDown, Clock, ShieldAlert, Sparkles, CheckCircle2
 interface PriceHistoryChartProps {
   productId: string;
   productTitle?: string;
+  currentPrice?: number;
   onSetAlertClick?: () => void;
 }
 
-export function PriceHistoryChart({ productId, productTitle, onSetAlertClick }: PriceHistoryChartProps) {
+export function PriceHistoryChart({ productId, productTitle, currentPrice, onSetAlertClick }: PriceHistoryChartProps) {
   const [days, setDays] = useState<30 | 60 | 90 | 180>(90);
 
-  const historyData = getProductPriceHistory(productId, days);
-  const metrics: PriceHistoryMetrics = calculatePriceMetrics(productId);
+  const historyData = getProductPriceHistory(productId, days, currentPrice);
+  const metrics: PriceHistoryMetrics = calculatePriceMetrics(productId, currentPrice);
 
   const minPrice = Math.min(...historyData.map((d) => d.price));
   const maxPrice = Math.max(...historyData.map((d) => d.price));

@@ -78,54 +78,66 @@ function CollectionDetailsPage() {
 
         {/* Ranked Products List */}
         <div className="mt-12 space-y-12">
-          {collection.items.map((item) => {
-            const itemEvidence = CANONICAL_EVIDENCE.filter((e) => e.productId === item.productId);
+          {collection.items.length > 0 ? (
+            collection.items.map((item) => {
+              const itemEvidence = CANONICAL_EVIDENCE.filter((e) => e.productId === item.productId);
 
-            return (
-              <div
-                key={item.id}
-                className="rounded-3xl border border-border/80 bg-card p-6 sm:p-8 shadow-md"
-              >
-                {/* Header Rank Badge */}
-                <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground font-display text-xl font-bold">
-                      #{item.rank}
+              return (
+                <div
+                  key={item.id}
+                  className="rounded-3xl border border-border/80 bg-card p-6 sm:p-8 shadow-md"
+                >
+                  {/* Header Rank Badge */}
+                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground font-display text-xl font-bold">
+                        #{item.rank}
+                      </div>
+                      <div>
+                        <span className="font-mono text-xs text-muted-foreground uppercase">
+                          Rank #{item.rank} Overall
+                        </span>
+                        <h2 className="font-display text-2xl font-bold text-foreground">
+                          <Link to="/product/$productId" params={{ productId: item.productId }}>
+                            {item.product?.title || "Product"}
+                          </Link>
+                        </h2>
+                      </div>
                     </div>
-                    <div>
-                      <span className="font-mono text-xs text-muted-foreground uppercase">
-                        Rank #{item.rank} Overall
-                      </span>
-                      <h2 className="font-display text-2xl font-bold text-foreground">
-                        <Link to="/product/$productId" params={{ productId: item.productId }}>
-                          {item.product.title}
-                        </Link>
-                      </h2>
-                    </div>
+
+                    <Link
+                      to="/product/$productId"
+                      params={{ productId: item.productId }}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-5 py-2 text-xs font-bold text-primary-foreground shadow-sm hover:scale-105 transition-transform"
+                    >
+                      <span>View Price History &amp; Deals</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
                   </div>
 
-                  <Link
-                    to="/product/$productId"
-                    params={{ productId: item.productId }}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-5 py-2 text-xs font-bold text-primary-foreground shadow-sm hover:scale-105 transition-transform"
-                  >
-                    <span>View Price History &amp; Deals</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
+                  {/* Rubric Breakdown Component */}
+                  <div className="mt-6">
+                    <FlashVerdictBadge
+                      recommendation={item}
+                      evidence={itemEvidence}
+                      score={item.overallScore}
+                      productTitle={item.product?.title || "Product"}
+                    />
+                  </div>
                 </div>
-
-                {/* Rubric Breakdown Component */}
-                <div className="mt-6">
-                  <FlashVerdictBadge
-                    recommendation={item}
-                    evidence={itemEvidence}
-                    score={item.overallScore}
-                    productTitle={item.product.title}
-                  />
-                </div>
-              </div>
-            );
-          })}
+              );
+            })
+          ) : (
+            <div className="rounded-3xl border border-dashed border-border/80 bg-card/40 p-12 text-center max-w-xl mx-auto">
+              <Award className="h-10 w-10 text-primary/60 mx-auto mb-3" />
+              <h3 className="font-display text-lg font-bold text-foreground">
+                Collection Under Editorial Review
+              </h3>
+              <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
+                Ranked lab benchmarks and multi-store pricing for this collection are being refreshed with real-time Indian merchant data.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </SiteShell>

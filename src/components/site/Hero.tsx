@@ -24,57 +24,22 @@ export function Hero() {
       <div className="relative mx-auto grid max-w-7xl items-center gap-8 lg:gap-12 lg:grid-cols-[1.05fr_1.1fr]">
         {/* URL Resolver & Scanner Card (Top on Mobile with order-1, Right on Desktop with order-2) */}
         <div className="reveal relative order-1 lg:order-2" style={{ transitionDelay: "0.1s" }}>
-          <div className="rounded-3xl border border-border/80 bg-card/95 p-5 sm:p-8 shadow-2xl backdrop-blur-xl">
-            {/* Card Header */}
-            <div className="mb-4 sm:mb-5 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
-                  <Search className="h-4 w-4 sm:h-5 sm:w-5" />
-                </div>
-                <div>
-                  <h3 className="font-display text-sm sm:text-lg font-bold text-foreground">
-                    Instant Product &amp; URL Resolver
-                  </h3>
-                  <span className="font-mono text-[10px] text-emerald-500 flex items-center gap-1 font-semibold">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Live Price &amp; 90d Low Scanner Active
-                  </span>
-                </div>
-              </div>
-
-              <span className="rounded-full bg-primary/10 border border-primary/20 px-2 sm:px-2.5 py-0.5 font-mono text-[9px] sm:text-[10px] font-bold text-primary">
-                GoCoupon Engine
-              </span>
+          <div className="rounded-3xl border border-border/80 bg-card/95 p-6 sm:p-8 shadow-xl backdrop-blur-xl">
+            {/* Clean Professional Header */}
+            <div className="mb-5 sm:mb-6">
+              <h3 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                Compare Prices &amp; Track Drops
+              </h3>
+              <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground">
+                Paste any product link or search to find the lowest price across 100+ stores.
+              </p>
             </div>
-
-            <p className="text-xs text-muted-foreground mb-4 sm:mb-5 leading-relaxed">
-              Paste any Amazon, Flipkart, Myntra, or Croma link to compare live prices, check 90-day history, and grab stackable coupons:
-            </p>
 
             {/* Prominent URL Resolver Input Component */}
             <UrlResolverSearch
               size="large"
-              placeholder="Paste Amazon, Flipkart URL or search product..."
+              showPopularChips={true}
             />
-
-            {/* Quick Live Preview Bar */}
-            <div className="mt-4 sm:mt-5 rounded-2xl border border-border/60 bg-muted/20 p-3 sm:p-3.5 text-xs font-mono">
-              <div className="flex items-center justify-between text-muted-foreground mb-1.5">
-                <span className="text-[11px] flex items-center gap-1 text-muted-foreground">
-                  <Clock className="h-3 w-3 text-primary" /> Live Comparison Preview:
-                </span>
-                <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-emerald-600 dark:text-emerald-400 font-bold text-[10px]">
-                  Save up to ₹4,354
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-foreground">
-                <span className="font-bold truncate pr-2 text-xs">Sony WH-1000XM5</span>
-                <span className="font-bold text-primary text-xs">
-                  ₹24,636{" "}
-                  <span className="text-[10px] text-muted-foreground font-normal">on Amazon</span>
-                </span>
-              </div>
-            </div>
           </div>
         </div>
 
