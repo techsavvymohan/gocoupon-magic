@@ -1,12 +1,8 @@
-import { useEffect, lazy, Suspense, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Particles } from "@/components/Particles";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { useRevealOnScroll } from "@/hooks/use-reveal";
-
-const MedusaeCursor = lazy(() =>
-  import("@/components/MedusaeCursor").then((m) => ({ default: m.MedusaeCursor })),
-);
 
 type SiteShellProps = {
   children: ReactNode;
@@ -35,11 +31,8 @@ export function SiteShell({ children, showParticles = true }: SiteShellProps) {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground">
-      {/* Fixed background layer for cursor and ambient particles (desktop only, disabled on mobile screens) */}
+      {/* Fixed background layer for ambient particles (desktop only, disabled on mobile screens) */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden hidden md:block" aria-hidden>
-        <Suspense fallback={null}>
-          <MedusaeCursor />
-        </Suspense>
         {showParticles && <Particles count={30} />}
       </div>
 
