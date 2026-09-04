@@ -3,6 +3,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { Hero } from "@/components/site/Hero";
 import { LogoMarquee } from "@/components/site/LogoMarquee";
 import { Stats } from "@/components/site/Stats";
+import { ExtensionShowcase } from "@/components/site/ExtensionShowcase";
 import { HowItWorks } from "@/components/site/HowItWorks";
 import { Features } from "@/components/site/Features";
 import { AnimatedDealsCarousel } from "@/components/site/AnimatedDealsCarousel";
@@ -57,6 +58,7 @@ function Index() {
       <Hero />
       <LogoMarquee />
       <Stats />
+      <ExtensionShowcase />
       <HowItWorks />
       <Features />
       <AnimatedDealsCarousel />

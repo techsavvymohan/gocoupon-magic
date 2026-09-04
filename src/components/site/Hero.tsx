@@ -47,23 +47,23 @@ export function Hero() {
         <div className="reveal order-2 lg:order-1">
           <div className="mb-4 sm:mb-5 inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1.5 font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground shadow-2xs">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Live Multi-Store Comparison • 90-Day Price Tracker • Verified Coupons</span>
+            <span>Auto-Apply Coupon Extension • Live Price Comparison • 90-Day Tracker</span>
           </div>
 
           <h1 className="font-display text-3xl font-bold leading-[1.1] text-foreground sm:text-5xl md:text-6xl text-balance">
-            Stop overpaying online.
+            Never search for coupons again.
             <br />
-            <span className="text-primary">Compare prices &amp; trends</span>
+            <span className="text-primary">Auto-apply best discounts</span>
             <br />
-            across India&apos;s top stores.
+            &amp; compare store prices.
           </h1>
 
           <p className="mt-4 sm:mt-5 max-w-xl text-sm sm:text-lg leading-relaxed text-muted-foreground">
-            Search any product or paste any store link. GoCoupon scans real-time prices across Amazon India, Flipkart, Croma, Myntra &amp; Tata CLiQ, tracks 90-day price drops to expose fake discounts, and auto-applies verified coupon codes at checkout.
+            GoCoupon&apos;s free Chrome extension automatically finds, tests, and applies working discount codes at checkout across Amazon India, Flipkart, Myntra &amp; 200+ stores. Plus, compare real-time prices and track 90-day price trends before you buy.
           </p>
 
           <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
-            {/* Desktop Only: Add to Chrome extension button (hidden on mobile devices) */}
+            {/* Desktop Only: Add to Chrome extension button */}
             <MagneticButton
               as="a"
               href="https://chromewebstore.google.com"
@@ -72,24 +72,35 @@ export function Hero() {
               className="hidden sm:inline-flex items-center gap-2.5 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-md transition-all hover:scale-105 hover:bg-primary-hover hover:shadow-[var(--shadow-accent)] active:scale-95"
             >
               <ChromeIcon />
-              <span>Add to Chrome — Free</span>
+              <span>Add to Chrome — Free Auto-Applier</span>
             </MagneticButton>
 
-            {/* Mobile Primary Action */}
-            <Link
-              to="/compare"
-              className="sm:hidden inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-xs font-bold text-primary-foreground shadow-md w-full active:scale-95"
-            >
-              <span>Explore Multi-Store Comparisons</span>
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
+            {/* Mobile Actions */}
+            <div className="sm:hidden flex flex-col gap-2 w-full">
+              <a
+                href="https://chromewebstore.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-xs font-bold text-primary-foreground shadow-md w-full active:scale-95"
+              >
+                <ChromeIcon />
+                <span>Add to Chrome — Free Auto-Applier</span>
+              </a>
+              <Link
+                to="/compare"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-card px-6 py-2.5 text-xs font-semibold text-foreground shadow-2xs w-full active:scale-95"
+              >
+                <span>Search &amp; Compare 25+ Stores</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
 
             {/* Secondary Action on Desktop */}
             <Link
               to="/compare"
               className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
             >
-              <span>Explore Comparisons</span>
+              <span>Search &amp; Compare Stores</span>
               <ArrowRight className="h-4 w-4 text-primary" />
             </Link>
           </div>

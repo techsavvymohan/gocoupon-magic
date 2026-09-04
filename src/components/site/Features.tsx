@@ -9,6 +9,16 @@ import {
 
 const features = [
   {
+    title: "1-Click Auto-Apply Promo Codes",
+    body: "Our Chrome extension automatically tests all verified coupon codes in under 2 seconds at checkout on 200+ stores and applies the biggest discount.",
+    icon: Zap,
+  },
+  {
+    title: "Hidden Voucher Auto-Clipper",
+    body: "Spots and auto-clicks hidden green discount checkboxes, coupon vouchers, and bank card offers directly on Amazon India and Flipkart product pages.",
+    icon: Ticket,
+  },
+  {
     title: "Live Multi-Store Comparison",
     body: "Compare real-time prices across Amazon India, Flipkart, Croma, Myntra, Tata CLiQ & Reliance Digital side-by-side with net checkout cost calculation.",
     icon: Layers,
@@ -17,16 +27,6 @@ const features = [
     title: "Interactive 90-Day Price Tracker",
     body: "Accurate historical price curves expose fake pre-sale markups, revealing the true lowest price ever recorded so you buy at the perfect time.",
     icon: TrendingDown,
-  },
-  {
-    title: "1-Click Auto-Apply Promo Codes",
-    body: "Our engine automatically tests all verified coupon codes in under 2 seconds at checkout and applies the highest rupee discount to your cart.",
-    icon: Zap,
-  },
-  {
-    title: "Hidden Voucher Auto-Clipper",
-    body: "Automatically finds and clips hidden discount checkboxes, coupon vouchers, and bank card offers directly on Amazon and Flipkart product pages.",
-    icon: Ticket,
   },
   {
     title: "Top Trusted Stores Prioritized",

@@ -2,9 +2,9 @@ import { Counter } from "../Counter";
 
 const stats = [
   { label: "Total saved by shoppers", to: 12400, prefix: "₹", suffix: " Cr" },
-  { label: "Active online shoppers", to: 180000, suffix: "+" },
-  { label: "Daily price & coupon checks", to: 420000, suffix: "+" },
-  { label: "Stores compared live", to: 25, suffix: "+" },
+  { label: "Active extension users", to: 180000, suffix: "+" },
+  { label: "Coupons tested daily", to: 42000, suffix: "+" },
+  { label: "Stores supported", to: 200, suffix: "+" },
 ];
 
 export function Stats() {

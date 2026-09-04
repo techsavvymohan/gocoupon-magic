@@ -3,18 +3,18 @@ import { useEffect, useRef } from "react";
 const steps = [
   {
     n: "01",
-    title: "Search or paste any link",
-    body: "Search for any phone, laptop, shoe, or appliance — or paste a link from Amazon India, Flipkart, or Myntra to compare prices across stores instantly.",
+    title: "Install free extension or search online",
+    body: "Add the free GoCoupon extension in 10 seconds, or search any product and paste links from Amazon India, Flipkart, or Myntra to compare live prices.",
   },
   {
     n: "02",
-    title: "Verify 90-day price history",
-    body: "View interactive 90-day price charts with lowest-ever price benchmarks to expose artificial pre-sale price hikes and verify genuine deals.",
+    title: "Check price history & voucher alerts",
+    body: "Browse stores as usual. GoCoupon automatically monitors 90-day price trends, detects fake sales, and spots hidden on-page discount checkboxes.",
   },
   {
     n: "03",
-    title: "Auto-apply best coupons",
-    body: "At checkout, goCoupon automatically discovers, tests, and applies the highest-saving discount codes and clips hidden on-page vouchers in 1 click.",
+    title: "1-Click auto-apply at checkout",
+    body: "When you reach the cart, click 'Apply Savings'. GoCoupon tests every working promo code in 2 seconds and applies the highest savings automatically.",
   },
 ];
 

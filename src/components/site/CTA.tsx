@@ -17,15 +17,15 @@ export function CTA() {
         </div>
 
         <h2 className="font-display text-4xl font-bold leading-[1.05] text-foreground md:text-6xl text-balance">
-          Fall in love with saving money.
+          Save automatically at checkout.
           <br />
           <span className="text-primary block mt-1">
-            Get GoCoupon 100% Free.
+            Get the GoCoupon Extension Free.
           </span>
         </h2>
 
         <p className="mx-auto mt-6 max-w-xl text-base text-muted-foreground sm:text-lg leading-relaxed">
-          Compare prices across Amazon India, Flipkart, Myntra, Croma &amp; 25+ stores, track 90-day price drops, and auto-apply working coupons in 1 click. Zero signup, no credit card, and completely free.
+          Install the free Chrome extension in 10 seconds. Auto-apply working discount codes, auto-clip Amazon &amp; Flipkart vouchers, and compare live store prices with zero effort.
         </p>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-5">
@@ -36,7 +36,7 @@ export function CTA() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2.5 rounded-full bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 px-8 py-4 text-base font-bold text-white shadow-xl transition-all hover:scale-105 hover:shadow-rose-500/30"
           >
-            <span>Add to Chrome — It&apos;s 100% Free</span>
+            <span>Add to Chrome — Free Auto-Applier</span>
             <ArrowRight className="h-4 w-4" />
           </MagneticButton>
           <div className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
