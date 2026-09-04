@@ -7,20 +7,18 @@ import { UrlResolverSearch } from "../shopping/UrlResolverSearch";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pt-2 sm:pt-4 pb-16 sm:pb-24">
-      {/* Top Banner Showcase Container */}
-      <div className="relative w-full overflow-hidden bg-gradient-to-b from-blue-50/50 via-background to-background dark:from-card/30 dark:via-background dark:to-background border-b border-border/40">
-        <div className="mx-auto max-w-5xl px-3 sm:px-6 pt-2 sm:pt-4 pb-2 sm:pb-4 flex items-center justify-center">
-          <img
-            src="/hero-banner.png"
-            alt="GoCoupon — Shop Smarter, Pay Less"
-            className="w-full max-w-4xl h-auto object-contain rounded-2xl sm:rounded-3xl shadow-xs transition-transform duration-300 hover:scale-[1.005]"
-            width={1024}
-            height={409}
-            loading="eager"
-            fetchPriority="high"
-          />
-        </div>
+    <section className="relative overflow-hidden pb-16 sm:pb-24">
+      {/* Full-Width Edge-to-Edge Top Banner (50% compact height) */}
+      <div className="relative w-full overflow-hidden bg-[#F6C34C] dark:bg-[#b88520]">
+        <img
+          src="/hero-top-banner.webp"
+          alt="GoCoupon — Shop Smarter, Pay Less"
+          className="w-full h-[130px] sm:h-[170px] md:h-[200px] lg:h-[220px] object-cover object-center"
+          width={1263}
+          height={379}
+          loading="eager"
+          fetchPriority="high"
+        />
       </div>
 
       {/* Centered Hero Content & Search Box */}
