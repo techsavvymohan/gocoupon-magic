@@ -1,9 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-const SERPAPI_KEY =
-  process.env.SERPAPI_API_KEY ||
-  process.env.VITE_SERPAPI_KEY ||
-  "3e5a818b044970872f984fc4f861138d65566790bfdfcae87f6c7f043b63d5d3";
+const SERPAPI_KEY = process.env.SERPAPI_API_KEY || process.env.SERPAPI_KEY || "";
 
 const shoppingCache = new Map<string, { data: any; expiry: number }>();
 

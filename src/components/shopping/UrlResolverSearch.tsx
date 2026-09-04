@@ -314,7 +314,7 @@ export function UrlResolverSearch({
           aria-haspopup="listbox"
           aria-autocomplete="list"
           aria-label="Search or paste store product URL"
-          className="w-full flex-1 bg-transparent border-none text-foreground placeholder:text-muted-foreground/70 text-sm sm:text-base font-normal focus:outline-none focus:ring-0 focus-visible:outline-none py-1 sm:py-2 pr-2 touch-manipulation min-w-0 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+          className="w-full flex-1 bg-transparent border-none text-foreground placeholder:text-muted-foreground/70 text-base font-normal focus:outline-none focus:ring-0 focus-visible:outline-none py-1 sm:py-2 pr-2 touch-manipulation min-w-0 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
         />
 
         {/* Right Section: Supports / Brand Avatars / Voice Search / Actions */}

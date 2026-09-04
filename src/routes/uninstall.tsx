@@ -131,7 +131,7 @@ function UninstallPage() {
                     value={customFeedback}
                     onChange={(e) => setCustomFeedback(e.target.value)}
                     placeholder="Tell us what we could have done better or which stores were missing…"
-                    className="mt-2 w-full rounded-2xl border border-border bg-background p-4 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 touch-manipulation"
+                    className="mt-2 w-full rounded-2xl border border-border bg-background p-4 text-base sm:text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 touch-manipulation"
                   />
                 </div>
 

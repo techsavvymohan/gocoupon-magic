@@ -19,8 +19,6 @@ import { compareProductOffers, type ProductComparisonSummary } from "./compariso
 import { getProductPriceHistory, calculatePriceMetrics, type PriceHistoryMetrics } from "./price-history";
 import type { CanonicalProduct, StoreCoupon, ProductEvidence } from "./canonical-types";
 
-const SERPAPI_KEY = "3e5a818b044970872f984fc4f861138d65566790bfdfcae87f6c7f043b63d5d3";
-
 export interface ToolCallExecution {
   toolName: "searchCatalog" | "compareOffers" | "getPriceHistory" | "findCoupons" | "getEvidence";
   arguments: Record<string, string | number | boolean>;

@@ -31,9 +31,19 @@ function searxngDevPlugin() {
               return;
             }
 
+            const apiKey = process.env.SERPAPI_API_KEY || process.env.SERPAPI_KEY || "";
+            if (!apiKey) {
+              console.warn("SERPAPI_API_KEY not set in environment. Returning empty shopping results.");
+              res.statusCode = 200;
+              res.setHeader("Content-Type", "application/json");
+              res.setHeader("Access-Control-Allow-Origin", "*");
+              res.end(JSON.stringify({ shopping_results: [] }));
+              return;
+            }
+
             const serpUrl = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
               q
-            )}&gl=in&hl=en&api_key=3e5a818b044970872f984fc4f861138d65566790bfdfcae87f6c7f043b63d5d3&num=20`;
+            )}&gl=in&hl=en&api_key=${apiKey}&num=20`;
 
             const upstream = await fetch(serpUrl, { signal: AbortSignal.timeout(12000) });
             if (upstream.ok) {

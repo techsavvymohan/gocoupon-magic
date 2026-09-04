@@ -12,10 +12,7 @@
 import * as cheerio from "cheerio";
 import { searchSearXNG } from "./searxng-service";
 
-const SERPAPI_KEY =
-  process.env.SERPAPI_API_KEY ||
-  process.env.VITE_SERPAPI_KEY ||
-  "3e5a818b044970872f984fc4f861138d65566790bfdfcae87f6c7f043b63d5d3";
+const SERPAPI_KEY = process.env.SERPAPI_API_KEY || process.env.SERPAPI_KEY || "";
 
 const FETCH_TIMEOUT_MS = 3500;
 const URL_CACHE_TTL_MS = 5 * 60 * 1000;
@@ -233,16 +230,31 @@ export async function resolveLiveUrlAndCompetitors(urlOrQuery: string): Promise<
   let competitors: LiveProductResolution["competitors"] = [];
 
   try {
-    const serpUrl = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
-      searchQuery
-    )}&gl=in&hl=en&api_key=${SERPAPI_KEY}&num=20`;
+    let rawShopping: any[] = [];
 
-    const serpRes = await fetch(serpUrl, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS + 1000) });
-    if (serpRes.ok) {
-      const serpData = await serpRes.json();
-      const rawShopping = serpData.shopping_results || [];
+    // In browser client, call /api/shopping securely without exposing any API key
+    if (typeof window !== "undefined") {
+      const res = await fetch(`/api/shopping?q=${encodeURIComponent(searchQuery)}`, {
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS + 1000),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        rawShopping = data.shopping_results || [];
+      }
+    } else if (SERPAPI_KEY) {
+      // In server-side runtime, query SerpAPI securely using environment key
+      const serpUrl = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
+        searchQuery
+      )}&gl=in&hl=en&api_key=${SERPAPI_KEY}&num=20`;
+      const serpRes = await fetch(serpUrl, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS + 1000) });
+      if (serpRes.ok) {
+        const serpData = await serpRes.json();
+        rawShopping = serpData.shopping_results || [];
+      }
+    }
 
-      if (!metadata && rawShopping.length > 0) {
+    if (rawShopping.length > 0) {
+      if (!metadata) {
         const top = rawShopping[0];
         metadata = {
           title: top.title,

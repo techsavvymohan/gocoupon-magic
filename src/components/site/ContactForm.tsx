@@ -162,7 +162,7 @@ export function ContactForm() {
                       placeholder="Aarav Mehta"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
+                      className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-base sm:text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors focus:border-primary touch-manipulation"
                     />
                   </div>
                 </div>
@@ -181,7 +181,7 @@ export function ContactForm() {
                       placeholder="aarav@example.com"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
+                      className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-base sm:text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors focus:border-primary touch-manipulation"
                     />
                   </div>
                 </div>
@@ -195,7 +195,7 @@ export function ContactForm() {
                     id="contact-subject"
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base sm:text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors focus:border-primary touch-manipulation cursor-pointer"
                   >
                     <option value="General Inquiry">General Inquiry</option>
                     <option value="Coupon Code Issue">Coupon Code Not Working</option>
@@ -222,10 +222,10 @@ export function ContactForm() {
                       required
                       rows={4}
                       maxLength={500}
-                      placeholder="Tell us how we can help you..."
+                      placeholder="Tell us how we can help you…"
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 resize-none"
+                      className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-base sm:text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors focus:border-primary resize-none touch-manipulation"
                     />
                   </div>
                 </div>

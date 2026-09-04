@@ -134,28 +134,36 @@ export function ComparePage() {
 
   // When search query or URL changes, fetch products from all shopping platforms
   useEffect(() => {
-    if (activeSearchParam.trim()) {
-      executeSearch(activeSearchParam.trim());
-    } else {
+    const trimmed = activeSearchParam.trim();
+    if (!trimmed) {
       setSearchResult(null);
+      return;
     }
-  }, [activeSearchParam]);
 
-  const executeSearch = async (queryOrUrl: string) => {
+    let isMounted = true;
     setIsSearching(true);
-    try {
-      const res = await searchProductsAcrossPlatforms(queryOrUrl);
-      setSearchResult(res);
-      // If it's a direct URL with only 1 product, automatically select it for deep inspection
-      if (res.isDirectUrl && res.products.length === 1) {
-        setSelectedProduct(res.products[0]);
-      }
-    } catch {
-      toast.error("Unable to search platforms. Please try again.");
-    } finally {
-      setIsSearching(false);
-    }
-  };
+
+    searchProductsAcrossPlatforms(trimmed)
+      .then((res) => {
+        if (!isMounted) return;
+        setSearchResult(res);
+        // If it's a direct URL with only 1 product, automatically select it for deep inspection
+        if (res.isDirectUrl && res.products.length === 1) {
+          setSelectedProduct(res.products[0]);
+        }
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        toast.error("Unable to search platforms. Please try again.");
+      })
+      .finally(() => {
+        if (isMounted) setIsSearching(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [activeSearchParam]);
 
   const handleCopy = (code: string) => {
     navigator.clipboard.writeText(code).catch(() => {});
@@ -290,7 +298,7 @@ export function ComparePage() {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as SortOption)}
-                    className="bg-transparent font-bold text-foreground focus:outline-none cursor-pointer"
+                    className="bg-transparent font-bold text-foreground rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer touch-manipulation"
                   >
                     <option value="relevance" className="bg-card text-foreground">Best Match (Top Stores First)</option>
                     <option value="price-asc" className="bg-card text-foreground">Price: Low to High</option>

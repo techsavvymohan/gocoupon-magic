@@ -106,7 +106,7 @@ export function AskGoCouponChat() {
               spellCheck={false}
               inputMode="search"
               aria-label="Ask a shopping question"
-              className="w-full rounded-2xl border border-border/80 bg-background/80 py-4 pl-12 pr-20 text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 touch-manipulation transition-colors"
+              className="w-full rounded-2xl border border-border/80 bg-background/80 py-4 pl-12 pr-20 text-base text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 touch-manipulation transition-colors"
             />
 
             {/* Clear / Paste Right Buttons */}

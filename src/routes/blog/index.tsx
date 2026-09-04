@@ -232,10 +232,10 @@ function BlogIndex() {
                 <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="search"
-                  placeholder="Search 36+ investigative guides (e.g. Price Comparison, 5-Layer Stacking, Amazon, Buyhatke)..."
+                  placeholder="Search 36+ investigative guides (e.g. Price Comparison, 5-Layer Stacking, Amazon, Buyhatke)…"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-2xl border border-border bg-card/80 py-3.5 pl-11 pr-20 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 backdrop-blur-md transition-all shadow-xs"
+                  className="w-full rounded-2xl border border-border bg-card/80 py-3.5 pl-11 pr-20 text-base sm:text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 backdrop-blur-md transition-all shadow-xs touch-manipulation"
                 />
                 {searchQuery ? (
                   <button
@@ -688,7 +688,7 @@ function BlogIndex() {
                   placeholder="Enter your email address…"
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
-                  className="flex-1 rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="flex-1 rounded-xl border border-border bg-background px-4 py-3 text-base sm:text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 touch-manipulation"
                 />
                 <button
                   type="submit"

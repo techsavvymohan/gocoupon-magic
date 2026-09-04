@@ -331,7 +331,7 @@ function NumberInput({
           const next = Number(e.target.value);
           if (Number.isFinite(next)) onChange(next);
         }}
-        className="block w-full rounded-lg border border-border bg-background px-4 py-3 text-base text-foreground outline-none transition-colors focus:border-primary"
+        className="block w-full rounded-lg border border-border bg-background px-4 py-3 text-base text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors focus:border-primary touch-manipulation"
         inputMode="numeric"
       />
     </label>

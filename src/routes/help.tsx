@@ -170,7 +170,7 @@ function HelpPage() {
                 autoComplete="off"
                 spellCheck={false}
                 aria-label="Search help center questions and guides"
-                className="w-full rounded-full border border-border bg-card py-3.5 pl-12 pr-16 text-sm text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 touch-manipulation"
+                className="w-full rounded-full border border-border bg-card py-3.5 pl-12 pr-16 text-base sm:text-sm text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 touch-manipulation"
               />
               {searchQuery && (
                 <button

@@ -10,10 +10,7 @@
  * 5. Strict Type & Price Bounds Clamping.
  */
 
-const SERPAPI_KEY =
-  process.env.SERPAPI_API_KEY ||
-  process.env.VITE_SERPAPI_KEY ||
-  "3e5a818b044970872f984fc4f861138d65566790bfdfcae87f6c7f043b63d5d3";
+const SERPAPI_KEY = process.env.SERPAPI_API_KEY || process.env.SERPAPI_KEY || "";
 
 const AMAZON_PARTNER_TAG = process.env.VITE_AMAZON_IN_PARTNER_TAG || "gocoupon0e-21";
 const CUELINKS_PUBLISHER_ID = process.env.VITE_CUELINKS_PUB_ID || "148920";
@@ -58,14 +55,28 @@ export async function searchAmazon(query: string): Promise<StoreSearchResult[]> 
   }
 
   try {
-    const url = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
-      query + " site:amazon.in"
-    )}&gl=in&hl=en&api_key=${SERPAPI_KEY}&num=5`;
+    let data: any = null;
 
-    const res = await fetch(url, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
-    if (!res.ok) return cached?.data || [];
+    if (typeof window !== "undefined") {
+      // Browser client: proxy through /api/shopping securely without key exposure
+      const res = await fetch(`/api/shopping?q=${encodeURIComponent(query + " site:amazon.in")}`, {
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      });
+      if (res.ok) {
+        data = await res.json();
+      }
+    } else if (SERPAPI_KEY) {
+      // Server runtime: query SerpAPI directly with server environment key
+      const url = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
+        query + " site:amazon.in"
+      )}&gl=in&hl=en&api_key=${SERPAPI_KEY}&num=5`;
+      const res = await fetch(url, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+      if (res.ok) {
+        data = await res.json();
+      }
+    }
 
-    const data = await res.json();
+    if (!data) return cached?.data || [];
     const items = (data.shopping_results || []).filter(
       (i: any) => typeof i.extracted_price === "number" && i.extracted_price > 0
     );
@@ -120,14 +131,28 @@ export async function searchFlipkart(query: string): Promise<StoreSearchResult[]
   }
 
   try {
-    const url = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
-      query + " site:flipkart.com"
-    )}&gl=in&hl=en&api_key=${SERPAPI_KEY}&num=5`;
+    let data: any = null;
 
-    const res = await fetch(url, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
-    if (!res.ok) return cached?.data || [];
+    if (typeof window !== "undefined") {
+      // Browser client: proxy through /api/shopping securely without key exposure
+      const res = await fetch(`/api/shopping?q=${encodeURIComponent(query + " site:flipkart.com")}`, {
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      });
+      if (res.ok) {
+        data = await res.json();
+      }
+    } else if (SERPAPI_KEY) {
+      // Server runtime: query SerpAPI directly with server environment key
+      const url = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
+        query + " site:flipkart.com"
+      )}&gl=in&hl=en&api_key=${SERPAPI_KEY}&num=5`;
+      const res = await fetch(url, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+      if (res.ok) {
+        data = await res.json();
+      }
+    }
 
-    const data = await res.json();
+    if (!data) return cached?.data || [];
     const items = (data.shopping_results || []).filter(
       (i: any) => typeof i.extracted_price === "number" && i.extracted_price > 0
     );
