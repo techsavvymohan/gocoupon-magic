@@ -226,3 +226,5 @@ export function PriceHistoryChart({ productId, productTitle, currentPrice, onSet
     </div>
   );
 }
+
+export default PriceHistoryChart;

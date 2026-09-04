@@ -52,6 +52,13 @@
     <meta name="theme-color" content="#080808" />
     <meta name="format-detection" content="telephone=no" />
 
+    <!-- PWA & Mobile Web App Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="goCoupon" />
+    <link rel="apple-touch-icon" href="/gc-logo.webp" />
+
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="goCoupon" />
@@ -264,6 +271,20 @@
 
   <body>
     <div id="root"></div>
+    <!-- PWA Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js', { scope: '/' })
+            .then(function(reg) {
+              // Successfully registered Service Worker
+            })
+            .catch(function(err) {
+              console.warn('Service Worker registration skipped:', err);
+            });
+        });
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -1,0 +1,48 @@
+{
+  "name": "goCoupon: Deals, Discounts & Price Tracker India",
+  "short_name": "goCoupon",
+  "description": "Find cheaper products, compare live prices across Amazon & Flipkart, auto-apply coupons, and get instant price-drop alerts.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#080808",
+  "theme_color": "#080808",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/gc-logo.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/gc-logo.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["shopping", "finance", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "Live Price Comparison",
+      "url": "/compare",
+      "description": "Compare Amazon and Flipkart prices in real time"
+    },
+    {
+      "name": "90-Day Price Tracker",
+      "url": "/price-history",
+      "description": "Track 90-day price trends and detect fake discounts"
+    },
+    {
+      "name": "Price Drop Watchlist",
+      "url": "/watchlist",
+      "description": "Monitor your price drop alerts"
+    },
+    {
+      "name": "Top Deals & Coupons",
+      "url": "/deals",
+      "description": "Browse today's verified deals and working coupons"
+    }
+  ]
+}

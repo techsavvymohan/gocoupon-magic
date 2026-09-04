@@ -3,9 +3,16 @@
  * @description UI/UX Pro Max Target Price & Price-Drop Alert Modal.
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { addToWatchlist } from "@/lib/services/watchlist-service";
-import { Bell, Check, X, ShieldCheck, Percent } from "lucide-react";
+import {
+  isPushNotificationSupported,
+  getNotificationPermission,
+  requestNotificationPermission,
+  triggerPriceDropNotification,
+  savePriceAlert,
+} from "@/lib/services/notification-service";
+import { Bell, Check, X, ShieldCheck, Percent, Smartphone, Sparkles, Send } from "lucide-react";
 import { toast } from "sonner";
 
 interface PriceAlertModalProps {
@@ -28,11 +35,39 @@ export function PriceAlertModal({
   const [targetPrice, setTargetPrice] = useState<number>(Math.round(currentPrice * 0.9));
   const [email, setEmail] = useState("");
   const [isSaved, setIsSaved] = useState(false);
+  const [pushStatus, setPushStatus] = useState<string>("default");
+  const [isTestingPush, setIsTestingPush] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setPushStatus(getNotificationPermission());
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleEnablePush = async () => {
+    const granted = await requestNotificationPermission();
+    setPushStatus(granted ? "granted" : "denied");
+  };
+
+  const handleTestAlert = async () => {
+    setIsTestingPush(true);
+    await triggerPriceDropNotification({
+      title: productTitle,
+      originalPrice: currentPrice,
+      newPrice: targetPrice,
+      store: "Amazon.in",
+      url: `/compare?q=${encodeURIComponent(productTitle)}`,
+    });
+    setIsTestingPush(false);
+    setPushStatus(getNotificationPermission());
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Save to local watchlist service
     addToWatchlist({
       productId,
       productTitle,
@@ -41,8 +76,26 @@ export function PriceAlertModal({
       currentLowestPrice: currentPrice,
       email: email.trim() || undefined,
     });
+
+    // Save to push notification price-alert registry
+    savePriceAlert({
+      productId,
+      productTitle,
+      targetPrice,
+      currentPrice,
+      store: "Amazon / Flipkart",
+    });
+
+    // If push is supported and not denied, prompt user to receive notifications
+    if (pushStatus === "default") {
+      await requestNotificationPermission();
+      setPushStatus(getNotificationPermission());
+    }
+
     setIsSaved(true);
-    toast.success(`Price alert set for ₹${targetPrice.toLocaleString("en-IN")}!`);
+    toast.success(`Price alert set for ₹${targetPrice.toLocaleString("en-IN")}!`, {
+      description: "You'll be alerted as soon as the price drops on Amazon or Flipkart.",
+    });
     setTimeout(() => {
       setIsSaved(false);
       onClose();
@@ -148,9 +201,56 @@ export function PriceAlertModal({
             />
           </div>
 
+          {/* Instant Browser & Mobile Web Push Card */}
+          <div className="rounded-2xl border border-primary/20 bg-primary/5 p-3.5">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Smartphone className="h-4 w-4 text-primary shrink-0" />
+                <span className="text-xs font-semibold text-foreground">
+                  Browser &amp; Phone Push Alerts
+                </span>
+              </div>
+              {pushStatus === "granted" ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-emerald-500 border border-emerald-500/20">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Active
+                </span>
+              ) : pushStatus === "denied" ? (
+                <span className="inline-flex items-center rounded-full bg-destructive/10 px-2 py-0.5 font-mono text-[10px] font-medium text-destructive">
+                  Blocked
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleEnablePush}
+                  className="rounded-lg bg-primary/15 px-2.5 py-1 text-[11px] font-bold text-primary hover:bg-primary/25 transition-colors"
+                >
+                  Enable
+                </button>
+              )}
+            </div>
+
+            <p className="mt-1.5 text-[11px] text-muted-foreground leading-relaxed">
+              Receive instant lockscreen and desktop popups the moment this drops below ₹
+              {targetPrice.toLocaleString("en-IN")}.
+            </p>
+
+            {pushStatus === "granted" && (
+              <button
+                type="button"
+                onClick={handleTestAlert}
+                disabled={isTestingPush}
+                className="mt-2.5 inline-flex items-center gap-1.5 rounded-xl border border-primary/30 bg-background px-3 py-1.5 font-mono text-[10px] font-semibold text-primary transition-colors hover:bg-primary/10 disabled:opacity-50"
+              >
+                <Send className="h-3 w-3" />
+                {isTestingPush ? "Dispatching notification…" : "Send Test Push Alert"}
+              </button>
+            )}
+          </div>
+
           <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
             <ShieldCheck className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-            <span>Zero spam guarantee. Saved directly to your local watchlist.</span>
+            <span>Zero spam guarantee. Handled securely via standard Web Push.</span>
           </div>
 
           <button

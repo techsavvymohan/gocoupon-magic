@@ -4,13 +4,15 @@
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import { CANONICAL_PRODUCTS } from "@/data/canonicalCatalogData";
 import { UrlResolverSearch } from "@/components/shopping/UrlResolverSearch";
-import { PriceHistoryChart } from "@/components/shopping/PriceHistoryChart";
-import { Clock, TrendingDown, ShieldAlert, Sparkles, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Clock, TrendingDown, ShieldAlert, Sparkles, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+
+// Dynamic import for Recharts-heavy charting component to optimize initial page chunks
+const PriceHistoryChart = lazy(() => import("@/components/shopping/PriceHistoryChart"));
 
 export const Route = createFileRoute("/price-history")({
   component: PriceHistoryHubPage,
@@ -92,11 +94,22 @@ function PriceHistoryHubPage() {
                 </div>
               )}
 
-              {/* Interactive Chart Component */}
-              <PriceHistoryChart
-                productId={activeProduct.id}
-                productTitle={activeProduct.title}
-              />
+              {/* Interactive Chart Component (Dynamically Loaded) */}
+              <Suspense
+                fallback={
+                  <div className="rounded-3xl border border-border bg-card p-6 shadow-sm min-h-[380px] flex flex-col items-center justify-center gap-3">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <span className="text-sm font-medium text-muted-foreground">
+                      Rendering 90-day price history matrix…
+                    </span>
+                  </div>
+                }
+              >
+                <PriceHistoryChart
+                  productId={activeProduct.id}
+                  productTitle={activeProduct.title}
+                />
+              </Suspense>
 
               {/* Product Quick View Card */}
               <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-border bg-card p-6 shadow-sm">

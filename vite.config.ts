@@ -166,18 +166,80 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          if (!id.includes("node_modules")) return undefined;
-          if (id.includes("react-dom") || id.includes("/react/") || id.includes("scheduler")) {
-            return "vendor-react";
+          const normalized = id.replace(/\\/g, "/");
+
+          // 1. Heavy application data modules
+          if (normalized.includes("/src/data/posts")) {
+            return "data-posts";
           }
-          if (id.includes("@tanstack")) return "vendor-tanstack";
-          if (id.includes("@radix-ui")) return "vendor-radix";
-          if (id.includes("lucide-react")) return "vendor-icons";
-          if (id.includes("recharts") || id.includes("embla-carousel")) return "vendor-charts";
-          if (id.includes("react-hook-form") || id.includes("@hookform") || id.includes("zod")) {
-            return "vendor-forms";
+          if (normalized.includes("/src/data/")) {
+            return "data-catalog";
           }
-          return "vendor";
+
+          // 2. Heavy feature page route modules
+          if (normalized.includes("/src/routes/blog/")) {
+            return "page-blog";
+          }
+          if (normalized.includes("/src/routes/compare")) {
+            return "page-compare";
+          }
+          if (normalized.includes("/src/routes/price-history")) {
+            return "page-price-history";
+          }
+          if (normalized.includes("/src/routes/product/")) {
+            return "page-product";
+          }
+          if (normalized.includes("/src/routes/collections/")) {
+            return "page-collections";
+          }
+
+          // 3. Third-party vendor dependencies
+          if (normalized.includes("node_modules")) {
+            if (
+              normalized.includes("react-dom") ||
+              normalized.includes("/react/") ||
+              normalized.includes("scheduler")
+            ) {
+              return "vendor-react";
+            }
+            if (normalized.includes("@tanstack")) {
+              return "vendor-tanstack";
+            }
+            if (normalized.includes("@radix-ui")) {
+              return "vendor-radix";
+            }
+            if (normalized.includes("lucide-react")) {
+              return "vendor-icons";
+            }
+            if (
+              normalized.includes("recharts") ||
+              normalized.includes("embla-carousel") ||
+              normalized.includes("d3-")
+            ) {
+              return "vendor-charts";
+            }
+            if (
+              normalized.includes("react-hook-form") ||
+              normalized.includes("@hookform") ||
+              normalized.includes("zod")
+            ) {
+              return "vendor-forms";
+            }
+            if (normalized.includes("@supabase")) {
+              return "vendor-supabase";
+            }
+            if (
+              normalized.includes("clsx") ||
+              normalized.includes("tailwind-merge") ||
+              normalized.includes("class-variance-authority") ||
+              normalized.includes("sonner")
+            ) {
+              return "vendor-ui";
+            }
+            return "vendor";
+          }
+
+          return undefined;
         },
       },
     },
