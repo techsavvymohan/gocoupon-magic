@@ -8,21 +8,21 @@ import { UrlResolverSearch } from "../shopping/UrlResolverSearch";
 export function Hero() {
   return (
     <section className="relative overflow-hidden pb-16 sm:pb-24">
-      {/* Top Banner Container - Curved design fully visible with transparent background */}
+      {/* Top Banner Container - Completely covers left-to-right border with compact vertical height */}
       <div className="relative w-full flex justify-center bg-transparent">
         <img
           src="/hero-top-banner.webp"
           alt="GoCoupon — Shop Smarter, Pay Less"
-          className="w-full h-auto object-contain object-top"
-          width={1263}
-          height={379}
+          className="w-full h-[90px] sm:h-[140px] md:h-auto md:max-h-[240px] object-cover md:object-contain object-center md:object-top"
+          width={2048}
+          height={252}
           loading="eager"
           fetchPriority="high"
         />
       </div>
 
       {/* Centered Hero Content & Search Box */}
-      <div className="relative mx-auto max-w-4xl px-4 sm:px-6 pt-8 sm:pt-12 text-center">
+      <div className="relative mx-auto max-w-4xl px-4 sm:px-6 pt-5 sm:pt-8 text-center">
         {/* Category Tag Pill */}
         <div className="mb-3.5 inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1 font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground shadow-2xs">
           <span>PRICE TRACKER &amp; AUTO-APPLY COUPONS</span>
