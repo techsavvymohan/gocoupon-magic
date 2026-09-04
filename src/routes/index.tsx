@@ -9,7 +9,6 @@ import { AnimatedDealsCarousel } from "@/components/site/AnimatedDealsCarousel";
 import { AmazonAffiliateCards } from "@/components/site/AmazonAffiliateCards";
 import { ShoppingIntelligenceSpotlight } from "@/components/shopping/ShoppingIntelligenceSpotlight";
 import { Testimonials } from "@/components/site/Testimonials";
-import { Pricing } from "@/components/site/Pricing";
 import { FAQ } from "@/components/site/FAQ";
 import { Blog } from "@/components/site/Blog";
 import { ContactForm } from "@/components/site/ContactForm";
@@ -65,7 +64,6 @@ function Index() {
       <ShoppingIntelligenceSpotlight />
       <About />
       <Testimonials />
-      <Pricing />
       <FAQ />
       <Blog />
       <ContactForm />
