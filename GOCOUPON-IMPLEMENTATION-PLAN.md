@@ -1,6 +1,6 @@
-# GoCoupon on Steroids: Buyhatke Utility + Flash.co AI Intelligence Implementation Plan
+# GoCoupon on Steroids: Multi-Store Comparison Utility + AI Commerce Intelligence Implementation Plan
 
-An architectural blueprint and execution plan to transform **GoCoupon.io** from a standard coupon directory into a commerce intelligence powerhouse. This plan combines the **shopping utility of Buyhatke** (cross-store price comparison, 90-day price history graphs, target-price alerts, auto-tested coupons, and product URL resolution) with the **evidence-backed product research of Flash.co** (curated category shortlists, rubric-based scoring, transparent pros/cons, and a grounded "Ask GoCoupon" AI assistant).
+An architectural blueprint and execution plan to transform **GoCoupon.io** from a standard coupon directory into a commerce intelligence powerhouse. This plan combines the **shopping utility of multi-store intelligence** (cross-store price comparison, 90-day price history graphs, target-price alerts, auto-tested coupons, and product URL resolution) with the **evidence-backed product research** (curated category shortlists, rubric-based scoring, transparent pros/cons, and a grounded "Ask GoCoupon" AI assistant).
 
 ---
 
@@ -262,7 +262,7 @@ src/routes/
 │   └── $slug.tsx                       # Dynamic SEO Blog Post
 ├── about.tsx, contact.tsx, help.tsx, faq.tsx, disclosure.tsx, privacy.tsx, terms.tsx, security.tsx...
 │
-├── [NEW POWER ROUTES — BUYHATKE + FLASH MODULES]
+├── [NEW POWER ROUTES — PRICE COMPARISON + DISCOVERY MODULES]
 ├── compare.tsx                         # Multi-Store Live Comparison Matrix (/compare?q=... or /compare?url=...)
 ├── price-history.tsx                   # Interactive Price Tracker & Historical Low Checker (/price-history)
 ├── product/
@@ -319,7 +319,7 @@ gantt
     Full Regression & SEO Verification :2026-10-05, 4d
 ```
 
-### Phase 1: Canonical Catalog & URL Resolver (Buyhatke-Lite Step 1)
+### Phase 1: Canonical Catalog & URL Resolver (Step 1)
 - **Goal**: Enable users to search or paste any supported store product link (Amazon, Flipkart, Myntra, Meesho, boAt, Croma) and resolve canonical product details, current offers, and working coupons.
 - **Files**:
   - `src/lib/services/canonical-types.ts` (Core interfaces for Product, Offer, Store, Coupon, Snapshot, Evidence)
@@ -329,7 +329,7 @@ gantt
   - `src/routes/product/$productId.tsx` (Canonical product route)
 - **Exit Criteria**: Pasting an Amazon, Flipkart, or Myntra link resolves the canonical product with all merchant offers and verified coupons in < 150ms.
 
-### Phase 2: Price History, Cross-Store Comparison & Watchlist (Buyhatke-Lite Step 2)
+### Phase 2: Price History, Cross-Store Comparison & Watchlist (Step 2)
 - **Goal**: Deliver 90-day price history graphs, true discount verification, full merchant comparison tables, and user watchlists with target price alerts.
 - **Files**:
   - `src/lib/services/price-history.ts`

@@ -1,7 +1,8 @@
 /**
  * @file multi-platform-search.ts
- * @description Real-time Multi-Platform Product Search Engine.
- * Searches across Amazon, Flipkart, Myntra, Croma, Meesho, Tata CLiQ, and Reliance Digital.
+ * @description Real-time Multi-Platform Shopping Search Engine.
+ * Exclusively searches buyable products across Amazon India, Flipkart, Myntra, Croma,
+ * Tata CLiQ, Reliance Digital, and Meesho. Strictly filters out blogs, reviews, and non-shopping pages.
  */
 
 import { searchSearXNG } from "./searxng-service";
@@ -75,7 +76,7 @@ export function getPlatformTrustRank(storeName: string): number {
       return plat.tier;
     }
   }
-  return 8; // Generic/other web results
+  return 8; // Other merchant
 }
 
 export function isTopTrustedPlatform(storeName: string): boolean {
@@ -97,44 +98,219 @@ const STORE_LOGOS: Record<string, string> = {
   nykaa: "/Brand logos/Nykaa.webp",
 };
 
-function getStoreLogo(storeName: string): string | undefined {
-  const norm = storeName.toLowerCase().trim();
+export function getStoreLogo(storeName: string): string | undefined {
+  const norm = (storeName || "").toLowerCase().trim();
   for (const [key, logo] of Object.entries(STORE_LOGOS)) {
     if (norm.includes(key)) return logo;
   }
   return undefined;
 }
 
-function getCategoryImage(title: string, brand: string): string {
-  const t = (title + " " + brand).toLowerCase();
-  if (t.includes("iphone") || t.includes("phone") || t.includes("mobile") || t.includes("samsung galaxy") || t.includes("oneplus") || t.includes("pixel") || t.includes("smartphone")) {
-    return "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=600&auto=format&fit=crop&q=80";
+/**
+ * Intelligent category classification for genuine shopping items.
+ */
+export function detectProductCategory(title: string, query: string, brand = ""): string {
+  const text = `${title} ${query} ${brand}`.toLowerCase();
+
+  // 1. Footwear & Shoes
+  if (
+    /\b(shoe|shoes|sneaker|sneakers|running|footwear|boots|loafers|sandals|slides|flip-flops|heels|flats|cleats|trainers)\b/i.test(
+      text
+    )
+  ) {
+    return "Footwear & Shoes";
   }
-  if (t.includes("headphone") || t.includes("earbuds") || t.includes("airpods") || t.includes("audio") || t.includes("boat") || t.includes("sony") || t.includes("xm5")) {
-    return "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80";
+
+  // 2. Smartphones & Mobiles
+  if (
+    /\b(iphone|phone|mobile|smartphone|galaxy s\d+|galaxy z|oneplus|pixel|redmi|realme|poco|vivo|oppo|iqoo|motorola|nokia)\b/i.test(
+      text
+    )
+  ) {
+    return "Smartphones & Mobiles";
   }
-  if (t.includes("laptop") || t.includes("macbook") || t.includes("computer") || t.includes("notebook")) {
-    return "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&auto=format&fit=crop&q=80";
+
+  // 3. Audio & Headphones
+  if (
+    /\b(headphone|headphones|earbuds|earphones|airpods|tws|neckband|speaker|speakers|soundbar|headset|audio|wh-1000xm|airdopes)\b/i.test(
+      text
+    )
+  ) {
+    return "Audio & Headphones";
   }
-  if (t.includes("shoe") || t.includes("sneaker") || t.includes("nike") || t.includes("adidas") || t.includes("puma") || t.includes("running")) {
-    return "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&auto=format&fit=crop&q=80";
+
+  // 4. Laptops & Computers
+  if (
+    /\b(laptop|laptops|macbook|notebook|chromebook|thinkpad|ideapad|zenbook|vivobook|desktop|pc|computer)\b/i.test(
+      text
+    )
+  ) {
+    return "Laptops & Computers";
   }
-  if (t.includes("watch") || t.includes("smartwatch") || t.includes("fitbit") || t.includes("colorfit")) {
-    return "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80";
+
+  // 5. Smartwatches & Wearables
+  if (
+    /\b(smartwatch|smartwatches|watch|watches|fitbit|smart band|fitness band|colorfit|galaxy watch|apple watch)\b/i.test(
+      text
+    )
+  ) {
+    return "Smartwatches & Wearables";
   }
-  if (t.includes("playstation") || t.includes("ps5") || t.includes("xbox") || t.includes("console") || t.includes("gaming")) {
-    return "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=600&auto=format&fit=crop&q=80";
+
+  // 6. Gaming & Consoles
+  if (
+    /\b(playstation|ps5|ps4|xbox|nintendo|switch|controller|gamepad|console|gaming)\b/i.test(
+      text
+    )
+  ) {
+    return "Gaming & Consoles";
   }
-  if (t.includes("ipad") || t.includes("tablet") || t.includes("tab")) {
-    return "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&auto=format&fit=crop&q=80";
+
+  // 7. Tablets & iPads
+  if (/\b(ipad|tablet|tablets|tab|galaxy tab|pad)\b/i.test(text)) {
+    return "Tablets & iPads";
   }
-  if (t.includes("dyson") || t.includes("vacuum") || t.includes("cleaner") || t.includes("appliance")) {
-    return "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=600&auto=format&fit=crop&q=80";
+
+  // 8. Home & Kitchen Appliances
+  if (
+    /\b(vacuum|cleaner|dyson|refrigerator|fridge|washing machine|air conditioner|ac|microwave|oven|purifier|mixer|blender|toaster|kettle|iron)\b/i.test(
+      text
+    )
+  ) {
+    return "Home & Kitchen Appliances";
   }
-  if (t.includes("tv") || t.includes("television") || t.includes("oled") || t.includes("qled")) {
-    return "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=600&auto=format&fit=crop&q=80";
+
+  // 9. Television & Displays
+  if (/\b(tv|television|smart tv|led tv|oled|qled|monitor|display)\b/i.test(text)) {
+    return "Television & Displays";
   }
-  return "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&auto=format&fit=crop&q=80";
+
+  // 10. Fashion & Apparel
+  if (
+    /\b(shirt|t-shirt|tshirt|jeans|jacket|hoodie|sweatshirt|dress|saree|kurti|trousers|shorts|trackpants|clothing|apparel)\b/i.test(
+      text
+    )
+  ) {
+    return "Fashion & Apparel";
+  }
+
+  // 11. Beauty & Personal Care
+  if (
+    /\b(perfume|deodorant|makeup|lipstick|cream|serum|lotion|shampoo|conditioner|skincare|haircare|trimmer|shaver)\b/i.test(
+      text
+    )
+  ) {
+    return "Beauty & Personal Care";
+  }
+
+  return "Electronics & Gadgets";
+}
+
+const KNOWN_BRANDS = [
+  "Apple", "Samsung", "Sony", "Nike", "Puma", "Adidas", "OnePlus", "Dyson", "Boat", "Noise",
+  "Google", "Lenovo", "Dell", "HP", "Asus", "Acer", "Xiaomi", "Redmi", "Realme", "Vivo", "Oppo",
+  "Motorola", "JBL", "Bose", "Sennheiser", "Fastrack", "Titan", "Fossil", "Casio", "LG", "Whirlpool",
+  "Philips", "Bosch", "Voltas", "Havells", "Bajaj", "Usha", "Reebok", "Skechers", "Asics", "New Balance",
+  "Under Armour", "Zara", "H&M", "Levi's", "Allen Solly", "Peter England", "Van Heusen", "Louis Philippe",
+  "Canon", "Nikon", "PlayStation", "Xbox", "Nintendo",
+];
+
+export function detectProductBrand(title: string, query: string): string {
+  const combined = `${query} ${title}`;
+  for (const b of KNOWN_BRANDS) {
+    const regex = new RegExp(`\\b${b}\\b`, "i");
+    if (regex.test(combined)) {
+      return b;
+    }
+  }
+
+  const firstWord = title.trim().split(/[\s|,-]+/)[0];
+  if (firstWord && firstWord.length > 1 && !/^(the|men|women|new|buy|online|best|pack|set|pair|us|in)$/i.test(firstWord)) {
+    return firstWord.charAt(0).toUpperCase() + firstWord.slice(1);
+  }
+
+  return "Brand";
+}
+
+export function cleanProductTitle(rawTitle: string): string {
+  if (!rawTitle) return "";
+  let clean = rawTitle
+    .replace(/^(Men's|Women's|Unisex)\s+/i, "$1 ")
+    .replace(/\s*\|\s*(Free Shipping|Best Price|Reviews|Ratings|Official Store|Shop Online).*$/i, "")
+    .replace(/\s*-\s*(Buy Online|Best Price|Flipkart|Amazon|Myntra|Croma|Official).*$/i, "")
+    .replace(/\s*\((Refurbished|Renewed)\)/i, " - Refurbished")
+    .replace(/\s+Online at (Low|Best) Prices? in India.*$/i, "")
+    .replace(/\s+at Best Price in India.*$/i, "")
+    .trim();
+
+  if (clean.length < 5) clean = rawTitle;
+  return clean;
+}
+
+/**
+ * Rejects blogs, news, forums, support pages, or generic store roots.
+ */
+export function isValidShoppingProduct(title: string, store: string, url: string, price: number): boolean {
+  if (!title || price <= 0) return false;
+  const t = title.toLowerCase();
+  const u = (url || "").toLowerCase();
+
+  const nonProductKeywords = [
+    "how to", "best ways to", "what is", "review of", "vs comparison", "guide 202", "top 10",
+    "clothing, shoes, accessories", "official site", "terms of use", "privacy policy",
+    "customer service", "contact us", "about us", "login", "sign in", "sign up", "cart",
+    "checkout", "forum", "discussion", "wikipedia", "news", "blog", "press release", "career",
+    "investors", "corporate"
+  ];
+
+  if (nonProductKeywords.some((kw) => t.includes(kw))) {
+    return false;
+  }
+
+  const nonShoppingHosts = [
+    "wikipedia.org", "gsmarena.com", "reddit.com", "quora.com", "resetera.com", "bizhows.com",
+    "medium.com", "github.com", "youtube.com", "theverge.com", "slashgear.com", "ign.com",
+    "ndtv.com", "indianexpress.com", "timesofindia", "pinterest.com", "facebook.com", "twitter.com", "x.com"
+  ];
+
+  if (nonShoppingHosts.some((host) => u.includes(host))) {
+    return false;
+  }
+
+  return true;
+}
+
+export function getCategoryImageByCategory(category: string, title = ""): string {
+  const t = title.toLowerCase();
+  switch (category) {
+    case "Footwear & Shoes":
+      return "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&auto=format&fit=crop&q=80";
+    case "Smartphones & Mobiles":
+      if (t.includes("iphone")) {
+        return "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=600&auto=format&fit=crop&q=80";
+      }
+      return "https://images.unsplash.com/photo-1511707171634-5f897ff02560?w=600&auto=format&fit=crop&q=80";
+    case "Audio & Headphones":
+      return "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80";
+    case "Laptops & Computers":
+      return "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&auto=format&fit=crop&q=80";
+    case "Smartwatches & Wearables":
+      return "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80";
+    case "Gaming & Consoles":
+      return "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=600&auto=format&fit=crop&q=80";
+    case "Tablets & iPads":
+      return "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&auto=format&fit=crop&q=80";
+    case "Home & Kitchen Appliances":
+      return "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=600&auto=format&fit=crop&q=80";
+    case "Television & Displays":
+      return "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=600&auto=format&fit=crop&q=80";
+    case "Fashion & Apparel":
+      return "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80";
+    case "Beauty & Personal Care":
+      return "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&auto=format&fit=crop&q=80";
+    default:
+      return "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&auto=format&fit=crop&q=80";
+  }
 }
 
 /**
@@ -177,7 +353,6 @@ function generateStoreOffers(
     };
   });
 
-  // Sort by effective net price ascending
   offers.sort((a, b) => a.effectiveNetPrice - b.effectiveNetPrice);
   if (offers.length > 0) {
     offers[0].isLowest = true;
@@ -219,17 +394,22 @@ export async function searchProductsAcrossPlatforms(
         isLowest: c.isBestDeal,
       }));
 
+      const detectedCat = detectProductCategory(meta.title, trimmed, meta.brand);
+      const detectedBrand = detectProductBrand(meta.title, trimmed);
+
       const productItem: MultiPlatformProductItem = {
         id: `url_${Date.now()}`,
         title: meta.title,
-        brand: meta.brand || "Brand",
-        category: "Shopping",
+        brand: meta.brand || detectedBrand,
+        category: detectedCat,
         primaryStore: meta.storeName || "Online Store",
         primaryStoreLogo: getStoreLogo(meta.storeName),
+        isTrustedStore: isTopTrustedPlatform(meta.storeName || ""),
+        trustTier: getPlatformTrustRank(meta.storeName || ""),
         price,
         originalPrice,
         discountPercent: discount,
-        imageUrl: meta.imageUrl || getCategoryImage(meta.title, meta.brand),
+        imageUrl: meta.imageUrl || getCategoryImageByCategory(detectedCat, meta.title),
         rating: meta.rating || 4.5,
         reviewCount: meta.reviewCount || 350,
         directUrl: trimmed,
@@ -252,7 +432,7 @@ export async function searchProductsAcrossPlatforms(
         isDirectUrl: true,
       };
     } catch {
-      // Fall through to search query
+      // Fall through to query search
     }
   }
 
@@ -261,7 +441,7 @@ export async function searchProductsAcrossPlatforms(
 
   try {
     const shoppingApiUrl = `/api/shopping?q=${encodeURIComponent(trimmed)}`;
-    const serpRes = await fetch(shoppingApiUrl, { signal: AbortSignal.timeout(5000) });
+    const serpRes = await fetch(shoppingApiUrl, { signal: AbortSignal.timeout(12000) });
     if (serpRes.ok) {
       const data = await serpRes.json();
       const rawShopping = (data.shopping_results || []).filter(
@@ -270,25 +450,38 @@ export async function searchProductsAcrossPlatforms(
 
       for (let i = 0; i < rawShopping.length; i++) {
         const item = rawShopping[i];
-        const price = Number(item.extracted_price) || 999;
+        const rawPrice = Number(item.extracted_price) || 0;
+        const storeName = (item.source || item.merchant || "Online Store").trim();
+        const directUrl =
+          item.product_link || item.link || `https://www.google.com/search?q=${encodeURIComponent(item.title)}`;
+
+        // Strict shopping-only check
+        if (!isValidShoppingProduct(item.title, storeName, directUrl, rawPrice)) {
+          continue;
+        }
+
+        const cleanTitle = cleanProductTitle(item.title);
+        const brand = detectProductBrand(cleanTitle, trimmed);
+        const category = detectProductCategory(cleanTitle, trimmed, brand);
+        const price = rawPrice;
         const originalPrice = Math.round(price * (1 + (0.15 + (i % 3) * 0.08)));
         const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
-        const storeName = (item.source || item.merchant || "Online Store").trim();
-        const directUrl = item.product_link || item.link || `https://www.google.com/search?q=${encodeURIComponent(item.title)}`;
 
-        const offers = generateStoreOffers(storeName, price, item.title, directUrl);
+        const offers = generateStoreOffers(storeName, price, cleanTitle, directUrl);
 
         products.push({
-          id: `prod_${i}_${item.title.slice(0, 15).replace(/[^a-zA-Z0-9]/g, "_")}`,
-          title: item.title,
-          brand: (item.title || "").split(" ")[0] || "Brand",
-          category: "Electronics",
+          id: `prod_${i}_${cleanTitle.slice(0, 15).replace(/[^a-zA-Z0-9]/g, "_")}`,
+          title: cleanTitle,
+          brand,
+          category,
           primaryStore: storeName,
           primaryStoreLogo: item.source_icon || getStoreLogo(storeName),
+          isTrustedStore: isTopTrustedPlatform(storeName),
+          trustTier: getPlatformTrustRank(storeName),
           price,
           originalPrice,
           discountPercent,
-          imageUrl: item.thumbnail || item.serpapi_thumbnail || getCategoryImage(item.title, storeName),
+          imageUrl: item.thumbnail || item.serpapi_thumbnail || getCategoryImageByCategory(category, cleanTitle),
           rating: Number(item.rating) || 4.4,
           reviewCount: Number(item.reviews) || 480,
           directUrl,
@@ -307,49 +500,25 @@ export async function searchProductsAcrossPlatforms(
   // 3. Fallback to SearXNG Shopping Search if SerpAPI returned few results
   if (products.length < 3) {
     try {
-      const searxData = await searchSearXNG(`${trimmed} price buy online india`, {
-        categories: "general,shopping",
+      const shoppingQuery = `${trimmed} (site:amazon.in OR site:flipkart.com OR site:myntra.com OR site:croma.com OR site:tatacliq.com OR site:reliancedigital.in OR site:meesho.com)`;
+      const searxData = await searchSearXNG(shoppingQuery, {
+        categories: "shopping",
         language: "en",
-        timeoutMs: 4000,
+        timeoutMs: 4500,
       });
 
       if (searxData.results && searxData.results.length > 0) {
-        // Filter out non-shopping domains
-        const nonShoppingDomains = [
-          "wikipedia.org",
-          "gsmarena.com",
-          "support.apple.com",
-          "youtube.com",
-          "reddit.com",
-          "quora.com",
-          "resetera.com",
-          "bizhows.com",
-          "medium.com",
-          "github.com",
-          "pinterest.com",
-          "instagram.com",
-          "facebook.com",
-          "twitter.com",
-          "x.com",
-          "slashgear.com",
-          "theverge.com",
-          "ign.com",
-          "ndtv.com",
-          "indianexpress.com",
-          "timesofindia",
-        ];
-        const shoppingItems = searxData.results.filter((r) => {
+        const validShoppingItems = searxData.results.filter((r) => {
           try {
             const host = new URL(r.url).hostname.toLowerCase();
-            return !nonShoppingDomains.some((d) => host.includes(d));
+            const isStore = TRUSTED_PLATFORMS.some((tp) => tp.aliases.some((a) => host.includes(a)));
+            return isStore && isValidShoppingProduct(r.title, host, r.url, 100);
           } catch {
             return false;
           }
         });
 
-        const itemsToProcess = shoppingItems.length > 0 ? shoppingItems : searxData.results.slice(0, 8);
-
-        itemsToProcess.slice(0, 10).forEach((res, idx) => {
+        validShoppingItems.slice(0, 8).forEach((res, idx) => {
           let storeName = "Online Merchant";
           try {
             const host = new URL(res.url).hostname.replace(/^www\./, "");
@@ -360,23 +529,25 @@ export async function searchProductsAcrossPlatforms(
             else if (host.includes("tatacliq")) storeName = "Tata CLiQ";
             else if (host.includes("meesho")) storeName = "Meesho";
             else if (host.includes("reliancedigital")) storeName = "Reliance Digital";
-            else if (host.includes("ajio")) storeName = "Ajio";
-            else if (host.includes("nykaa")) storeName = "Nykaa";
             else storeName = host.split(".")[0].toUpperCase();
           } catch {}
+
+          const cleanTitle = cleanProductTitle(res.title);
+          const brand = detectProductBrand(cleanTitle, trimmed);
+          const category = detectProductCategory(cleanTitle, trimmed, brand);
 
           const priceMatch = (res.content || res.title).match(/(?:₹|Rs\.?\s*)([0-9,]{3,7})/i);
           const price = priceMatch ? Number(priceMatch[1].replace(/,/g, "")) : 1999 + idx * 450;
           const originalPrice = Math.round(price * 1.25);
           const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
 
-          const offers = generateStoreOffers(storeName, price, res.title, res.url);
+          const offers = generateStoreOffers(storeName, price, cleanTitle, res.url);
 
           products.push({
             id: `searx_${idx}`,
-            title: res.title,
-            brand: res.title.split(" ")[0] || "Brand",
-            category: "Products",
+            title: cleanTitle,
+            brand,
+            category,
             primaryStore: storeName,
             primaryStoreLogo: getStoreLogo(storeName),
             isTrustedStore: isTopTrustedPlatform(storeName),
@@ -384,7 +555,7 @@ export async function searchProductsAcrossPlatforms(
             price,
             originalPrice,
             discountPercent,
-            imageUrl: res.thumbnail || res.img_src || getCategoryImage(res.title, storeName),
+            imageUrl: res.thumbnail || res.img_src || getCategoryImageByCategory(category, cleanTitle),
             rating: 4.5,
             reviewCount: 250,
             directUrl: res.url,
@@ -403,18 +574,22 @@ export async function searchProductsAcrossPlatforms(
 
   // 4. Default Seed Fallback if completely offline
   if (products.length === 0) {
-    const basePrice = 4999;
+    const fallbackCategory = detectProductCategory(trimmed, trimmed);
+    const fallbackBrand = detectProductBrand(trimmed, trimmed);
+    const basePrice = fallbackCategory === "Smartphones & Mobiles" ? 49999 : fallbackCategory === "Laptops & Computers" ? 64999 : 2499;
+
     const dummyStores = ["Amazon India", "Flipkart", "Croma", "Myntra"];
     dummyStores.forEach((store, i) => {
       const price = Math.round(basePrice * (1 + (i * 0.05 - 0.03)));
       const orig = Math.round(price * 1.25);
-      const offers = generateStoreOffers(store, price, `${trimmed} (${store} Official)`, "https://amazon.in");
+      const cleanTitle = `${trimmed} (${store} Verified)`;
+      const offers = generateStoreOffers(store, price, cleanTitle, "https://amazon.in");
 
       products.push({
         id: `offline_${i}`,
-        title: `${trimmed} - Verified ${store} Edition`,
-        brand: trimmed.split(" ")[0] || "Verified",
-        category: "Electronics",
+        title: cleanTitle,
+        brand: fallbackBrand,
+        category: fallbackCategory,
         primaryStore: store,
         primaryStoreLogo: getStoreLogo(store),
         isTrustedStore: true,
@@ -422,7 +597,7 @@ export async function searchProductsAcrossPlatforms(
         price,
         originalPrice: orig,
         discountPercent: Math.round(((orig - price) / orig) * 100),
-        imageUrl: getCategoryImage(trimmed, store),
+        imageUrl: getCategoryImageByCategory(fallbackCategory, cleanTitle),
         rating: 4.6,
         reviewCount: 890,
         directUrl: "https://amazon.in",
@@ -445,22 +620,25 @@ export async function searchProductsAcrossPlatforms(
   const hasAmazon = products.some((p) => p.primaryStore.toLowerCase().includes("amazon"));
   const hasFlipkart = products.some((p) => p.primaryStore.toLowerCase().includes("flipkart"));
   const benchmarkItem = products[0];
-  const benchmarkPrice = products.length > 0 ? Math.min(...products.map((p) => p.price)) : 4999;
+  const benchmarkCategory = benchmarkItem?.category || detectProductCategory(trimmed, trimmed);
+  const benchmarkBrand = benchmarkItem?.brand || detectProductBrand(trimmed, trimmed);
+  const benchmarkPrice = products.length > 0 ? Math.min(...products.map((p) => p.price)) : 2499;
 
   if (!hasAmazon) {
     const amzPrice = benchmarkPrice;
     const amzOrig = Math.round(amzPrice * 1.25);
+    const cleanTitle = benchmarkItem ? `${benchmarkItem.title}` : `${trimmed}`;
     const amzOffers = generateStoreOffers(
       "Amazon India",
       amzPrice,
-      `${benchmarkItem ? benchmarkItem.title : trimmed} (Amazon India)`,
+      cleanTitle,
       `https://www.amazon.in/s?k=${encodeURIComponent(trimmed)}`
     );
     products.unshift({
       id: `amz_verified_${Date.now()}`,
-      title: benchmarkItem ? `${benchmarkItem.title} - Amazon Official` : `${trimmed} - Amazon India`,
-      brand: benchmarkItem ? benchmarkItem.brand : trimmed.split(" ")[0] || "Amazon",
-      category: benchmarkItem ? benchmarkItem.category : "Products",
+      title: `${cleanTitle} (Amazon India)`,
+      brand: benchmarkBrand,
+      category: benchmarkCategory,
       primaryStore: "Amazon India",
       primaryStoreLogo: getStoreLogo("amazon"),
       isTrustedStore: true,
@@ -468,7 +646,7 @@ export async function searchProductsAcrossPlatforms(
       price: amzPrice,
       originalPrice: amzOrig,
       discountPercent: Math.round(((amzOrig - amzPrice) / amzOrig) * 100),
-      imageUrl: benchmarkItem ? benchmarkItem.imageUrl : getCategoryImage(trimmed, "amazon"),
+      imageUrl: benchmarkItem?.imageUrl || getCategoryImageByCategory(benchmarkCategory, cleanTitle),
       rating: 4.6,
       reviewCount: 1250,
       directUrl: `https://www.amazon.in/s?k=${encodeURIComponent(trimmed)}`,
@@ -483,17 +661,18 @@ export async function searchProductsAcrossPlatforms(
   if (!hasFlipkart) {
     const flipPrice = Math.round(benchmarkPrice * 0.98);
     const flipOrig = Math.round(flipPrice * 1.26);
+    const cleanTitle = benchmarkItem ? `${benchmarkItem.title}` : `${trimmed}`;
     const flipOffers = generateStoreOffers(
       "Flipkart",
       flipPrice,
-      `${benchmarkItem ? benchmarkItem.title : trimmed} (Flipkart Assured)`,
+      cleanTitle,
       `https://www.flipkart.com/search?q=${encodeURIComponent(trimmed)}`
     );
     products.splice(1, 0, {
       id: `flip_verified_${Date.now()}`,
-      title: benchmarkItem ? `${benchmarkItem.title} - Flipkart Assured` : `${trimmed} - Flipkart Assured`,
-      brand: benchmarkItem ? benchmarkItem.brand : trimmed.split(" ")[0] || "Flipkart",
-      category: benchmarkItem ? benchmarkItem.category : "Products",
+      title: `${cleanTitle} (Flipkart Assured)`,
+      brand: benchmarkBrand,
+      category: benchmarkCategory,
       primaryStore: "Flipkart",
       primaryStoreLogo: getStoreLogo("flipkart"),
       isTrustedStore: true,
@@ -501,7 +680,7 @@ export async function searchProductsAcrossPlatforms(
       price: flipPrice,
       originalPrice: flipOrig,
       discountPercent: Math.round(((flipOrig - flipPrice) / flipOrig) * 100),
-      imageUrl: benchmarkItem ? benchmarkItem.imageUrl : getCategoryImage(trimmed, "flipkart"),
+      imageUrl: benchmarkItem?.imageUrl || getCategoryImageByCategory(benchmarkCategory, cleanTitle),
       rating: 4.5,
       reviewCount: 940,
       directUrl: `https://www.flipkart.com/search?q=${encodeURIComponent(trimmed)}`,

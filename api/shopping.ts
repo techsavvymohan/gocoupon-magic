@@ -5,6 +5,8 @@ const SERPAPI_KEY =
   process.env.VITE_SERPAPI_KEY ||
   "3e5a818b044970872f984fc4f861138d65566790bfdfcae87f6c7f043b63d5d3";
 
+const shoppingCache = new Map<string, { data: any; expiry: number }>();
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -19,15 +21,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: "Query 'q' is required" });
   }
 
+  const cacheKey = q.toLowerCase();
+  const cached = shoppingCache.get(cacheKey);
+  if (cached && cached.expiry > Date.now()) {
+    res.setHeader("Cache-Control", "public, s-maxage=600, stale-while-revalidate=1200");
+    return res.status(200).json(cached.data);
+  }
+
   try {
     const serpUrl = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
       q
     )}&gl=in&hl=en&api_key=${SERPAPI_KEY}&num=20`;
 
-    const upstream = await fetch(serpUrl, { signal: AbortSignal.timeout(6000) });
+    const upstream = await fetch(serpUrl, { signal: AbortSignal.timeout(12000) });
     if (upstream.ok) {
       const data = await upstream.json();
-      res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
+      if (data.shopping_results && data.shopping_results.length > 0) {
+        shoppingCache.set(cacheKey, {
+          data,
+          expiry: Date.now() + 15 * 60 * 1000,
+        });
+      }
+      res.setHeader("Cache-Control", "public, s-maxage=600, stale-while-revalidate=1200");
       return res.status(200).json(data);
     }
   } catch (err: any) {

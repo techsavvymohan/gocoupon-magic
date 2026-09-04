@@ -12,7 +12,7 @@ function searxngDevPlugin() {
         if (req.url?.startsWith("/api/shopping")) {
           try {
             const urlObj = new URL(req.url, "http://localhost:8080");
-            const q = urlObj.searchParams.get("q");
+            const q = urlObj.searchParams.get("q")?.trim();
             if (!q) {
               res.statusCode = 400;
               res.setHeader("Content-Type", "application/json");
@@ -20,13 +20,33 @@ function searxngDevPlugin() {
               return;
             }
 
+            // Check in-memory cache (15 min TTL)
+            const cacheKey = q.toLowerCase();
+            const cached = (globalThis as any).__shoppingCache?.get(cacheKey);
+            if (cached && cached.expiry > Date.now()) {
+              res.statusCode = 200;
+              res.setHeader("Content-Type", "application/json");
+              res.setHeader("Access-Control-Allow-Origin", "*");
+              res.end(JSON.stringify(cached.data));
+              return;
+            }
+
             const serpUrl = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
               q
             )}&gl=in&hl=en&api_key=3e5a818b044970872f984fc4f861138d65566790bfdfcae87f6c7f043b63d5d3&num=20`;
 
-            const upstream = await fetch(serpUrl, { signal: AbortSignal.timeout(6000) });
+            const upstream = await fetch(serpUrl, { signal: AbortSignal.timeout(12000) });
             if (upstream.ok) {
               const data = await upstream.json();
+              if (data.shopping_results && data.shopping_results.length > 0) {
+                if (!(globalThis as any).__shoppingCache) {
+                  (globalThis as any).__shoppingCache = new Map();
+                }
+                (globalThis as any).__shoppingCache.set(cacheKey, {
+                  data,
+                  expiry: Date.now() + 15 * 60 * 1000,
+                });
+              }
               res.statusCode = 200;
               res.setHeader("Content-Type", "application/json");
               res.setHeader("Access-Control-Allow-Origin", "*");

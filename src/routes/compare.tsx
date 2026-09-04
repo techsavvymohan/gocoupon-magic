@@ -408,9 +408,16 @@ export function ComparePage() {
 
                       {/* Product Info */}
                       <div className="mt-4">
-                        <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                          <span className="font-mono text-[11px] uppercase tracking-wider">{product.brand}</span>
-                          <span className="flex items-center gap-1 text-amber-500 font-bold">
+                        <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="rounded-md bg-muted px-2 py-0.5 font-mono text-[10px] font-bold text-foreground shrink-0">
+                              {product.brand}
+                            </span>
+                            <span className="rounded-md bg-primary/5 text-primary px-1.5 py-0.5 font-mono text-[9px] font-semibold truncate">
+                              {product.category}
+                            </span>
+                          </div>
+                          <span className="flex items-center gap-1 text-amber-500 font-bold shrink-0 ml-2">
                             <Star className="h-3 w-3 fill-amber-500" />
                             {product.rating.toFixed(1)}
                             <span className="text-muted-foreground font-normal">({product.reviewCount})</span>
@@ -594,6 +601,9 @@ export function ComparePage() {
                   <div className="flex items-center gap-2 mb-1">
                     <span className="rounded-md bg-primary/10 text-primary px-2 py-0.5 font-mono text-[10px] font-bold">
                       {selectedProduct.brand}
+                    </span>
+                    <span className="rounded-md bg-muted px-2 py-0.5 font-mono text-[10px] font-bold text-foreground">
+                      {selectedProduct.category}
                     </span>
                     <span className="rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 font-mono text-[10px] font-bold flex items-center gap-1">
                       <CheckCircle2 className="h-3 w-3" />

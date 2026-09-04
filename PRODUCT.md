@@ -6,7 +6,7 @@
 - **Core Value Proposition**: Real-time savings automation, zero manual code hunting, verified laboratory price tracking, and multi-store instant checkout intelligence.
 
 ## Experience & Brand
-- **Product Lane**: Modern commerce utility & consumer intelligence platform (combining Buyhatke-style multi-store price history & comparison with Flash.co-style clean luxury commerce aesthetic).
+- **Product Lane**: Modern commerce utility & consumer intelligence platform (combining multi-store price history & comparison with clean luxury commerce aesthetic).
 - **Voice & Tone**: High-precision, transparent, decisive, frictionless, and respectful.
 - **Anti-References**: Generic listicle coupon farms (CouponDunia, RetailMeNot), spammy popups, fake countdown timers, cliché purple/rainbow AI gradients, low-contrast text on colored backdrops.
 
