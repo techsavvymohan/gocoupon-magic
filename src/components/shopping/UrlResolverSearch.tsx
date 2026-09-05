@@ -8,7 +8,6 @@
  * - WAI-ARIA APG compliant combobox with full keyboard navigation (ArrowUp/Down, Enter, Esc)
  * - Dynamic store placeholder rotating between Myntra, Amazon, Flipkart, Ajio & Meesho
  * - Supported store avatar stack (Amazon, Flipkart, Myntra, Meesho)
- * - Built-in Voice Search & AI Deal Sparkle with Web Speech API
  * - 1-Click Clipboard Paste detection & clear button
  * - Optional connected trust badges row (8M+ Active Users, ₹10K CR Cash Saved, 100K+ Trusted Stores)
  */
@@ -22,8 +21,6 @@ import {
   ArrowRight,
   Clipboard,
   X,
-  Mic,
-  Sparkles,
   ShieldCheck,
   Globe,
   Loader2,
@@ -66,7 +63,6 @@ export function UrlResolverSearch({
 }: UrlResolverSearchProps) {
   const [query, setQuery] = useState("");
   const [isResolving, setIsResolving] = useState(false);
-  const [isListening, setIsListening] = useState(false);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
 
   // SearXNG live state
@@ -219,51 +215,6 @@ export function UrlResolverSearch({
     }
   };
 
-  const handleVoiceSearch = () => {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      toast.info("Voice search is not supported in this browser. Please type your query.");
-      return;
-    }
-
-    try {
-      const recognition = new SpeechRecognition();
-      recognition.lang = "en-IN";
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-
-      setIsListening(true);
-      toast.info("Listening… Speak product name or store link", { duration: 3000 });
-
-      recognition.onresult = (event: any) => {
-        const speechResult = event.results?.[0]?.[0]?.transcript;
-        if (speechResult) {
-          setQuery(speechResult);
-          toast.success(`Heard: “${speechResult}”`);
-          handleExecuteSearch(speechResult);
-        }
-      };
-
-      recognition.onerror = (event: any) => {
-        setIsListening(false);
-        if (event.error !== "no-speech") {
-          toast.error("Could not capture speech. Please try again.");
-        }
-      };
-
-      recognition.onend = () => {
-        setIsListening(false);
-      };
-
-      recognition.start();
-    } catch {
-      setIsListening(false);
-      toast.error("Microphone access could not be initialized.");
-    }
-  };
-
   const handleClear = () => {
     setQuery("");
     setShowDropdown(false);
@@ -373,26 +324,6 @@ export function UrlResolverSearch({
                   </div>
                 ))}
               </div>
-
-              {/* Vertical Divider */}
-              <div className="h-6 w-px bg-border/80 mx-1 sm:mx-1.5" aria-hidden="true" />
-
-              {/* Voice / AI Sparkle Icon Button */}
-              <button
-                type="button"
-                onClick={handleVoiceSearch}
-                aria-label="Search with voice or AI deal finder"
-                title="Search with Voice or AI Deal Finder"
-                className={`relative flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                  isListening ? "text-red-500 bg-red-500/10 animate-pulse" : ""
-                }`}
-              >
-                <Mic className="h-4 w-4 sm:h-4.5 sm:w-4.5" aria-hidden="true" />
-                <Sparkles
-                  className="absolute top-1 right-1 h-3 w-3 text-amber-500"
-                  aria-hidden="true"
-                />
-              </button>
             </>
           )}
         </div>
