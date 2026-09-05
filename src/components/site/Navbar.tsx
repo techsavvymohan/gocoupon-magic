@@ -85,19 +85,6 @@ export function Navbar() {
             </span>
           </Link>
 
-          {/* Mobile Screen Centered Business Name */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:hidden">
-            <Link
-              to="/"
-              className="font-display text-lg sm:text-xl font-extrabold tracking-tight transition-opacity hover:opacity-85"
-              aria-label="GoCoupon"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <span className="text-black dark:text-white">Go</span>
-              <span className="text-blue-600 dark:text-[#dbfc14]">Coupon</span>
-            </Link>
-          </div>
-
           {/* Desktop Nav Links (Compact & Responsive) */}
           <ul className="hidden items-center gap-5 lg:gap-6 md:flex">
             {primaryLinks.map((l) => {
