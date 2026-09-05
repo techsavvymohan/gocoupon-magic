@@ -224,16 +224,22 @@ export function UrlResolverSearch({
   const isLarge = size === "large";
 
   return (
-    <div ref={containerRef} className={`relative w-full ${className}`}>
+    <div ref={containerRef} className={`group/search relative w-full ${className}`}>
+      {/* Ambient Luminous Glow Halo to highlight search bar and make it prominently noticeable */}
+      <div
+        className="absolute -inset-1 sm:-inset-1.5 rounded-[22px] sm:rounded-[30px] bg-gradient-to-r from-primary/30 via-amber-500/20 to-primary/30 opacity-75 blur-xl transition-all duration-500 group-hover/search:opacity-100 group-focus-within/search:opacity-100 pointer-events-none"
+        aria-hidden="true"
+      />
+
       {/* Main Search Input Form Card */}
       <form
         onSubmit={handleSubmit}
-        className={`group relative flex items-center w-full rounded-2xl sm:rounded-3xl border border-border/80 bg-card/95 backdrop-blur-xl shadow-xs transition-all duration-300 hover:shadow-md hover:border-primary/40 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 focus-within:shadow-lg ${
+        className={`group relative flex items-center w-full rounded-2xl sm:rounded-3xl border-2 border-primary/40 dark:border-primary/50 hover:border-primary/80 bg-card/98 backdrop-blur-2xl shadow-xl shadow-primary/10 hover:shadow-2xl hover:shadow-primary/20 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/20 focus-within:shadow-2xl focus-within:shadow-primary/25 transition-all duration-300 ${
           isLarge ? "py-2 sm:py-2.5 px-3 sm:px-4 min-h-[58px] sm:min-h-[66px]" : "py-1.5 px-3 min-h-[48px]"
         }`}
       >
         {/* Left Magnifying Glass / Loading Spinner */}
-        <div className="flex items-center justify-center pl-1 sm:pl-2 pr-2.5 text-muted-foreground transition-colors group-focus-within:text-primary shrink-0 pointer-events-none">
+        <div className="flex items-center justify-center pl-1 sm:pl-2 pr-2.5 text-primary transition-colors shrink-0 pointer-events-none">
           {isResolving || isLoadingSearxng ? (
             <div
               className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent"
