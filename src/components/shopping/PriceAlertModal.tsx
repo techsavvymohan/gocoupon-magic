@@ -20,7 +20,7 @@ interface PriceAlertModalProps {
   onClose: () => void;
   productId: string;
   productTitle: string;
-  productImage: string;
+  productImage?: string;
   currentPrice: number;
 }
 
@@ -29,7 +29,7 @@ export function PriceAlertModal({
   onClose,
   productId,
   productTitle,
-  productImage,
+  productImage = "/gc-logo.webp",
   currentPrice,
 }: PriceAlertModalProps) {
   const [targetPrice, setTargetPrice] = useState<number>(Math.round(currentPrice * 0.9));

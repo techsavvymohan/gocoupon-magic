@@ -165,6 +165,7 @@ html.dark {
     font-family: var(--font-display);
     letter-spacing: -0.025em;
     font-weight: 700;
+    text-wrap: balance;
   }
 
   button,

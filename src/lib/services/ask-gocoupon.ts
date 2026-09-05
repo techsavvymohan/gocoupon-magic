@@ -134,12 +134,24 @@ export async function askGoCoupon(userQuery: string): Promise<AssistantAnswer> {
   let liveLowestStore = "Amazon.in";
 
   try {
-    const serpUrl = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
-      userQuery
-    )}&gl=in&hl=en&api_key=${SERPAPI_KEY}&num=10`;
-    const res = await fetch(serpUrl);
-    if (res.ok) {
-      const data = await res.json();
+    let data: any = null;
+    if (typeof window !== "undefined") {
+      const res = await fetch(`/api/shopping?q=${encodeURIComponent(userQuery)}`, {
+        signal: AbortSignal.timeout(5000),
+      });
+      if (res.ok) data = await res.json();
+    } else {
+      const apiKey = process.env.SERPAPI_API_KEY || process.env.SERPAPI_KEY || "";
+      if (apiKey) {
+        const serpUrl = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
+          userQuery
+        )}&gl=in&hl=en&api_key=${apiKey}&num=10`;
+        const res = await fetch(serpUrl, { signal: AbortSignal.timeout(5000) });
+        if (res.ok) data = await res.json();
+      }
+    }
+
+    if (data) {
       const items = (data.shopping_results || []).filter((i: any) => i.extracted_price > 0);
       if (items.length > 0) {
         liveTopItem = items[0];

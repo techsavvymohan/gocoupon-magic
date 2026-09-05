@@ -200,93 +200,28 @@ const collectionRoutes = [
 // Add product routes (dynamic at runtime)
 const productRoutes = [];
 
-// Add blog routes
-const blogRoutes = [
-  {
-    path: "blog/myntra-coupon-codes-that-actually-work",
-    title: "Myntra Coupon Codes That Actually Work (Verified Feb 2026) – goCoupon",
-    description: "Step-by-step guide to finding 100% verified working Myntra coupon codes, stacking Myntra Insider points, and getting flat ₹400 off.",
-    h1: "Myntra Coupon Codes That Actually Work (Feb 2026 Guide)",
-    lead: "Stop copying expired codes from random listicles. Here is how to unlock 100% working Myntra promo codes and stack discounts.",
-  },
-  {
-    path: "blog/best-coupon-codes-for-flipkart-2026",
-    title: "Best Flipkart Coupon Codes & Sale Hacks 2026 – goCoupon",
-    description: "How to find working Flipkart coupon codes, stack SuperCoins, and maximize instant bank discounts on electronics and fashion.",
-    h1: "Best Working Flipkart Coupon Codes & Sale Hacks (2026)",
-    lead: "Master Flipkart savings with verified coupon codes, SuperCoin redemption, and bank credit card discount stacking.",
-  },
-  {
-    path: "blog/how-to-save-money-on-amazon-india",
-    title: "How to Save Maximum Money on Amazon India – goCoupon",
-    description: "Secrets to unlocking hidden Amazon India coupons, lightning deal alerts, Prime savings, and credit card cashback.",
-    h1: "How to Save Maximum Money on Amazon India (Pro Shopping Guide)",
-    lead: "Comprehensive guide to combining Amazon lightning deals, collectible coupons, and bank card discounts.",
-  },
-  {
-    path: "blog/meesho-discount-codes-today",
-    title: "Meesho Discount Codes Today – Flat Discounts & First Order Hacks | goCoupon",
-    description: "Learn how to find working Meesho promo codes, first-order discounts, and free shipping hacks on clothing and household items.",
-    h1: "Meesho Discount Codes & First-Order Savings Guide",
-    lead: "Everything you need to know about getting the lowest price on Meesho with active promo codes.",
-  },
-  {
-    path: "blog/why-coupons-fail-at-checkout",
-    title: "Why Do Coupon Codes Fail at Checkout? 5 Hidden Reasons Explained – goCoupon",
-    description: "Understand why promo codes return 'Invalid Code' or 'Expired' and how goCoupon's automated scanner solves coupon failure.",
-    h1: "Why Do Coupon Codes Fail at Checkout? (And How to Fix It)",
-    lead: "Category locks, minimum cart constraints, seller exclusions, and how automated coupon testing guarantees verified discounts.",
-  },
-  {
-    path: "blog/stack-coupons-bank-offers-flipkart",
-    title: "How to Stack Coupons and Bank Offers on Flipkart – goCoupon",
-    description: "Learn the exact checkout order to combine Flipkart cart coupons with HDFC, ICICI, and Axis Bank instant card discounts.",
-    h1: "How to Stack Coupons with Bank Card Offers on Flipkart",
-    lead: "Step-by-step walkthrough on stacking cart promo codes and bank credit card discounts without voiding either offer.",
-  },
-  {
-    path: "blog/best-buyhatke-alternatives-india-2026",
-    title: "Best Buyhatke Alternatives in India (2026): Faster Price Trackers & Coupon Extensions",
-    description: "Looking for a modern Buyhatke alternative? Compare GoCoupon, CashKaro, and Honey for auto-applying coupon codes, 90-day price trackers, and ad-free browsing.",
-    h1: "Top 5 Buyhatke Alternatives in India for 2026",
-    lead: "Fatigued by intrusive popup ads and sluggish checkout delays? Here are the best lightweight, ad-free Buyhatke alternatives for Amazon and Flipkart.",
-  },
-  {
-    path: "blog/flash-co-alternatives-shopping-extension",
-    title: "Best Flash.co Alternatives for Auto Coupons & Smart Shopping in India",
-    description: "Searching for Flash.co alternatives? Discover why in-browser automation extensions like GoCoupon outperform email routing for instant discounts and privacy.",
-    h1: "Best Flash.co Alternatives: In-Browser Savings vs Email Redirection",
-    lead: "Compare direct browser automation with shopping email domains. Discover how GoCoupon saves you money at checkout without altering your registered email.",
-  },
-  {
-    path: "blog/buyhatke-vs-gocoupon-price-tracker-comparison",
-    title: "Buyhatke vs GoCoupon: Which Shopping Extension Saves More in India?",
-    description: "Head-to-head comparison of Buyhatke vs GoCoupon across 50 Amazon and Flipkart carts. See real benchmark data on coupon success rates, RAM usage, and speed.",
-    h1: "Buyhatke vs GoCoupon: The Definitive Head-to-Head Comparison",
-    lead: "We tested 50 identical shopping carts on Amazon India and Flipkart across Buyhatke and GoCoupon. Here are the unfiltered benchmark results.",
-  },
-  {
-    path: "blog/how-to-find-cheaper-products-online-price-comparison-guide",
-    title: "How to Find Cheaper Products Online in India: The Cross-Store Price Comparison Guide",
-    description: "Stop overpaying online. Discover how cross-store price comparison helps Indian shoppers find cheaper products across Amazon, Flipkart, Croma, and Myntra with zero guesswork.",
-    h1: "How to Find Cheaper Products Online in India (2026 Guide)",
-    lead: "A step-by-step masterclass in cross-store price comparison, factoring in delivery fees, bank card offers, and stackable promo codes.",
-  },
-  {
-    path: "blog/online-shopping-discounts-deals-stacking-secrets-2026",
-    title: "The 2026 Blueprint to Online Shopping Discounts: How to Find Real Deals & Stack Coupons",
-    description: "Master the 5-layer discount stacking formula. Learn how to combine base price drops, seller promo codes, cart discounts, bank credit card offers, and cashback to save up to 65%.",
-    h1: "The 2026 Blueprint to Online Shopping Discounts & Deals",
-    lead: "Learn the exact discount stacking formula used by coupon experts to save 40% to 65% on electronics, fashion, and daily orders.",
-  },
-  {
-    path: "blog/best-price-tracking-tools-india-price-history-guide",
-    title: "Complete Guide to Price Tracking in India: How to Use 90-Day Graphs to Save Thousands",
-    description: "Why do Amazon and Flipkart prices fluctuate every 6 hours? Here is how to use 90-day price tracking graphs, detect fake sale markups, and configure price drop alerts.",
-    h1: "Complete Guide to Price Tracking & 90-Day History in India",
-    lead: "Learn how e-commerce pricing algorithms fluctuate, how to spot artificial pre-sale price spikes, and how to set automated price drop alerts.",
-  },
-];
+// Dynamically load all blog routes from src/data/posts.ts for complete 100% SEO indexation
+const postsFilePath = path.resolve(__dirname, "../src/data/posts.ts");
+const blogRoutes = [];
+if (fs.existsSync(postsFilePath)) {
+  const postsContent = fs.readFileSync(postsFilePath, "utf-8");
+  const postRegex = /slug:\s*"([^"]+)",[\s\S]*?tag:\s*"([^"]+)",[\s\S]*?date:\s*"([^"]+)",[\s\S]*?title:\s*"([^"]+)",[\s\S]*?excerpt:\s*"([^"]+)"/g;
+  let m;
+  const seen = new Set();
+  while ((m = postRegex.exec(postsContent)) !== null) {
+    const slug = m[1];
+    if (!seen.has(slug)) {
+      seen.add(slug);
+      blogRoutes.push({
+        path: `blog/${slug}`,
+        title: `${m[4]} – goCoupon Deals & Shopping Blog`,
+        description: m[5].replace(/\s+/g, " ").trim().slice(0, 160),
+        h1: m[4],
+        lead: m[5].replace(/\s+/g, " ").trim(),
+      });
+    }
+  }
+}
 
 const allRoutes = [...routeConfigs, ...collectionRoutes, ...productRoutes, ...blogRoutes];
 console.log(`Generating high-SEO pre-rendered static routes in ${distDir}...`);
@@ -390,3 +325,40 @@ for (const route of allRoutes) {
 fs.writeFileSync(path.join(distDir, "404.html"), baseIndexHtml, "utf-8");
 
 console.log(`Successfully generated ${generatedCount} rich pre-rendered static route files!`);
+
+// Generate comprehensive, verified sitemap.xml
+const sitemapUrls = allRoutes.map((r) => {
+  let priority = "0.8";
+  let changefreq = "weekly";
+  if (r.path === "") {
+    priority = "1.0";
+    changefreq = "daily";
+  } else if (
+    [
+      "compare",
+      "price-history",
+      "deals",
+      "stores",
+      "ask",
+      "flipkart-coupons",
+      "amazon-coupons",
+      "myntra-coupons",
+    ].includes(r.path)
+  ) {
+    priority = "0.95";
+    changefreq = "daily";
+  } else if (r.path.startsWith("blog/")) {
+    priority = "0.85";
+    changefreq = "weekly";
+  }
+  return `  <url>\n    <loc>https://gocoupon.io/${r.path ? r.path : ""}</loc>\n    <lastmod>2026-09-05</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
+});
+
+const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.join(
+  "\n"
+)}\n</urlset>\n`;
+
+fs.writeFileSync(path.join(distDir, "sitemap.xml"), sitemapXml, "utf-8");
+fs.writeFileSync(path.resolve(__dirname, "../public/sitemap.xml"), sitemapXml, "utf-8");
+console.log(`Successfully updated sitemap.xml with all ${allRoutes.length} indexed URLs!`);
+

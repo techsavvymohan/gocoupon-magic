@@ -770,6 +770,7 @@ export function ComparePage() {
         onClose={() => setIsAlertModalOpen(false)}
         productId={selectedProduct?.id || "product"}
         productTitle={selectedProduct?.title || "Product"}
+        productImage={selectedProduct?.imageUrl || "/gc-logo.webp"}
         currentPrice={selectedProduct?.price || 1499}
       />
     </SiteShell>

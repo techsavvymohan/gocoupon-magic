@@ -120,13 +120,13 @@ export async function triggerPriceDropNotification(params?: {
   )} (was ₹${origPrice.toLocaleString("en-IN")}).`;
 
   try {
-    let registration = await navigator.serviceWorker.getRegistration();
+    let registration: ServiceWorkerRegistration | null | undefined = await navigator.serviceWorker.getRegistration();
     if (!registration) {
-      registration = await registerServiceWorker();
+      registration = (await registerServiceWorker()) || undefined;
     }
 
     if (registration && "showNotification" in registration) {
-      await registration.showNotification(notifTitle, {
+      await (registration as any).showNotification(notifTitle, {
         body: notifBody,
         icon: "/gc-logo.webp",
         badge: "/gc-logo.webp",

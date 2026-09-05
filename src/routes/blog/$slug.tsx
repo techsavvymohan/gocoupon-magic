@@ -69,7 +69,7 @@ function PostPage() {
 
   const faqItems = post.body
     .filter(
-      (sec): sec is Extract<PostSection, { type: "callout" }> =>
+      (sec: PostSection): sec is Extract<PostSection, { type: "callout" }> =>
         sec.type === "callout" &&
         Boolean(
           sec.title &&
@@ -82,7 +82,7 @@ function PostPage() {
               sec.title.toLowerCase().startsWith("what"))
         )
     )
-    .map((sec) => ({
+    .map((sec: Extract<PostSection, { type: "callout" }>) => ({
       "@type": "Question",
       name: sec.title,
       acceptedAnswer: {
