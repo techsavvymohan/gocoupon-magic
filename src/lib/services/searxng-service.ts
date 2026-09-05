@@ -26,6 +26,7 @@ export interface SearXNGResult {
   publishedDate?: string;
   thumbnail?: string;
   img_src?: string;
+  price?: string;
 }
 
 export interface SearXNGResponse {

@@ -1,0 +1,52 @@
+use_default_settings: true
+
+general:
+  debug: false
+  instance_name: "GoCoupon SearXNG"
+
+search:
+  safe_search: 0
+  autocomplete: "duckduckgo"
+  default_lang: "en-IN"
+  formats:
+    - html
+    - json
+
+server:
+  port: 8080
+  bind_address: "0.0.0.0"
+  secret_key: "gocoupon_secure_searxng_secret_key_prod_2026"
+  base_url: "http://localhost:8888"
+  image_proxy: false
+  method: "GET"
+
+engines:
+  - name: google
+    engine: google
+    enable: true
+    shortcut: g
+    categories: [general, web]
+
+  - name: bing
+    engine: bing
+    enable: true
+    shortcut: b
+    categories: [general, web]
+
+  - name: duckduckgo
+    engine: duckduckgo
+    enable: true
+    shortcut: ddg
+    categories: [general, web]
+
+  - name: ebay
+    engine: ebay
+    enable: true
+    shortcut: eb
+    categories: [shopping]
+
+  - name: geizhals
+    engine: geizhals
+    enable: true
+    shortcut: gh
+    categories: [shopping]

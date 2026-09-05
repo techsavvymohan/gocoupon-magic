@@ -10,6 +10,8 @@
  * 5. Strict Type & Price Bounds Clamping.
  */
 
+import { bridgeSearXNGPriceOffers } from "./searxng-price-bridge";
+
 const SERPAPI_KEY = process.env.SERPAPI_API_KEY || process.env.SERPAPI_KEY || "";
 
 const AMAZON_PARTNER_TAG = process.env.VITE_AMAZON_IN_PARTNER_TAG || "gocoupon0e-21";
@@ -33,7 +35,7 @@ export interface StoreSearchResult {
   rating: number;
   reviewCount: number;
   inStock: boolean;
-  source: "amazon" | "flipkart" | "cuelinks" | "serpapi";
+  source: "amazon" | "flipkart" | "cuelinks" | "serpapi" | "searxng";
 }
 
 // In-Memory Stale-While-Revalidate Cache
@@ -322,10 +324,11 @@ export async function searchAllStoresConcurrent(query: string): Promise<{
 
   const executionPromise = (async () => {
     try {
-      const [amazonRes, flipkartRes, cuelinksRes] = await Promise.allSettled([
+      const [amazonRes, flipkartRes, cuelinksRes, searxngRes] = await Promise.allSettled([
         searchAmazon(query),
         searchFlipkart(query),
         searchCuelinks(query),
+        bridgeSearXNGPriceOffers(query),
       ]);
 
       const allOffers: StoreSearchResult[] = [];
@@ -359,6 +362,29 @@ export async function searchAllStoresConcurrent(query: string): Promise<{
         }
       } else {
         unavailableStores.push({ storeName: "Brand Partners", reason: "timed_out" });
+      }
+
+      // Add SearXNG Meta-Search Offers
+      if (searxngRes.status === "fulfilled" && searxngRes.value.length > 0) {
+        const searxOffers: StoreSearchResult[] = searxngRes.value.map((o) => ({
+          storeId: o.storeId,
+          storeName: o.storeName,
+          storeLogo: o.storeLogo,
+          title: o.productTitle,
+          itemPrice: o.itemPrice,
+          effectiveNetPrice: o.effectiveNetPrice,
+          couponCode: null,
+          couponSavings: 0,
+          cashbackRate: o.cashbackRate,
+          cashbackAmount: o.cashbackEstimate,
+          deliveryEstimate: "2-4 Days",
+          affiliateUrl: o.url,
+          rating: o.rating,
+          reviewCount: o.reviewsCount,
+          inStock: o.inStock,
+          source: "searxng",
+        }));
+        allOffers.push(...searxOffers);
       }
 
       // Deduplicate offers keeping the lowest price per store
