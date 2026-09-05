@@ -263,9 +263,90 @@ export const CANONICAL_COUPONS: StoreCoupon[] = [
   },
 ];
 
-export const CANONICAL_PRODUCTS: CanonicalProduct[] = [];
+export const CANONICAL_PRODUCTS: CanonicalProduct[] = [
+  {
+    id: "prod_sony_wh1000xm5",
+    slug: "sony-wh-1000xm5-wireless-noise-cancelling-headphones",
+    title: "Sony WH-1000XM5 Wireless Noise Cancelling Headphones (Black)",
+    brand: "Sony",
+    category: "Electronics",
+    subcategory: "Headphones",
+    description:
+      "Industry-leading active noise cancellation with dual Auto NC Optimizer processors, 30-hour battery life, and crystal-clear hands-free calling.",
+    imageUrl: "/Brand logos/Amazon_logo.svg.webp",
+    identifiers: {
+      asin: "B09XS7JWHH",
+      modelNumber: "WH1000XM5/B",
+    },
+    specs: {
+      Battery: "30 Hours",
+      Driver: "30mm Carbon Fiber",
+      Bluetooth: "5.2 (LDAC / AAC / SBC)",
+      Weight: "250g",
+    },
+    tags: ["noise-cancelling", "wireless", "premium-audio"],
+    rating: 4.8,
+    reviewCount: 14280,
+    reviewCountDisplay: "14.2k ratings",
+    flashScore: 9.4,
+  },
+];
 
-export const CANONICAL_OFFERS: MerchantOffer[] = [];
+export const CANONICAL_OFFERS: MerchantOffer[] = [
+  {
+    id: "off_amz_sony_xm5",
+    productId: "prod_sony_wh1000xm5",
+    storeId: "amazon",
+    storeName: "Amazon India",
+    storeLogo: "/Brand logos/Amazon_logo.svg.webp",
+    rawUrl: "https://amazon.in/dp/B09XS7JWHH",
+    affiliateUrl: "https://amazon.in/dp/B09XS7JWHH?tag=gocoupon0e-21",
+    itemPrice: 26990,
+    originalPrice: 34990,
+    discountPercentage: 23,
+    shippingFee: 0,
+    currency: "INR",
+    stockStatus: "In Stock",
+    deliveryTime: "Tomorrow by 11 AM",
+    lastCheckedAt: Date.now(),
+    effectiveNetPrice: 26990,
+  },
+  {
+    id: "off_fk_sony_xm5",
+    productId: "prod_sony_wh1000xm5",
+    storeId: "flipkart",
+    storeName: "Flipkart",
+    storeLogo: "/Brand logos/flipkart.webp",
+    rawUrl: "https://flipkart.com/sony-wh-1000xm5",
+    affiliateUrl: "https://flipkart.com/sony-wh-1000xm5",
+    itemPrice: 27990,
+    originalPrice: 34990,
+    discountPercentage: 20,
+    shippingFee: 0,
+    currency: "INR",
+    stockStatus: "In Stock",
+    deliveryTime: "2 Days Delivery",
+    lastCheckedAt: Date.now(),
+    effectiveNetPrice: 27990,
+  },
+  {
+    id: "off_croma_sony_xm5",
+    productId: "prod_sony_wh1000xm5",
+    storeId: "croma",
+    storeName: "Croma Retail",
+    rawUrl: "https://croma.com/sony-wh-1000xm5",
+    affiliateUrl: "https://croma.com/sony-wh-1000xm5",
+    itemPrice: 28990,
+    originalPrice: 34990,
+    discountPercentage: 17,
+    shippingFee: 0,
+    currency: "INR",
+    stockStatus: "In Stock",
+    deliveryTime: "Same Day Store Pickup",
+    lastCheckedAt: Date.now(),
+    effectiveNetPrice: 28990,
+  },
+];
 
 export const CANONICAL_SNAPSHOTS: PriceSnapshot[] = [];
 
