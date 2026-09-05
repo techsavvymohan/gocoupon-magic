@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="gc-grad" x1="4" y1="4" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="50%" stop-color="#0ea5e9" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+    <linearGradient id="gc-spark" x1="16" y1="16" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e0f2fe" />
+    </linearGradient>
+  </defs>
+
+  <!-- Squircle Base -->
+  <rect x="4" y="4" width="56" height="56" rx="16" fill="#080808" />
+  <rect x="4" y="4" width="56" height="56" rx="16" fill="url(#gc-grad)" fill-opacity="0.12" stroke="url(#gc-grad)" stroke-width="2.5" />
+
+  <!-- Stylized Shopping Coupon Tag & Spark -->
+  <path d="M22 18H36L46 28L34 40L20 40C18.8954 40 18 39.1046 18 38V22C18 19.7909 19.7909 18 22 18Z" fill="url(#gc-grad)" />
+  
+  <!-- Coupon Hole -->
+  <circle cx="25" cy="25" r="3.5" fill="#080808" />
+
+  <!-- Magic Spark Icon -->
+  <path d="M42 16L44 21L49 23L44 25L42 30L40 25L35 23L40 21L42 16Z" fill="#38bdf8" />
+  <path d="M43 36L44 39L47 40L44 41L43 44L42 41L39 40L42 39L43 36Z" fill="#7dd3fc" />
+</svg>

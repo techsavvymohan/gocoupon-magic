@@ -1,7 +1,7 @@
 /**
  * @file canonical-types.ts
  * @description Canonical commerce data contracts for GoCoupon.
- * 
+ *
  * Strict separation of:
  * - CanonicalProduct (normalized cross-store item)
  * - MerchantStore (store metadata & capabilities)
@@ -39,6 +39,16 @@ export interface CanonicalProduct {
   flashScore?: number; // 1-10 overall Flash verdict score
 }
 
+export type CommerceCategory =
+  | "Electronics"
+  | "Mobiles"
+  | "Fashion"
+  | "Beauty"
+  | "Home"
+  | "Food"
+  | "Travel"
+  | "General";
+
 export interface MerchantStore {
   id: string; // e.g. "amazon", "flipkart", "myntra", "croma", "tatacliq", "boat"
   name: string;
@@ -49,7 +59,8 @@ export interface MerchantStore {
   affiliateNetwork: "Amazon Associates" | "Impact" | "Cuelinks" | "Direct" | "EarnKaro";
   partnerTag?: string;
   cashbackRate: string;
-  cashbackPercentage: number;
+  cashbackPercentage: number; // Base / default fallback commission percentage
+  categoryTiers?: Partial<Record<CommerceCategory, number>>;
   isAutoApplySupported: boolean;
   rating: number;
 }
@@ -105,8 +116,10 @@ export interface StoreCoupon {
   maxDiscount?: number;
   expiresAt: string;
   status: "Active" | "Expiring Soon" | "Exclusive" | "Bank Offer";
-  successRate: number; // 0-100 percentage
-  verifiedUses: number;
+  verificationStatus: "Editor Tested" | "Merchant Partner";
+  lastVerified: string;
+  successRate?: number; // Optional/legacy
+  verifiedUses?: number; // Optional/legacy
   isStackableWithBankOffers: boolean;
   applicableCategories?: string[];
   terms?: string;
@@ -117,9 +130,21 @@ export interface ProductEvidence {
   productId: string;
   sourceTitle: string;
   sourceUrl: string;
-  sourceType: "Tech Reviewer" | "Lab Benchmark" | "Buyer Consensus" | "Reddit Community" | "Editorial";
+  sourceType:
+    | "Tech Reviewer"
+    | "Lab Benchmark"
+    | "Buyer Consensus"
+    | "Reddit Community"
+    | "Editorial";
   authorOrChannel: string;
-  claimType: "Battery Life" | "Noise Cancellation" | "Sound Quality" | "Build Quality" | "Value" | "Camera" | "Durability";
+  claimType:
+    | "Battery Life"
+    | "Noise Cancellation"
+    | "Sound Quality"
+    | "Build Quality"
+    | "Value"
+    | "Camera"
+    | "Durability";
   claimExcerpt: string;
   sentiment: "Positive" | "Neutral" | "Critical";
   confidenceScore: number; // 0.0 to 1.0

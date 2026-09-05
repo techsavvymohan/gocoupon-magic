@@ -68,7 +68,7 @@ export async function searchAmazon(query: string): Promise<StoreSearchResult[]> 
     } else if (SERPAPI_KEY) {
       // Server runtime: query SerpAPI directly with server environment key
       const url = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
-        query + " site:amazon.in"
+        query + " site:amazon.in",
       )}&gl=in&hl=en&api_key=${SERPAPI_KEY}&num=5`;
       const res = await fetch(url, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
       if (res.ok) {
@@ -78,7 +78,7 @@ export async function searchAmazon(query: string): Promise<StoreSearchResult[]> 
 
     if (!data) return cached?.data || [];
     const items = (data.shopping_results || []).filter(
-      (i: any) => typeof i.extracted_price === "number" && i.extracted_price > 0
+      (i: any) => typeof i.extracted_price === "number" && i.extracted_price > 0,
     );
 
     const results: StoreSearchResult[] = items.map((item: any) => {
@@ -87,7 +87,8 @@ export async function searchAmazon(query: string): Promise<StoreSearchResult[]> 
       const cashbackAmount = Math.round(rawPrice * 0.07);
       const effectiveNetPrice = Math.max(0, rawPrice - couponSavings - cashbackAmount);
 
-      const baseLink = item.product_link || item.link || `https://www.amazon.in/s?k=${encodeURIComponent(query)}`;
+      const baseLink =
+        item.product_link || item.link || `https://www.amazon.in/s?k=${encodeURIComponent(query)}`;
       const affiliateUrl = baseLink.includes("amazon.in")
         ? `${baseLink}${baseLink.includes("?") ? "&" : "?"}tag=${AMAZON_PARTNER_TAG}`
         : baseLink;
@@ -95,7 +96,8 @@ export async function searchAmazon(query: string): Promise<StoreSearchResult[]> 
       return {
         storeId: "amazon_in",
         storeName: "Amazon.in",
-        storeLogo: item.source_icon || "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
+        storeLogo:
+          item.source_icon || "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
         title: item.title || query,
         itemPrice: rawPrice,
         effectiveNetPrice,
@@ -135,16 +137,19 @@ export async function searchFlipkart(query: string): Promise<StoreSearchResult[]
 
     if (typeof window !== "undefined") {
       // Browser client: proxy through /api/shopping securely without key exposure
-      const res = await fetch(`/api/shopping?q=${encodeURIComponent(query + " site:flipkart.com")}`, {
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-      });
+      const res = await fetch(
+        `/api/shopping?q=${encodeURIComponent(query + " site:flipkart.com")}`,
+        {
+          signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        },
+      );
       if (res.ok) {
         data = await res.json();
       }
     } else if (SERPAPI_KEY) {
       // Server runtime: query SerpAPI directly with server environment key
       const url = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
-        query + " site:flipkart.com"
+        query + " site:flipkart.com",
       )}&gl=in&hl=en&api_key=${SERPAPI_KEY}&num=5`;
       const res = await fetch(url, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
       if (res.ok) {
@@ -154,7 +159,7 @@ export async function searchFlipkart(query: string): Promise<StoreSearchResult[]
 
     if (!data) return cached?.data || [];
     const items = (data.shopping_results || []).filter(
-      (i: any) => typeof i.extracted_price === "number" && i.extracted_price > 0
+      (i: any) => typeof i.extracted_price === "number" && i.extracted_price > 0,
     );
 
     const results: StoreSearchResult[] = items.map((item: any) => {
@@ -163,13 +168,18 @@ export async function searchFlipkart(query: string): Promise<StoreSearchResult[]
       const cashbackAmount = Math.round(rawPrice * 0.085);
       const effectiveNetPrice = Math.max(0, rawPrice - couponSavings - cashbackAmount);
 
-      const baseLink = item.product_link || item.link || `https://www.flipkart.com/search?q=${encodeURIComponent(query)}`;
+      const baseLink =
+        item.product_link ||
+        item.link ||
+        `https://www.flipkart.com/search?q=${encodeURIComponent(query)}`;
       const affiliateUrl = `https://clnk.in/r?pub=${CUELINKS_PUBLISHER_ID}&url=${encodeURIComponent(baseLink)}`;
 
       return {
         storeId: "flipkart",
         storeName: "Flipkart",
-        storeLogo: item.source_icon || "https://static-assets-web.flixcart.com/fk-p-linchpin-web/fk-cp-zion/img/flipkart-plus_8d85f4.png",
+        storeLogo:
+          item.source_icon ||
+          "https://static-assets-web.flixcart.com/fk-p-linchpin-web/fk-cp-zion/img/flipkart-plus_8d85f4.png",
         title: item.title || query,
         itemPrice: rawPrice,
         effectiveNetPrice,
@@ -206,7 +216,7 @@ export async function searchCuelinks(query: string): Promise<StoreSearchResult[]
 
   try {
     const url = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
-      query
+      query,
     )}&gl=in&hl=en&api_key=${SERPAPI_KEY}&num=15`;
 
     const res = await fetch(url, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
@@ -215,7 +225,12 @@ export async function searchCuelinks(query: string): Promise<StoreSearchResult[]
     const data = await res.json();
     const items = (data.shopping_results || []).filter((i: any) => {
       const s = (i.source || i.merchant || "").toLowerCase();
-      return typeof i.extracted_price === "number" && i.extracted_price > 0 && !s.includes("amazon") && !s.includes("flipkart");
+      return (
+        typeof i.extracted_price === "number" &&
+        i.extracted_price > 0 &&
+        !s.includes("amazon") &&
+        !s.includes("flipkart")
+      );
     });
 
     const results: StoreSearchResult[] = items.map((item: any) => {
@@ -248,7 +263,10 @@ export async function searchCuelinks(query: string): Promise<StoreSearchResult[]
       }
 
       const effectiveNetPrice = Math.max(0, rawPrice - couponSavings - cashbackAmount);
-      const baseLink = item.product_link || item.link || `https://www.google.com/search?q=${encodeURIComponent(item.title)}`;
+      const baseLink =
+        item.product_link ||
+        item.link ||
+        `https://www.google.com/search?q=${encodeURIComponent(item.title)}`;
       const affiliateUrl = `https://clnk.in/r?pub=${CUELINKS_PUBLISHER_ID}&url=${encodeURIComponent(baseLink)}`;
 
       return {
@@ -279,6 +297,11 @@ export async function searchCuelinks(query: string): Promise<StoreSearchResult[]
   }
 }
 
+export interface UnavailableStoreReport {
+  storeName: string;
+  reason: "timed_out" | "no_results" | "error";
+}
+
 /**
  * Runs searchAmazon(), searchFlipkart(), and searchCuelinks() concurrently
  * with SingleFlight coalescing to prevent cache stampedes under high concurrency!
@@ -288,6 +311,7 @@ export async function searchAllStoresConcurrent(query: string): Promise<{
   bestDeal: StoreSearchResult | null;
   maxSavings: number;
   totalStoresFound: number;
+  unavailableStores: UnavailableStoreReport[];
 }> {
   const normKey = query.toLowerCase().trim();
 
@@ -305,10 +329,37 @@ export async function searchAllStoresConcurrent(query: string): Promise<{
       ]);
 
       const allOffers: StoreSearchResult[] = [];
+      const unavailableStores: UnavailableStoreReport[] = [];
 
-      if (amazonRes.status === "fulfilled") allOffers.push(...amazonRes.value);
-      if (flipkartRes.status === "fulfilled") allOffers.push(...flipkartRes.value);
-      if (cuelinksRes.status === "fulfilled") allOffers.push(...cuelinksRes.value);
+      if (amazonRes.status === "fulfilled") {
+        if (amazonRes.value.length === 0) {
+          unavailableStores.push({ storeName: "Amazon India", reason: "no_results" });
+        } else {
+          allOffers.push(...amazonRes.value);
+        }
+      } else {
+        unavailableStores.push({ storeName: "Amazon India", reason: "timed_out" });
+      }
+
+      if (flipkartRes.status === "fulfilled") {
+        if (flipkartRes.value.length === 0) {
+          unavailableStores.push({ storeName: "Flipkart", reason: "no_results" });
+        } else {
+          allOffers.push(...flipkartRes.value);
+        }
+      } else {
+        unavailableStores.push({ storeName: "Flipkart", reason: "timed_out" });
+      }
+
+      if (cuelinksRes.status === "fulfilled") {
+        if (cuelinksRes.value.length === 0) {
+          unavailableStores.push({ storeName: "Brand Partners", reason: "no_results" });
+        } else {
+          allOffers.push(...cuelinksRes.value);
+        }
+      } else {
+        unavailableStores.push({ storeName: "Brand Partners", reason: "timed_out" });
+      }
 
       // Deduplicate offers keeping the lowest price per store
       const storeMap = new Map<string, StoreSearchResult>();
@@ -320,13 +371,13 @@ export async function searchAllStoresConcurrent(query: string): Promise<{
       });
 
       const dedupedOffers = Array.from(storeMap.values()).sort(
-        (a, b) => a.effectiveNetPrice - b.effectiveNetPrice
+        (a, b) => a.effectiveNetPrice - b.effectiveNetPrice,
       );
 
       const bestDeal = dedupedOffers[0] || null;
       const highestPrice = Math.max(
         ...dedupedOffers.map((o) => o.itemPrice),
-        bestDeal?.effectiveNetPrice || 0
+        bestDeal?.effectiveNetPrice || 0,
       );
       const lowestPrice = bestDeal?.effectiveNetPrice || 0;
       const maxSavings = Math.max(0, highestPrice - lowestPrice);
@@ -336,6 +387,7 @@ export async function searchAllStoresConcurrent(query: string): Promise<{
         bestDeal,
         maxSavings,
         totalStoresFound: dedupedOffers.length,
+        unavailableStores,
       };
     } finally {
       inFlightRequests.delete(normKey);

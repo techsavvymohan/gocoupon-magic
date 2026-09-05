@@ -151,10 +151,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const searchQuery = rawQuery || productId || "Sony WH-1000XM5";
 
   try {
-    const { offers, bestDeal, maxSavings, totalStoresFound } = await searchAllStoresConcurrent(searchQuery);
+    const { offers, bestDeal, maxSavings, totalStoresFound, unavailableStores } =
+      await searchAllStoresConcurrent(searchQuery);
 
     if (totalStoresFound === 0) {
       const fallbackComp = compareProductOffers("prod_sony_wh1000xm5");
+      if (fallbackComp) {
+        fallbackComp.unavailableStores = unavailableStores;
+      }
       return res.status(200).json(fallbackComp);
     }
 
@@ -222,6 +226,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       bestDeal: formattedRows[0],
       maxSavings,
       storesComparedCount: formattedRows.length,
+      unavailableStores: unavailableStores || [],
     };
 
     res.setHeader("Cache-Control", "public, s-maxage=120, stale-while-revalidate=300");

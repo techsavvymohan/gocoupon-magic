@@ -35,6 +35,7 @@ import { Route as SecurityRouteImport } from './routes/security'
 import { Route as SitemapRouteImport } from './routes/sitemap'
 import { Route as StoresRouteImport } from './routes/stores'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as ThankYouRouteImport } from './routes/thank-you'
 import { Route as UninstallRouteImport } from './routes/uninstall'
 import { Route as WatchlistRouteImport } from './routes/watchlist'
 import { Route as WelcomeRouteImport } from './routes/welcome'
@@ -174,6 +175,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ThankYouRoute = ThankYouRouteImport.update({
+  id: '/thank-you',
+  path: '/thank-you',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UninstallRoute = UninstallRouteImport.update({
   id: '/uninstall',
   path: '/uninstall',
@@ -242,6 +248,7 @@ export interface FileRoutesByFullPath {
   '/sitemap': typeof SitemapRoute
   '/stores': typeof StoresRoute
   '/terms': typeof TermsRoute
+  '/thank-you': typeof ThankYouRoute
   '/uninstall': typeof UninstallRoute
   '/watchlist': typeof WatchlistRoute
   '/welcome': typeof WelcomeRoute
@@ -278,6 +285,7 @@ export interface FileRoutesByTo {
   '/sitemap': typeof SitemapRoute
   '/stores': typeof StoresRoute
   '/terms': typeof TermsRoute
+  '/thank-you': typeof ThankYouRoute
   '/uninstall': typeof UninstallRoute
   '/watchlist': typeof WatchlistRoute
   '/welcome': typeof WelcomeRoute
@@ -315,6 +323,7 @@ export interface FileRoutesById {
   '/sitemap': typeof SitemapRoute
   '/stores': typeof StoresRoute
   '/terms': typeof TermsRoute
+  '/thank-you': typeof ThankYouRoute
   '/uninstall': typeof UninstallRoute
   '/watchlist': typeof WatchlistRoute
   '/welcome': typeof WelcomeRoute
@@ -353,6 +362,7 @@ export interface FileRouteTypes {
     | '/sitemap'
     | '/stores'
     | '/terms'
+    | '/thank-you'
     | '/uninstall'
     | '/watchlist'
     | '/welcome'
@@ -389,6 +399,7 @@ export interface FileRouteTypes {
     | '/sitemap'
     | '/stores'
     | '/terms'
+    | '/thank-you'
     | '/uninstall'
     | '/watchlist'
     | '/welcome'
@@ -425,6 +436,7 @@ export interface FileRouteTypes {
     | '/sitemap'
     | '/stores'
     | '/terms'
+    | '/thank-you'
     | '/uninstall'
     | '/watchlist'
     | '/welcome'
@@ -462,6 +474,7 @@ export interface RootRouteChildren {
   SitemapRoute: typeof SitemapRoute
   StoresRoute: typeof StoresRoute
   TermsRoute: typeof TermsRoute
+  ThankYouRoute: typeof ThankYouRoute
   UninstallRoute: typeof UninstallRoute
   WatchlistRoute: typeof WatchlistRoute
   WelcomeRoute: typeof WelcomeRoute
@@ -656,6 +669,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/thank-you': {
+      id: '/thank-you'
+      path: '/thank-you'
+      fullPath: '/thank-you'
+      preLoaderRoute: typeof ThankYouRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/uninstall': {
       id: '/uninstall'
       path: '/uninstall'
@@ -742,6 +762,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapRoute: SitemapRoute,
   StoresRoute: StoresRoute,
   TermsRoute: TermsRoute,
+  ThankYouRoute: ThankYouRoute,
   UninstallRoute: UninstallRoute,
   WatchlistRoute: WatchlistRoute,
   WelcomeRoute: WelcomeRoute,

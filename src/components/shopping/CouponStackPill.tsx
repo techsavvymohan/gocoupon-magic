@@ -56,10 +56,13 @@ export function CouponStackPill({ coupon, compact = false }: CouponStackPillProp
           )}
         </div>
         <p className="mt-1 text-xs text-muted-foreground line-clamp-1">{coupon.description}</p>
-        <div className="mt-2 flex items-center gap-3 text-[11px] font-mono text-muted-foreground">
-          <span className="text-emerald-500 font-medium">✓ {coupon.successRate}% Success Rate</span>
-          <span>•</span>
-          <span>{coupon.verifiedUses.toLocaleString("en-IN")} Uses Today</span>
+        <div className="mt-2 flex items-center gap-2.5 text-[11px] font-mono text-muted-foreground">
+          <span className="inline-flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
+            <ShieldCheck className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            {coupon.verificationStatus || "Editor Tested"}
+          </span>
+          <span aria-hidden="true">•</span>
+          <span>Verified {coupon.lastVerified || "Today"}</span>
         </div>
       </div>
 

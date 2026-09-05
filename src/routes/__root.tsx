@@ -1,4 +1,4 @@
-import { Outlet, Link, createRootRoute } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { useState } from "react";
@@ -21,6 +21,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <CurrencyProvider>
+        <HeadContent />
         <Outlet />
         <Toaster position="top-right" richColors />
       </CurrencyProvider>
@@ -60,7 +61,9 @@ function RootErrorComponent({ error }: { error: unknown }) {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 text-center">
       <div className="max-w-md">
-        <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">Something went wrong</h1>
+        <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
+          Something went wrong
+        </h1>
         <p className="mt-3 text-sm text-muted-foreground">
           A new version of the website was recently updated or an unexpected error occurred.
         </p>

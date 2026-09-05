@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # 1. Typesense: Ultra-Fast Typo-Tolerant Product Search Index (<15ms)
+  typesense:
+    image: typesense/typesense:27.1
+    container_name: gocoupon-typesense
+    restart: unless-stopped
+    ports:
+      - "8108:8108"
+    environment:
+      - TYPESENSE_API_KEY=xyz123_gocoupon_local_secret
+      - TYPESENSE_DATA_DIR=/data
+      - TYPESENSE_ENABLE_CORS=true
+    volumes:
+      - typesense-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8108/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # 2. SearXNG: 100% Free Web Meta-Search Engine & Product Discovery Fallback
+  searxng:
+    image: searxng/searxng:latest
+    container_name: gocoupon-searxng
+    restart: unless-stopped
+    ports:
+      - "8888:8080"
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8888
+    volumes:
+      - ./searxng:/etc/searxng
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+
+  # 3. Dragonfly: Multi-Threaded Redis Alternative (3-5x Faster for Queues & Caching)
+  dragonfly:
+    image: 'docker.dragonflydb.io/dragonflydb/dragonfly'
+    container_name: gocoupon-dragonfly
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - dragonfly-data:/data
+    ulimits:
+      memlock: -1
+
+  # 4. TimescaleDB: PostgreSQL 16 with Timescale Hyper-tables & pgvector Extension
+  timescaledb:
+    image: timescale/timescaledb-ha:pg16
+    container_name: gocoupon-timescaledb
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=gocoupon
+      - POSTGRES_PASSWORD=gocoupon_secure_pass
+      - POSTGRES_DB=gocoupon_db
+    volumes:
+      - timescale-data:/home/postgres/pgdata/data
+
+  # 5. FlareSolverr: Cloudflare Turnstile & DDoS-Guard Bypass Proxy
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: gocoupon-flaresolverr
+    restart: unless-stopped
+    ports:
+      - "8191:8191"
+    environment:
+      - LOG_LEVEL=info
+      - CAPTCHA_SOLVER=none
+
+volumes:
+  typesense-data:
+  dragonfly-data:
+  timescale-data:

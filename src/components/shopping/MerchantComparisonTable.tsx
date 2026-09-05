@@ -274,6 +274,29 @@ export function MerchantComparisonTable({ comparison, productTitle }: MerchantCo
           </div>
         ))}
       </div>
+
+      {/* Unavailable / Timed-Out Store Callout */}
+      {comparison.unavailableStores && comparison.unavailableStores.length > 0 && (
+        <div className="border-t border-border bg-muted/20 px-6 py-3.5">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <span className="font-semibold text-amber-600 dark:text-amber-400">Notice:</span>
+            <span>Some store checks could not complete:</span>
+            <div className="flex flex-wrap gap-1.5 ml-1">
+              {comparison.unavailableStores.map((store) => (
+                <span
+                  key={store.storeName}
+                  className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-2 py-0.5 font-mono text-[11px] text-foreground"
+                >
+                  <span className="font-medium">{store.storeName}</span>
+                  <span className="text-muted-foreground">
+                    ({store.reason === "timed_out" ? "Timed out" : "No exact match"})
+                  </span>
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

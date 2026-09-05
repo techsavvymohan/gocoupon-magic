@@ -145,6 +145,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://gocoupon.io/thank-you</loc>
+    <lastmod>2026-09-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://gocoupon.io/collections/best-wireless-headphones-under-30000</loc>
     <lastmod>2026-09-05</lastmod>
     <changefreq>weekly</changefreq>

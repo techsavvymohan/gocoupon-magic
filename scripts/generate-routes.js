@@ -184,6 +184,13 @@ const routeConfigs = [
     h1: "Frequently Asked Questions",
     lead: "Everything you need to know about using goCoupon, auto-applying promo codes, and claiming cashback.",
   },
+  {
+    path: "thank-you",
+    title: "Thank You – goCoupon Official Confirmation",
+    description: "Thank you for contacting goCoupon. Our team has received your message and will respond promptly. Explore top coupons, live price comparison, and browser extension savings.",
+    h1: "Thank You for Reaching Out to GoCoupon!",
+    lead: "Our support team has received your message and will reply within 2 hours during active business hours.",
+  },
 ];
 
 // Add collection routes

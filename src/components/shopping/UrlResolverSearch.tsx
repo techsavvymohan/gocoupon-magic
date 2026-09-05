@@ -14,7 +14,11 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { searchSearXNG, type SearXNGResult } from "@/lib/services/searxng-service";
+import {
+  unifiedProductSearch,
+  type UnifiedProductSuggestion,
+} from "@/lib/services/unified-search-router";
+import type { SearXNGResult } from "@/lib/services/searxng-service";
 import {
   Search,
   TrendingUp,
@@ -116,14 +120,14 @@ export function UrlResolverSearch({
     setIsLoadingSearxng(true);
     searchTimeoutRef.current = setTimeout(async () => {
       try {
-        const response = await searchSearXNG(trimmed, {
-          categories: "general,shopping",
-          language: "en",
-          timeoutMs: 3500,
-        });
+        const response = await unifiedProductSearch(trimmed, { limit: 5 });
 
         const suggestions = (response.suggestions || []).slice(0, 4);
-        const results = (response.results || []).slice(0, 3);
+        const results: SearXNGResult[] = (response.results || []).slice(0, 4).map((r) => ({
+          title: r.title,
+          url: r.url,
+          score: r.score,
+        }));
 
         setSearxngSuggestions(suggestions);
         setSearxngResults(results);
@@ -136,7 +140,7 @@ export function UrlResolverSearch({
       } finally {
         setIsLoadingSearxng(false);
       }
-    }, 250);
+    }, 150);
 
     return () => {
       if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
@@ -157,7 +161,7 @@ export function UrlResolverSearch({
 
       navigate({
         to: "/compare",
-        search: { q: trimmed } as any,
+        search: { q: trimmed } as unknown as Record<string, string>,
       });
     },
     [navigate, onSearchSubmit],
@@ -235,7 +239,9 @@ export function UrlResolverSearch({
       <form
         onSubmit={handleSubmit}
         className={`group relative flex items-center w-full rounded-2xl sm:rounded-3xl border-2 border-primary/40 dark:border-primary/50 hover:border-primary/80 bg-card/98 backdrop-blur-2xl shadow-xl shadow-primary/10 hover:shadow-2xl hover:shadow-primary/20 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/20 focus-within:shadow-2xl focus-within:shadow-primary/25 transition-all duration-300 ${
-          isLarge ? "py-2 sm:py-2.5 px-3 sm:px-4 min-h-[58px] sm:min-h-[66px]" : "py-1.5 px-3 min-h-[48px]"
+          isLarge
+            ? "py-2 sm:py-2.5 px-3 sm:px-4 min-h-[58px] sm:min-h-[66px]"
+            : "py-1.5 px-3 min-h-[48px]"
         }`}
       >
         {/* Left Magnifying Glass / Loading Spinner */}
@@ -313,7 +319,10 @@ export function UrlResolverSearch({
               </span>
 
               {/* Overlapping Brand Avatars */}
-              <div className="flex items-center -space-x-2 sm:-space-x-2.5 py-0.5" aria-label="Supported stores">
+              <div
+                className="flex items-center -space-x-2 sm:-space-x-2.5 py-0.5"
+                aria-label="Supported stores"
+              >
                 {SUPPORTED_STORES.map((store) => (
                   <div
                     key={store.name}
@@ -384,14 +393,18 @@ export function UrlResolverSearch({
                 <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
                   <Globe className="h-2.5 w-2.5 text-emerald-500" /> Live Web Results
                 </span>
-                <span className="text-[9px] font-mono text-muted-foreground/60">Verified Store</span>
+                <span className="text-[9px] font-mono text-muted-foreground/60">
+                  Verified Store
+                </span>
               </div>
               <ul className="space-y-1">
                 {searxngResults.map((item, idx) => {
                   let hostname = "store";
                   try {
                     hostname = new URL(item.url).hostname.replace(/^www\./, "");
-                  } catch {}
+                  } catch (e) {
+                    void e;
+                  }
 
                   return (
                     <li
@@ -439,7 +452,10 @@ export function UrlResolverSearch({
       {showTrustBadges && (
         <div className="mt-6 sm:mt-7 flex flex-wrap items-center justify-center sm:justify-between gap-3 sm:gap-4 text-xs select-none">
           {/* Left dashed divider line */}
-          <div className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30" aria-hidden="true" />
+          <div
+            className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30"
+            aria-hidden="true"
+          />
 
           {/* Badge 1: 200+ Stores Worldwide */}
           <div className="inline-flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-400">
@@ -452,7 +468,10 @@ export function UrlResolverSearch({
           </div>
 
           {/* Middle dashed divider line */}
-          <div className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30" aria-hidden="true" />
+          <div
+            className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30"
+            aria-hidden="true"
+          />
 
           {/* Badge 2: 90-Day Price Tracker */}
           <div className="inline-flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-400">
@@ -465,7 +484,10 @@ export function UrlResolverSearch({
           </div>
 
           {/* Middle dashed divider line */}
-          <div className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30" aria-hidden="true" />
+          <div
+            className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30"
+            aria-hidden="true"
+          />
 
           {/* Badge 3: 100% Free Extension */}
           <div className="inline-flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-400">
@@ -478,7 +500,10 @@ export function UrlResolverSearch({
           </div>
 
           {/* Right dashed divider line */}
-          <div className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30" aria-hidden="true" />
+          <div
+            className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30"
+            aria-hidden="true"
+          />
         </div>
       )}
 
