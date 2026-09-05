@@ -38,36 +38,36 @@ export function Hero() {
           coupons, and apply the best available savings at checkout.
         </p>
 
-        {/* Direct Above-The-Fold Action CTAs */}
+        {/* Centered Search Box — Prioritized directly below heading */}
+        <div className="mt-6 sm:mt-8 mx-auto max-w-3xl text-left">
+          <UrlResolverSearch size="large" showPopularChips={true} showTrustBadges={true} />
+        </div>
+
+        {/* Pro Tip Pill */}
+        <div className="mt-7 inline-flex items-center gap-2 rounded-full border border-blue-500/25 bg-blue-500/5 px-4 sm:px-5 py-2 text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-400 shadow-2xs">
+          <span>💡</span>
+          <span>
+            <strong>Pro Tip:</strong> Paste any product link (Amazon, Walmart, Target, Flipkart,
+            etc.) to find the lowest price in 1 click
+          </span>
+        </div>
+
+        {/* Action CTAs — Relocated below primary search intent */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <Link
             to="/chrome-extension"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs sm:text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 touch-manipulation min-h-[44px]"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs sm:text-sm font-bold text-primary-foreground shadow-md shadow-primary/20 transition-all hover:scale-105 active:scale-95 touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
           >
             <Sparkles className="h-4 w-4" aria-hidden="true" />
             <span>Add to Chrome — It&apos;s 100% Free</span>
           </Link>
           <a
             href="#how-it-works"
-            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/80 px-5 py-3 text-xs sm:text-sm font-semibold text-foreground hover:bg-muted active:scale-95 transition-all shadow-2xs touch-manipulation min-h-[44px]"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-border bg-card/80 px-5 py-2.5 text-xs sm:text-sm font-semibold text-foreground hover:bg-muted active:scale-95 transition-all shadow-2xs touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
           >
             <span>How It Works</span>
             <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
           </a>
-        </div>
-
-        {/* Centered Search Box */}
-        <div className="mt-7 sm:mt-9 mx-auto max-w-3xl text-left">
-          <UrlResolverSearch size="large" showPopularChips={true} showTrustBadges={true} />
-        </div>
-
-        {/* Pro Tip Pill */}
-        <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-blue-500/25 bg-blue-500/5 px-4 sm:px-5 py-2 text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-400 shadow-2xs">
-          <span>💡</span>
-          <span>
-            <strong>Pro Tip:</strong> Paste any product link (Amazon, Walmart, Target, Flipkart,
-            etc.) to find the lowest price in 1 click
-          </span>
         </div>
       </div>
     </section>
