@@ -9,7 +9,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import { CANONICAL_PRODUCTS } from "@/data/canonicalCatalogData";
 import { UrlResolverSearch } from "@/components/shopping/UrlResolverSearch";
-import { Clock, TrendingDown, ShieldAlert, Sparkles, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import { Clock, TrendingDown, ShieldAlert, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 
 // Dynamic import for Recharts-heavy charting component to optimize initial page chunks
 const PriceHistoryChart = lazy(() => import("@/components/shopping/PriceHistoryChart"));

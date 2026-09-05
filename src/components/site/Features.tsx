@@ -2,7 +2,7 @@ import {
   Zap,
   Ticket,
   ShieldCheck,
-  Sparkles,
+  Lock,
   Layers,
   TrendingDown,
 } from "lucide-react";
@@ -36,7 +36,7 @@ const features = [
   {
     title: "100% Free & Privacy-First",
     body: "Zero signup, no credit cards, and no personal data collection. Ultra-lightweight and fast — stays asleep until you are ready to shop.",
-    icon: Sparkles,
+    icon: Lock,
   },
 ];
 

@@ -28,7 +28,6 @@ import { isProductInWatchlist, addToWatchlist, removeFromWatchlist } from "@/lib
 import {
   Bell,
   Check,
-  Sparkles,
   TrendingDown,
   ShieldCheck,
   Truck,

@@ -9,7 +9,7 @@ import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import { CURATED_COLLECTIONS } from "@/data/collectionsData";
 import { CANONICAL_EVIDENCE } from "@/data/canonicalCatalogData";
 import { FlashVerdictBadge } from "@/components/shopping/FlashVerdictBadge";
-import { Sparkles, ArrowRight, ShieldCheck, CheckCircle2, ChevronRight, Award } from "lucide-react";
+import { ArrowRight, ShieldCheck, CheckCircle2, ChevronRight, Award } from "lucide-react";
 
 export const Route = createFileRoute("/collections/$slug")({
   component: CollectionDetailsPage,

@@ -11,7 +11,6 @@ import {
   Shield,
   HelpCircle,
   FileText,
-  Sparkles,
   ArrowRight,
   ExternalLink,
 } from "lucide-react";

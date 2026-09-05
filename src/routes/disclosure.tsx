@@ -3,7 +3,6 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import {
   DollarSign,
-  Sparkles,
   HeartHandshake,
   ShieldCheck,
   CheckCircle2,
@@ -69,7 +68,7 @@ function DisclosurePage() {
 
             <div className="rounded-2xl border border-border bg-card p-6 shadow-sm text-center">
               <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-500">
-                <Sparkles className="h-6 w-6" />
+                <CheckCircle2 className="h-6 w-6" />
               </div>
               <h3 className="font-display text-lg font-bold text-foreground">100% Fair Promise</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">

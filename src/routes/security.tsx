@@ -9,7 +9,6 @@ import {
   CheckCircle2,
   XCircle,
   ArrowRight,
-  Sparkles,
   HeartHandshake,
 } from "lucide-react";
 import { MagneticButton } from "@/components/MagneticButton";

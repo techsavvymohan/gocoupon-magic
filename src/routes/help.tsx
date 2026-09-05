@@ -6,7 +6,6 @@ import {
   HelpCircle,
   Search,
   ChevronDown,
-  Sparkles,
   LifeBuoy,
   Download,
   AlertCircle,

@@ -13,7 +13,6 @@ import {
   Check,
   Copy,
   Star,
-  Sparkles,
   ShieldCheck,
   Clock,
   Percent,
@@ -120,7 +119,7 @@ function StoresPage() {
 
           {/* Floating Brand Orbital Deck — Responsive: Touch Snap Carousel on Mobile, Floating Deck on Desktop */}
           <div className="relative mt-6 sm:mt-10">
-            <div className="flex items-center justify-start md:justify-center gap-3 sm:gap-4 md:gap-6 overflow-x-auto no-scrollbar py-2 px-2 -mx-3.5 sm:mx-0 snap-x snap-mandatory preserve-3d md:animate-storeverse-float">
+            <div className="flex items-center justify-start md:justify-center gap-3 sm:gap-4 md:gap-6 overflow-x-auto no-scrollbar py-2 px-2 -mx-3.5 sm:mx-0 snap-x snap-mandatory md:animate-storeverse-float">
               {[
                 { name: "Amazon", logo: "/Brand logos/Amazon_logo.svg.webp", deal: "75% OFF" },
                 { name: "Walmart", icon: "🛒", deal: "Rollback $20" },
@@ -292,7 +291,7 @@ function StoresPage() {
           ) : (
             <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {filteredStores.map((store) => (
-                <StoreCard3D
+                <StoreCard
                   key={store.id}
                   store={store}
                   onCopy={handleCopy}
@@ -341,7 +340,7 @@ function StoresPage() {
             </div>
 
             {/* Isometric Interactive Cart Mockup Card */}
-            <div className="relative preserve-3d">
+            <div className="relative">
               <div className="rounded-2xl border border-border/80 bg-background/90 p-4 sm:p-5 shadow-xl backdrop-blur-md md:hover:rotate-1 transition-transform duration-300">
                 <div className="flex items-center justify-between border-b border-border/80 pb-3">
                   <div className="flex items-center gap-2">
@@ -400,9 +399,9 @@ function StoresPage() {
 }
 
 /**
- * Interactive Store Card with Multi-Layer Perspective Elevation (Mobile-First)
+ * Interactive Store Card with Multi-Layer Elevation (Mobile-First)
  */
-function StoreCard3D({
+function StoreCard({
   store,
   onCopy,
   isCopied,
@@ -420,7 +419,7 @@ function StoreCard3D({
   const CardContent = (
     <div
       ref={cardRef}
-      className="group relative flex h-full flex-col justify-between rounded-2xl sm:rounded-3xl border border-border/80 bg-card/95 p-4 sm:p-6 shadow-2xs transition-all duration-300 preserve-3d hover:-translate-y-1.5 sm:hover:-translate-y-2 hover:border-primary/60 hover:shadow-xl cursor-pointer"
+      className="group relative flex h-full flex-col justify-between rounded-2xl sm:rounded-3xl border border-border/80 bg-card/95 p-4 sm:p-6 shadow-2xs transition-all duration-300 hover:-translate-y-1.5 sm:hover:-translate-y-2 hover:border-primary/60 hover:shadow-xl cursor-pointer"
     >
       {/* Top Row: Elevated Brand Podium + Floating Cashback Badge */}
       <div>

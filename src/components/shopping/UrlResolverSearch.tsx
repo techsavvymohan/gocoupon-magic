@@ -305,7 +305,7 @@ export function UrlResolverSearch({
               </button>
             </>
           ) : (
-            /* When input is empty: show 'supports' + Brand Avatars + Divider + Voice/Sparkle */
+            /* When input is empty: show 'supports' + Brand Avatars */
             <>
               {/* Supports Label */}
               <span className="hidden sm:inline text-xs sm:text-sm font-normal text-muted-foreground/75 select-none mr-1">

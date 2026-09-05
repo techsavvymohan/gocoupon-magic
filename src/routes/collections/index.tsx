@@ -7,7 +7,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import { CURATED_COLLECTIONS } from "@/data/collectionsData";
-import { Sparkles, ArrowRight, Award, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Award, ShieldCheck, CheckCircle2 } from "lucide-react";
 
 export const Route = createFileRoute("/collections/")({
   component: CollectionsIndexPage,
@@ -37,7 +37,7 @@ function CollectionsIndexPage() {
       <section className="relative border-b border-border px-6 pb-16 pt-20 sm:pt-28">
         <div className="mx-auto max-w-5xl text-center">
           <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 font-mono text-xs uppercase tracking-[0.2em] text-primary">
-            <Sparkles className="h-3.5 w-3.5" />
+            <Award className="h-3.5 w-3.5" />
             Evidence-Backed Product Shortlists
           </div>
           <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">

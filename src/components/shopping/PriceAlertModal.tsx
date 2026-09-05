@@ -13,7 +13,7 @@ import {
   savePriceAlert,
 } from "@/lib/services/notification-service";
 import { useCurrency } from "@/context/CurrencyContext";
-import { Bell, Check, X, ShieldCheck, Percent, Smartphone, Sparkles, Send } from "lucide-react";
+import { Bell, Check, X, ShieldCheck, Percent, Smartphone, Send } from "lucide-react";
 import { toast } from "sonner";
 
 interface PriceAlertModalProps {

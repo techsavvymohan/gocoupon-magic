@@ -11,7 +11,6 @@ import {
   ShieldCheck,
   CheckCircle2,
   RefreshCw,
-  Sparkles,
   ArrowRight,
   ShoppingBag,
   Percent,
@@ -43,7 +42,7 @@ export function ExtensionShowcase() {
           {/* Copy Column (7 cols) */}
           <div className="reveal lg:col-span-7">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-primary">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
+              <Zap className="h-3.5 w-3.5 text-primary" />
               <span>Free Chrome Extension</span>
             </div>
 

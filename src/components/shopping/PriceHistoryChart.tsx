@@ -26,7 +26,7 @@ import {
   type PriceHistoryMetrics,
 } from "@/lib/services/price-history";
 import { useCurrency } from "@/context/CurrencyContext";
-import { AlertTriangle, TrendingDown, Clock, ShieldAlert, Sparkles, CheckCircle2, Award } from "lucide-react";
+import { AlertTriangle, TrendingDown, Clock, ShieldAlert, CheckCircle2, Award } from "lucide-react";
 
 interface PriceHistoryChartProps {
   productId: string;

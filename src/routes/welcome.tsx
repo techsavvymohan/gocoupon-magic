@@ -4,7 +4,6 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import {
   CheckCircle2,
-  Sparkles,
   Pin,
   ShoppingBag,
   Zap,

@@ -5,7 +5,6 @@ import { posts, type Post } from "@/data/posts";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import {
   Search,
-  Sparkles,
   ArrowRight,
   BookOpen,
   Layers,
@@ -339,7 +338,7 @@ function BlogIndex() {
           <div className="mx-auto max-w-7xl">
             <div className="mb-4 flex items-center justify-between">
               <div className="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-[0.2em] text-primary">
-                <Sparkles className="h-4 w-4" />
+                <BookOpen className="h-4 w-4" />
                 Featured Editorial Lead Investigation
               </div>
               <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest hidden sm:inline">

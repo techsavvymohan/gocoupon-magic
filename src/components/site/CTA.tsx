@@ -1,5 +1,5 @@
 import { MagneticButton } from "../MagneticButton";
-import { Heart, Sparkles, ArrowRight } from "lucide-react";
+import { Heart, ArrowRight } from "lucide-react";
 
 export function CTA() {
   return (

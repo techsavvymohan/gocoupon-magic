@@ -20,7 +20,7 @@ import {
 } from "@/lib/services/multi-platform-search";
 import { useCurrency } from "@/context/CurrencyContext";
 import {
-  Sparkles,
+  Search,
   ArrowRight,
   ShieldCheck,
   Tag,
@@ -528,7 +528,7 @@ export function ComparePage() {
             <div className="rounded-3xl border border-border/80 bg-card p-6 sm:p-10 shadow-sm">
               <div className="text-center max-w-xl mx-auto">
                 <div className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-primary uppercase tracking-wider mb-2">
-                  <Sparkles className="h-3.5 w-3.5" />
+                  <Search className="h-3.5 w-3.5" />
                   Popular Searches
                 </div>
                 <h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">

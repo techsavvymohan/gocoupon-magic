@@ -6,7 +6,7 @@ import {
   Shirt,
   Utensils,
   Plane,
-  Sparkles,
+  Heart,
   Home,
   Baby,
   ShoppingBag,
@@ -111,7 +111,7 @@ const CATEGORIES_LIST: CategoryItem[] = [
   {
     id: "beauty",
     name: "Beauty & Personal Care",
-    icon: Sparkles,
+    icon: Heart,
     tagline: "Skincare, Makeup, Haircare & Fragrances",
     avgSavings: "20% – 50% OFF",
     popularStores: [

@@ -14,7 +14,7 @@ import {
   requestNotificationPermission,
   triggerPriceDropNotification,
 } from "@/lib/services/notification-service";
-import { Bell, Sparkles, ShieldCheck, Smartphone, Send, Radio, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Bell, ShieldCheck, Smartphone, Send, Radio, AlertCircle, CheckCircle2 } from "lucide-react";
 
 export const Route = createFileRoute("/watchlist")({
   component: WatchlistPage,

@@ -8,7 +8,7 @@ import {
   Tag,
   TrendingDown,
   ExternalLink,
-  Sparkles,
+  ShoppingBag,
   CheckCircle2,
   Copy,
   Check,
@@ -40,7 +40,7 @@ const DEAL_CATEGORIES = [
   { id: "electronics", label: "Electronics & Tech", icon: Zap },
   { id: "audio", label: "Headphones & Audio", icon: Percent },
   { id: "laptops", label: "Laptops & Computing", icon: Tag },
-  { id: "fashion", label: "Fashion & Lifestyle", icon: Sparkles },
+  { id: "fashion", label: "Fashion & Lifestyle", icon: ShoppingBag },
 ];
 
 const CURATED_DEALS = [
