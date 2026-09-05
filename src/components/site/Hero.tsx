@@ -4,7 +4,7 @@
  */
 
 import { Link } from "@tanstack/react-router";
-import { Sparkles, ArrowRight, ShieldCheck, Star } from "lucide-react";
+import { Sparkles, ArrowRight } from "lucide-react";
 import { UrlResolverSearch } from "../shopping/UrlResolverSearch";
 
 export function Hero() {
@@ -25,11 +25,6 @@ export function Hero() {
 
       {/* Centered Hero Content & Search Box */}
       <div className="relative mx-auto max-w-4xl px-4 sm:px-6 pt-5 sm:pt-8 text-center">
-        {/* Category Tag Pill */}
-        <div className="mb-3.5 inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1 font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground shadow-2xs">
-          <span>PRICE TRACKER &amp; AUTO-APPLY COUPONS</span>
-        </div>
-
         {/* Main Headline */}
         <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">
           GoCoupon: Compare Prices, Track Drops &amp; Auto-Apply Coupons Across 200+ Stores
@@ -59,20 +54,6 @@ export function Hero() {
             <span>How It Works</span>
             <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
           </a>
-        </div>
-
-        {/* Social Proof Mini-Row */}
-        <div className="mt-3 flex items-center justify-center gap-2 text-[11px] sm:text-xs text-muted-foreground">
-          <div className="flex items-center text-amber-400">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
-            ))}
-          </div>
-          <span className="font-semibold text-foreground">4.9/5 Rating</span>
-          <span>•</span>
-          <span>Chrome Web Store</span>
-          <span>•</span>
-          <span>100K+ Smart Shoppers</span>
         </div>
 
         {/* Centered Search Box */}
