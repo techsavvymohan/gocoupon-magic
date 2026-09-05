@@ -132,11 +132,13 @@ export function PriceAlertModal({
 
         {/* Product Snapshot */}
         <div className="mt-4 flex items-center gap-3 rounded-2xl border border-border/80 bg-muted/30 p-3">
-          <img
-            src={productImage}
-            alt={productTitle}
-            className="h-12 w-12 rounded-xl object-cover"
-          />
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border bg-white dark:bg-card p-1">
+            <img
+              src={productImage || "/Brand logos/Amazon_logo.svg.webp"}
+              alt={productTitle}
+              className="max-h-full max-w-full object-contain"
+            />
+          </div>
           <div className="min-w-0 flex-1">
             <h4 className="truncate text-xs font-semibold text-foreground">{productTitle}</h4>
             <span className="font-mono text-xs text-muted-foreground">

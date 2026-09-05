@@ -124,6 +124,15 @@ function ProductDetailsPage() {
     { name: product.title, path: `/product/${product.id}` },
   ]);
 
+  const [imageError, setImageError] = useState(false);
+  const fallbackStoreLogo = bestDeal?.storeLogo || "/Brand logos/Amazon_logo.svg.webp";
+  const displayImage = imageError || !product.imageUrl ? fallbackStoreLogo : product.imageUrl;
+  const isLogo =
+    imageError ||
+    !product.imageUrl ||
+    displayImage.toLowerCase().includes("logo") ||
+    displayImage.toLowerCase().includes("brand");
+
   return (
     <SiteShell>
       <script
@@ -146,15 +155,18 @@ function ProductDetailsPage() {
         <div className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-start">
           {/* Gallery / Product Visual */}
           <div className="space-y-4">
-            <div className="relative aspect-square w-full overflow-hidden rounded-3xl border border-border bg-card shadow-lg">
+            <div className="relative aspect-square w-full overflow-hidden rounded-3xl border border-border bg-white dark:bg-card shadow-lg flex items-center justify-center p-8 sm:p-14">
               <img
-                src={product.imageUrl}
+                src={displayImage}
                 alt={product.title}
-                className="h-full w-full object-cover"
+                onError={() => setImageError(true)}
+                className={`max-h-full max-w-full object-contain drop-shadow-xs transition-transform duration-300 hover:scale-105 ${
+                  isLogo ? "w-4/5 max-h-48" : "w-full h-full"
+                }`}
                 fetchPriority="high"
               />
               {bestDeal && (
-                <div className="absolute top-4 left-4 rounded-full bg-emerald-500 text-white px-3.5 py-1 font-mono text-xs font-bold shadow-md flex items-center gap-1.5">
+                <div className="absolute top-4 left-4 rounded-full bg-emerald-500 text-white px-3.5 py-1 font-mono text-xs font-bold shadow-md flex items-center gap-1.5 z-10">
                   <TrendingDown className="h-3.5 w-3.5" />
                   Lowest on {bestDeal.storeName}
                 </div>
@@ -358,7 +370,7 @@ function ProductDetailsPage() {
         }}
         productId={product.id}
         productTitle={product.title}
-        productImage={product.imageUrl}
+        productImage={displayImage}
         currentPrice={currentPrice}
       />
     </SiteShell>
