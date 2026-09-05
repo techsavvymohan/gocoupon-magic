@@ -111,7 +111,7 @@ function StoresPage() {
           </div>
 
           <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-foreground text-balance">
-            Explore the 3D Merchant Storeverse
+            Explore the Merchant Storeverse
           </h1>
 
           <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base md:text-lg text-muted-foreground text-balance leading-relaxed">
@@ -306,7 +306,7 @@ function StoresPage() {
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 font-mono text-xs uppercase tracking-wider text-primary font-bold">
                 <Zap className="h-3.5 w-3.5" />
-                <span>3D Auto-Injector Technology</span>
+                <span>Auto-Injector Technology</span>
               </div>
               <h2 className="mt-3 font-display text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                 How GoCoupon Injects Discounts at Checkout
