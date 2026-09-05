@@ -192,17 +192,20 @@ function StoresPage() {
                 )}
               </div>
             </div>
+          </div>
 
-            {/* Tactile Category Console Switcher — Responsive Horizontal Scroll on Mobile */}
-            <div className="mt-5 flex items-center justify-start sm:justify-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-1 px-1 -mx-2 sm:mx-0 snap-x">
+          {/* Tactile Category Console Switcher — Centered & Fully Responsive (No Cut-Off) */}
+          <div className="mx-auto mt-5 sm:mt-6 max-w-4xl px-2">
+            <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
               {CATEGORIES.map((cat) => {
                 const count = categoryCounts[cat] || 0;
                 const isActive = selectedCategory === cat;
                 return (
                   <button
                     key={cat}
+                    type="button"
                     onClick={() => setSelectedCategory(cat)}
-                    className={`group relative inline-flex shrink-0 snap-center items-center gap-1.5 rounded-full px-3.5 py-2 min-h-[40px] text-xs font-bold transition-all duration-200 touch-manipulation border-b-2 active:border-b-0 active:translate-y-0.5 ${
+                    className={`group relative inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 min-h-[40px] text-xs font-bold transition-all duration-200 touch-manipulation border-b-2 active:border-b-0 active:translate-y-0.5 ${
                       isActive
                         ? "bg-primary text-primary-foreground border-primary-hover shadow-md scale-105"
                         : "border border-border/80 border-b-border bg-card/90 text-muted-foreground hover:border-primary/40 hover:text-foreground hover:bg-muted/40 shadow-2xs"
