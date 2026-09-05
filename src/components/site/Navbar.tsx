@@ -93,7 +93,7 @@ export function Navbar() {
               onClick={() => setMobileMenuOpen(false)}
             >
               <span className="text-black dark:text-white">Go</span>
-              <span className="text-blue-600 dark:text-blue-400">Coupon</span>
+              <span className="text-blue-600 dark:text-[#dbfc14]">Coupon</span>
             </Link>
           </div>
 
