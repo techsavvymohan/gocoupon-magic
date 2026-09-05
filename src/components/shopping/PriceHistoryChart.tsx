@@ -25,6 +25,7 @@ import {
   calculatePriceMetrics,
   type PriceHistoryMetrics,
 } from "@/lib/services/price-history";
+import { useCurrency } from "@/context/CurrencyContext";
 import { AlertTriangle, TrendingDown, Clock, ShieldAlert, Sparkles, CheckCircle2, Award } from "lucide-react";
 
 interface PriceHistoryChartProps {
@@ -35,6 +36,7 @@ interface PriceHistoryChartProps {
 }
 
 export function PriceHistoryChart({ productId, productTitle, currentPrice, onSetAlertClick }: PriceHistoryChartProps) {
+  const { formatPrice, isIndia } = useCurrency();
   const [days, setDays] = useState<30 | 60 | 90 | 180>(90);
 
   const historyData = getProductPriceHistory(productId, days, currentPrice);
@@ -92,7 +94,7 @@ export function PriceHistoryChart({ productId, productTitle, currentPrice, onSet
             Current Price
           </span>
           <span className="font-display text-lg sm:text-2xl font-bold text-foreground mt-1 block">
-            ₹{metrics.currentPrice.toLocaleString("en-IN")}
+            {formatPrice(metrics.currentPrice)}
           </span>
         </div>
 
@@ -103,7 +105,7 @@ export function PriceHistoryChart({ productId, productTitle, currentPrice, onSet
             90-Day Lowest
           </span>
           <span className="font-display text-lg sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 block">
-            ₹{metrics.lowestPrice90d.toLocaleString("en-IN")}
+            {formatPrice(metrics.lowestPrice90d)}
           </span>
         </div>
 
@@ -113,7 +115,7 @@ export function PriceHistoryChart({ productId, productTitle, currentPrice, onSet
             90-Day Average
           </span>
           <span className="font-display text-lg sm:text-2xl font-bold text-foreground mt-1 block">
-            ₹{metrics.averagePrice90d.toLocaleString("en-IN")}
+            {formatPrice(metrics.averagePrice90d)}
           </span>
         </div>
 
@@ -167,7 +169,7 @@ export function PriceHistoryChart({ productId, productTitle, currentPrice, onSet
               fontSize={11}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
+              tickFormatter={(v) => (isIndia ? `₹${(v / 1000).toFixed(0)}k` : `$${Math.round(v / 85)}`)}
             />
             <Tooltip
               content={({ active, payload }) => {
@@ -177,7 +179,7 @@ export function PriceHistoryChart({ productId, productTitle, currentPrice, onSet
                     <div className="rounded-2xl border border-border bg-card/95 p-3.5 shadow-2xl backdrop-blur-xl">
                       <span className="text-[10px] font-mono text-muted-foreground block">{data.date}</span>
                       <span className="font-display text-lg font-bold text-foreground">
-                        ₹{data.price.toLocaleString("en-IN")}
+                        {formatPrice(data.price)}
                       </span>
                       {data.isLowest && (
                         <span className="mt-1 inline-block rounded-md bg-emerald-500/20 px-2 py-0.5 font-mono text-[9px] font-bold text-emerald-500">

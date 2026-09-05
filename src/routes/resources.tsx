@@ -9,10 +9,10 @@ export const Route = createFileRoute("/resources")({
     createSeoHead({
       title: "Free Coupon Resources: Success Rate Calculator & Shopping Guides",
       description:
-        "Free data-backed tools from goCoupon: estimate your coupon success rate, pick the best time to shop on Flipkart, and plan your Indian checkout with confidence.",
+        "Free data-backed tools from GoCoupon: estimate your coupon success rate, pick the best time to shop, and plan your checkout with confidence.",
       path: "/resources",
       keywords:
-        "coupon success rate calculator, best time to shop flipkart, coupon savings calculator india, checkout savings estimator",
+        "coupon success rate calculator, best time to shop, coupon savings calculator, checkout savings estimator",
     }),
 });
 

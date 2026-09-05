@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
+import { useCurrency } from "@/context/CurrencyContext";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import {
   Flame,
@@ -124,6 +125,7 @@ const CURATED_DEALS = [
 ];
 
 function DealsHubPage() {
+  const { formatPriceString } = useCurrency();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
@@ -268,7 +270,7 @@ function DealsHubPage() {
                       {deal.store}
                     </span>
                     <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[10px] font-bold text-emerald-500">
-                      {deal.badge}
+                      {formatPriceString(deal.badge)}
                     </span>
                   </div>
 
@@ -278,10 +280,10 @@ function DealsHubPage() {
 
                   <div className="mt-4 flex items-baseline gap-2">
                     <span className="text-2xl font-extrabold text-foreground font-mono">
-                      {deal.dealPrice}
+                      {formatPriceString(deal.dealPrice)}
                     </span>
                     <span className="text-sm line-through text-muted-foreground font-mono">
-                      {deal.originalPrice}
+                      {formatPriceString(deal.originalPrice)}
                     </span>
                     <span className="ml-auto rounded bg-red-500/10 px-2 py-0.5 text-xs font-bold text-red-500">
                       {deal.discount}

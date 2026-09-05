@@ -9,6 +9,7 @@ import type { CanonicalProduct } from "@/lib/services/canonical-types";
 import { compareProductOffers } from "@/lib/services/comparison-engine";
 import { calculatePriceMetrics } from "@/lib/services/price-history";
 import { isProductInWatchlist, addToWatchlist, removeFromWatchlist } from "@/lib/services/watchlist-service";
+import { useCurrency } from "@/context/CurrencyContext";
 import { PriceAlertModal } from "./PriceAlertModal";
 import { TrendingDown, Bell, ExternalLink, ArrowRight, Star } from "lucide-react";
 import { toast } from "sonner";
@@ -20,6 +21,7 @@ interface ProductHeroCardProps {
 export function ProductHeroCard({ product }: ProductHeroCardProps) {
   if (!product) return null;
 
+  const { formatPrice } = useCurrency();
   const comparison = compareProductOffers(product.id);
   const metrics = calculatePriceMetrics(product.id);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
@@ -88,11 +90,11 @@ export function ProductHeroCard({ product }: ProductHeroCardProps) {
             <div className="mt-4 flex items-baseline justify-between">
               <div>
                 <span className="font-display text-2xl font-bold text-foreground tabular-nums">
-                  ₹{currentPrice.toLocaleString("en-IN")}
+                  {formatPrice(currentPrice)}
                 </span>
                 {bestDeal && bestDeal.couponSavings > 0 && (
                   <span className="ml-2 text-xs font-mono text-emerald-500 font-bold tabular-nums">
-                    (-₹{bestDeal.couponSavings.toLocaleString("en-IN")} coupon)
+                    (-{formatPrice(bestDeal.couponSavings)} coupon)
                   </span>
                 )}
               </div>
@@ -118,7 +120,7 @@ export function ProductHeroCard({ product }: ProductHeroCardProps) {
                   {comparison.storesComparedCount} Stores Scanned
                 </span>
                 <span className="font-mono text-[11px] text-emerald-500 font-bold tabular-nums">
-                  Save up to ₹{comparison.maxSavings.toLocaleString("en-IN")}
+                  Save up to {formatPrice(comparison.maxSavings)}
                 </span>
               </div>
             )}

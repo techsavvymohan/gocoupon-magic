@@ -160,7 +160,7 @@ export async function askGoCoupon(userQuery: string): Promise<AssistantAnswer> {
         liveLowestPrice = items[0].extracted_price;
         liveLowestStore = items[0].source || items[0].merchant || "Amazon.in";
 
-        thoughts.push(`Connected live to ${liveStoreCount} Indian online merchants via Google Shopping.`);
+        thoughts.push(`Connected live to ${liveStoreCount} online merchants via Google Shopping.`);
       }
     }
   } catch {

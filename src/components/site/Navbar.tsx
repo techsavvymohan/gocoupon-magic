@@ -7,6 +7,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { useState } from "react";
 import { MagneticButton } from "../MagneticButton";
 import { ThemeToggle } from "../ThemeToggle";
+import { CurrencyToggle } from "../CurrencyToggle";
 import {
   Menu,
   X,
@@ -36,7 +37,7 @@ const primaryLinks: NavLink[] = [
   { label: "Ask", to: "/ask" },
   { label: "Stores", to: "/stores" },
   { label: "Deals", href: "https://deals.gocoupon.io", isExternal: true, badge: "HOT", badgeColor: "bg-rose-500/15 text-rose-500" },
-  { label: "Extension", to: "/extension" },
+  { label: "Extension", to: "/chrome-extension" },
   { label: "Blog", to: "/blog" },
 ];
 
@@ -59,13 +60,13 @@ export function Navbar() {
           <Link
             to="/"
             className="group flex items-center gap-2 transition-transform duration-200 hover:scale-105"
-            aria-label="goCoupon — home"
+            aria-label="GoCoupon — home"
             onClick={() => setMobileMenuOpen(false)}
           >
             <span className="inline-flex items-center rounded-lg px-2 py-1 transition-colors">
               <img
                 src="/gc-logo.webp"
-                alt="goCoupon"
+                alt="GoCoupon"
                 className="h-7 w-auto dark:hidden transition-transform group-hover:scale-105"
                 width={120}
                 height={28}
@@ -74,7 +75,7 @@ export function Navbar() {
               />
               <img
                 src="/gc-logo-dark.webp"
-                alt="goCoupon"
+                alt="GoCoupon"
                 className="hidden h-7 w-auto dark:block transition-transform group-hover:scale-105"
                 width={120}
                 height={28}
@@ -150,7 +151,8 @@ export function Navbar() {
           </ul>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            <CurrencyToggle />
             <ThemeToggle />
 
             <MagneticButton
@@ -236,6 +238,10 @@ export function Navbar() {
                   <span>Add to Chrome — Free</span>
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </a>
+              </li>
+              <li className="flex items-center justify-between pt-3 border-t border-border">
+                <span className="text-xs text-muted-foreground font-mono">Currency Preference:</span>
+                <CurrencyToggle />
               </li>
             </ul>
           </div>

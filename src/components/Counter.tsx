@@ -17,13 +17,18 @@ export function Counter({
   duration = 2000,
   format = "comma",
 }: CounterProps) {
+  // Initialize with target value so SSR / static pre-rendering renders the real number for search crawlers
   const ref = useRef<HTMLSpanElement>(null);
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(to);
   const startedRef = useRef(false);
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el || typeof window === "undefined" || !("IntersectionObserver" in window)) return;
+
+    // Reset to 0 once mounted in a live browser to begin scroll-triggered animation
+    setValue(0);
+
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {

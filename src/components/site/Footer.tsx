@@ -4,11 +4,12 @@ const cols = [
   {
     title: "Product",
     links: [
-      { label: "How It Works", to: "/how-it-works" },
-      { label: "Chrome Extension", to: "/extension" },
+      { label: "GoCoupon Official Extension", to: "/chrome-extension" },
+      { label: "GoCoupon Price Comparison", to: "/compare" },
+      { label: "GoCoupon 90-Day Price Tracker", to: "/price-history" },
+      { label: "How GoCoupon Works", to: "/how-it-works" },
       { label: "Cashback Rewards", to: "/cashback-rewards" },
       { label: "Trending Deals", href: "https://deals.gocoupon.io", isExternal: true },
-      { label: "Welcome Guide", to: "/welcome" },
       { label: "FAQ", to: "/faq" },
     ],
   },
@@ -19,17 +20,18 @@ const cols = [
       { label: "Amazon Coupons", to: "/amazon-coupons" },
       { label: "Myntra Coupons", to: "/myntra-coupons" },
       { label: "Meesho Coupons", to: "/meesho-coupons" },
-      { label: "All Stores Directory", to: "/stores" },
+      { label: "All 200+ Stores Directory", to: "/stores" },
       { label: "Browse Categories", to: "/categories" },
     ],
   },
   {
     title: "Company & Support",
     links: [
-      { label: "About Us", to: "/about" },
-      { label: "Blog", to: "/blog" },
-      { label: "Free Resources", to: "/resources" },
-      { label: "Press Kit", to: "/press" },
+      { label: "About GoCoupon", to: "/about" },
+      { label: "Identify Official Website", to: "/blog/how-to-identify-official-gocoupon-website" },
+      { label: "Savings Intelligence Blog", to: "/blog" },
+      { label: "Free Calculators & Guides", to: "/resources" },
+      { label: "Press & Media Kit", to: "/press" },
       { label: "Help Center", to: "/help" },
       { label: "Contact Us", to: "/contact" },
       { label: "HTML Sitemap", to: "/sitemap" },
@@ -38,10 +40,10 @@ const cols = [
   {
     title: "Legal & Trust",
     links: [
+      { label: "GoCoupon Affiliate Disclosure", to: "/disclosure" },
+      { label: "Security & Trust Architecture", to: "/security" },
       { label: "Privacy Policy", to: "/privacy" },
       { label: "Terms of Service", to: "/terms" },
-      { label: "Affiliate Disclosure", to: "/disclosure" },
-      { label: "Security & Trust Center", to: "/security" },
       { label: "Uninstall Survey", to: "/uninstall" },
     ],
   },
@@ -73,11 +75,11 @@ export function Footer() {
     <footer className="border-t border-border px-6 py-16 bg-card/40">
       <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1.3fr_repeat(4,1fr)]">
         <div>
-          <Link to="/" className="flex items-center gap-2.5" aria-label="goCoupon — home">
+          <Link to="/" className="flex items-center gap-2.5" aria-label="GoCoupon — home">
             <span className="inline-flex items-center rounded-lg px-2 py-1 transition-colors">
               <img
                 src="/gc-logo.webp"
-                alt="goCoupon"
+                alt="GoCoupon"
                 className="h-7 w-auto dark:hidden"
                 width={120}
                 height={28}
@@ -86,7 +88,7 @@ export function Footer() {
               />
               <img
                 src="/gc-logo-dark.webp"
-                alt="goCoupon"
+                alt="GoCoupon"
                 className="hidden h-7 w-auto dark:block"
                 width={120}
                 height={28}
@@ -96,11 +98,11 @@ export function Footer() {
             </span>
           </Link>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
-            The free Chrome extension that automatically finds and applies the best working coupon code at checkout on Indian e-commerce stores.
+            GoCoupon is the official free Chrome extension and shopping intelligence platform for online shoppers worldwide.
           </p>
 
           <div className="mt-4 text-xs text-muted-foreground">
-            Headquartered in Bengaluru, Karnataka, India 🇮🇳
+            Global store coverage • Engineering HQ in Bengaluru • <span className="font-mono text-foreground font-medium">https://gocoupon.io/</span>
           </div>
 
           <ul className="mt-6 flex items-center gap-3" aria-label="goCoupon on social media">

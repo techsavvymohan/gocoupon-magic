@@ -18,6 +18,7 @@ import {
   type MultiPlatformProductItem,
   type MultiPlatformSearchResult,
 } from "@/lib/services/multi-platform-search";
+import { useCurrency } from "@/context/CurrencyContext";
 import {
   Sparkles,
   ArrowRight,
@@ -120,6 +121,7 @@ function ProductCardImg({ src, alt }: { src: string; alt: string }) {
 export function ComparePage() {
   const { q, url } = useSearch({ from: "/compare" });
   const activeSearchParam = url || q || "";
+  const { formatPrice, isIndia, symbol } = useCurrency();
 
   const [searchResult, setSearchResult] = useState<MultiPlatformSearchResult | null>(null);
   const [isSearching, setIsSearching] = useState(false);
@@ -264,10 +266,10 @@ export function ComparePage() {
               <Loader2 className="h-7 w-7 animate-spin" aria-hidden="true" />
             </div>
             <h2 className="font-display text-xl font-bold text-foreground">
-              Searching across Indian shopping platforms…
+              Searching across top online stores…
             </h2>
             <p className="text-xs font-mono text-muted-foreground max-w-md mx-auto">
-              Scanning live product listings, stock status, coupons, and discounts on Amazon, Flipkart, Myntra, Croma, and Tata CLiQ.
+              Scanning live product listings, stock status, coupons, and discounts across supported retailers.
             </p>
           </div>
         )}
@@ -352,13 +354,22 @@ export function ComparePage() {
               {/* Price Range */}
               <div className="flex flex-wrap items-center gap-1.5 text-xs">
                 <span className="text-muted-foreground font-mono mr-1">Price:</span>
-                {[
-                  { label: "All", value: "all" },
-                  { label: "< ₹2k", value: "under-2k" },
-                  { label: "₹2k - ₹10k", value: "2k-10k" },
-                  { label: "₹10k - ₹50k", value: "10k-50k" },
-                  { label: "> ₹50k", value: "above-50k" },
-                ].map((range) => (
+                {(isIndia
+                  ? [
+                      { label: "All", value: "all" },
+                      { label: "< ₹2k", value: "under-2k" },
+                      { label: "₹2k - ₹10k", value: "2k-10k" },
+                      { label: "₹10k - ₹50k", value: "10k-50k" },
+                      { label: "> ₹50k", value: "above-50k" },
+                    ]
+                  : [
+                      { label: "All", value: "all" },
+                      { label: "< $25", value: "under-2k" },
+                      { label: "$25 - $120", value: "2k-10k" },
+                      { label: "$120 - $600", value: "10k-50k" },
+                      { label: "> $600", value: "above-50k" },
+                    ]
+                ).map((range) => (
                   <button
                     key={range.value}
                     type="button"
@@ -443,11 +454,11 @@ export function ComparePage() {
                         {/* Pricing Row */}
                         <div className="mt-3 flex items-baseline gap-2">
                           <span className="font-display text-xl font-bold text-foreground tabular-nums">
-                            ₹{product.price.toLocaleString("en-IN")}
+                            {formatPrice(product.price)}
                           </span>
                           {product.originalPrice > product.price && (
                             <span className="font-mono text-xs text-muted-foreground line-through tabular-nums">
-                              ₹{product.originalPrice.toLocaleString("en-IN")}
+                              {formatPrice(product.originalPrice)}
                             </span>
                           )}
                         </div>
@@ -458,7 +469,7 @@ export function ComparePage() {
                             Compared in {product.offers.length} stores
                           </span>
                           <span className="font-mono text-[10px]">
-                            Lowest: ₹{(product.offers[0]?.effectiveNetPrice || product.price).toLocaleString("en-IN")}
+                            Lowest: {formatPrice(product.offers[0]?.effectiveNetPrice || product.price)}
                           </span>
                         </div>
                       </div>
@@ -644,7 +655,7 @@ export function ComparePage() {
                   </span>
                   <div className="flex items-baseline gap-2 mt-0.5">
                     <span className="font-display text-2xl font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
-                      ₹{(selectedProduct.offers[0]?.effectiveNetPrice || selectedProduct.price).toLocaleString("en-IN")}
+                      {formatPrice(selectedProduct.offers[0]?.effectiveNetPrice || selectedProduct.price)}
                     </span>
                     <span className="text-xs font-bold text-foreground">
                       on {selectedProduct.offers[0]?.storeName || selectedProduct.primaryStore}
@@ -730,7 +741,7 @@ export function ComparePage() {
                           <div>
                             <span className="font-mono text-[10px] text-muted-foreground block">Net Cost:</span>
                             <span className="font-display text-base sm:text-lg font-bold text-foreground tabular-nums">
-                              ₹{offer.effectiveNetPrice.toLocaleString("en-IN")}
+                              {formatPrice(offer.effectiveNetPrice)}
                             </span>
                           </div>
 

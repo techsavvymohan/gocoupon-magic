@@ -95,11 +95,11 @@ function PressPage() {
             <Fact label="HQ" value="Bengaluru, India" />
             <Fact label="Category" value="Browser extension" />
             <Fact label="Platforms" value="Chrome (Manifest V3)" />
-            <Fact label="Coverage" value="Flipkart, Amazon India, Myntra, Meesho" />
+            <Fact label="Coverage" value="Amazon, Walmart, Target, Flipkart &amp; 200+ stores" />
             <Fact label="Price" value="Free · No account required" />
             <Fact label="Active users" value="180,000+" />
             <Fact label="Rating" value="4.9 / 5 (1,247+ reviews)" />
-            <Fact label="Avg. saving per checkout" value="₹300–₹500" />
+            <Fact label="Avg. saving per checkout" value="$12–$25 / ₹300–₹600" />
           </dl>
         </div>
       </section>
@@ -125,11 +125,11 @@ function PressPage() {
           <ul className="mt-8 grid gap-4 md:grid-cols-2">
             <NewsPlaceholder outlet="Your story goes here" hint="Pitch us a topic — we'll help" />
             <NewsPlaceholder
-              outlet="Mainstream Indian tech press"
+              outlet="Tech &amp; consumer retail press"
               hint="We're actively seeking coverage"
             />
             <NewsPlaceholder outlet="Personal-finance creators" hint="Open to collaborations" />
-            <NewsPlaceholder outlet="Indian e-commerce analysts" hint="We share aggregate data" />
+            <NewsPlaceholder outlet="Global e-commerce analysts" hint="We share aggregate data" />
           </ul>
         </div>
       </section>
@@ -146,7 +146,7 @@ function PressPage() {
               saving.
             </Quote>
             <Quote>
-              The average Indian online shopper loses 8–14% of the lowest achievable price because
+              The average online shopper loses 8–14% of the lowest achievable price because
               they never test every coupon combination. We close that gap automatically.
             </Quote>
           </div>

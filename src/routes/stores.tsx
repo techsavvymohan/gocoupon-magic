@@ -10,12 +10,12 @@ export const Route = createFileRoute("/stores")({
   component: StoresPage,
   head: () =>
     createSeoHead({
-      title: "Top 200+ Indian Stores Coupons & Deals Directory (Feb 2026) – goCoupon",
+      title: "Top 200+ Online Stores Coupons & Deals Directory (2026) – GoCoupon",
       description:
-        "Browse verified working coupon codes, promo codes, and up to 10% cashback across 200+ top Indian shopping stores including Flipkart, Amazon, Myntra, Meesho, Nykaa, and Swiggy.",
+        "Browse verified working coupon codes, promo codes, and up to 10% cashback across 200+ top online shopping stores worldwide including Amazon, Walmart, Target, Flipkart, Myntra, and more.",
       path: "/stores",
       keywords:
-        "all stores coupons, indian online store deals, flipkart amazon myntra coupons, store directory, brand promo codes india",
+        "all stores coupons, online store deals, shopping discounts, store directory, brand promo codes worldwide",
     }),
 });
 
@@ -66,10 +66,10 @@ function StoresPage() {
             Merchant Directory
           </div>
           <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            Verified Coupons for Top Indian Stores
+            Verified Coupons for Top Stores Worldwide
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">
-            Explore active discount codes, promo vouchers, and cashback rates across India's most popular online shopping portals.
+            Explore active discount codes, promo vouchers, and cashback rates across the most popular online shopping portals worldwide.
           </p>
 
           {/* Search & Filter Controls */}

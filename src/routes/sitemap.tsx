@@ -69,7 +69,7 @@ function SitemapPage() {
           isExternal: true,
           desc: "Dedicated deals & coupon codes portal on deals.gocoupon.io",
         },
-        { label: "All Stores Directory", to: "/stores", desc: "25+ Indian online shopping brands" },
+        { label: "All Stores Directory", to: "/stores", desc: "200+ global & regional shopping brands" },
         { label: "Shopping Categories", to: "/categories", desc: "Electronics, Fashion, Food, Travel & More" },
       ],
     },
@@ -202,7 +202,7 @@ function SitemapPage() {
                   Published Blog Articles &amp; Guides
                 </h2>
                 <p className="text-xs text-muted-foreground">
-                  {posts.length} editorial posts on Indian e-commerce coupons &amp; shopping hacks
+                  {posts.length} editorial posts on global e-commerce coupons &amp; shopping hacks
                 </p>
               </div>
             </div>

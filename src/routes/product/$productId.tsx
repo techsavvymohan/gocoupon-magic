@@ -23,6 +23,7 @@ import { PriceHistoryChart } from "@/components/shopping/PriceHistoryChart";
 import { FlashVerdictBadge } from "@/components/shopping/FlashVerdictBadge";
 import { CouponStackPill } from "@/components/shopping/CouponStackPill";
 import { PriceAlertModal } from "@/components/shopping/PriceAlertModal";
+import { useCurrency } from "@/context/CurrencyContext";
 import { isProductInWatchlist, addToWatchlist, removeFromWatchlist } from "@/lib/services/watchlist-service";
 import {
   Bell,
@@ -49,11 +50,11 @@ export const Route = createFileRoute("/product/$productId")({
         : "Product Price Comparison & Price History – goCoupon",
       description: product
         ? `Compare prices on ${product.title} across Amazon, Flipkart, Croma and more. View 90-day price history and auto-apply valid coupons.`
-        : "Compare live prices, coupons, and 90-day price history across top Indian online stores.",
+        : "Compare live prices, coupons, and 90-day price history across top online stores worldwide.",
       path: `/product/${params.productId}`,
       keywords: product
-        ? `${product.title} price in india, ${product.brand} discount code, lowest price ${product.title}, price tracker`
-        : "product comparison india, price tracker, discount coupon",
+        ? `${product.title} price comparison, ${product.brand} discount code, lowest price ${product.title}, price tracker`
+        : "product comparison, price tracker, discount coupon, best price online",
     });
   },
 });
@@ -96,6 +97,7 @@ function ProductDetailsPage() {
 
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
   const [isWatched, setIsWatched] = useState(() => isProductInWatchlist(product.id));
+  const { formatPrice, formatSaving } = useCurrency();
 
   const bestDeal = comparison?.bestDeal;
   const currentPrice = bestDeal?.effectiveNetPrice || 28990;
@@ -224,11 +226,11 @@ function ProductDetailsPage() {
                 </div>
                 <div className="mt-2 flex items-baseline gap-3">
                   <span className="font-display text-4xl font-bold text-foreground">
-                    ₹{currentPrice.toLocaleString("en-IN")}
+                    {formatPrice(currentPrice)}
                   </span>
                   {bestDeal && bestDeal.couponSavings > 0 && (
                     <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                      Save ₹{bestDeal.couponSavings.toLocaleString("en-IN")} with coupon
+                      {formatSaving(bestDeal.couponSavings)} with coupon
                     </span>
                   )}
                 </div>
@@ -322,7 +324,7 @@ function ProductDetailsPage() {
                 Lowest on {bestDeal.storeName}
               </span>
               <span className="font-display text-lg font-bold text-foreground">
-                ₹{currentPrice.toLocaleString("en-IN")}
+                {formatPrice(currentPrice)}
               </span>
             </div>
 

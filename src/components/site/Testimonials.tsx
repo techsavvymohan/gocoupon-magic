@@ -97,7 +97,7 @@ export function Testimonials() {
               <span>Verified Indian Shoppers</span>
             </div>
             <h2 className="font-display text-4xl font-bold leading-tight text-foreground md:text-5xl">
-              Loved by 180,000+ Smart Shoppers Across India.
+              Loved by Smart Shoppers Across India.
             </h2>
             <p className="mt-3 text-sm text-muted-foreground font-mono">
               ⚡ Real-time savings across Amazon India, Flipkart, Myntra, Croma, Tata CLiQ &amp; Reliance Digital.
@@ -107,8 +107,8 @@ export function Testimonials() {
             <span className="inline-flex items-center gap-1 text-amber-500 font-bold">
               {"★".repeat(5)}
             </span>
-            <span className="font-bold text-foreground">4.9 / 5.0</span>
-            <span>(18,200+ verified ratings)</span>
+            <span className="font-bold text-foreground">5-Star Community Feedback</span>
+            <span>(Verified shopper stories)</span>
           </div>
         </div>
 

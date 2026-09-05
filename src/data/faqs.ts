@@ -7,37 +7,37 @@ export const couponFaqs = [
   {
     question: "How does live multi-store price comparison work?",
     answer:
-      "When you search for any product or paste a link, goCoupon queries real-time pricing across Amazon India, Flipkart, Croma, Myntra, Tata CLiQ, and Reliance Digital. It calculates net checkout prices including active promo codes, card discounts, and delivery fees so you can immediately see which merchant is truly the cheapest.",
+      "When you search for any product or paste a link, GoCoupon queries real-time pricing across major retailers including Amazon, Walmart, Target, Flipkart, and partner stores. It calculates net checkout prices including active promo codes, discounts, and delivery fees so you can immediately see which merchant is truly the cheapest.",
   },
   {
     question: "How does the 90-day price history tracker expose fake sales?",
     answer:
-      "Many e-commerce sellers inflate prices a few days before festival sales and then advertise a '50% discount'. goCoupon records daily historical prices over 90 days and graphs the true price curve, marking the all-time lowest price and alerting you whether the current deal is authentic or artificially marked up.",
+      "Many e-commerce sellers inflate prices a few days before major sales and then advertise a '50% discount'. GoCoupon records daily historical prices over 90 days and graphs the true price curve, marking the all-time lowest price and alerting you whether the current deal is authentic or artificially marked up.",
   },
   {
-    question: "Can I compare prices by pasting a product link from Amazon or Flipkart?",
+    question: "Can I compare prices by pasting a product link from Amazon or other stores?",
     answer:
-      "Yes! Simply paste any product URL from Amazon India, Flipkart, or Myntra into the search bar. goCoupon instantly resolves the product specifications and scans all major Indian retailers to find competing offers and stackable coupons.",
+      "Yes! Simply paste any product URL from Amazon, Walmart, Target, Flipkart, or Myntra into the search bar. GoCoupon instantly resolves the product specifications and scans retailers to find competing offers and stackable coupons.",
   },
   {
     question: "How does 1-click coupon auto-apply work at checkout?",
     answer:
-      "When you install our free Chrome extension and proceed to checkout on any supported store, goCoupon tests all verified working discount codes in seconds and automatically applies the single code that saves you the most rupees.",
+      "When you install our free Chrome extension and proceed to checkout on any supported store, GoCoupon tests all verified working discount codes in seconds and automatically applies the single code that saves you the most money.",
   },
   {
-    question: "Can I stack bank credit card offers with promo codes?",
+    question: "Can I stack payment offers with promo codes?",
     answer:
-      "Yes. goCoupon identifies both instant merchant promo codes and eligible credit/debit card cashback offers (e.g., HDFC, ICICI, SBI, Axis), allowing you to stack store coupons with bank discounts for maximum total savings.",
+      "Yes. GoCoupon identifies both instant merchant promo codes and eligible card or digital wallet offers, allowing you to stack store coupons with payment discounts for maximum total savings.",
   },
   {
-    question: "How do I find cheaper products across online stores with goCoupon?",
+    question: "How do I find cheaper products across online stores with GoCoupon?",
     answer:
-      "Go to our Live Price Comparison page (/compare) and search for any smartphone, laptop, sneaker, or appliance. goCoupon benchmarks real-time prices across Amazon India, Flipkart, Myntra, Croma, and Tata CLiQ, factoring in delivery charges and active promo codes to show you the absolute cheapest store to buy from.",
+      "Go to our Live Price Comparison page (/compare) and search for any smartphone, laptop, sneaker, or appliance. GoCoupon benchmarks real-time prices across major online retailers, factoring in delivery charges and active promo codes to show you the absolute cheapest store to buy from.",
   },
   {
-    question: "Where can I find today's verified deals and shopping discounts in India?",
+    question: "Where can I find today's verified deals and shopping discounts?",
     answer:
-      "Visit goCoupon's Deals Hub (/deals) to explore hand-verified lightning deals, flash discounts, and all-time low price drops updated daily across electronics, smartphones, laptops, audio, and fashion.",
+      "Visit GoCoupon's Deals Hub (/deals) to explore hand-verified lightning deals, flash discounts, and all-time low price drops updated daily across electronics, smartphones, laptops, audio, and fashion.",
   },
   {
     question: "Is goCoupon safe and private?",

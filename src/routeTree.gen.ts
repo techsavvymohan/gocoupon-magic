@@ -15,6 +15,7 @@ import { Route as AmazonCouponsRouteImport } from './routes/amazon-coupons'
 import { Route as AskRouteImport } from './routes/ask'
 import { Route as CashbackRewardsRouteImport } from './routes/cashback-rewards'
 import { Route as CategoriesRouteImport } from './routes/categories'
+import { Route as ChromeExtensionRouteImport } from './routes/chrome-extension'
 import { Route as CompareRouteImport } from './routes/compare'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DealsRouteImport } from './routes/deals'
@@ -71,6 +72,11 @@ const CashbackRewardsRoute = CashbackRewardsRouteImport.update({
 const CategoriesRoute = CategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChromeExtensionRoute = ChromeExtensionRouteImport.update({
+  id: '/chrome-extension',
+  path: '/chrome-extension',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompareRoute = CompareRouteImport.update({
@@ -216,6 +222,7 @@ export interface FileRoutesByFullPath {
   '/ask': typeof AskRoute
   '/cashback-rewards': typeof CashbackRewardsRoute
   '/categories': typeof CategoriesRoute
+  '/chrome-extension': typeof ChromeExtensionRoute
   '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/deals': typeof DealsRoute
@@ -251,6 +258,7 @@ export interface FileRoutesByTo {
   '/ask': typeof AskRoute
   '/cashback-rewards': typeof CashbackRewardsRoute
   '/categories': typeof CategoriesRoute
+  '/chrome-extension': typeof ChromeExtensionRoute
   '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/deals': typeof DealsRoute
@@ -287,6 +295,7 @@ export interface FileRoutesById {
   '/ask': typeof AskRoute
   '/cashback-rewards': typeof CashbackRewardsRoute
   '/categories': typeof CategoriesRoute
+  '/chrome-extension': typeof ChromeExtensionRoute
   '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/deals': typeof DealsRoute
@@ -324,6 +333,7 @@ export interface FileRouteTypes {
     | '/ask'
     | '/cashback-rewards'
     | '/categories'
+    | '/chrome-extension'
     | '/compare'
     | '/contact'
     | '/deals'
@@ -359,6 +369,7 @@ export interface FileRouteTypes {
     | '/ask'
     | '/cashback-rewards'
     | '/categories'
+    | '/chrome-extension'
     | '/compare'
     | '/contact'
     | '/deals'
@@ -394,6 +405,7 @@ export interface FileRouteTypes {
     | '/ask'
     | '/cashback-rewards'
     | '/categories'
+    | '/chrome-extension'
     | '/compare'
     | '/contact'
     | '/deals'
@@ -430,6 +442,7 @@ export interface RootRouteChildren {
   AskRoute: typeof AskRoute
   CashbackRewardsRoute: typeof CashbackRewardsRoute
   CategoriesRoute: typeof CategoriesRoute
+  ChromeExtensionRoute: typeof ChromeExtensionRoute
   CompareRoute: typeof CompareRoute
   ContactRoute: typeof ContactRoute
   DealsRoute: typeof DealsRoute
@@ -501,6 +514,13 @@ declare module '@tanstack/react-router' {
       path: '/categories'
       fullPath: '/categories'
       preLoaderRoute: typeof CategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chrome-extension': {
+      id: '/chrome-extension'
+      path: '/chrome-extension'
+      fullPath: '/chrome-extension'
+      preLoaderRoute: typeof ChromeExtensionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compare': {
@@ -702,6 +722,7 @@ const rootRouteChildren: RootRouteChildren = {
   AskRoute: AskRoute,
   CashbackRewardsRoute: CashbackRewardsRoute,
   CategoriesRoute: CategoriesRoute,
+  ChromeExtensionRoute: ChromeExtensionRoute,
   CompareRoute: CompareRoute,
   ContactRoute: ContactRoute,
   DealsRoute: DealsRoute,

@@ -1,13 +1,15 @@
 import { Counter } from "../Counter";
-
-const stats = [
-  { label: "Total saved by shoppers", to: 12400, prefix: "₹", suffix: " Cr" },
-  { label: "Active extension users", to: 180000, suffix: "+" },
-  { label: "Coupons tested daily", to: 42000, suffix: "+" },
-  { label: "Stores supported", to: 200, suffix: "+" },
-];
+import { useCurrency } from "@/context/CurrencyContext";
 
 export function Stats() {
+  const { symbol } = useCurrency();
+
+  const stats = [
+    { label: "Stores supported worldwide", to: 200, suffix: "+" },
+    { label: "Days price history tracked", to: 90, suffix: " Days" },
+    { label: "Always 100% free to use", to: 0, prefix: symbol, suffix: "" },
+    { label: "Sub-second coupon testing", to: 850, suffix: " ms" },
+  ];
   return (
     <section className="relative border-y border-border px-6 py-24">
       <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-4">

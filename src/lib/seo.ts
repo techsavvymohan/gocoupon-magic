@@ -4,7 +4,7 @@
  */
 
 export const SITE_URL = "https://gocoupon.io";
-export const SITE_NAME = "goCoupon";
+export const SITE_NAME = "GoCoupon";
 export const DEFAULT_OG_IMAGE = "/og-image.png";
 
 export function getCurrentMonthYear(): string {
@@ -144,20 +144,38 @@ export function productSchema(params: {
   };
 }
 
+export function websiteSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "https://gocoupon.io/#website",
+    url: "https://gocoupon.io/",
+    name: "GoCoupon",
+    alternateName: ["GoCoupon.io", "goCoupon"],
+    publisher: { "@id": "https://gocoupon.io/#organization" },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://gocoupon.io/compare?q={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  };
+}
+
 export function softwareAppSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "goCoupon - Deals, Discounts, Auto Coupons & Price Tracker",
-    operatingSystem: "Windows, macOS, Linux, ChromeOS, Android",
+    "@id": "https://gocoupon.io/#softwareapplication",
+    name: "GoCoupon Chrome Extension",
+    operatingSystem: "Chrome, Edge, Brave, Opera",
     applicationCategory: "ShoppingApplication",
     applicationSubCategory: "Price Comparison, Price Tracking, Coupon Automation",
-    url: SITE_URL,
+    url: "https://gocoupon.io/chrome-extension",
     description:
-      "goCoupon automatically tests and applies valid promo codes at checkout, tracks 90-day price drop graphs, and compares real-time prices across Amazon, Flipkart, Myntra, and Croma.",
+      "GoCoupon automatically tests and applies valid promo codes at checkout, tracks 90-day price drop graphs, and compares real-time prices across Amazon, Walmart, Target, Flipkart, and 200+ stores worldwide.",
     featureList: [
-      "1-Click Automated Coupon Testing at Checkout",
-      "Live Cross-Store Price Comparison (Amazon, Flipkart, Croma)",
+      "1-Click Automated Coupon Testing at Checkout in 850ms",
+      "Live Cross-Store Price Comparison (Amazon, Walmart, Target, Flipkart, and more)",
       "90-Day Price Drop Tracker & Historical Low Checker",
       "Fake Discount & Pre-Sale Markup Detection",
       "Instant Price Drop Watchlist & Target Price Alerts",
@@ -165,17 +183,10 @@ export function softwareAppSchema() {
     offers: {
       "@type": "Offer",
       price: "0",
-      priceCurrency: "INR",
-    },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.9",
-      ratingCount: "2840",
+      priceCurrency: "USD",
     },
     author: {
-      "@type": "Organization",
-      name: "goCoupon",
-      url: SITE_URL,
+      "@id": "https://gocoupon.io/#organization",
     },
   };
 }
@@ -184,11 +195,17 @@ export function organizationSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "goCoupon",
-    url: SITE_URL,
-    logo: absoluteUrl("/logo.png"),
+    "@id": "https://gocoupon.io/#organization",
+    name: "GoCoupon",
+    url: "https://gocoupon.io/",
+    logo: absoluteUrl("/gc-logo.webp"),
+    description:
+      "GoCoupon provides coupon discovery, price comparison, price history tracking, cashback and a browser extension for online shoppers worldwide.",
+    email: "support@gocoupon.io",
     sameAs: [
+      "https://facebook.com/gocouponapp",
       "https://twitter.com/gocoupon_in",
+      "https://instagram.com/gocoupon.io",
       "https://github.com/techsavvymohan/gocoupon-magic",
     ],
     contactPoint: {

@@ -1,7 +1,7 @@
 {
-  "name": "goCoupon: Deals, Discounts & Price Tracker India",
-  "short_name": "goCoupon",
-  "description": "Find cheaper products, compare live prices across Amazon & Flipkart, auto-apply coupons, and get instant price-drop alerts.",
+  "name": "GoCoupon: Coupons, Price Comparison & Cashback",
+  "short_name": "GoCoupon",
+  "description": "GoCoupon is the free shopping extension for working coupons, live price comparison, 90-day price history and cashback across online stores worldwide.",
   "start_url": "/",
   "id": "/",
   "display": "standalone",
@@ -27,7 +27,7 @@
     {
       "name": "Live Price Comparison",
       "url": "/compare",
-      "description": "Compare Amazon and Flipkart prices in real time"
+      "description": "Compare prices across stores in real time"
     },
     {
       "name": "90-Day Price Tracker",

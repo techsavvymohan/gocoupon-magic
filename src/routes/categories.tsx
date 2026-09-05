@@ -21,12 +21,12 @@ export const Route = createFileRoute("/categories")({
   component: CategoriesPage,
   head: () =>
     createSeoHead({
-      title: "Browse Coupon Categories – Electronics, Fashion, Food, Travel & More | goCoupon",
+      title: "Browse Coupon Categories – Electronics, Fashion, Food, Travel & More | GoCoupon",
       description:
-        "Find discounts across Indian online shopping categories: Electronics, Fashion, Food Delivery, Flight Bookings, Beauty & Home. Save up to 80% with goCoupon.",
+        "Find discounts across top online shopping categories: Electronics, Fashion, Food Delivery, Travel Bookings, Beauty & Home. Save up to 80% with GoCoupon.",
       path: "/categories",
       keywords:
-        "coupon categories india, electronics coupons, fashion promo codes, food discount codes, flight deals, beauty cashback",
+        "coupon categories, electronics coupons, fashion promo codes, food discount codes, flight deals, beauty cashback worldwide",
     }),
 });
 
@@ -74,7 +74,7 @@ const CATEGORIES_LIST: CategoryItem[] = [
     ],
     description:
       "Get instant bank discounts on 5G smartphones, gaming laptops, smart TVs, noise-cancelling headphones, and home smart appliances.",
-    bestDealsTime: "Great Indian Festival & Flipkart Big Billion Days (Oct)",
+    bestDealsTime: "Prime Day, Black Friday, Cyber Monday & Festive Mega Sales",
     highlight: "Combine exchange bonus with HDFC/ICICI bank credit card EMI codes",
   },
   {

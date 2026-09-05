@@ -3,6 +3,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { useState } from "react";
 
+import { CurrencyProvider } from "@/context/CurrencyContext";
+
 function RootComponent() {
   const [queryClient] = useState(
     () =>
@@ -18,8 +20,10 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
-      <Toaster position="top-right" richColors />
+      <CurrencyProvider>
+        <Outlet />
+        <Toaster position="top-right" richColors />
+      </CurrencyProvider>
     </QueryClientProvider>
   );
 }

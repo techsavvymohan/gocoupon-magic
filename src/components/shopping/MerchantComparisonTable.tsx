@@ -11,6 +11,7 @@
 
 import { useState } from "react";
 import { type ProductComparisonSummary, type ComparisonRow } from "@/lib/services/comparison-engine";
+import { useCurrency } from "@/context/CurrencyContext";
 import { Check, Copy, ExternalLink, ShieldCheck, Truck, Tag, TrendingDown, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
@@ -20,6 +21,7 @@ interface MerchantComparisonTableProps {
 }
 
 export function MerchantComparisonTable({ comparison, productTitle }: MerchantComparisonTableProps) {
+  const { formatPrice } = useCurrency();
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   const handleCopy = (code: string) => {
@@ -105,7 +107,7 @@ export function MerchantComparisonTable({ comparison, productTitle }: MerchantCo
                     {row.shippingFee === 0 ? (
                       <span className="text-emerald-500 font-medium font-mono text-[11px]">Free Shipping</span>
                     ) : (
-                      <span className="font-mono text-[11px]">+₹{row.shippingFee} Shipping</span>
+                      <span className="font-mono text-[11px]">+{formatPrice(row.shippingFee)} Shipping</span>
                     )}
                   </div>
                 </div>
@@ -127,14 +129,14 @@ export function MerchantComparisonTable({ comparison, productTitle }: MerchantCo
                       <Tag className="h-3 w-3" />
                       <span>{copiedCode === row.bestCouponCode ? "Copied!" : row.bestCouponCode}</span>
                       <span className="text-[10px] text-emerald-500 font-bold">
-                        (-₹{row.couponSavings.toLocaleString("en-IN")})
+                        (-{formatPrice(row.couponSavings)})
                       </span>
                     </button>
                   ) : (
                     <span className="text-xs text-muted-foreground">No extra coupons</span>
                   )}
                   <span className="font-mono text-[11px] text-emerald-500 font-semibold">
-                    +{row.cashbackRate} Cashback (~₹{row.cashbackAmount.toLocaleString("en-IN")})
+                    +{row.cashbackRate} Cashback (~{formatPrice(row.cashbackAmount)})
                   </span>
                 </div>
               </div>
@@ -147,17 +149,17 @@ export function MerchantComparisonTable({ comparison, productTitle }: MerchantCo
                 <div className="mt-1">
                   <div className="flex items-baseline gap-2">
                     <span className="font-display text-2xl font-bold text-foreground tabular-nums">
-                      ₹{row.effectiveNetPrice.toLocaleString("en-IN")}
+                      {formatPrice(row.effectiveNetPrice)}
                     </span>
                     {row.couponSavings > 0 && (
                       <span className="text-xs text-muted-foreground line-through tabular-nums">
-                        ₹{row.itemPrice.toLocaleString("en-IN")}
+                        {formatPrice(row.itemPrice)}
                       </span>
                     )}
                   </div>
                   {row.savingsVsWorst > 0 && (
                     <span className="font-mono text-[10px] text-emerald-500 font-semibold block tabular-nums">
-                      Save ₹{row.savingsVsWorst.toLocaleString("en-IN")} vs highest
+                      Save {formatPrice(row.savingsVsWorst)} vs highest
                     </span>
                   )}
                 </div>
@@ -220,11 +222,11 @@ export function MerchantComparisonTable({ comparison, productTitle }: MerchantCo
 
                 <div className="text-right">
                   <span className="font-display text-xl font-bold text-foreground block">
-                    ₹{row.effectiveNetPrice.toLocaleString("en-IN")}
+                    {formatPrice(row.effectiveNetPrice)}
                   </span>
                   {row.couponSavings > 0 && (
                     <span className="text-[11px] text-muted-foreground line-through">
-                      ₹{row.itemPrice.toLocaleString("en-IN")}
+                      {formatPrice(row.itemPrice)}
                     </span>
                   )}
                 </div>
@@ -241,7 +243,7 @@ export function MerchantComparisonTable({ comparison, productTitle }: MerchantCo
                     <Tag className="h-3 w-3" />
                     <span>{copiedCode === row.bestCouponCode ? "Copied!" : row.bestCouponCode}</span>
                     <span className="text-emerald-500 font-bold">
-                      (-₹{row.couponSavings.toLocaleString("en-IN")})
+                      (-{formatPrice(row.couponSavings)})
                     </span>
                   </button>
                 ) : (

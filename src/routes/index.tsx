@@ -16,36 +16,33 @@ import { ContactForm } from "@/components/site/ContactForm";
 import { CTA } from "@/components/site/CTA";
 import { About } from "@/components/site/About";
 import { couponFaqs } from "@/data/faqs";
-import { breadcrumbSchema, createSeoHead, faqSchema, organizationSchema, softwareAppSchema } from "@/lib/seo";
+import { breadcrumbSchema, createSeoHead, faqSchema, organizationSchema, softwareAppSchema, websiteSchema } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   component: Index,
   head: () =>
     createSeoHead({
-      title: "goCoupon: Deals, Discounts, Coupons, Price Tracking & Comparison India – Find Cheaper Products",
+      title: "GoCoupon: Coupons, Price Comparison & Cashback Extension",
       description:
-        "Find cheaper products instantly with goCoupon. Compare live prices across Amazon, Flipkart & Croma, auto-apply 100% working discount coupons, track 90-day price drops, and grab today's best online shopping deals in India.",
+        "GoCoupon is the free shopping extension for working coupons, live price comparison, 90-day price history and cashback across online stores worldwide.",
       path: "/",
       keywords:
-        "deals, discounts, coupons, coupon codes, promo codes, price tracking, price tracker india, price comparison, compare prices, cheaper products, lowest price online, amazon vs flipkart price, auto apply coupons, fake discount detector, online shopping savings",
+        "GoCoupon, gocoupon.io, go coupon, gocoupon extension, deals, discounts, coupons, promo codes, price tracking, price tracker, price comparison, compare prices, auto apply coupons, fake discount detector, cashback extension",
     }),
 });
 
 function Index() {
-  const breadcrumb = breadcrumbSchema([{ name: "Home", path: "/" }]);
-  const faq = faqSchema(couponFaqs);
+  const website = websiteSchema();
   const org = organizationSchema();
   const app = softwareAppSchema();
+  const breadcrumb = breadcrumbSchema([{ name: "Home", path: "/" }]);
+  const faq = faqSchema(couponFaqs);
 
   return (
     <SiteShell>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(website) }}
       />
       <script
         type="application/ld+json"
@@ -54,6 +51,14 @@ function Index() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(app) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
       />
       <Hero />
       <LogoMarquee />

@@ -12,6 +12,7 @@ import {
   triggerPriceDropNotification,
   savePriceAlert,
 } from "@/lib/services/notification-service";
+import { useCurrency } from "@/context/CurrencyContext";
 import { Bell, Check, X, ShieldCheck, Percent, Smartphone, Sparkles, Send } from "lucide-react";
 import { toast } from "sonner";
 
@@ -32,6 +33,7 @@ export function PriceAlertModal({
   productImage = "/gc-logo.webp",
   currentPrice,
 }: PriceAlertModalProps) {
+  const { formatPrice } = useCurrency();
   const [targetPrice, setTargetPrice] = useState<number>(Math.round(currentPrice * 0.9));
   const [email, setEmail] = useState("");
   const [isSaved, setIsSaved] = useState(false);
@@ -93,7 +95,7 @@ export function PriceAlertModal({
     }
 
     setIsSaved(true);
-    toast.success(`Price alert set for ₹${targetPrice.toLocaleString("en-IN")}!`, {
+    toast.success(`Price alert set for ${formatPrice(targetPrice)}!`, {
       description: "You'll be alerted as soon as the price drops on Amazon or Flipkart.",
     });
     setTimeout(() => {
@@ -138,7 +140,7 @@ export function PriceAlertModal({
           <div className="min-w-0 flex-1">
             <h4 className="truncate text-xs font-semibold text-foreground">{productTitle}</h4>
             <span className="font-mono text-xs text-muted-foreground">
-              Current Lowest: <strong className="text-foreground">₹{currentPrice.toLocaleString("en-IN")}</strong>
+              Current Lowest: <strong className="text-foreground">{formatPrice(currentPrice)}</strong>
             </span>
           </div>
         </div>
@@ -149,7 +151,7 @@ export function PriceAlertModal({
             <div className="flex justify-between text-xs">
               <span className="font-medium text-foreground">Desired Target Price:</span>
               <span className="font-display text-base font-bold text-primary">
-                ₹{targetPrice.toLocaleString("en-IN")}{" "}
+                {formatPrice(targetPrice)}{" "}
                 <span className="text-xs font-normal text-emerald-500 font-mono">({discountTargetPct}% drop)</span>
               </span>
             </div>
@@ -182,8 +184,8 @@ export function PriceAlertModal({
               className="mt-3 w-full accent-primary cursor-pointer"
             />
             <div className="flex justify-between font-mono text-[10px] text-muted-foreground">
-              <span>₹{Math.round(currentPrice * 0.5).toLocaleString("en-IN")} (-50%)</span>
-              <span>₹{currentPrice.toLocaleString("en-IN")} (Current)</span>
+              <span>{formatPrice(Math.round(currentPrice * 0.5))} (-50%)</span>
+              <span>{formatPrice(currentPrice)} (Current)</span>
             </div>
           </div>
 

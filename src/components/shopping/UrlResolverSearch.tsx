@@ -45,12 +45,11 @@ const SUPPORTED_STORES = [
 ];
 
 const ROTATING_PLACEHOLDERS = [
-  "Search or paste any Myntra link for the best price",
   "Search or paste any Amazon link for the best price",
-  "Search or paste any Flipkart link for the best price",
-  "Search or paste any Ajio link for the best price",
-  "Search or paste any Meesho link for the best price",
-  "Search any product (e.g. Sony XM5, iPhone 16)…",
+  "Search or paste any Walmart, Target or eBay link",
+  "Search or paste any Flipkart or Myntra link",
+  "Search or paste any Ajio or Meesho link",
+  "Search any product (e.g. Sony XM5, MacBook Pro, iPhone 16)…",
 ];
 
 export function UrlResolverSearch({
@@ -436,39 +435,39 @@ export function UrlResolverSearch({
           {/* Left dashed divider line */}
           <div className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30" aria-hidden="true" />
 
-          {/* Badge 1: 8M+ Active Users */}
+          {/* Badge 1: 200+ Stores Worldwide */}
           <div className="inline-flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-400">
             <span className="flex h-5 w-5 items-center justify-center rounded-md bg-emerald-700 text-white shadow-xs">
               <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
             </span>
             <span className="font-sans text-xs sm:text-[13px] tracking-tight">
-              8M+ Active Users
+              200+ Stores Worldwide
             </span>
           </div>
 
           {/* Middle dashed divider line */}
           <div className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30" aria-hidden="true" />
 
-          {/* Badge 2: ₹10K CR Cash Saved */}
+          {/* Badge 2: 90-Day Price Tracker */}
           <div className="inline-flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-400">
             <span className="flex h-5 w-5 items-center justify-center rounded-md bg-emerald-700 text-white shadow-xs">
               <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
             </span>
             <span className="font-sans text-xs sm:text-[13px] tracking-tight">
-              ₹10K CR Cash Saved
+              90-Day Price Tracker
             </span>
           </div>
 
           {/* Middle dashed divider line */}
           <div className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30" aria-hidden="true" />
 
-          {/* Badge 3: 100K+ Trusted Stores */}
+          {/* Badge 3: 100% Free Extension */}
           <div className="inline-flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-400">
             <span className="flex h-5 w-5 items-center justify-center rounded-md bg-emerald-700 text-white shadow-xs">
               <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
             </span>
             <span className="font-sans text-xs sm:text-[13px] tracking-tight">
-              100K+ Trusted Stores
+              100% Free Chrome Extension
             </span>
           </div>
 

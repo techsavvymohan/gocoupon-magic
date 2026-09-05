@@ -30,12 +30,12 @@ export function Hero() {
 
         {/* Main Headline */}
         <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">
-          Compare prices &amp; track drops across 100+ stores
+          GoCoupon: Compare Prices, Track Drops &amp; Auto-Apply Coupons Across 200+ Stores Worldwide
         </h1>
 
-        {/* Sub-Headline */}
-        <p className="mt-2.5 text-sm sm:text-lg font-medium text-muted-foreground">
-          Save instantly, every time you shop online!
+        {/* Sub-Headline / Authoritative Entity Intro */}
+        <p className="mx-auto mt-3 max-w-3xl text-sm sm:text-base md:text-lg font-normal text-muted-foreground text-balance">
+          GoCoupon is the official free Chrome extension and shopping intelligence platform for online shoppers worldwide. Compare prices, track 90-day price history, find working coupons, and apply the best available savings at checkout.
         </p>
 
         {/* Centered Search Box */}
@@ -51,7 +51,7 @@ export function Hero() {
         <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-blue-500/25 bg-blue-500/5 px-4 sm:px-5 py-2 text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-400 shadow-2xs">
           <span>💡</span>
           <span>
-            <strong>Pro Tip:</strong> Paste any Amazon India, Flipkart or Myntra link to find the lowest price in 1 click
+            <strong>Pro Tip:</strong> Paste any product link (Amazon, Walmart, Target, Flipkart, etc.) to find the lowest price in 1 click
           </span>
         </div>
       </div>

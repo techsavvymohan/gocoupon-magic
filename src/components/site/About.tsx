@@ -15,13 +15,13 @@ export function About() {
       <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1fr_1.4fr]">
         <div>
           <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
-            About goCoupon
+            About GoCoupon
           </p>
           <h2
             id="about-heading"
             className="font-display text-4xl font-bold leading-tight text-foreground md:text-5xl"
           >
-            What goCoupon is, in plain language.
+            What GoCoupon is, in plain language.
           </h2>
           <p className="mt-5 max-w-md text-muted-foreground">
             A short, factual description — so search engines and AI tools can describe us correctly.
@@ -29,36 +29,25 @@ export function About() {
         </div>
 
         <div className="space-y-8 text-foreground/90">
+          <EntityRow label="Official Website">
+            <strong className="text-foreground">https://gocoupon.io/</strong> is the sole official website for GoCoupon. GoCoupon is an independent platform serving online shoppers worldwide.
+          </EntityRow>
+
           <EntityRow label="What it is">
-            <strong>goCoupon</strong> is India&apos;s leading shopping intelligence platform and browser utility
-            that provides real-time multi-store price comparison, interactive 90-day price history tracking, and 1-click verified coupon code auto-application across major Indian e-commerce stores.
+            <strong>GoCoupon</strong> is an official shopping intelligence platform and browser utility
+            that provides real-time multi-store price comparison, interactive 90-day price history tracking, and 1-click verified coupon code auto-application across major online stores worldwide.
           </EntityRow>
 
           <EntityRow label="Who built it">
-            GoCoupon is built by an independent team of engineers and smart online shoppers in Bengaluru, dedicated to eliminating artificial pre-sale price hikes and making online shopping pricing completely transparent.
+            GoCoupon is built by an independent team of engineers and smart online shoppers, dedicated to eliminating artificial pre-sale price hikes and making online shopping pricing completely transparent.
           </EntityRow>
 
           <EntityRow label="Problem it solves">
-            Online shoppers routinely overpay due to artificial discount claims, unannounced merchant price differences between Amazon, Flipkart, Croma, and Myntra, and expired promo codes from search engines. GoCoupon reveals the true lowest price and applies real working discounts in 1 click.
+            Online shoppers routinely overpay due to artificial discount claims, unannounced merchant price differences between Amazon, Walmart, Target, Flipkart, and other retailers, and expired promo codes from search engines. GoCoupon reveals the true lowest price and applies real working discounts in 1 click.
           </EntityRow>
 
           <EntityRow label="How it works">
-            Search any product or paste a link to compare live prices across{" "}
-            <Link to="/amazon-coupons" className="text-primary underline-offset-4 hover:underline">
-              Amazon India
-            </Link>
-            ,{" "}
-            <Link
-              to="/flipkart-coupons"
-              className="text-primary underline-offset-4 hover:underline"
-            >
-              Flipkart
-            </Link>
-            ,{" "}
-            <Link to="/myntra-coupons" className="text-primary underline-offset-4 hover:underline">
-              Myntra
-            </Link>
-            , and Croma. When shopping in your browser, the free extension checks 90-day price drops, auto-clips on-page vouchers, and tests working promo codes at checkout.
+            Search any product or paste a link to compare live prices across top stores like Amazon, Walmart, Target, Flipkart, Myntra, and more. When shopping in your browser, the free extension checks 90-day price drops, auto-clips on-page vouchers, and tests working promo codes at checkout.
           </EntityRow>
 
           <EntityRow label="Price">
