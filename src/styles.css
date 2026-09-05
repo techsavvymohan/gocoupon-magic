@@ -463,3 +463,13 @@ html:not(.dark) .bg-card:hover {
     animation: none !important;
   }
 }
+
+/* ── Clean Touch Carousel / Pill Scroller ── */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
