@@ -334,19 +334,19 @@ export function UrlResolverSearch({
         </div>
       </form>
 
-      {/* SearXNG Live Dropdown Suggestions */}
+      {/* Live Dropdown Suggestions */}
       {showDropdown && (searxngSuggestions.length > 0 || searxngResults.length > 0) && (
         <div
           role="listbox"
-          id="searxng-suggestions-list"
+          id="search-suggestions-list"
           className="absolute top-full left-0 right-0 mt-2 z-50 rounded-2xl sm:rounded-3xl border border-border/80 bg-card/98 backdrop-blur-2xl p-2.5 sm:p-3 shadow-2xl text-left animate-in fade-in zoom-in-95 duration-150 divide-y divide-border/40 max-h-[380px] overflow-y-auto"
         >
-          {/* SearXNG Autocomplete Suggestions */}
+          {/* Autocomplete Suggestions */}
           {searxngSuggestions.length > 0 && (
             <div className="pb-2">
               <div className="flex items-center justify-between px-2 py-0.5 mb-1">
                 <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
-                  <Search className="h-2.5 w-2.5 text-primary" /> SearXNG Suggestions
+                  <Search className="h-2.5 w-2.5 text-primary" /> Suggested Searches
                 </span>
                 <span className="text-[9px] font-mono text-muted-foreground/60">Live Query</span>
               </div>
@@ -377,14 +377,14 @@ export function UrlResolverSearch({
             </div>
           )}
 
-          {/* SearXNG Live Web & Store Results */}
+          {/* Live Web & Store Results */}
           {searxngResults.length > 0 && (
             <div className="pt-2">
               <div className="flex items-center justify-between px-2 py-0.5 mb-1">
                 <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
                   <Globe className="h-2.5 w-2.5 text-emerald-500" /> Live Web Results
                 </span>
-                <span className="text-[9px] font-mono text-muted-foreground/60">SearXNG</span>
+                <span className="text-[9px] font-mono text-muted-foreground/60">Verified Store</span>
               </div>
               <ul className="space-y-1">
                 {searxngResults.map((item, idx) => {
@@ -428,7 +428,7 @@ export function UrlResolverSearch({
           <div className="pt-2 px-2 flex items-center justify-between text-[10px] text-muted-foreground font-mono">
             <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              SearXNG Engine Connected
+              Live Price Engine Active
             </span>
             <span>Press ↵ to compare</span>
           </div>
