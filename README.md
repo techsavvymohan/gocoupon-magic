@@ -4,111 +4,105 @@
 
 ![GoCoupon Banner](public/gc-logo-dark.webp)
 
-**The next-generation multi-store price comparison engine, 90-day price history tracker, and 1-click automated discount coupon applier.**
+**The unified commerce intelligence platform: Multi-store cross-comparison across 200+ retailers, 90-day price history tracking, 1-click verified coupon auto-applying, and card-linked bank discount arbitrage.**
 
 [![Vite](https://img.shields.io/badge/Vite-7.3-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind-v4.2-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![TanStack Router](https://img.shields.io/badge/TanStack_Router-v1.168-FF4154?style=flat-square)](https://tanstack.com/router)
-[![Pre-rendered Routes](https://img.shields.io/badge/Pre--rendered_Routes-125_Static_Pages-10b981?style=flat-square)](#seo--static-pre-rendering-pipeline)
+[![Pre-rendered Routes](https://img.shields.io/badge/Pre--rendered_Routes-141_Static_Pages-10b981?style=flat-square)](#seo--static-pre-rendering-pipeline)
 [![License](https://img.shields.io/badge/License-Proprietary-slate?style=flat-square)](#)
 
-[Live Platform](https://www.gocoupon.io) • [Explore Stores](https://www.gocoupon.io/stores) • [Compare Prices](https://www.gocoupon.io/compare) • [Price Tracker](https://www.gocoupon.io/price-history) • [Chrome Extension](https://www.gocoupon.io/chrome-extension)
+[Live Platform](https://www.gocoupon.io) • [Explore Stores](https://www.gocoupon.io/stores) • [Compare Prices](https://www.gocoupon.io/compare) • [Price Tracker](https://www.gocoupon.io/price-history) • [Chrome Extension](https://www.gocoupon.io/chrome-extension) • [Blog Guides](https://www.gocoupon.io/blog)
 
 </div>
 
 ---
 
-## 📖 Executive Summary
+## 📖 Executive Summary & Category Monopoly
 
-**GoCoupon** is a high-performance commerce intelligence and shopping utility SaaS platform. Traditional coupon websites are cluttered with expired promo codes, intrusive ads, misleading countdown timers, and spammy redirects. GoCoupon completely reimagines the digital shopping experience by combining:
+For over a decade, consumer shopping tools have been fractured into weak, single-feature point solutions:
+- **Keepa / CamelCamelCamel** only track Amazon, blind to outside stores.
+- **Honey / Coupert** only scrape coupons, blind to base store pricing and bank offers.
+- **Google Shopping** operates as an ad auction, selling ranking to the highest bidder.
+- **Retail Banks** (Chase, Amex, HDFC, SBI) hide partner offers inside isolated app portals.
 
-1. **Real-Time Cross-Store Price Comparison**: Resolve any product URL or search term to compare prices, delivery estimates, seller ratings, and final net checkout costs across major retailers (Amazon, Flipkart, Myntra, Croma, Meesho, Tata CLiQ, and Reliance Digital).
-2. **Interactive 90-Day Price Tracker & Deal Scoring**: Expose artificial "pre-sale" markups by analyzing verified historical price curves against all-time lows and highs.
-3. **Automated Voucher Applier (Manifest V3 Chrome Extension)**: A lightweight, privacy-first browser companion that awakens at checkout on 200+ partner stores, parallel-tests candidate coupon codes in under 850 milliseconds, and auto-clips hidden retailer vouchers.
-4. **Push Notification Price Alerts**: Real-time browser and mobile lockscreen notifications triggered the instant an item drops to a user-defined target price.
-5. **Evidence-Backed Category Dossiers**: Transparent, rubric-based product shortlists (top 1% scoring) that help consumers make informed purchasing decisions based on hard benchmark data rather than sponsored hype.
+Shoppers were forced to juggle 5 different tools, 10 open browser tabs, and manual calculator math just to buy a single laptop or pair of headphones.
+
+**GoCoupon completely renders this fragmented ecosystem obsolete.** We unify the entire consumer commerce intelligence stack into **ONE sovereign, lightning-fast platform and browser extension**. In under 1 second, shoppers get the mathematical truth before hitting "Place Order."
 
 ---
 
-## ⚡ Core Platform Capabilities
+## ⚡ The 5-in-1 Unified Architecture
 
 ### 1. Cross-Store Price Comparison Matrix (`/compare`)
-- **Instant Product URL Resolver**: Users can paste a direct product URL from Amazon, Flipkart, or Myntra to extract product metadata, canonical ASIN/identifiers, and instantly fetch cross-merchant listings.
-- **Multi-Platform Search Engine**: Searches across India's top online stores simultaneously with unified sorting by Net Effective Cost (Base Price + Shipping - Active Coupons).
-- **Side-by-Side Merchant Cards**: Displays seller credibility ratings, return policies, delivery windows, and direct affiliate deep-links.
+- **200+ Enterprise Retailers**: Real-time cross-merchant price tracking across Amazon (US/UK/EU/IN), Walmart, Best Buy, Target, Flipkart, Croma, Reliance Digital, and specialized DTC brands.
+- **Instant Product URL Resolver**: Paste any product link from Amazon, Flipkart, or Walmart to extract canonical identifiers and instantly surface competitor pricing.
+- **Unbiased Ranking**: 100% store-agnostic with zero sponsored ad bias. The store with the authentic lowest delivered price always occupies the #1 spot.
 
-### 2. Interactive 90-Day Price History Tracker (`/price-history`)
-- **Interactive Recharts Visualization**: Fluid SVG price trajectory charts over 30, 60, 90, and 180-day intervals with hover tooltips and reference thresholds.
-- **Algorithmic Deal Score (0–100)**: Evaluates whether the current price is genuinely discounted or an inflated "fake sale":
-  - **Score ≥ 80 (Green)**: True lowest price window — recommended to buy immediately.
-  - **Score 60–79 (Amber)**: Standard pricing within typical fluctuation bounds.
-  - **Score < 60 (Red)**: Artificially marked-up price before a sale event.
-- **Price Metric Summary**: All-time low, all-time high, 90-day moving average, and price volatility index.
+### 2. Interactive 90-Day Price Tracker & Fake Sale Detector (`/price-history`)
+- **Continuous Price Telemetry**: Fluid SVG historical price trajectory curves over 30, 60, 90, and 180-day windows.
+- **Fake Discount Shield**: Exposes synthetic "pre-sale" markups where retailers inflate prices by 20%–40% right before Black Friday, Prime Day, or festival sales.
+- **Algorithmic Deal Score (0–100)**: Evaluates current prices against all-time lows, 90-day moving averages, and price volatility indexes.
 
-### 3. Price-Drop Watchlist & Web Push Alerts (`/watchlist`)
-- **Custom Budget Targets**: Users set precise numerical target prices or quick percentage drops (-5%, -10%, -15%, -20%, -25%).
-- **Web Push API Integration**: Dispatches instant browser notifications and mobile phone lockscreen alerts without requiring account registration or personal email.
-- **Zero-Spam Client Storage**: Watchlists and alert configurations persist securely in client storage (`localStorage` / IndexedDB).
+### 3. Bank Card & Financing Arbitrage Engine
+- **Exclusive Bank Tie-Up Discovery**: Retailers keep competitor card partnerships secret (e.g. Amazon won't tell you Flipkart has ₹5,000 off with HDFC, or Best Buy has $120 off with Chase).
+- **Official Vector SVG Brand Registry**: Authentic vector logos for **Chase, American Express (Amex), Capital One, Citi, Affirm, HDFC Bank, SBI Card, ICICI Bank, Axis Bank, Kotak Mahindra, and IndusInd Bank**.
+- **Universal Pricing + Optional Booster**: Guarantees the lowest store base price for all shoppers (cash, UPI, debit, standard checkout) while stacking extra instant discounts for cardholders.
 
-### 4. Manifest V3 Chrome Extension (`/chrome-extension`, `/extension`)
-- **Parallel Code Injection Engine**: Injects and tests dozens of discount vouchers within a client-side sandbox in <850ms, automatically selecting the code delivering the maximum net discount.
-- **Hidden Voucher Auto-Clipper**: Detects and automatically clicks on hidden green voucher checkboxes on Amazon India and Flipkart product pages.
-- **Dormant Privacy Architecture**: Consumes zero background CPU cycles; stays dormant until the user navigates to a supported store checkout.
+### 4. 1-Click Working Coupon Auto-Applier (`/chrome-extension`)
+- **Autonomous DOM Injection**: Parallel-tests candidate promo codes in under 850 milliseconds directly within the checkout sandbox.
+- **Hidden Voucher Auto-Clipper**: Detects and automatically activates hidden on-page voucher checkboxes on Amazon and Flipkart product pages.
+- **Zero Dead-Code Spam**: Replaces expired crowd-sourced codes with mathematical savings.
 
-### 5. Merchant Directory (`/stores`)
-- **200+ Verified Retailers**: Global and regional e-commerce directory featuring Amazon, Walmart, Target, Flipkart, Myntra, Best Buy, Nike, and more.
-- **Tactile Category Console**: Filter instantly by General, Fashion, Electronics, Beauty, Food, Travel, and Home.
-- **1-Click Coupon Copy**: Instant clipboard copying with feedback toasts and direct merchant redirection.
-- **Brand Snap Carousel**: Touch-friendly horizontal snap carousel for quick discovery on mobile devices.
-
-### 6. Evidence-Backed Collections (`/collections`, `/collections/$slug`)
-- **Top 1% Shortlists**: Curated buyer guides for headphones, laptops, smartphones, monitors, and lifestyle products.
-- **Weighted Evaluation Rubrics**: Transparent breakdown of laboratory metrics (e.g., active noise cancellation attenuation in dB, battery endurance, thermal throttling, and cost-per-feature).
-- **Flash Verdict Badges**: Concise takeaway pills indicating best overall, runner-up, and budget winner.
-
-### 7. Global Multi-Currency Support (INR ₹ / USD $)
-- **Instant Navbar Currency Switcher**: Seamless toggle between Indian Rupee (`₹`) and US Dollar (`$`).
-- **Dynamic Context Provider (`CurrencyContext`)**: Automatically formats prices, discounts, savings deltas, and chart axes across all routes with regional numbering systems (`en-IN` lakhs/crores vs `en-US` thousands/millions).
+### 5. "Ask GoCoupon" Grounded AI Commerce Assistant (`/`)
+- **Deterministic Tool Calling**: Integrates internal catalog retrieval, 90-day price history telemetry, and live Google Shopping feeds via SerpAPI.
+- **Grounded Verification**: Synthesizes verified purchasing advice with citations, limitation disclaimers, and zero hallucinations.
 
 ---
 
-## 🏗️ Architecture & Technology Stack
+## 💰 Consumer Economics: Direct Shopping vs. GoCoupon
 
-```
-                               ┌───────────────────────────────────────────────┐
-                               │             GoCoupon Web Client               │
-                               │  (React 19 + TanStack Router + Tailwind v4)   │
-                               └───────┬───────────────────────────────┬───────┘
-                                       │                               │
-                      ┌────────────────┴──────────────┐ ┌──────────────┴────────────────┐
-                      ▼                               ▼ ▼                               ▼
-           ┌───────────────────────┐       ┌───────────────────────┐       ┌────────────────────────┐
-           │   Product & Price     │       │  Automated Coupons    │       │     Push & Alerts      │
-           │     Engine (API)      │       │     & Extension       │       │    Service Worker      │
-           ├───────────────────────┤       ├───────────────────────┤       ├────────────────────────┤
-           │ • Multi-Store Search  │       │ • Chrome Extension M3 │       │ • Web Push API         │
-           │ • URL Metadata Parser │       │ • Code Test Sandbox   │       │ • Target Price Watch   │
-           │ • 90-Day Histograms   │       │ • Voucher Auto-Clip   │       │ • Browser Notifications│
-           └───────────────────────┘       └───────────────────────┘       └────────────────────────┘
-```
+When shopping directly on single retail platforms, consumers routinely pay the full monopoly markup. GoCoupon eliminates this hidden tax across every major category:
 
-| Layer | Technology | Details |
+| Product / Category | Direct Store Checkout (Without GoCoupon) | GoCoupon Optimized Path (Store + Card Arbitrage) | Net Paid with GoCoupon | Real Money Saved |
+| :--- | :--- | :--- | :--- | :--- |
+| **Apple iPhone 16 (128GB)** | ₹79,900 ($829) on Amazon | Flipkart / Best Buy + HDFC / Chase Flat Bank Discount | **₹74,900 ($769)** | **₹5,000 ($60.00)** |
+| **MacBook Air 13" M3 (256GB)** | ₹1,04,900 ($1,099) on Amazon | Croma / B&H + SBI / Amex Instant Promotion | **₹95,900 ($979)** | **₹9,000 ($120.00)** |
+| **Sony WH-1000XM5 ANC** | ₹29,990 ($398) on Amazon | Reliance / Target + ICICI / Capital One 10% Discount | **₹25,490 ($338)** | **₹4,500 ($60.00)** |
+| **Samsung 55" QLED 4K TV** | ₹64,990 ($749) on Flipkart | Amazon / Walmart + Axis / Affirm 0% APR Promo | **₹56,490 ($649)** | **₹8,500 ($100.00)** |
+| **Nike Air Force 1 '07** | ₹8,945 ($125) on Nike.com | Myntra / Nordstrom Rack + Auto-Applied 15% VIP Code | **₹6,371 ($83)** | **₹2,574 ($42.00)** |
+| **Skincare Essentials Bundle** | ₹3,450 ($68) on Nykaa | Official Brand Store + 20% Voucher + Wallet Cashback | **₹2,460 ($49)** | **₹990 ($19.00)** |
+
+### Annual Household Impact
+An active household spending **₹3,97,000 ($4,750)** annually across gadgets, home goods, apparel, and lifestyle saves an estimated **₹50,100 ($655.00)** per year in 1 second per purchase.
+
+---
+
+## 🔒 Privacy-by-Design Architecture
+
+- **Zero Financial Data Ingestion**: GoCoupon never asks for, reads, or stores credit card numbers, CVVs, passwords, or personal banking credentials.
+- **Client-Side Calculation**: Card discount rules match public merchant promotion tables inside the local browser sandbox.
+- **Direct Merchant Checkout**: Purchases execute directly on the authorized retailer's encrypted page with full manufacturer warranties.
+
+---
+
+## 🏗️ Technology Stack
+
+| Layer | Technology | Version & Details |
 | :--- | :--- | :--- |
-| **Frontend Framework** | React 19.2.0 | High-concurrency UI rendering, actions, and Suspense |
-| **Build & Bundler** | Vite 7.3.6 | Hot Module Replacement (HMR), optimized vendor code-splitting |
-| **Language** | TypeScript 5.8.3 | Strict static typing across routes, services, and affiliate contracts |
-| **Routing** | TanStack Router v1.168 | Fully type-safe routing, search parameter validation, and preloaders |
-| **Data Fetching** | TanStack Query v5.83 | Async cache management, background revalidation, optimistic UI |
-| **Styling** | Tailwind CSS v4.2 | PostCSS-free native `@tailwindcss/vite` configuration |
-| **UI Primitives** | Radix UI | Accessible headless primitives (Dialog, Popover, Slider, Tabs, etc.) |
-| **Data Visualization** | Recharts 2.15.4 | SVG price history curves, Cartesian grids, and reference areas |
-| **Icons** | Lucide React | Curated SVG icons strictly adhering to non-"vibe coded" design standards |
-| **Toast Notifications** | Sonner 2.0.7 | Accessible, queue-managed interactive toasts |
-| **Static Pre-Rendering** | Node.js Custom Runner | 125 static HTML pages pre-rendered during build (`generate-routes.js`) |
-| **SEO & Schemas** | JSON-LD Schema | Product, FAQ, BreadcrumbList, WebSite, and Organization schemas |
-| **Hosting & Edge** | Vercel & Cloudflare | Edge CDN caching, immutable assets, and serverless API endpoints |
+| **Frontend Framework** | React | `19.2.0` — High-concurrency UI rendering, actions & Suspense |
+| **Build Tool & Bundler** | Vite | `7.3.6` — Optimized vendor code-splitting & HMR |
+| **Language** | TypeScript | `5.8.3` — Strict static typing across routes, services & affiliate contracts |
+| **Routing** | TanStack Router | `1.168` — Fully type-safe routing, preloaders & search param validation |
+| **Data Fetching** | TanStack Query | `5.83` — Async cache management, background revalidation |
+| **Styling** | Tailwind CSS | `v4.2` — Native `@tailwindcss/vite` configuration |
+| **UI Primitives** | Radix UI | Accessible headless primitives (Dialog, Popover, Slider, Tabs) |
+| **Data Visualization** | Recharts | `2.15.4` — SVG price history curves, Cartesian grids & reference areas |
+| **Static Pre-Rendering** | Node.js Custom Runner | **141 static HTML pages** pre-rendered during build (`generate-routes.js`) |
+| **XML Sitemap** | Dynamic Generator | **71 indexed URLs** synchronized automatically during build |
+| **SEO & Schemas** | JSON-LD Schema | Product, Offer, FAQPage, BreadcrumbList, WebSite, and Organization |
 
 ---
 
@@ -117,40 +111,36 @@
 ```
 gocoupon-magic/
 ├── api/                             # Serverless API routes (Vercel Functions)
-│   └── affiliates/
-│       └── products.ts              # Cross-merchant product search endpoint
+│   ├── affiliates/                  # Product search & affiliate deep-links
+│   └── shopping.ts                  # SerpAPI Google Shopping live proxy
 ├── public/                          # Static assets, manifests, icons & Brand logos
-│   ├── Brand logos/                 # High-res merchant logos (Amazon, Flipkart, etc.)
-│   ├── gc-logo-dark.webp            # Primary brand mark
+│   ├── Brand logos/                 # High-resolution merchant logos
+│   ├── hero-top-banner.webp         # Curved transparent header artwork
 │   ├── manifest.json                # PWA & Web Extension manifest
 │   ├── robots.txt                   # Search engine crawling directives
-│   ├── sitemap.xml                  # Dynamic XML sitemap (63 indexed routes)
+│   ├── sitemap.xml                  # Dynamic XML sitemap (71 indexed routes)
 │   └── sw.js                        # Service worker for Web Push notifications
 ├── scripts/                         # Build & automation scripts
-│   └── generate-routes.js           # Static pre-rendering pipeline (125 HTML routes)
+│   └── generate-routes.js           # Static pre-rendering pipeline (141 HTML routes)
 ├── src/                             # Application source code
 │   ├── components/                  # Modular UI components
-│   │   ├── shopping/                # Commerce widgets (PriceHistory, Comparator, AlertModal)
-│   │   ├── site/                    # Site structure (Navbar, Footer, SiteShell, CTA, Features)
+│   │   ├── icons/                   # Pixel-perfect SVG bank brand logos (Chase, Amex, HDFC, SBI, etc.)
+│   │   ├── shopping/                # Commerce widgets (PriceHistory, BankCardSelector, Comparator)
+│   │   ├── site/                    # Structural layout (Hero, HowItWorks, CardArbitrageShowcase, Features)
 │   │   └── ui/                      # Headless Radix UI base components
-│   ├── context/                     # Global state providers (CurrencyContext)
-│   ├── data/                        # Static datasets (stores, canonical catalog, collections)
-│   ├── hooks/                       # Custom React hooks (useCurrency, useWatchlist, etc.)
+│   ├── context/                     # Global state (CurrencyContext, UserCardsContext)
+│   ├── data/                        # Static datasets (stores, canonical catalog, collections, posts)
+│   ├── hooks/                       # Custom React hooks (useCurrency, useUserCards, useWatchlist)
 │   ├── lib/                         # Business logic, services & utilities
-│   │   ├── affiliates/              # Multi-network affiliate deep-link abstractions
-│   │   ├── services/                # Price history algorithms, URL parsers, notifications
+│   │   ├── services/                # Price history algorithms, URL parsers, Ask GoCoupon AI
 │   │   └── seo.ts                   # SEO metadata & JSON-LD schema builder
 │   ├── routes/                      # File-based TanStack Router pages
-│   │   ├── __root.tsx               # Root layout & global error boundary
 │   │   ├── index.tsx                # Homepage
 │   │   ├── compare.tsx              # Multi-store price comparison engine
 │   │   ├── price-history.tsx        # 90-day price tracking hub
 │   │   ├── stores.tsx               # 200+ Merchant Storeverse directory
-│   │   ├── deals.tsx                # Verified live discount deals
-│   │   ├── categories.tsx           # Category taxonomy explorer
 │   │   ├── chrome-extension.tsx     # Extension landing & installation guide
 │   │   ├── watchlist.tsx            # Saved items & price alert monitor
-│   │   ├── collections/             # Evidence-backed product shortlists
 │   │   └── blog/                    # In-depth shopping guides & research articles
 │   ├── main.tsx                     # React client entry point & preload recovery
 │   └── styles.css                   # Global styles, typography & color variables
@@ -182,13 +172,13 @@ npm install
 ```bash
 npm run dev
 ```
-Open [http://localhost:5173](http://localhost:5173) in your browser to explore the platform.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### 4. Build for Production
+### 4. Build for Production & Pre-Render Static Routes
 ```bash
 npm run build
 ```
-The build process compiles Vite client assets, chunks vendor libraries, pre-renders all **125 static HTML routes** in `/dist`, and automatically synchronizes `sitemap.xml`.
+This command compiles the Vite client bundle, chunks vendor libraries, pre-renders **141 static HTML routes** in `/dist`, and updates `sitemap.xml` with all 71 indexed URLs.
 
 ### 5. Local Production Preview
 ```bash
@@ -212,26 +202,21 @@ VITE_FLIPKART_AFFILIATE_ID=gocoupon_fk
 # Web Push Notification Configuration (VAPID Keys)
 VITE_VAPID_PUBLIC_KEY=your_public_vapid_key_here
 
-# Search API Proxies (Optional)
-VITE_SEARXNG_API_URL=https://search.gocoupon.io
+# Live Search & Product APIs (Optional)
+SERPAPI_API_KEY=your_serpapi_key_here
 ```
 
 ---
 
 ## 🔍 SEO & Web Interface Standards
 
-- **Static Pre-Rendering (SSG)**: 125 static routes pre-compiled with unique HTML tags, meta titles, descriptions, and Canonical URLs.
-- **Rich Structured Data (JSON-LD)**:
-  - `Product` & `Offer` schemas with low/high price points.
-  - `BreadcrumbList` hierarchy on all sub-routes.
-  - `FAQPage` schema on informational and coupon pages.
-  - `Organization` and `WebSite` schemas on the root layout.
+- **Static Pre-Rendering (SSG)**: 141 pre-rendered static routes for instant First Contentful Paint (FCP) and full search engine discoverability.
+- **Rich Structured Data (JSON-LD)**: Complete schema coverage including `Product`, `Offer`, `FAQPage`, `BreadcrumbList`, `WebSite`, and `Organization`.
 - **Strict Web Interface Guidelines**:
   - Minimum touch targets of $\ge 44\text{px}$ on mobile viewports.
   - Zero layout shifts (CLS = 0) with explicit image aspect ratios.
-  - Mobile bottom navigation clearance (`pb-28`) ensuring UI controls are never obscured.
+  - Complete elimination of generic "sparkle" glyphs in favor of clean, purposeful iconography.
   - Accessible focus rings (`:focus-visible`) and polite `aria-live` regions for dynamic state updates.
-  - Complete elimination of generic "vibe-coded" sparkle icons in favor of clear, contextual iconography.
 
 ---
 
