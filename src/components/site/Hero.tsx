@@ -10,12 +10,12 @@ import { UrlResolverSearch } from "../shopping/UrlResolverSearch";
 export function Hero() {
   return (
     <section className="relative overflow-hidden pb-16 sm:pb-24">
-      {/* Top Banner Container - Completely covers left-to-right border with compact vertical height */}
+      {/* Curved Transparent Top Banner */}
       <div className="relative w-full flex justify-center bg-transparent">
         <img
           src="/hero-top-banner.webp"
           alt="GoCoupon — Shop Smarter, Pay Less"
-          className="w-full h-[90px] sm:h-[140px] md:h-auto md:max-h-[240px] object-cover md:object-contain object-center md:object-top"
+          className="w-full h-auto max-h-[140px] sm:max-h-[180px] md:max-h-[220px] lg:max-h-[260px] object-contain object-top"
           width={2048}
           height={252}
           loading="eager"
@@ -27,15 +27,12 @@ export function Hero() {
       <div className="relative mx-auto max-w-4xl px-4 sm:px-6 pt-5 sm:pt-8 text-center">
         {/* Main Headline */}
         <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">
-          GoCoupon: Compare Prices, Track Drops &amp; Auto-Apply Coupons Across 200+ Stores
-          Worldwide
+          Find Your Lowest Price Across Stores with Your Bank Card in 1 Second
         </h1>
 
         {/* Sub-Headline / Authoritative Entity Intro */}
         <p className="mx-auto mt-3 max-w-3xl text-sm sm:text-base md:text-lg font-normal text-muted-foreground text-balance">
-          GoCoupon is the official free Chrome extension and shopping intelligence platform for
-          online shoppers worldwide. Compare prices, track 90-day price history, find working
-          coupons, and apply the best available savings at checkout.
+          Stores will never tell you a competitor is cheaper. GoCoupon is store-agnostic—we instantly cross-check Amazon, Flipkart, Walmart, Best Buy &amp; 200+ stores against your exact credit cards, bank discounts, and financing to reveal your true net price.
         </p>
 
         {/* Centered Search Box — Prioritized directly below heading */}
@@ -47,8 +44,7 @@ export function Hero() {
         <div className="mt-7 inline-flex items-center gap-2 rounded-full border border-blue-500/25 bg-blue-500/5 px-4 sm:px-5 py-2 text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-400 shadow-2xs">
           <span>💡</span>
           <span>
-            <strong>Pro Tip:</strong> Paste any product link (Amazon, Walmart, Target, Flipkart,
-            etc.) to find the lowest price in 1 click
+            <strong>Pro Tip:</strong> Paste any product link or search—GoCoupon auto-applies HDFC, SBI, ICICI, Chase, Amex &amp; Affirm discounts in 1 click
           </span>
         </div>
 

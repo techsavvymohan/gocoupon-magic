@@ -25,7 +25,7 @@ export function CTA() {
         </h2>
 
         <p className="mx-auto mt-6 max-w-xl text-base text-muted-foreground sm:text-lg leading-relaxed">
-          Install the free Chrome extension in 10 seconds. Auto-apply working discount codes, auto-clip Amazon &amp; Flipkart vouchers, and compare live store prices with zero effort.
+          Install the free Chrome extension in 10 seconds. Auto-apply working coupon codes, track 90-day price drops, and calculate your lowest card-linked price across Amazon, Flipkart, Walmart &amp; 200+ stores with zero effort.
         </p>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-5">

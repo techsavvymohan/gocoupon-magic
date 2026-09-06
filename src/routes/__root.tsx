@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { useState } from "react";
 
 import { CurrencyProvider } from "@/context/CurrencyContext";
+import { UserCardsProvider } from "@/context/UserCardsContext";
 
 function RootComponent() {
   const [queryClient] = useState(
@@ -21,9 +22,11 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <CurrencyProvider>
-        <HeadContent />
-        <Outlet />
-        <Toaster position="top-right" richColors />
+        <UserCardsProvider>
+          <HeadContent />
+          <Outlet />
+          <Toaster position="top-right" richColors />
+        </UserCardsProvider>
       </CurrencyProvider>
     </QueryClientProvider>
   );

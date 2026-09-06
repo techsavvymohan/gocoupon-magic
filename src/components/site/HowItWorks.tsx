@@ -3,18 +3,18 @@ import { useEffect, useRef } from "react";
 const steps = [
   {
     n: "01",
-    title: "Install free extension or search online",
-    body: "Add the free GoCoupon extension in 10 seconds, or search any product and paste links from Amazon India, Flipkart, or Myntra to compare live prices.",
+    title: "Search any product or paste a store link",
+    body: "Paste any product link from Amazon, Flipkart, Walmart, Best Buy, or Target—or search directly to compare live prices across 200+ verified stores.",
   },
   {
     n: "02",
-    title: "Check price history & voucher alerts",
-    body: "Browse stores as usual. GoCoupon automatically monitors 90-day price trends, detects fake sales, and spots hidden on-page discount checkboxes.",
+    title: "Select your bank card or financing",
+    body: "Choose your card (HDFC, SBI, ICICI, Axis / Chase, Amex, Capital One) or 0% APR with Affirm. GoCoupon automatically factors in instant bank offers and reward points.",
   },
   {
     n: "03",
-    title: "1-Click auto-apply at checkout",
-    body: "When you reach the cart, click 'Apply Savings'. GoCoupon tests every working promo code in 2 seconds and applies the highest savings automatically.",
+    title: "See your lowest price & save in 1 second",
+    body: "In 1 second, GoCoupon uncovers which store has the lowest net checkout price for your specific wallet. Click the direct link, check out, and save instantly.",
   },
 ];
 

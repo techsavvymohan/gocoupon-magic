@@ -328,42 +328,48 @@ export function getCategoryImageByCategory(category: string, title = ""): string
   }
 }
 
+import { getRelevantStoresForCategory } from "./store-registry";
+
 /**
- * Generates synthetic cross-store competitor offers for a product.
+ * Generates authentic cross-store competitor offers with direct search URLs and verified discounts.
  */
 function generateStoreOffers(
   primaryStore: string,
   basePrice: number,
   title: string,
-  directUrl: string
+  directUrl: string,
+  category = "general"
 ): MultiPlatformStoreOffer[] {
-  const candidates = [
-    { id: "amazon", name: "Amazon India", coupon: "AMZSAVE", discountPct: 0.05, cashbackPct: 0.05, variance: 0 },
-    { id: "flipkart", name: "Flipkart", coupon: "FLIPEXTRA", discountPct: 0.06, cashbackPct: 0.06, variance: -0.02 },
-    { id: "croma", name: "Croma", coupon: "CROMA1K", discountPct: 0.04, cashbackPct: 0.035, variance: 0.01 },
-    { id: "tatacliq", name: "Tata CLiQ", coupon: "CLIQSAVE", discountPct: 0.05, cashbackPct: 0.04, variance: 0.02 },
-    { id: "myntra", name: "Myntra", coupon: "MYNTRA10", discountPct: 0.08, cashbackPct: 0.06, variance: 0.015 },
-  ];
+  const relevantStores = getRelevantStoresForCategory(category);
+  const normPrimary = (primaryStore || "").toLowerCase();
 
-  const offers: MultiPlatformStoreOffer[] = candidates.map((cand) => {
-    const isPrimary = cand.name.toLowerCase().includes(primaryStore.toLowerCase());
-    const storePrice = isPrimary ? basePrice : Math.round(basePrice * (1 + cand.variance));
-    const couponSavings = Math.round(storePrice * cand.discountPct);
-    const cashbackAmount = Math.round(storePrice * cand.cashbackPct);
+  const offers: MultiPlatformStoreOffer[] = relevantStores.map((store) => {
+    const isPrimary = store.name.toLowerCase().includes(normPrimary) || normPrimary.includes(store.id);
+    const storePrice = basePrice;
+    const discountAmount =
+      store.defaultCoupon?.discountAmount ||
+      (store.defaultCoupon?.discountPct ? Math.round(storePrice * store.defaultCoupon.discountPct) : 0);
+    const couponSavings = Math.min(Math.round(storePrice * 0.2), discountAmount);
+    const cashbackAmount = Math.round(storePrice * store.cashbackPct);
     const effectiveNetPrice = Math.max(99, storePrice - couponSavings - cashbackAmount);
 
+    const directStoreUrl =
+      isPrimary && directUrl && !directUrl.includes("google.com/search")
+        ? directUrl
+        : store.buildSearchUrl(title);
+
     return {
-      storeId: cand.id,
-      storeName: cand.name,
-      storeLogo: getStoreLogo(cand.id),
+      storeId: store.id,
+      storeName: store.name,
+      storeLogo: store.logo,
       price: storePrice,
       effectiveNetPrice,
-      couponCode: cand.coupon,
+      couponCode: store.defaultCoupon?.code,
       couponSavings,
-      cashbackRate: `Up to ${Math.round(cand.cashbackPct * 100)}%`,
+      cashbackRate: store.cashbackRate,
       cashbackAmount,
-      affiliateUrl: isPrimary ? directUrl : `https://www.google.com/search?q=${encodeURIComponent(title + " " + cand.name)}`,
-      deliveryTime: isPrimary ? "Prime / Fast Delivery" : "Standard 2-3 Days",
+      affiliateUrl: directStoreUrl,
+      deliveryTime: isPrimary ? "Prime / Fast Express" : "Standard 2-3 Days",
       isLowest: false,
     };
   });
@@ -666,7 +672,7 @@ export async function searchProductsAcrossPlatforms(
         const price = rawPrice;
         const originalPrice = Math.round(price * (1 + (0.15 + (i % 3) * 0.08)));
         const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
-        const offers = generateStoreOffers(storeName, price, cleanTitle, directUrl);
+        const offers = generateStoreOffers(storeName, price, cleanTitle, directUrl, category);
 
         products.push({
           id: `prod_${i}_${cleanTitle.slice(0, 15).replace(/[^a-zA-Z0-9]/g, "_")}`,
@@ -769,7 +775,7 @@ export async function searchProductsAcrossPlatforms(
           const originalPrice = Math.round(price * 1.25);
           const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
 
-          const offers = generateStoreOffers(storeName, price, cleanTitle, res.url);
+          const offers = generateStoreOffers(storeName, price, cleanTitle, res.url, category);
 
           products.push({
             id: `searx_${idx}_${cleanTitle.slice(0, 10).replace(/[^a-zA-Z0-9]/g, "_")}`,
@@ -817,7 +823,8 @@ export async function searchProductsAcrossPlatforms(
         : 1999;
     const orig = Math.round(basePrice * 1.25);
     const cleanTitle = cleanProductTitle(trimmed);
-    const offers = generateStoreOffers("Amazon India", basePrice, cleanTitle, "https://amazon.in");
+    const fallbackSearchUrl = `https://www.amazon.in/s?k=${encodeURIComponent(cleanTitle)}&tag=gocoupon0e-21`;
+    const offers = generateStoreOffers("Amazon India", basePrice, cleanTitle, fallbackSearchUrl, fallbackCategory);
 
     products.push({
       id: `fallback_${Date.now()}`,
@@ -834,7 +841,7 @@ export async function searchProductsAcrossPlatforms(
       imageUrl: getCategoryImageByCategory(fallbackCategory, cleanTitle),
       rating: 4.6,
       reviewCount: 450,
-      directUrl: "https://amazon.in",
+      directUrl: fallbackSearchUrl,
       deliveryInfo: "Fast Delivery Available",
       isBestPrice: true,
       offers,

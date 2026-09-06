@@ -9,9 +9,34 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { resolveProduct } from "../src/lib/services/product-resolver";
 import { resolveLiveUrlAndCompetitors } from "../src/lib/services/url-metadata-extractor";
 
+import { apiRateLimiter } from "../src/lib/services/rate-limiter";
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  // Rate Limiting (60 requests/min per IP)
+  const clientIp =
+    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+    req.socket?.remoteAddress ||
+    "127.0.0.1";
+
+  const rateCheck = apiRateLimiter.check(clientIp, 60, 60 * 1000);
+  if (!rateCheck.allowed) {
+    res.setHeader("Retry-After", String(rateCheck.retryAfterSeconds));
+    return res.status(429).json({
+      error: "Rate limit exceeded. Please slow down.",
+      retryAfterSeconds: rateCheck.retryAfterSeconds,
+    });
   }
 
   const query = (req.query.url as string) || (req.query.q as string) || (req.query.asin as string);

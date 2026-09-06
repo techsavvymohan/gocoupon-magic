@@ -1,0 +1,74 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gocoupon-app
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
+      - SEARXNG_URL=http://searxng:8080
+      - REDIS_URL=redis://redis:6379
+      - VITE_AMAZON_IN_PARTNER_TAG=gocoupon0e-21
+      - VITE_CUELINKS_PUB_ID=148920
+      # Pass through external keys if defined in .env
+      - SERPAPI_API_KEY=${SERPAPI_API_KEY:-}
+      - UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL:-}
+      - UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN:-}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - redis
+      - searxng
+    networks:
+      - gocoupon-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: gocoupon-redis
+    restart: always
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redis_data:/data
+    networks:
+      - gocoupon-network
+
+  searxng:
+    image: searxng/searxng:latest
+    container_name: gocoupon-searxng
+    restart: always
+    volumes:
+      - ./services/searxng:/etc/searxng:rw
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8080/
+      - UWSGI_WORKERS=4
+      - UWSGI_THREADS=4
+    networks:
+      - gocoupon-network
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: gocoupon-caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+    networks:
+      - gocoupon-network
+
+volumes:
+  redis_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  gocoupon-network:
+    driver: bridge

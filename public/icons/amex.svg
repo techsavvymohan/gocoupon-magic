@@ -1,0 +1,21 @@
+<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Blue rounded squircle container -->
+  <rect width="100" height="100" rx="18" fill="#006FCF" />
+  <!-- AMEX Typography Outline & Fill -->
+  <g fill="#006FCF" stroke="#FFFFFF" stroke-width="5" stroke-linejoin="miter" stroke-miterlimit="3">
+    <!-- 'A' -->
+    <path d="M 28 50 L 44 18 H 54 L 70 50 H 59 L 55.5 42 H 42.5 L 39 50 Z" />
+    <!-- 'M' -->
+    <path d="M 64 50 V 18 H 73 L 80 34 L 87 18 H 96 V 50 H 88 V 28 L 82.5 40 H 77.5 L 72 28 V 50 Z" />
+    <!-- 'E' -->
+    <path d="M 40 82 V 52 H 67 V 60 H 50 V 63.5 H 63 V 70.5 H 50 V 74 H 67 V 82 Z" />
+    <!-- 'X' -->
+    <path d="M 72 82 L 81 67 L 73 52 H 82 L 85.5 59 L 89 52 H 98 L 90 67 L 99 82 H 90 L 85.5 75 L 81 82 Z" />
+  </g>
+  <!-- Inner White Cutouts -->
+  <g fill="#FFFFFF">
+    <polygon points="49,27 45.5,35 52.5,35" />
+  </g>
+  <!-- Subtle outer container border -->
+  <rect x="0.5" y="0.5" width="99" height="99" rx="17.5" stroke="#000000" stroke-opacity="0.12" stroke-width="1" fill="none" />
+</svg>

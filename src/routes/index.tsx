@@ -7,14 +7,11 @@ import { ExtensionShowcase } from "@/components/site/ExtensionShowcase";
 import { HowItWorks } from "@/components/site/HowItWorks";
 import { Features } from "@/components/site/Features";
 import { AnimatedDealsCarousel } from "@/components/site/AnimatedDealsCarousel";
-import { AmazonAffiliateCards } from "@/components/site/AmazonAffiliateCards";
+import { CardArbitrageShowcase } from "@/components/site/CardArbitrageShowcase";
 import { ShoppingIntelligenceSpotlight } from "@/components/shopping/ShoppingIntelligenceSpotlight";
-import { Testimonials } from "@/components/site/Testimonials";
 import { FAQ } from "@/components/site/FAQ";
 import { Blog } from "@/components/site/Blog";
-import { ContactForm } from "@/components/site/ContactForm";
 import { CTA } from "@/components/site/CTA";
-import { About } from "@/components/site/About";
 import { couponFaqs } from "@/data/faqs";
 import { breadcrumbSchema, createSeoHead, faqSchema, organizationSchema, softwareAppSchema, websiteSchema } from "@/lib/seo";
 
@@ -62,19 +59,17 @@ function Index() {
       />
       <Hero />
       <LogoMarquee />
+      <CardArbitrageShowcase />
       <Stats />
+      <AnimatedDealsCarousel />
+      <ShoppingIntelligenceSpotlight />
       <ExtensionShowcase />
       <HowItWorks />
       <Features />
-      <AnimatedDealsCarousel />
-      <AmazonAffiliateCards />
-      <ShoppingIntelligenceSpotlight />
-      <About />
-      <Testimonials />
       <FAQ />
       <Blog />
-      <ContactForm />
       <CTA />
     </SiteShell>
   );
 }
+

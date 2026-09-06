@@ -11,11 +11,13 @@
 
 import * as cheerio from "cheerio";
 import { searchSearXNG } from "./searxng-service";
+import { globalCache } from "./cache-service";
+import { REGISTERED_STORES, wrapAffiliateTracking } from "./store-registry";
 
 const SERPAPI_KEY = process.env.SERPAPI_API_KEY || process.env.SERPAPI_KEY || "";
 
 const FETCH_TIMEOUT_MS = 3500;
-const URL_CACHE_TTL_MS = 5 * 60 * 1000;
+const URL_CACHE_TTL_MS = 15 * 60 * 1000;
 
 export interface ExtractedProductMetadata {
   title: string;
@@ -54,9 +56,6 @@ export interface LiveProductResolution {
   maxSavings: number;
 }
 
-// In-Memory Stale-While-Revalidate Cache
-const urlResolutionCache = new Map<string, { data: LiveProductResolution; timestamp: number }>();
-
 /**
  * Extracts product metadata from raw HTML using Cheerio.
  */
@@ -87,8 +86,6 @@ export function extractMetadataFromHtml(html: string, pageUrl: string): Extracte
   } catch {
     // ignore URL parsing error
   }
-
-  // 1. JSON-LD parsing (schema.org/Product)
   $('script[type="application/ld+json"]').each((_, el) => {
     try {
       const raw = $(el).html();
@@ -195,9 +192,10 @@ export function extractMetadataFromHtml(html: string, pageUrl: string): Extracte
  */
 export async function resolveLiveUrlAndCompetitors(urlOrQuery: string): Promise<LiveProductResolution> {
   const normKey = urlOrQuery.toLowerCase().trim();
-  const cached = urlResolutionCache.get(normKey);
-  if (cached && Date.now() - cached.timestamp < URL_CACHE_TTL_MS) {
-    return cached.data;
+  const cacheKey = `url_resolve:${normKey}`;
+  const cached = await globalCache.get<LiveProductResolution>(cacheKey);
+  if (cached) {
+    return cached;
   }
 
   const isUrl = /^https?:\/\//i.test(urlOrQuery.trim());
@@ -320,10 +318,14 @@ export async function resolveLiveUrlAndCompetitors(urlOrQuery: string): Promise<
             couponSavings,
             cashbackRate,
             cashbackAmount,
-            affiliateUrl:
+            affiliateUrl: wrapAffiliateTracking(
               item.product_link ||
-              item.link ||
-              `https://www.google.com/search?q=${encodeURIComponent(item.title)}`,
+                item.link ||
+                (REGISTERED_STORES.find(
+                  (s) => s.name.toLowerCase().includes(store.toLowerCase()) || store.toLowerCase().includes(s.id)
+                )?.buildSearchUrl(item.title || searchQuery) ??
+                  `https://www.amazon.in/s?k=${encodeURIComponent(item.title || searchQuery)}&tag=gocoupon0e-21`)
+            ),
             isBestDeal: false,
             savingsVsOriginal: originalPrice > 0 ? Math.max(0, originalPrice - effectiveNetPrice) : 0,
           };
@@ -386,7 +388,7 @@ export async function resolveLiveUrlAndCompetitors(urlOrQuery: string): Promise<
                 couponSavings,
                 cashbackRate: "Up to 5.0%",
                 cashbackAmount,
-                affiliateUrl: r.url,
+                affiliateUrl: wrapAffiliateTracking(r.url),
                 isBestDeal: false,
                 savingsVsOriginal: couponSavings + cashbackAmount,
               });
@@ -446,6 +448,6 @@ export async function resolveLiveUrlAndCompetitors(urlOrQuery: string): Promise<
     maxSavings: Math.max(0, maxPrice - minPrice),
   };
 
-  urlResolutionCache.set(normKey, { data: result, timestamp: Date.now() });
+  await globalCache.set(cacheKey, result, URL_CACHE_TTL_MS);
   return result;
 }

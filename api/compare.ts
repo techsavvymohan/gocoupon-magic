@@ -24,6 +24,8 @@ import type { MerchantOffer } from "../src/lib/services/canonical-types";
 import { searchAllStoresConcurrent } from "../src/lib/services/multi-store-connectors";
 import { resolveLiveUrlAndCompetitors } from "../src/lib/services/url-metadata-extractor";
 import { recordPriceSnapshot } from "../src/lib/services/price-tracking-storage";
+import { globalCache } from "../src/lib/services/cache-service";
+import { apiRateLimiter } from "../src/lib/services/rate-limiter";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // 1. Handle CORS Preflight
@@ -39,9 +41,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  // Rate Limiting (40 comparisons/min per IP)
+  const clientIp =
+    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+    req.socket?.remoteAddress ||
+    "127.0.0.1";
+
+  const rateCheck = apiRateLimiter.check(clientIp, 40, 60 * 1000);
+  if (!rateCheck.allowed) {
+    res.setHeader("Retry-After", String(rateCheck.retryAfterSeconds));
+    return res.status(429).json({
+      error: "Too many comparison requests. Please slow down.",
+      retryAfterSeconds: rateCheck.retryAfterSeconds,
+    });
+  }
+
   const productId = (req.query.productId as string) || (req.query.id as string);
   const rawQuery = (req.query.url as string) || (req.query.q as string);
   const isUrl = /^https?:\/\//i.test((rawQuery || "").trim());
+
+  // Check cache for this comparison
+  const cacheKey = `compare:${(rawQuery || productId || "").toLowerCase().trim()}`;
+  if (cacheKey.length > 10) {
+    const cached = await globalCache.get<any>(cacheKey);
+    if (cached) {
+      res.setHeader("X-Cache", "HIT");
+      res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
+      return res.status(200).json(cached);
+    }
+  }
 
   // 2. Try resolving locally from canonical seed catalog first
   let targetProductId = productId;
@@ -228,6 +256,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       storesComparedCount: formattedRows.length,
       unavailableStores: unavailableStores || [],
     };
+
+    if (cacheKey.length > 10) {
+      await globalCache.set(cacheKey, responsePayload, 5 * 60 * 1000);
+    }
 
     res.setHeader("Cache-Control", "public, s-maxage=120, stale-while-revalidate=300");
     return res.status(200).json(responsePayload);

@@ -1,0 +1,25 @@
+<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- White rounded squircle container -->
+  <rect width="100" height="100" rx="18" fill="#FFFFFF" />
+  <!-- Iconic Citi Red Arc -->
+  <path
+    d="M 35 34 C 44 14 84 14 94 34"
+    stroke="#ED1C24"
+    stroke-width="9"
+    stroke-linecap="round"
+    fill="none"
+  />
+  <!-- citi typography in Navy Blue -->
+  <g fill="#003B70">
+    <!-- 'c' -->
+    <path d="M 33 54 C 30 46 24 43 18 43 C 8 43 2 52 2 69 C 2 86 8 95 18 95 C 24 95 30 92 33 84 L 25 80 C 23 85 21 87 18 87 C 12 87 9 81 9 69 C 9 57 12 51 18 51 C 21 51 23 53 25 58 Z" />
+    <!-- first 'i' -->
+    <rect x="39" y="44" width="8" height="50" rx="1" />
+    <!-- 't' -->
+    <path d="M 59 28 H 67 V 44 H 74 V 51 H 67 V 86 C 67 89 69 91 72 91 H 74 V 95 C 71 95 67 95 64 94 C 60 92 59 88 59 83 V 51 H 53 V 44 H 59 Z" />
+    <!-- second 'i' -->
+    <rect x="83" y="44" width="8" height="50" rx="1" />
+  </g>
+  <!-- Subtle outer container border -->
+  <rect x="0.5" y="0.5" width="99" height="99" rx="17.5" stroke="#000000" stroke-opacity="0.08" stroke-width="1" fill="none" />
+</svg>

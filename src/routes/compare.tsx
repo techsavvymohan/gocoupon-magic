@@ -19,6 +19,15 @@ import {
   type MultiPlatformSearchResult,
 } from "@/lib/services/multi-platform-search";
 import { useCurrency } from "@/context/CurrencyContext";
+import { useUserCards } from "@/context/UserCardsContext";
+import { BankCardSelectorBar } from "@/components/shopping/BankCardSelectorBar";
+import { BankOfferBadge } from "@/components/shopping/BankOfferBadge";
+import { CardApplicationModal } from "@/components/shopping/CardApplicationModal";
+import { SUPPORTED_BANK_CARDS, type BankCardDefinition } from "@/lib/services/bank-offers";
+import {
+  US_CREDIT_CARDS,
+  calculateBnplInstallments,
+} from "@/lib/services/international-market";
 import {
   Search,
   ArrowRight,
@@ -44,6 +53,7 @@ import {
   ChevronUp,
   Truck,
   Award,
+  CreditCard,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -141,6 +151,10 @@ export function ComparePage() {
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
   const [showSpotlightHistory, setShowSpotlightHistory] = useState(false);
   const [alertTargetProduct, setAlertTargetProduct] = useState<MultiPlatformProductItem | null>(null);
+  const [cardModalTarget, setCardModalTarget] = useState<BankCardDefinition | null>(null);
+
+  // Bank Card Intelligence
+  const { selectedCardId, activeCard, getSavingsForOffer } = useUserCards();
 
   const openAlertFor = (product: MultiPlatformProductItem) => {
     setAlertTargetProduct(product);
@@ -264,8 +278,21 @@ export function ComparePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />
 
+      {/* Curved Transparent Top Banner */}
+      <div className="relative w-full flex justify-center bg-transparent">
+        <img
+          src="/hero-top-banner.webp"
+          alt="GoCoupon — Shop Smarter, Pay Less"
+          className="w-full h-auto max-h-[130px] sm:max-h-[170px] md:max-h-[200px] lg:max-h-[230px] object-contain object-top"
+          width={2048}
+          height={252}
+          loading="eager"
+          fetchPriority="high"
+        />
+      </div>
+
       {/* Hero Search Section */}
-      <section className="relative border-b border-border bg-gradient-to-b from-background via-background/95 to-muted/20 px-4 sm:px-6 pb-12 pt-14 sm:pt-20">
+      <section className="relative border-b border-border bg-gradient-to-b from-background via-background/95 to-muted/20 px-4 sm:px-6 pb-12 pt-10 sm:pt-14">
         <div className="mx-auto max-w-5xl text-center">
           <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 font-mono text-xs uppercase tracking-[0.2em] text-primary">
             <Layers className="h-3.5 w-3.5" aria-hidden="true" />
@@ -350,7 +377,17 @@ export function ComparePage() {
                   ★
                 </span>
                 <span>
-                  <strong>Top Trusted Stores on Top:</strong> Showing verified listings from <strong>Amazon</strong>, <strong>Flipkart</strong>, <strong>Croma</strong>, <strong>Myntra</strong> &amp; <strong>Tata CLiQ</strong> first.
+                  <strong>Top Trusted Stores on Top:</strong> Showing verified listings from{" "}
+                  {isIndia ? (
+                    <>
+                      <strong>Amazon</strong>, <strong>Flipkart</strong>, <strong>Croma</strong>, <strong>Myntra</strong> &amp; <strong>Tata CLiQ</strong>
+                    </>
+                  ) : (
+                    <>
+                      <strong>Amazon US</strong>, <strong>Walmart</strong>, <strong>Target</strong>, <strong>Best Buy</strong> &amp; <strong>eBay</strong>
+                    </>
+                  )}{" "}
+                  first.
                 </span>
               </div>
               <div className="flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
@@ -359,6 +396,9 @@ export function ComparePage() {
               </div>
             </div>
 
+            {/* Bank Card & EMI / BNPL Intelligence Selector Bar */}
+            <BankCardSelectorBar />
+
             {/* Platform & Price Range Filter Pills */}
             <div className="flex flex-wrap items-center justify-between gap-3 pb-2">
               {/* Platforms */}
@@ -366,7 +406,10 @@ export function ComparePage() {
                 <span className="text-xs font-mono text-muted-foreground mr-1 flex items-center gap-1">
                   <Store className="h-3.5 w-3.5" /> Platform:
                 </span>
-                {["All", "Amazon", "Flipkart", "Croma", "Myntra", "Meesho", "Tata CLiQ"].map((store) => (
+                {(isIndia
+                  ? ["All", "Amazon", "Flipkart", "Croma", "Myntra", "Meesho", "Tata CLiQ"]
+                  : ["All", "Amazon US", "Walmart", "Target", "Best Buy", "eBay", "Newegg"]
+                ).map((store) => (
                   <button
                     key={store}
                     type="button"
@@ -487,17 +530,53 @@ export function ComparePage() {
                       </h2>
                     </div>
 
-                    {/* Best Offer Callout Banner */}
+                    {/* Best Offer Callout Banner with Bank Card Intelligence */}
                     {(() => {
-                      const lowestOffer = exactMatchProduct.offers[0] || {
+                      const offersWithBank = exactMatchProduct.offers.map((offer) => {
+                        const bankSavings = getSavingsForOffer(
+                          offer.storeName,
+                          offer.price,
+                          exactMatchProduct.category
+                        );
+                        const netCostWithCard = Math.max(
+                          99,
+                          offer.effectiveNetPrice - bankSavings.totalCardSavings
+                        );
+                        return {
+                          ...offer,
+                          bankSavings,
+                          netCostWithCard,
+                        };
+                      });
+
+                      // Sort dynamically by lowest net out-of-pocket price factoring in bank card
+                      offersWithBank.sort((a, b) => a.netCostWithCard - b.netCostWithCard);
+
+                      const lowestOffer = offersWithBank[0] || {
                         storeName: exactMatchProduct.primaryStore,
                         effectiveNetPrice: exactMatchProduct.price,
+                        netCostWithCard: exactMatchProduct.price,
                         affiliateUrl: exactMatchProduct.directUrl,
                         couponCode: undefined,
+                        bankSavings: getSavingsForOffer(
+                          exactMatchProduct.primaryStore,
+                          exactMatchProduct.price,
+                          exactMatchProduct.category
+                        ),
                       };
-                      const maxSavings = exactMatchProduct.originalPrice > lowestOffer.effectiveNetPrice
-                        ? exactMatchProduct.originalPrice - lowestOffer.effectiveNetPrice
-                        : 0;
+
+                      const maxSavings =
+                        exactMatchProduct.originalPrice > lowestOffer.netCostWithCard
+                          ? exactMatchProduct.originalPrice - lowestOffer.netCostWithCard
+                          : 0;
+
+                      const recommendedCard = isIndia
+                        ? SUPPORTED_BANK_CARDS.find(
+                            (c) => c.id === lowestOffer.bankSavings?.cardId
+                          ) || SUPPORTED_BANK_CARDS[0]
+                        : US_CREDIT_CARDS.find(
+                            (c) => c.id === lowestOffer.bankSavings?.cardId
+                          ) || US_CREDIT_CARDS[0];
 
                       return (
                         <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -507,9 +586,9 @@ export function ComparePage() {
                             </span>
                             <div className="flex flex-wrap items-baseline gap-2.5 mt-1">
                               <span className="font-display text-3xl sm:text-4xl font-extrabold text-emerald-600 dark:text-emerald-400 tabular-nums">
-                                {formatPrice(lowestOffer.effectiveNetPrice)}
+                                {formatPrice(lowestOffer.netCostWithCard)}
                               </span>
-                              {exactMatchProduct.originalPrice > lowestOffer.effectiveNetPrice && (
+                              {exactMatchProduct.originalPrice > lowestOffer.netCostWithCard && (
                                 <span className="font-mono text-sm sm:text-base text-muted-foreground line-through tabular-nums">
                                   {formatPrice(exactMatchProduct.originalPrice)}
                                 </span>
@@ -520,12 +599,35 @@ export function ComparePage() {
                                 </span>
                               )}
                             </div>
-                            <span className="text-xs text-foreground font-medium mt-1 block">
-                              Live offer on <strong>{lowestOffer.storeName}</strong>
-                            </span>
+                            <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                              <span className="text-xs text-foreground font-medium">
+                                Live offer on <strong>{lowestOffer.storeName}</strong>
+                              </span>
+                              {lowestOffer.bankSavings && lowestOffer.bankSavings.totalCardSavings > 0 && (
+                                <span className="inline-flex items-center gap-1 rounded-md bg-primary/15 border border-primary/25 px-2 py-0.5 text-[11px] font-mono font-bold text-primary">
+                                  <CreditCard className="h-3 w-3" />
+                                  <span>
+                                    Includes {formatPrice(lowestOffer.bankSavings.totalCardSavings)} off via{" "}
+                                    {lowestOffer.bankSavings.bankName}
+                                  </span>
+                                </span>
+                              )}
+                            </div>
                           </div>
 
                           <div className="flex flex-wrap items-center gap-2.5">
+                            {lowestOffer.bankSavings && lowestOffer.bankSavings.totalCardSavings > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => setCardModalTarget(recommendedCard)}
+                                className="inline-flex items-center gap-1.5 rounded-xl border border-primary/30 bg-primary/10 px-3.5 py-2.5 min-h-[44px] text-xs font-bold text-primary hover:bg-primary/20 transition-colors touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
+                                title={`Apply for ${recommendedCard.cardName}`}
+                              >
+                                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                                <span>Need {recommendedCard.shortName}? Apply</span>
+                              </button>
+                            )}
+
                             <button
                               type="button"
                               id="spotlight-set-alert-btn"
@@ -543,7 +645,7 @@ export function ComparePage() {
                               className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2.5 min-h-[44px] text-xs font-bold text-foreground hover:bg-muted transition-colors touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
                             >
                               <TrendingDown className="h-4 w-4 text-primary" />
-                              <span>{showSpotlightHistory ? "Hide Price Chart" : "90-Day Trend"}</span>
+                              <span>{showSpotlightHistory ? "Hide Chart" : "90-Day Trend"}</span>
                               {showSpotlightHistory ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
                             </button>
 
@@ -595,6 +697,7 @@ export function ComparePage() {
                           <th className="py-3 px-4">Merchant Store</th>
                           <th className="py-3 px-4">Base Price</th>
                           <th className="py-3 px-4">Instant Coupon</th>
+                          <th className="py-3 px-4">Bank Card Offer</th>
                           <th className="py-3 px-4">goCoupon Cashback</th>
                           <th className="py-3 px-4">Delivery Speed</th>
                           <th className="py-3 px-4 font-bold text-foreground">Final Net Cost</th>
@@ -603,7 +706,17 @@ export function ComparePage() {
                       </thead>
                       <tbody className="divide-y divide-border">
                         {exactMatchProduct.offers.map((offer, idx) => {
+                          const bankSavings = getSavingsForOffer(
+                            offer.storeName,
+                            offer.price,
+                            exactMatchProduct.category
+                          );
+                          const netWithCard = Math.max(
+                            99,
+                            offer.effectiveNetPrice - bankSavings.totalCardSavings
+                          );
                           const isBest = offer.isLowest || idx === 0;
+
                           return (
                             <tr
                               key={offer.storeId + idx}
@@ -672,6 +785,19 @@ export function ComparePage() {
                                 )}
                               </td>
 
+                              {/* Bank Card Offer */}
+                              <td className="py-3.5 px-4">
+                                {bankSavings.totalCardSavings > 0 ? (
+                                  <BankOfferBadge
+                                    savingsResult={bankSavings}
+                                    productTitle={exactMatchProduct.title}
+                                    size="small"
+                                  />
+                                ) : (
+                                  <span className="text-muted-foreground font-mono text-[11px]">—</span>
+                                )}
+                              </td>
+
                               {/* Cashback */}
                               <td className="py-3.5 px-4">
                                 {offer.cashbackAmount && offer.cashbackAmount > 0 ? (
@@ -693,13 +819,20 @@ export function ComparePage() {
 
                               {/* Effective Net Price */}
                               <td className="py-3.5 px-4">
-                                <span
-                                  className={`font-display text-sm sm:text-base font-extrabold tabular-nums ${
-                                    isBest ? "text-emerald-600 dark:text-emerald-400" : "text-foreground"
-                                  }`}
-                                >
-                                  {formatPrice(offer.effectiveNetPrice)}
-                                </span>
+                                <div>
+                                  <span
+                                    className={`font-display text-sm sm:text-base font-extrabold tabular-nums ${
+                                      isBest ? "text-emerald-600 dark:text-emerald-400" : "text-foreground"
+                                    }`}
+                                  >
+                                    {formatPrice(netWithCard)}
+                                  </span>
+                                  {bankSavings.totalCardSavings > 0 && (
+                                    <span className="font-mono text-[10px] text-muted-foreground block line-through">
+                                      {formatPrice(offer.effectiveNetPrice)}
+                                    </span>
+                                  )}
+                                </div>
                               </td>
 
                               {/* CTA Action */}
@@ -805,17 +938,44 @@ export function ComparePage() {
                             {product.title}
                           </h3>
 
-                          {/* Pricing Row */}
-                          <div className="mt-3 flex items-baseline gap-2">
-                            <span className="font-display text-xl font-bold text-foreground tabular-nums">
-                              {formatPrice(product.price)}
-                            </span>
-                            {product.originalPrice > product.price && (
-                              <span className="font-mono text-xs text-muted-foreground line-through tabular-nums">
-                                {formatPrice(product.originalPrice)}
-                              </span>
-                            )}
-                          </div>
+                          {/* Pricing Row with Bank Intelligence */}
+                          {(() => {
+                            const cardSavings = getSavingsForOffer(
+                              product.primaryStore,
+                              product.price,
+                              product.category
+                            );
+                            const lowestOfferPrice = product.offers[0]?.effectiveNetPrice || product.price;
+                            const netCardPrice = Math.max(99, lowestOfferPrice - cardSavings.totalCardSavings);
+
+                            return (
+                              <div>
+                                <div className="mt-3 flex items-baseline gap-2">
+                                  <span className="font-display text-xl font-bold text-foreground tabular-nums">
+                                    {formatPrice(netCardPrice)}
+                                  </span>
+                                  {(product.originalPrice > netCardPrice || product.price > netCardPrice) && (
+                                    <span className="font-mono text-xs text-muted-foreground line-through tabular-nums">
+                                      {formatPrice(product.originalPrice || product.price)}
+                                    </span>
+                                  )}
+                                </div>
+
+                                {cardSavings.totalCardSavings > 0 && (
+                                  <div className="mt-1.5 flex items-center gap-1.5">
+                                    <BankOfferBadge
+                                      savingsResult={cardSavings}
+                                      productTitle={product.title}
+                                      size="small"
+                                    />
+                                    <span className="font-mono text-[10px] text-muted-foreground">
+                                      with card
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()}
 
                           {/* Compared Stores Pill */}
                           <div className="mt-2 text-[11px] text-muted-foreground flex items-center justify-between">
@@ -1076,29 +1236,53 @@ export function ComparePage() {
                           </div>
                         </div>
 
-                        {/* Coupons & Cashback Info */}
+                        {/* Coupons & Cashback & Bank Info */}
                         <div className="flex items-center gap-3 text-right">
-                          {offer.couponCode && (
-                            <button
-                              type="button"
-                              onClick={() => handleCopy(offer.couponCode!)}
-                              className="inline-flex items-center gap-1 rounded-lg border border-border/80 bg-background px-2 py-1 text-[10px] font-mono font-bold text-primary hover:border-primary transition-colors"
-                            >
-                              {copiedCode === offer.couponCode ? (
-                                <Check className="h-3 w-3 text-emerald-500" />
-                              ) : (
-                                <Copy className="h-3 w-3" />
-                              )}
-                              <span>{offer.couponCode}</span>
-                            </button>
-                          )}
+                          {(() => {
+                            const bankSavings = getSavingsForOffer(
+                              offer.storeName,
+                              offer.price,
+                              selectedProduct.category
+                            );
+                            const netWithCard = Math.max(
+                              99,
+                              offer.effectiveNetPrice - bankSavings.totalCardSavings
+                            );
 
-                          <div>
-                            <span className="font-mono text-[10px] text-muted-foreground block">Net Cost:</span>
-                            <span className="font-display text-base sm:text-lg font-bold text-foreground tabular-nums">
-                              {formatPrice(offer.effectiveNetPrice)}
-                            </span>
-                          </div>
+                            return (
+                              <div className="flex items-center gap-3">
+                                {bankSavings.totalCardSavings > 0 && (
+                                  <BankOfferBadge
+                                    savingsResult={bankSavings}
+                                    productTitle={selectedProduct.title}
+                                    size="small"
+                                  />
+                                )}
+
+                                {offer.couponCode && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCopy(offer.couponCode!)}
+                                    className="inline-flex items-center gap-1 rounded-lg border border-border/80 bg-background px-2 py-1 text-[10px] font-mono font-bold text-primary hover:border-primary transition-colors"
+                                  >
+                                    {copiedCode === offer.couponCode ? (
+                                      <Check className="h-3 w-3 text-emerald-500" />
+                                    ) : (
+                                      <Copy className="h-3 w-3" />
+                                    )}
+                                    <span>{offer.couponCode}</span>
+                                  </button>
+                                )}
+
+                                <div>
+                                  <span className="font-mono text-[10px] text-muted-foreground block">Net Cost:</span>
+                                  <span className="font-display text-base sm:text-lg font-bold text-foreground tabular-nums">
+                                    {formatPrice(netWithCard)}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })()}
 
                           <a
                             href={offer.affiliateUrl}
@@ -1141,6 +1325,13 @@ export function ComparePage() {
         productTitle={alertTargetProduct?.title || selectedProduct?.title || "Product"}
         productImage={alertTargetProduct?.imageUrl || selectedProduct?.imageUrl || "/gc-logo.webp"}
         currentPrice={alertTargetProduct?.price || selectedProduct?.price || 1499}
+      />
+
+      {/* Direct Card Application & Benefits Modal */}
+      <CardApplicationModal
+        isOpen={cardModalTarget !== null}
+        onClose={() => setCardModalTarget(null)}
+        card={cardModalTarget}
       />
     </SiteShell>
   );

@@ -24,10 +24,10 @@ export function ShoppingIntelligenceSpotlight() {
               Live Commerce Intelligence
             </div>
             <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Multi-Store Price Comparison &amp; 90-Day Tracker
+              Multi-Store Price Comparison &amp; Card-Linked Savings
             </h2>
             <p className="mt-3 max-w-2xl text-sm text-muted-foreground leading-relaxed">
-              We monitor prices across Amazon, Flipkart, Myntra, and Croma every hour. Compare net checkout prices after auto-applying stackable coupons and cashback.
+              We monitor live prices across Amazon, Flipkart, Walmart, Best Buy, and Croma. Compare real net checkout totals with your specific bank cards, instant discounts, and 0% APR financing in 1 click.
             </p>
           </div>
           <Link

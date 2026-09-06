@@ -55,7 +55,7 @@ export function ExtensionShowcase() {
             </h2>
 
             <p className="mt-5 max-w-xl text-sm sm:text-base leading-relaxed text-muted-foreground">
-              Stop hunting through spammy coupon websites for expired promo codes. When you reach checkout on Amazon India, Flipkart, Myntra, or 200+ partner stores, the goCoupon extension tests every verified discount code in parallel and auto-applies the highest savings.
+              Stop hunting through spammy coupon websites for expired promo codes. When you reach checkout on Amazon, Flipkart, Walmart, Best Buy, or 200+ partner stores worldwide, the GoCoupon extension tests every verified discount code in parallel and auto-applies the highest savings.
             </p>
 
             {/* Feature Highlights Grid */}
@@ -67,7 +67,7 @@ export function ExtensionShowcase() {
                 <div>
                   <h4 className="text-xs sm:text-sm font-bold text-foreground">1-Click Auto-Apply</h4>
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                    Tests all active codes in 1.8 seconds and applies the biggest rupee discount automatically.
+                    Tests all active codes in 1.8 seconds and applies the highest net savings automatically.
                   </p>
                 </div>
               </div>
@@ -79,7 +79,7 @@ export function ExtensionShowcase() {
                 <div>
                   <h4 className="text-xs sm:text-sm font-bold text-foreground">Voucher Auto-Clipper</h4>
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                    Spots and auto-clicks hidden green discount checkboxes on Amazon &amp; Flipkart product pages.
+                    Spots and auto-clicks hidden discount checkboxes and on-page merchant vouchers.
                   </p>
                 </div>
               </div>
@@ -89,9 +89,9 @@ export function ExtensionShowcase() {
                   <Percent className="h-4 w-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs sm:text-sm font-bold text-foreground">Bank Card Stacking</h4>
+                  <h4 className="text-xs sm:text-sm font-bold text-foreground">Bank Card &amp; Financing Stacking</h4>
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                    Stacks store promo codes with eligible HDFC, ICICI, SBI &amp; Axis card offers for extra savings.
+                    Stacks promo codes with eligible HDFC, SBI, Chase, Amex &amp; Affirm financing for maximum savings.
                   </p>
                 </div>
               </div>

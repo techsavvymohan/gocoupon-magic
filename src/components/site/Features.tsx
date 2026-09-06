@@ -9,33 +9,33 @@ import {
 
 const features = [
   {
-    title: "1-Click Auto-Apply Promo Codes",
-    body: "Our Chrome extension automatically tests all verified coupon codes in under 2 seconds at checkout on 200+ stores and applies the biggest discount.",
+    title: "Card-Linked Net Price Intelligence",
+    body: "Calculates real checkout prices factoring in instant discounts from HDFC, SBI, ICICI, Axis and cash back rewards from Chase, Amex, Capital One, or Affirm 0% APR.",
     icon: Zap,
   },
   {
-    title: "Hidden Voucher Auto-Clipper",
-    body: "Spots and auto-clicks hidden green discount checkboxes, coupon vouchers, and bank card offers directly on Amazon India and Flipkart product pages.",
-    icon: Ticket,
-  },
-  {
-    title: "Live Multi-Store Comparison",
-    body: "Compare real-time prices across Amazon India, Flipkart, Croma, Myntra, Tata CLiQ & Reliance Digital side-by-side with net checkout cost calculation.",
+    title: "Unbiased Multi-Store Comparison",
+    body: "Real-time pricing across Amazon, Flipkart, Walmart, Best Buy, Target, Croma, and 200+ stores. Completely store-agnostic—finding your lowest price is our only objective.",
     icon: Layers,
   },
   {
+    title: "1-Second Instant Arbitrage",
+    body: "Stores will never tell you when a competitor is cheaper. In 1 second, GoCoupon highlights the single best store for your specific card so you can click and save.",
+    icon: Ticket,
+  },
+  {
     title: "Interactive 90-Day Price Tracker",
-    body: "Accurate historical price curves expose fake pre-sale markups, revealing the true lowest price ever recorded so you buy at the perfect time.",
+    body: "Historical price curves expose fake pre-sale markups and artificial discounts, revealing the true lowest price ever recorded so you buy at the optimal moment.",
     icon: TrendingDown,
   },
   {
-    title: "Top Trusted Stores Prioritized",
-    body: "Search results guarantee authentic, verified listings from India's most trusted e-commerce platforms ranked on top with genuine seller ratings.",
+    title: "1-Click Auto-Apply Coupons",
+    body: "Automatically tests every verified promo code and clips on-page voucher checkboxes in under 2 seconds at checkout across all major retail platforms.",
     icon: ShieldCheck,
   },
   {
     title: "100% Free & Privacy-First",
-    body: "Zero signup, no credit cards, and no personal data collection. Ultra-lightweight and fast — stays asleep until you are ready to shop.",
+    body: "Zero signup required, no credit cards stored, and no personal data collection. Free forever—partner stores pay our referral fee when you successfully save.",
     icon: Lock,
   },
 ];

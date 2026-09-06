@@ -11,13 +11,15 @@
  */
 
 import { bridgeSearXNGPriceOffers } from "./searxng-price-bridge";
+import { globalCache } from "./cache-service";
+import { wrapAffiliateTracking } from "./store-registry";
 
 const SERPAPI_KEY = process.env.SERPAPI_API_KEY || process.env.SERPAPI_KEY || "";
 
 const AMAZON_PARTNER_TAG = process.env.VITE_AMAZON_IN_PARTNER_TAG || "gocoupon0e-21";
 const CUELINKS_PUBLISHER_ID = process.env.VITE_CUELINKS_PUB_ID || "148920";
 const REQUEST_TIMEOUT_MS = 4000;
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes persistent TTL
 
 export interface StoreSearchResult {
   storeId: string;
@@ -38,12 +40,6 @@ export interface StoreSearchResult {
   source: "amazon" | "flipkart" | "cuelinks" | "serpapi" | "searxng";
 }
 
-// In-Memory Stale-While-Revalidate Cache
-interface CachedResult<T> {
-  data: T;
-  timestamp: number;
-}
-const connectorCache = new Map<string, CachedResult<any>>();
 const inFlightRequests = new Map<string, Promise<any>>();
 
 /**
@@ -51,9 +47,9 @@ const inFlightRequests = new Map<string, Promise<any>>();
  */
 export async function searchAmazon(query: string): Promise<StoreSearchResult[]> {
   const cacheKey = `amz:${query.toLowerCase().trim()}`;
-  const cached = connectorCache.get(cacheKey);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
-    return cached.data;
+  const cached = await globalCache.get<StoreSearchResult[]>(cacheKey);
+  if (cached) {
+    return cached;
   }
 
   try {
@@ -78,7 +74,7 @@ export async function searchAmazon(query: string): Promise<StoreSearchResult[]> 
       }
     }
 
-    if (!data) return cached?.data || [];
+    if (!data) return [];
     const items = (data.shopping_results || []).filter(
       (i: any) => typeof i.extracted_price === "number" && i.extracted_price > 0,
     );
@@ -116,11 +112,11 @@ export async function searchAmazon(query: string): Promise<StoreSearchResult[]> 
       };
     });
 
-    connectorCache.set(cacheKey, { data: results, timestamp: Date.now() });
+    await globalCache.set(cacheKey, results, CACHE_TTL_MS);
     return results;
   } catch (err) {
     console.warn("searchAmazon timeout or failure, using cached/fallback:", err);
-    return cached?.data || [];
+    return cached || [];
   }
 }
 
@@ -129,9 +125,9 @@ export async function searchAmazon(query: string): Promise<StoreSearchResult[]> 
  */
 export async function searchFlipkart(query: string): Promise<StoreSearchResult[]> {
   const cacheKey = `flip:${query.toLowerCase().trim()}`;
-  const cached = connectorCache.get(cacheKey);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
-    return cached.data;
+  const cached = await globalCache.get<StoreSearchResult[]>(cacheKey);
+  if (cached) {
+    return cached;
   }
 
   try {
@@ -159,7 +155,7 @@ export async function searchFlipkart(query: string): Promise<StoreSearchResult[]
       }
     }
 
-    if (!data) return cached?.data || [];
+    if (!data) return [];
     const items = (data.shopping_results || []).filter(
       (i: any) => typeof i.extracted_price === "number" && i.extracted_price > 0,
     );
@@ -198,11 +194,11 @@ export async function searchFlipkart(query: string): Promise<StoreSearchResult[]
       };
     });
 
-    connectorCache.set(cacheKey, { data: results, timestamp: Date.now() });
+    await globalCache.set(cacheKey, results, CACHE_TTL_MS);
     return results;
   } catch (err) {
     console.warn("searchFlipkart timeout or failure, using cached/fallback:", err);
-    return cached?.data || [];
+    return cached || [];
   }
 }
 
@@ -211,9 +207,9 @@ export async function searchFlipkart(query: string): Promise<StoreSearchResult[]
  */
 export async function searchCuelinks(query: string): Promise<StoreSearchResult[]> {
   const cacheKey = `cue:${query.toLowerCase().trim()}`;
-  const cached = connectorCache.get(cacheKey);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
-    return cached.data;
+  const cached = await globalCache.get<StoreSearchResult[]>(cacheKey);
+  if (cached) {
+    return cached;
   }
 
   try {
@@ -222,7 +218,7 @@ export async function searchCuelinks(query: string): Promise<StoreSearchResult[]
     )}&gl=in&hl=en&api_key=${SERPAPI_KEY}&num=15`;
 
     const res = await fetch(url, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
-    if (!res.ok) return cached?.data || [];
+    if (!res.ok) return [];
 
     const data = await res.json();
     const items = (data.shopping_results || []).filter((i: any) => {
@@ -265,11 +261,16 @@ export async function searchCuelinks(query: string): Promise<StoreSearchResult[]
       }
 
       const effectiveNetPrice = Math.max(0, rawPrice - couponSavings - cashbackAmount);
-      const baseLink =
-        item.product_link ||
-        item.link ||
-        `https://www.google.com/search?q=${encodeURIComponent(item.title)}`;
-      const affiliateUrl = `https://clnk.in/r?pub=${CUELINKS_PUBLISHER_ID}&url=${encodeURIComponent(baseLink)}`;
+      const fallbackSearch = isMyntra
+        ? `https://www.myntra.com/${encodeURIComponent(item.title || query)}`
+        : isCroma
+        ? `https://www.croma.com/searchB?q=${encodeURIComponent(item.title || query)}`
+        : isTata
+        ? `https://www.tatacliq.com/search/?searchCategory=all&text=${encodeURIComponent(item.title || query)}`
+        : `https://www.amazon.in/s?k=${encodeURIComponent(item.title || query)}&tag=${AMAZON_PARTNER_TAG}`;
+
+      const baseLink = item.product_link || item.link || fallbackSearch;
+      const affiliateUrl = wrapAffiliateTracking(baseLink);
 
       return {
         storeId: storeName.toLowerCase().replace(/[^a-z0-9]/g, "_"),
@@ -291,11 +292,11 @@ export async function searchCuelinks(query: string): Promise<StoreSearchResult[]
       };
     });
 
-    connectorCache.set(cacheKey, { data: results, timestamp: Date.now() });
+    await globalCache.set(cacheKey, results, CACHE_TTL_MS);
     return results;
   } catch (err) {
     console.warn("searchCuelinks timeout or failure, using cached/fallback:", err);
-    return cached?.data || [];
+    return cached || [];
   }
 }
 

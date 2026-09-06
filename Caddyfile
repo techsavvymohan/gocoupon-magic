@@ -1,0 +1,19 @@
+# Caddy reverse proxy with automatic SSL (Let's Encrypt)
+# Replace {$DOMAIN:localhost} with your actual domain (e.g. gocoupon.io) in your .env or run command.
+
+{$DOMAIN:localhost} {
+    # Proxy all traffic to the GoCoupon Node application
+    reverse_proxy app:3000
+
+    # Enable Gzip and Zstandard compression
+    encode gzip zstd
+
+    # Security Headers
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    }
+}
