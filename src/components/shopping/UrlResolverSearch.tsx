@@ -566,34 +566,7 @@ export function UrlResolverSearch({
         </div>
       )}
 
-      {/* Popular Query Chips */}
-      {showPopularChips && (
-        <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 text-xs">
-          <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground font-bold flex items-center gap-1">
-              <TrendingUp className="h-3 w-3 text-primary" aria-hidden="true" /> Popular:
-            </span>
-            {[
-              { label: "Smartphones", query: "Best 5G smartphones" },
-              { label: "Laptops", query: "Thin and light laptops" },
-              { label: "Earphones", query: "Wireless noise cancelling earbuds" },
-              { label: "Smart TVs", query: "4K smart TV offers" },
-            ].map((item) => (
-              <button
-                key={item.label}
-                type="button"
-                onClick={() => {
-                  setQuery(item.query);
-                  handleExecuteSearch(item.query);
-                }}
-                className="rounded-lg border border-border/60 bg-card/60 backdrop-blur-sm px-2.5 py-1 min-h-[28px] text-[11px] font-medium text-foreground hover:border-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors active:scale-95 touch-manipulation"
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }

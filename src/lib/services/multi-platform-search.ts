@@ -13,6 +13,18 @@ import {
   CANONICAL_COUPONS,
 } from "@/data/canonicalCatalogData";
 import { tokenSortRatio, matchProductEntities } from "./entity-matcher";
+import {
+  analyzeQueryIntent,
+  isCandidateCompatible,
+  buildCleanInternetQuery,
+  extractInrPrice,
+  KNOWN_BRANDS,
+  BRAND_ALIASES,
+  extractExplicitBrand,
+  type QueryIntent,
+} from "./query-engine";
+
+export { KNOWN_BRANDS, BRAND_ALIASES, extractExplicitBrand };
 
 export interface MultiPlatformStoreOffer {
   storeId: string;
@@ -215,36 +227,6 @@ export function detectProductCategory(title: string, query: string, brand = ""):
   }
 
   return "Electronics & Gadgets";
-}
-
-const KNOWN_BRANDS = [
-  "Apple", "Samsung", "Sony", "Nike", "Puma", "Adidas", "OnePlus", "Dyson", "Boat", "Noise",
-  "Google", "Lenovo", "Dell", "HP", "Asus", "Acer", "Xiaomi", "Redmi", "Realme", "Vivo", "Oppo",
-  "Motorola", "JBL", "Bose", "Sennheiser", "Fastrack", "Titan", "Fossil", "Casio", "LG", "Whirlpool",
-  "Philips", "Bosch", "Voltas", "Havells", "Bajaj", "Usha", "Reebok", "Skechers", "Asics", "New Balance",
-  "Under Armour", "Zara", "H&M", "Levi's", "Allen Solly", "Peter England", "Van Heusen", "Louis Philippe",
-  "Canon", "Nikon", "PlayStation", "Xbox", "Nintendo", "Minimalist", "Cetaphil", "CeraVe", "L'Oréal Paris",
-  "L'Oreal", "Tresemme", "Himalaya", "Head & Shoulders", "Bare Anatomy", "Nykaa", "Mamaearth",
-];
-
-export const BRAND_ALIASES: Record<string, string[]> = {
-  xiaomi: ["xiaomi", "redmi", "mi"],
-  redmi: ["xiaomi", "redmi", "mi"],
-  "l'oreal": ["l'oréal", "l'oreal", "loreal", "l'oréal paris", "l'oreal paris"],
-  "l'oréal paris": ["l'oréal", "l'oreal", "loreal", "l'oréal paris", "l'oreal paris"],
-  apple: ["apple", "iphone", "macbook", "airpods", "ipad"],
-};
-
-export function extractExplicitBrand(query: string): string | null {
-  const q = query.toLowerCase();
-  for (const b of KNOWN_BRANDS) {
-    const bLower = b.toLowerCase();
-    const regex = new RegExp(`\\b${bLower.replace(/'/g, "['’]?")}\\b`, "i");
-    if (regex.test(q)) {
-      return bLower;
-    }
-  }
-  return null;
 }
 
 
@@ -516,21 +498,19 @@ export async function searchProductsAcrossPlatforms(
     }
   }
 
-  // 2. Query Search: First Priority — Check Verified Canonical Catalog (<5ms)
-  const normQuery = trimmed
-    .toLowerCase()
-    .replace(/\bfacewash\b/g, "face wash")
-    .replace(/\bphones\b/g, "phone")
-    .replace(/\bmobiles\b/g, "phone");
+  // 2. Query Search: Process via Universal Query Intent Analyzer
+  const intent = analyzeQueryIntent(trimmed);
   const qTokens = Array.from(
-    new Set([...trimmed.toLowerCase().split(/\s+/), ...normQuery.split(/\s+/)])
+    new Set([...trimmed.toLowerCase().split(/\s+/), ...intent.normalizedQuery.split(/\s+/)])
   ).filter(Boolean);
-  const explicitBrand = extractExplicitBrand(trimmed);
-  const isFaceWashQuery = /\b(facewash|face wash|cleanser|face cleanser)\b/i.test(trimmed);
-  const isShampooQuery = /\b(shampoo|shampoos|conditioner|hair wash)\b/i.test(trimmed);
-  const isPhoneQuery = /\b(phone|phones|mobile|mobiles|smartphone|smartphones)\b/i.test(trimmed);
 
+  // Check Canonical Catalog with Universal Semantic Boundary Enforcement
   const canonicalMatches = CANONICAL_PRODUCTS.map((prod) => {
+    // 1. Strict Semantic Boundary Check (Brand isolation, Category isolation, Accessory suppression)
+    if (!isCandidateCompatible(intent, prod)) {
+      return { prod, score: 0 };
+    }
+
     const titleLower = prod.title.toLowerCase();
     const brandLower = prod.brand.toLowerCase();
     const categoryLower = (prod.category || "").toLowerCase();
@@ -538,38 +518,9 @@ export async function searchProductsAcrossPlatforms(
     const tagsLower = (prod.tags || []).join(" ").toLowerCase();
     const searchable = `${titleLower} ${brandLower} ${categoryLower} ${subcatLower} ${tagsLower}`;
 
-    // 1. Brand guard: if query specified an explicit brand, disqualify conflicting brands
-    if (explicitBrand) {
-      const allowedBrands = BRAND_ALIASES[explicitBrand] || [explicitBrand];
-      const brandMatches =
-        allowedBrands.includes(brandLower) ||
-        allowedBrands.some((ab) => brandLower.includes(ab) || titleLower.includes(ab));
-      if (!brandMatches) {
-        return { prod, score: 0 };
-      }
-    }
-
-    // 2. Subcategory guard: disqualify conflicting beauty/tech items
-    if (isFaceWashQuery) {
-      const isDocFaceWash = /\b(facewash|face wash|cleanser)\b/i.test(`${titleLower} ${tagsLower}`);
-      if (!isDocFaceWash) return { prod, score: 0 };
-    }
-
-    if (isShampooQuery) {
-      const isDocShampoo = /\b(shampoo|conditioner)\b/i.test(`${titleLower} ${tagsLower}`);
-      if (!isDocShampoo) return { prod, score: 0 };
-    }
-
-    if (isPhoneQuery) {
-      const isDocPhone =
-        categoryLower.includes("mobile") ||
-        /\b(phone|smartphone)\b/i.test(`${titleLower} ${tagsLower}`);
-      if (!isDocPhone) return { prod, score: 0 };
-    }
-
     const fuzzyScore = Math.max(
       tokenSortRatio(trimmed, prod.title),
-      tokenSortRatio(normQuery, prod.title)
+      tokenSortRatio(intent.normalizedQuery, prod.title)
     );
     const entityMatch = matchProductEntities(trimmed, prod.title);
 
@@ -580,23 +531,39 @@ export async function searchProductsAcrossPlatforms(
       qTokens.some((t) => t.length >= 3 && brandLower.includes(t));
     const isTagMatch =
       tagsLower.includes(trimmed.toLowerCase()) ||
-      tagsLower.includes(normQuery) ||
+      tagsLower.includes(intent.normalizedQuery) ||
       qTokens.some((t) => t.length >= 3 && tagsLower.includes(t));
     const exactSubstr =
       titleLower.includes(trimmed.toLowerCase()) ||
-      titleLower.includes(normQuery) ||
+      titleLower.includes(intent.normalizedQuery) ||
       tagsLower.includes(trimmed.toLowerCase()) ||
-      tagsLower.includes(normQuery);
+      tagsLower.includes(intent.normalizedQuery);
+
+    // Model token boost: if query has specific model tokens and candidate matches them
+    const modelMatch =
+      intent.modelTokens.length > 0 &&
+      intent.modelTokens.every((mt) => searchable.includes(mt));
 
     let finalScore = fuzzyScore;
     if (entityMatch.isMatch) finalScore = Math.max(finalScore, entityMatch.confidenceScore);
+    if (modelMatch) finalScore = Math.max(finalScore, 90);
     if (allTokensMatch) finalScore = Math.max(finalScore, 85);
     if (isBrandMatch) finalScore = Math.max(finalScore, 82);
     if (isTagMatch) finalScore = Math.max(finalScore, 80);
     if (exactSubstr) finalScore = Math.max(finalScore, 92);
 
+    // Variant alignment: penalize if candidate is a Pro/Max/Ultra variant when not requested
+    const modifiers = ["pro", "ultra", "max", "plus", "mini"];
+    for (const mod of modifiers) {
+      const qHas = intent.variantTokens.includes(mod) || intent.rawQuery.toLowerCase().includes(mod);
+      const titleHas = titleLower.includes(mod);
+      if (!qHas && titleHas && intent.isSkuSpecific) {
+        finalScore -= 30;
+      }
+    }
+
     const hasMeaningfulMatch =
-      entityMatch.isMatch || allTokensMatch || isBrandMatch || isTagMatch || exactSubstr || fuzzyScore >= 70;
+      entityMatch.isMatch || modelMatch || allTokensMatch || isBrandMatch || isTagMatch || exactSubstr || fuzzyScore >= 70;
 
     return { prod, score: hasMeaningfulMatch ? finalScore : 0 };
   }).filter((item) => item.score >= 70);
@@ -604,25 +571,8 @@ export async function searchProductsAcrossPlatforms(
   canonicalMatches.sort((a, b) => b.score - a.score);
 
   if (canonicalMatches.length > 0) {
-    const isBroadSearch =
-      [
-        "xiaomi",
-        "xiaomi phones",
-        "vivo",
-        "vivo phones",
-        "facewash",
-        "face wash",
-        "shampoo",
-        "shampoos",
-        "phone",
-        "phones",
-        "smartphones",
-        "laptops",
-      ].includes(trimmed.toLowerCase().trim()) ||
-      isPhoneQuery ||
-      isFaceWashQuery ||
-      isShampooQuery;
-    const isTopExactMatch = !isBroadSearch && canonicalMatches[0].score >= 75;
+    // Dynamic Broad vs SKU classification: ZERO preset string arrays
+    const isTopExactMatch = intent.isSkuSpecific && canonicalMatches[0].score >= 75;
     const matchedProducts: MultiPlatformProductItem[] = canonicalMatches.map((item, idx) => {
       const p = item.prod;
       const cOffers = CANONICAL_OFFERS.filter((o) => o.productId === p.id);
@@ -685,7 +635,7 @@ export async function searchProductsAcrossPlatforms(
   const products: MultiPlatformProductItem[] = [];
 
   try {
-    const shoppingApiUrl = `/api/shopping?q=${encodeURIComponent(trimmed)}`;
+    const shoppingApiUrl = `/api/shopping?q=${encodeURIComponent(intent.cleanSearchTerm)}`;
     const serpRes = await fetch(shoppingApiUrl, { signal: AbortSignal.timeout(6000) });
     if (serpRes.ok) {
       const data = await serpRes.json();
@@ -707,10 +657,15 @@ export async function searchProductsAcrossPlatforms(
         const cleanTitle = cleanProductTitle(item.title);
         const brand = detectProductBrand(cleanTitle, trimmed);
         const category = detectProductCategory(cleanTitle, trimmed, brand);
+
+        // Apply Universal Semantic Boundary Filter
+        if (!isCandidateCompatible(intent, { title: cleanTitle, brand, category })) {
+          continue;
+        }
+
         const price = rawPrice;
         const originalPrice = Math.round(price * (1 + (0.15 + (i % 3) * 0.08)));
         const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
-
         const offers = generateStoreOffers(storeName, price, cleanTitle, directUrl);
 
         products.push({
@@ -741,18 +696,28 @@ export async function searchProductsAcrossPlatforms(
     console.warn("Shopping proxy search error:", err);
   }
 
-  // 4. SearXNG Shopping Search
+  // 4. SearXNG Clean Commerce Search
   if (products.length < 2) {
     try {
-      const shoppingQuery = `${trimmed} (site:amazon.in OR site:flipkart.com OR site:myntra.com OR site:croma.com OR site:tatacliq.com OR site:reliancedigital.in OR site:meesho.com)`;
-      const searxData = await searchSearXNG(shoppingQuery, {
+      const internetQuery = buildCleanInternetQuery(intent);
+      const searxData = await searchSearXNG(internetQuery, {
         categories: "shopping",
         language: "en",
         timeoutMs: 4000,
       });
 
-      if (searxData.results && searxData.results.length > 0) {
-        const validShoppingItems = searxData.results.filter((r) => {
+      const rawResults = (searxData.results && searxData.results.length > 0)
+        ? searxData.results
+        : (
+            await searchSearXNG(`${intent.cleanSearchTerm} price india amazon flipkart`, {
+              categories: "general",
+              language: "en",
+              timeoutMs: 3500,
+            })
+          ).results || [];
+
+      if (rawResults.length > 0) {
+        const validShoppingItems = rawResults.filter((r) => {
           try {
             const host = new URL(r.url).hostname.toLowerCase();
             const isStore = TRUSTED_PLATFORMS.some((tp) => tp.aliases.some((a) => host.includes(a)));
@@ -762,7 +727,7 @@ export async function searchProductsAcrossPlatforms(
           }
         });
 
-        validShoppingItems.slice(0, 6).forEach((res, idx) => {
+        validShoppingItems.slice(0, 8).forEach((res, idx) => {
           let storeName = "Online Merchant";
           try {
             const host = new URL(res.url).hostname.replace(/^www\./, "");
@@ -772,6 +737,8 @@ export async function searchProductsAcrossPlatforms(
             else if (host.includes("myntra")) storeName = "Myntra";
             else if (host.includes("tatacliq")) storeName = "Tata CLiQ";
             else if (host.includes("meesho")) storeName = "Meesho";
+            else if (host.includes("nykaa")) storeName = "Nykaa";
+            else if (host.includes("purplle")) storeName = "Purplle";
             else if (host.includes("reliancedigital")) storeName = "Reliance Digital";
             else storeName = host.split(".")[0].toUpperCase();
           } catch {}
@@ -780,15 +747,30 @@ export async function searchProductsAcrossPlatforms(
           const brand = detectProductBrand(cleanTitle, trimmed);
           const category = detectProductCategory(cleanTitle, trimmed, brand);
 
-          const priceMatch = (res.content || res.title).match(/(?:₹|Rs\.?\s*)([0-9,]{3,7})/i);
-          const price = priceMatch ? Number(priceMatch[1].replace(/,/g, "")) : 1999 + idx * 450;
+          // Universal Semantic Filter for internet hits
+          if (!isCandidateCompatible(intent, { title: cleanTitle, brand, category })) {
+            return;
+          }
+
+          const extractedPrice = extractInrPrice(res.price || res.title || res.content || "");
+          const fallbackPrice =
+            category === "Smartphones & Mobiles"
+              ? 29999
+              : category === "Laptops & Computers"
+              ? 54999
+              : category === "Audio & Headphones"
+              ? 3499
+              : category === "Beauty & Personal Care"
+              ? 449
+              : 1499;
+          const price = extractedPrice || fallbackPrice;
           const originalPrice = Math.round(price * 1.25);
           const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
 
           const offers = generateStoreOffers(storeName, price, cleanTitle, res.url);
 
           products.push({
-            id: `searx_${idx}`,
+            id: `searx_${idx}_${cleanTitle.slice(0, 10).replace(/[^a-zA-Z0-9]/g, "_")}`,
             title: cleanTitle,
             brand,
             category,
@@ -801,13 +783,14 @@ export async function searchProductsAcrossPlatforms(
             discountPercent,
             imageUrl: res.thumbnail || res.img_src || getCategoryImageByCategory(category, cleanTitle),
             rating: 4.5,
-            reviewCount: 250,
+            reviewCount: 320,
             directUrl: res.url,
             deliveryInfo: "2-3 Days Standard Delivery",
             isBestPrice: idx === 0,
             offers,
             lowestPriceStore: offers[0]?.storeName || storeName,
             maxSavingsVsOriginal: originalPrice - (offers[0]?.effectiveNetPrice || price),
+            isExactSkuMatch: idx === 0 && intent.isSkuSpecific,
           });
         });
       }
@@ -816,16 +799,20 @@ export async function searchProductsAcrossPlatforms(
     }
   }
 
-  // 5. Clean Single Product Fallback (No cloned titles)
+  // 5. Clean Fallback without duplicate cards or fake clones
   if (products.length === 0) {
-    const fallbackCategory = detectProductCategory(trimmed, trimmed);
-    const fallbackBrand = detectProductBrand(trimmed, trimmed);
+    const fallbackCategory = intent.category || detectProductCategory(trimmed, trimmed);
+    const fallbackBrand = intent.brand ? (intent.brand.charAt(0).toUpperCase() + intent.brand.slice(1)) : detectProductBrand(trimmed, trimmed);
     const basePrice =
       fallbackCategory === "Smartphones & Mobiles"
-        ? 49999
+        ? 34999
         : fallbackCategory === "Laptops & Computers"
-        ? 64999
-        : 2499;
+        ? 59999
+        : fallbackCategory === "Audio & Headphones"
+        ? 3999
+        : fallbackCategory === "Beauty & Personal Care"
+        ? 399
+        : 1999;
     const orig = Math.round(basePrice * 1.25);
     const cleanTitle = cleanProductTitle(trimmed);
     const offers = generateStoreOffers("Amazon India", basePrice, cleanTitle, "https://amazon.in");
@@ -844,14 +831,14 @@ export async function searchProductsAcrossPlatforms(
       discountPercent: Math.round(((orig - basePrice) / orig) * 100),
       imageUrl: getCategoryImageByCategory(fallbackCategory, cleanTitle),
       rating: 4.6,
-      reviewCount: 890,
+      reviewCount: 450,
       directUrl: "https://amazon.in",
-      deliveryInfo: "Free 1-Day Delivery",
+      deliveryInfo: "Fast Delivery Available",
       isBestPrice: true,
       offers,
       lowestPriceStore: offers[0]?.storeName || "Amazon India",
       maxSavingsVsOriginal: orig - (offers[0]?.effectiveNetPrice || basePrice),
-      isExactSkuMatch: true,
+      isExactSkuMatch: intent.isSkuSpecific,
       matchConfidence: 80,
     });
   }

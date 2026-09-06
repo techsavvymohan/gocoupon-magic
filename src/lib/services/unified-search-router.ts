@@ -16,6 +16,12 @@ import {
   type TypesenseProductDocument,
 } from "./typesense-client";
 import { searchSearXNG, type SearXNGResult } from "./searxng-service";
+import {
+  analyzeQueryIntent,
+  buildCleanInternetQuery,
+  isCandidateCompatible,
+  extractInrPrice,
+} from "./query-engine";
 
 export interface UnifiedProductSuggestion {
   id: string;
@@ -59,12 +65,26 @@ export async function unifiedProductSearch(
     };
   }
 
-  // 1. Check Layer 1: Instant Local Index (<15ms)
+  // 1. Universal Query Intent Decomposition
+  const intent = analyzeQueryIntent(q);
+
+  // 2. Check Layer 1: Instant Local Index (<15ms)
   const localResult = await searchLocalProducts(q, { limit });
 
   if (localResult.hits.length > 0) {
-    const suggestions = localResult.hits.map((h) => h.title);
-    const results: UnifiedProductSuggestion[] = localResult.hits.map((doc, idx) => ({
+    // Filter out candidates incompatible with intent (brand isolation, form isolation, accessory suppression)
+    const filteredHits = localResult.hits.filter((doc) =>
+      isCandidateCompatible(intent, {
+        title: doc.title,
+        brand: doc.brand,
+        category: doc.category,
+        tags: doc.tags || [],
+      })
+    );
+
+    const hitsToUse = filteredHits.length > 0 ? filteredHits : localResult.hits;
+    const suggestions = hitsToUse.map((h) => h.title);
+    const results: UnifiedProductSuggestion[] = hitsToUse.map((doc, idx) => ({
       id: doc.id,
       title: doc.title,
       brand: doc.brand,
@@ -76,7 +96,8 @@ export async function unifiedProductSearch(
       imageUrl: doc.imageUrl,
       url: `/compare?q=${encodeURIComponent(doc.title)}`,
       isLocalHit: true,
-      isExactMatch: idx === 0,
+      // Only mark exact match if query intent is specific SKU (not broad discovery)
+      isExactMatch: idx === 0 && intent.isSkuSpecific,
     }));
 
     return {
@@ -88,15 +109,42 @@ export async function unifiedProductSearch(
     };
   }
 
-  // 2. Layer 2: Not in local index -> Fallback to SearXNG Meta-Search
+  // 3. Layer 2: Not in local index -> Fallback to SearXNG Web Meta-Search
   try {
-    const searxngRes = await searchSearXNG(q, {
+    const cleanQuery = buildCleanInternetQuery(intent);
+    let searxngRes = await searchSearXNG(cleanQuery, {
       categories: "shopping",
       language: "en-IN",
       timeoutMs: 4000,
     });
 
-    const webResults: UnifiedProductSuggestion[] = (searxngRes.results || [])
+    // Fallback to general category if shopping yielded 0 results
+    let rawHits = searxngRes.results || [];
+    if (rawHits.length === 0) {
+      searxngRes = await searchSearXNG(cleanQuery, {
+        categories: "general",
+        language: "en-IN",
+        timeoutMs: 4000,
+      });
+      rawHits = searxngRes.results || [];
+    }
+
+    // Filter web hits by semantic boundary rules
+    const compatibleWebHits = rawHits.filter((r) => {
+      let candidateBrand = "";
+      if (intent.brand && (r.title.toLowerCase().includes(intent.brand) || (r.content || "").toLowerCase().includes(intent.brand))) {
+        candidateBrand = intent.brand;
+      }
+      return isCandidateCompatible(intent, {
+        title: r.title,
+        brand: candidateBrand || "General",
+        category: intent.category,
+      });
+    });
+
+    const webHitsToUse = compatibleWebHits.length > 0 ? compatibleWebHits : rawHits;
+
+    const webResults: UnifiedProductSuggestion[] = webHitsToUse
       .slice(0, limit)
       .map((r: SearXNGResult, idx) => {
         let storeName = "Online Store";
@@ -107,32 +155,37 @@ export async function unifiedProductSearch(
           else if (host.includes("myntra")) storeName = "Myntra";
           else if (host.includes("croma")) storeName = "Croma";
           else if (host.includes("meesho")) storeName = "Meesho";
+          else if (host.includes("nykaa")) storeName = "Nykaa";
           else storeName = host;
         } catch (e) {
           void e;
         }
 
+        const detectedPrice = extractInrPrice(`${r.title} ${r.content || ""}`);
+
         return {
           id: `searxng-${idx}-${Date.now()}`,
           title: r.title,
+          price: detectedPrice || undefined,
           storeName,
           url: r.url,
           isLocalHit: false,
+          isExactMatch: idx === 0 && intent.isSkuSpecific,
           score: r.score,
         };
       });
 
-    // 3. Asynchronously background-index top results into Typesense
+    // 4. Asynchronously background-index top results into Typesense
     if (webResults.length > 0 && webResults[0].title) {
       const top = webResults[0];
       const newDoc: TypesenseProductDocument = {
         id: `auto-${Date.now()}`,
         title: top.title,
-        brand: top.storeName || "Brand",
-        category: "General Deals",
-        price: 0,
-        originalPrice: 0,
-        discountPercent: 0,
+        brand: intent.brand || top.storeName || "Brand",
+        category: intent.category || "General Deals",
+        price: top.price || 0,
+        originalPrice: top.price ? Math.round(top.price * 1.2) : 0,
+        discountPercent: top.price ? 15 : 0,
         storeName: top.storeName || "Verified Store",
         directUrl: top.url,
         imageUrl: "/gc-logo.webp",

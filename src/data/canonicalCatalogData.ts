@@ -562,7 +562,7 @@ export const CANONICAL_PRODUCTS: CanonicalProduct[] = [
     slug: "xiaomi-14-leica-512gb",
     title: "Xiaomi 14 (White, 512 GB, 12 GB RAM) - Leica Optics, Snapdragon 8 Gen 3",
     brand: "Xiaomi",
-    category: "Mobiles",
+    category: "Electronics",
     subcategory: "Smartphones",
     description:
       "Next-generation flagship smartphone with Leica Summilux optical lens, Snapdragon 8 Gen 3 chipset, 1.5K 120Hz LTPO AMOLED display, and 90W HyperCharge.",
@@ -589,7 +589,7 @@ export const CANONICAL_PRODUCTS: CanonicalProduct[] = [
     slug: "redmi-note-13-pro-plus-5g",
     title: "Redmi Note 13 Pro+ 5G (Fusion Purple, 256 GB, 8 GB RAM) - 200MP OIS Camera",
     brand: "Xiaomi",
-    category: "Mobiles",
+    category: "Electronics",
     subcategory: "Smartphones",
     description:
       "Premium mid-range powerhouse featuring a 3D curved AMOLED 1.5K display, 200MP ultra-clear camera with OIS, IP68 water resistance, and 120W HyperCharge.",
@@ -616,7 +616,7 @@ export const CANONICAL_PRODUCTS: CanonicalProduct[] = [
     slug: "vivo-x100-pro-5g-zeiss",
     title: "Vivo X100 Pro 5G (Asteroid Black, 512 GB, 16 GB RAM) - ZEISS 1-inch Camera",
     brand: "Vivo",
-    category: "Mobiles",
+    category: "Electronics",
     subcategory: "Smartphones",
     description:
       "Ultimate mobile photography flagship with ZEISS 1-inch main sensor, APO floating telephoto lens, Dimensity 9300 chipset, and V3 imaging chip.",
@@ -643,7 +643,7 @@ export const CANONICAL_PRODUCTS: CanonicalProduct[] = [
     slug: "vivo-v30-pro-5g",
     title: "Vivo V30 Pro 5G (Andaman Blue, 512 GB, 12 GB RAM) - ZEISS Studio Portrait",
     brand: "Vivo",
-    category: "Mobiles",
+    category: "Electronics",
     subcategory: "Smartphones",
     description:
       "Slimmest 5000 mAh smartphone with ZEISS professional portrait camera, Studio-Quality Aura Light, and 50MP Eye AF group selfie camera.",
