@@ -77,11 +77,5 @@
         { "key": "Cache-Control", "value": "public, max-age=3600" }
       ]
     }
-  ],
-  "crons": [
-    {
-      "path": "/api/alerts/cron-check",
-      "schedule": "0 */6 * * *"
-    }
   ]
 }
