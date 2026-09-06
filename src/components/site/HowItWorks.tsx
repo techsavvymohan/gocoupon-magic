@@ -1,13 +1,11 @@
 /**
  * @file HowItWorks.tsx
- * @description The Autonomous Commerce Intelligence Engine: How GoCoupon Works.
+ * @description Plain English, High-SEO Commerce Intelligence Guide.
  *
- * Aesthetic, high-conviction architectural breakdown explaining why GoCoupon
- * holds an insurmountable category monopoly over legacy single-feature tools
- * (Keepa, Honey, Google Shopping).
+ * Explains GoCoupon's all-in-one monopoly advantage in clear, everyday
+ * language that real shoppers search on Google.
  *
- * Clean, Swiss-inspired typography, zero sparkles, zero noise.
- * Integrated high-SEO search knowledge index for Google ranking.
+ * Clean, modern, aesthetic layout without noisy effects or sparkles.
  */
 
 import { Link } from "@tanstack/react-router";
@@ -20,106 +18,118 @@ import {
   ArrowRight,
   Search,
   Lock,
-  Cpu,
   FileText,
+  Zap,
 } from "lucide-react";
 
-const ENGINE_PILLARS = [
+const SHOPPING_STEPS = [
   {
     step: "01",
-    tag: "SPATIAL INGESTION",
-    title: "Multi-Store Parallel Telemetry",
+    tag: "PRICE COMPARISON",
+    title: "Find the Lowest Price Across 200+ Stores",
     summary:
-      "Legacy tools are trapped in single stores. GoCoupon queries 200+ authorized enterprise endpoints in parallel—including Amazon, Flipkart, Walmart, Best Buy, Target, and Croma—eliminating retail silos in 400 milliseconds.",
-    proof: "Indexes 200+ merchants simultaneously with zero paid advertising bias.",
+      "Never overpay because you didn't check another tab. When you browse or search any product, GoCoupon instantly checks Amazon, Flipkart, Walmart, Best Buy, Target, and Croma so you always buy from the cheapest verified store.",
+    proof: "Compares 200+ stores in 1 second with zero paid ads or sponsored bias.",
     icon: Layers,
   },
   {
     step: "02",
-    tag: "TEMPORAL TELEMETRY",
-    title: "90-Day Fake Sale Markup Shield",
+    tag: "FAKE SALE DETECTOR",
+    title: "Spot Fake Discounts with 90-Day Price History",
     summary:
-      "Retailers frequently spike list prices by 15% to 30% right before major sales to market artificial discounts. Our historical telemetry curves audit price fluctuations to verify if a deal is an authentic all-time low.",
-    proof: "Real-time historical curve validation before you add to cart.",
+      "Ever notice how stores quietly raise prices right before a big sale just to advertise a fake '40% discount'? Our 90-day price tracker exposes artificial price hikes so you know if a deal is truly at its all-time low.",
+    proof: "Real-time price history graphs show what the product actually sold for.",
     icon: TrendingDown,
   },
   {
     step: "03",
-    tag: "SETTLEMENT ARBITRAGE",
-    title: "Bank Card & Financing Optimization",
+    tag: "EXTRA BANK DISCOUNTS",
+    title: "Save Even More with Your Credit & Debit Cards",
     summary:
-      "Retailers lock billions in exclusive bank partnerships (HDFC, SBI, ICICI, Chase, Amex, Affirm). GoCoupon computes these dynamic discounts against checkout rules, revealing competitor price gaps of ₹3,000–₹8,000 / $50–$150.",
-    proof: "Optional card-linked booster. Works for any shopper, regardless of payment mode.",
+      "Stores have exclusive bank deals that other websites never tell you about. An iPhone might be ₹5,000 cheaper on Flipkart with HDFC, or a laptop $120 cheaper at Best Buy with Chase. GoCoupon automatically finds these hidden savings for you.",
+    proof: "Extra savings with HDFC, SBI, ICICI, Chase, or Amex. (No card? You still get the lowest store price).",
     icon: CreditCard,
   },
   {
     step: "04",
-    tag: "VERIFIED EXECUTION",
-    title: "DOM-Level Voucher Injection",
+    tag: "AUTOMATIC COUPONS",
+    title: "Auto-Apply Working Coupons in 1 Click",
     summary:
-      "Broken crowd-sourced promo codes and expired spam waste minutes. GoCoupon autonomously tests verified merchant vouchers directly in your browser checkout in under 2 seconds, applying mathematical savings.",
-    proof: "Zero dead codes. Zero affiliate pop-up clutter. 100% verified math.",
+      "Stop wasting 15 minutes typing in expired coupon codes from sketchy websites. GoCoupon automatically tests verified promo codes and on-page discount vouchers at checkout in under 2 seconds.",
+    proof: "100% verified codes applied automatically with zero dead codes or popup spam.",
     icon: CheckCircle2,
   },
 ];
 
-const HIGH_INTENT_SEARCH_GUIDES = [
+const SEARCH_INTENT_GUIDES = [
   {
-    topic: "Cross-Store Price Comparison",
-    title: "How to Find Cheaper Products Online: The Multi-Store Price Comparison Guide",
-    slug: "how-to-find-cheaper-products-online-price-comparison-guide",
-    searchIntent: "price comparison across stores, best price finder online",
     badge: "Price Comparison",
+    title: "How to Find the Cheapest Price for Any Product Across Stores",
+    slug: "how-to-find-cheaper-products-online-price-comparison-guide",
+    searchQuery: "compare prices across amazon walmart flipkart best buy",
   },
   {
-    topic: "Credit Card Discount Stacking",
-    title: "Credit Card & Bank Offers: The Complete Checkout Stacking Guide",
+    badge: "Card Discounts",
+    title: "How to Stack Bank Card Offers & Coupons for Maximum Savings",
     slug: "credit-card-bank-offers-coupon-stacking-guide",
-    searchIntent: "bank card discount coupons, hdfc sbi chase card discount",
-    badge: "Card Arbitrage",
+    searchQuery: "hdfc sbi icici chase credit card shopping discount guide",
   },
   {
-    topic: "Fake Sale Detection",
-    title: "Best Price Tracking Tools & Price History Guide (Exposing Fake Markups)",
-    slug: "best-price-tracking-tools-india-price-history-guide",
-    searchIntent: "amazon price history tracker, fake discount detector, price drop alerts",
     badge: "Price History",
+    title: "How to Spot Fake Discounts & Check Price History Before Buying",
+    slug: "best-price-tracking-tools-india-price-history-guide",
+    searchQuery: "check if sale discount is real or fake price drop tracker",
   },
   {
-    topic: "Automated Coupon Verification",
-    title: "Why Coupons Silently Fail at Checkout & How Automated Stacking Works",
+    badge: "Coupon Codes",
+    title: "Why Online Coupons Fail at Checkout & How to Find Working Codes",
     slug: "why-coupons-silently-fail-checkout",
-    searchIntent: "working coupon codes, auto apply promo codes, coupon extensions",
-    badge: "Voucher Stacking",
+    searchQuery: "how to find working discount codes without expired coupons",
   },
+];
+
+const POPULAR_SEARCH_TOPICS = [
+  "Cheapest store for iPhone 16",
+  "MacBook Air M3 lowest price today",
+  "Sony WH-1000XM5 price drop history",
+  "Amazon vs Flipkart price comparison",
+  "Best credit card shopping discounts",
+  "How to avoid fake online sale prices",
 ];
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="relative scroll-mt-12 border-t border-border/70 bg-gradient-to-b from-background via-card/25 to-background px-4 sm:px-6 py-20 sm:py-28">
+    <section
+      id="how-it-works"
+      className="relative scroll-mt-12 border-t border-border/70 bg-gradient-to-b from-background via-card/20 to-background px-4 sm:px-6 py-20 sm:py-28"
+    >
       {/* Anchor alias for backwards compatibility */}
       <div id="how" className="absolute -top-12 left-0 h-0 w-0" aria-hidden="true" />
 
       <div className="mx-auto max-w-6xl">
-        {/* Conceptual Header */}
+        {/* Clear, Human, High-SEO Header */}
         <div className="max-w-3xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1 text-xs font-mono font-medium text-foreground/80 mb-4 shadow-2xs">
-            <Cpu className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
-            <span>The Commerce Intelligence Architecture</span>
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1 text-xs font-medium text-foreground/80 mb-4 shadow-2xs">
+            <Zap className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+            <span>Why You Need Only 1 Tool to Shop Online</span>
           </div>
 
           <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">
-            Why Every Other Shopping Tool Is Now Obsolete.
+            Stop Juggling 5 Different Shopping Apps.
+            <br />
+            <span className="bg-gradient-to-r from-blue-600 via-primary to-emerald-600 bg-clip-text text-transparent">
+              GoCoupon Does It All in 1 Second.
+            </span>
           </h2>
 
           <p className="mt-4 text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed text-balance">
-            For 15 years, consumer shopping software was fractured: Keepa only tracked Amazon, Honey only tested coupons, and Google Shopping sold ranking to the highest ad bidder. GoCoupon unifies the entire commerce intelligence layer into ONE sovereign mathematical engine.
+            Most shoppers use one tool for Amazon price history, another website to compare store prices, a coupon app that gives expired codes, and banking apps for card offers. GoCoupon replaces them all with <strong>ONE free platform</strong> that guarantees you always get the lowest price before placing your order.
           </p>
         </div>
 
-        {/* 4-Stage Architectural Grid */}
+        {/* 4 Plain-English Pillars Grid */}
         <div className="mt-12 sm:mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {ENGINE_PILLARS.map((pillar) => {
+          {SHOPPING_STEPS.map((pillar) => {
             const Icon = pillar.icon;
             return (
               <article
@@ -127,7 +137,7 @@ export function HowItWorks() {
                 className="group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card/60 p-6 sm:p-7 shadow-xs backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card/90"
               >
                 <div>
-                  {/* Step Header */}
+                  {/* Step Number & Clean Icon */}
                   <div className="flex items-center justify-between pb-4 border-b border-border/50">
                     <span className="font-mono text-2xl font-black tracking-tight text-foreground/30 group-hover:text-primary transition-colors">
                       {pillar.step}
@@ -150,7 +160,7 @@ export function HowItWorks() {
                   </p>
                 </div>
 
-                {/* Bottom Proof Metric */}
+                {/* Proof Line */}
                 <div className="mt-6 pt-4 border-t border-border/50">
                   <div className="flex items-start gap-2 text-[11px] font-medium text-foreground/90">
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" aria-hidden="true" />
@@ -162,40 +172,56 @@ export function HowItWorks() {
           })}
         </div>
 
-        {/* Zero-Knowledge Privacy Standard (Aesthetic & High-Trust) */}
+        {/* 100% Privacy Card (Plain English, High Trust) */}
         <div className="mt-8 rounded-2xl border border-border/80 bg-card/40 p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3.5">
             <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary border border-primary/20">
               <Lock className="h-4 w-4" aria-hidden="true" />
             </div>
             <div>
               <h4 className="text-sm font-bold text-foreground">
-                Client-Side Mathematical Privacy (Zero Financial Ingestion)
+                100% Safe &amp; Private: We Never Ask for Your Card Number
               </h4>
               <p className="text-xs text-muted-foreground mt-0.5">
-                GoCoupon never reads, requests, or stores card numbers, CVVs, or logins. Discount algorithms match published merchant rules client-side.
+                GoCoupon never reads or stores your bank logins, passwords, or credit card details. We simply match public store promotions and bank partner offers on your screen.
               </p>
             </div>
           </div>
           <div className="inline-flex items-center gap-2 font-mono text-[11px] text-muted-foreground shrink-0">
             <ShieldCheck className="h-4 w-4 text-emerald-500" />
-            <span>Independent &amp; Store-Agnostic</span>
+            <span>100% Free &amp; Independent</span>
           </div>
         </div>
 
-        {/* High-Intent Search & Editorial Knowledge Index (SEO Foundation) */}
+        {/* Real-Life Shopping Search Topics (SEO Power Strip) */}
+        <div className="mt-8 flex flex-wrap items-center gap-2 text-xs">
+          <span className="font-mono text-[11px] text-muted-foreground uppercase tracking-wider mr-1">
+            Common Shopping Searches:
+          </span>
+          {POPULAR_SEARCH_TOPICS.map((topic) => (
+            <Link
+              key={topic}
+              to="/compare"
+              className="rounded-full border border-border/70 bg-card/70 px-3 py-1 text-[11px] text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
+            >
+              {topic}
+            </Link>
+          ))}
+        </div>
+
+        {/* High-Intent SEO Guides (Direct Google Search Queries) */}
         <div className="mt-16 sm:mt-20 border-t border-border/70 pt-12 sm:pt-16">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
             <div>
               <div className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
                 <Search className="h-3.5 w-3.5" aria-hidden="true" />
-                <span>Verified Shopping &amp; Discount Knowledge Base</span>
+                <span>Smart Shopping Guides &amp; Deal Secrets</span>
               </div>
               <h3 className="font-display text-xl sm:text-2xl font-bold text-foreground">
-                Deep-Dive Shopping Intelligence &amp; Research Guides
+                Helpful Guides to Save Money on Every Online Purchase
               </h3>
               <p className="mt-1 text-xs sm:text-sm text-muted-foreground max-w-2xl">
-                Read our in-depth research on exposing fake retail discounts, cross-store price comparisons, and card discount stacking secrets.
+                Practical guides explaining how price tracking works, how to spot fake discounts, and how to get maximum savings with your bank cards.
               </p>
             </div>
 
@@ -203,14 +229,14 @@ export function HowItWorks() {
               to="/blog"
               className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline shrink-0"
             >
-              <span>Explore All Guides</span>
+              <span>View All Shopping Guides</span>
               <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
             </Link>
           </div>
 
-          {/* Curated High-Ranking Topic Cards */}
+          {/* Curated Guides with Real Search Intent */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {HIGH_INTENT_SEARCH_GUIDES.map((guide) => (
+            {SEARCH_INTENT_GUIDES.map((guide) => (
               <Link
                 key={guide.slug}
                 to="/blog/$slug"
@@ -231,8 +257,8 @@ export function HowItWorks() {
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-border/40 flex items-center justify-between text-[11px] text-muted-foreground">
-                  <span className="font-mono text-[10px] truncate max-w-[170px]">
-                    {guide.searchIntent}
+                  <span className="font-mono text-[10px] truncate max-w-[170px]" title={guide.searchQuery}>
+                    {guide.searchQuery}
                   </span>
                   <ArrowRight className="h-3 w-3 text-primary shrink-0 transition-transform group-hover:translate-x-0.5" />
                 </div>
