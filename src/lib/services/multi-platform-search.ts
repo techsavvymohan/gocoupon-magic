@@ -134,7 +134,7 @@ export function detectProductCategory(title: string, query: string, brand = ""):
 
   // 2. Smartphones & Mobiles
   if (
-    /\b(iphone|phone|mobile|smartphone|galaxy s\d+|galaxy z|oneplus|pixel|redmi|realme|poco|vivo|oppo|iqoo|motorola|nokia)\b/i.test(
+    /\b(iphone|phone|mobile|smartphone|galaxy s\d+|galaxy z|oneplus|pixel|xiaomi|redmi|realme|poco|vivo|oppo|iqoo|motorola|nokia)\b/i.test(
       text
     )
   ) {
@@ -207,7 +207,7 @@ export function detectProductCategory(title: string, query: string, brand = ""):
 
   // 11. Beauty & Personal Care
   if (
-    /\b(perfume|deodorant|makeup|lipstick|cream|serum|lotion|shampoo|conditioner|skincare|haircare|trimmer|shaver)\b/i.test(
+    /\b(facewash|face wash|cleanser|face cleanser|perfume|deodorant|makeup|lipstick|cream|serum|lotion|shampoo|conditioner|skincare|haircare|trimmer|shaver)\b/i.test(
       text
     )
   ) {
@@ -223,8 +223,30 @@ const KNOWN_BRANDS = [
   "Motorola", "JBL", "Bose", "Sennheiser", "Fastrack", "Titan", "Fossil", "Casio", "LG", "Whirlpool",
   "Philips", "Bosch", "Voltas", "Havells", "Bajaj", "Usha", "Reebok", "Skechers", "Asics", "New Balance",
   "Under Armour", "Zara", "H&M", "Levi's", "Allen Solly", "Peter England", "Van Heusen", "Louis Philippe",
-  "Canon", "Nikon", "PlayStation", "Xbox", "Nintendo",
+  "Canon", "Nikon", "PlayStation", "Xbox", "Nintendo", "Minimalist", "Cetaphil", "CeraVe", "L'Oréal Paris",
+  "L'Oreal", "Tresemme", "Himalaya", "Head & Shoulders", "Bare Anatomy", "Nykaa", "Mamaearth",
 ];
+
+export const BRAND_ALIASES: Record<string, string[]> = {
+  xiaomi: ["xiaomi", "redmi", "mi"],
+  redmi: ["xiaomi", "redmi", "mi"],
+  "l'oreal": ["l'oréal", "l'oreal", "loreal", "l'oréal paris", "l'oreal paris"],
+  "l'oréal paris": ["l'oréal", "l'oreal", "loreal", "l'oréal paris", "l'oreal paris"],
+  apple: ["apple", "iphone", "macbook", "airpods", "ipad"],
+};
+
+export function extractExplicitBrand(query: string): string | null {
+  const q = query.toLowerCase();
+  for (const b of KNOWN_BRANDS) {
+    const bLower = b.toLowerCase();
+    const regex = new RegExp(`\\b${bLower.replace(/'/g, "['’]?")}\\b`, "i");
+    if (regex.test(q)) {
+      return bLower;
+    }
+  }
+  return null;
+}
+
 
 export function detectProductBrand(title: string, query: string): string {
   const combined = `${query} ${title}`;
@@ -495,31 +517,112 @@ export async function searchProductsAcrossPlatforms(
   }
 
   // 2. Query Search: First Priority — Check Verified Canonical Catalog (<5ms)
-  const qTokens = trimmed.toLowerCase().split(/\s+/).filter(Boolean);
+  const normQuery = trimmed
+    .toLowerCase()
+    .replace(/\bfacewash\b/g, "face wash")
+    .replace(/\bphones\b/g, "phone")
+    .replace(/\bmobiles\b/g, "phone");
+  const qTokens = Array.from(
+    new Set([...trimmed.toLowerCase().split(/\s+/), ...normQuery.split(/\s+/)])
+  ).filter(Boolean);
+  const explicitBrand = extractExplicitBrand(trimmed);
+  const isFaceWashQuery = /\b(facewash|face wash|cleanser|face cleanser)\b/i.test(trimmed);
+  const isShampooQuery = /\b(shampoo|shampoos|conditioner|hair wash)\b/i.test(trimmed);
+  const isPhoneQuery = /\b(phone|phones|mobile|mobiles|smartphone|smartphones)\b/i.test(trimmed);
+
   const canonicalMatches = CANONICAL_PRODUCTS.map((prod) => {
     const titleLower = prod.title.toLowerCase();
     const brandLower = prod.brand.toLowerCase();
+    const categoryLower = (prod.category || "").toLowerCase();
+    const subcatLower = (prod.subcategory || "").toLowerCase();
     const tagsLower = (prod.tags || []).join(" ").toLowerCase();
-    const searchable = `${titleLower} ${brandLower} ${tagsLower}`;
+    const searchable = `${titleLower} ${brandLower} ${categoryLower} ${subcatLower} ${tagsLower}`;
 
-    const fuzzyScore = tokenSortRatio(trimmed, prod.title);
+    // 1. Brand guard: if query specified an explicit brand, disqualify conflicting brands
+    if (explicitBrand) {
+      const allowedBrands = BRAND_ALIASES[explicitBrand] || [explicitBrand];
+      const brandMatches =
+        allowedBrands.includes(brandLower) ||
+        allowedBrands.some((ab) => brandLower.includes(ab) || titleLower.includes(ab));
+      if (!brandMatches) {
+        return { prod, score: 0 };
+      }
+    }
+
+    // 2. Subcategory guard: disqualify conflicting beauty/tech items
+    if (isFaceWashQuery) {
+      const isDocFaceWash = /\b(facewash|face wash|cleanser)\b/i.test(`${titleLower} ${tagsLower}`);
+      if (!isDocFaceWash) return { prod, score: 0 };
+    }
+
+    if (isShampooQuery) {
+      const isDocShampoo = /\b(shampoo|conditioner)\b/i.test(`${titleLower} ${tagsLower}`);
+      if (!isDocShampoo) return { prod, score: 0 };
+    }
+
+    if (isPhoneQuery) {
+      const isDocPhone =
+        categoryLower.includes("mobile") ||
+        /\b(phone|smartphone)\b/i.test(`${titleLower} ${tagsLower}`);
+      if (!isDocPhone) return { prod, score: 0 };
+    }
+
+    const fuzzyScore = Math.max(
+      tokenSortRatio(trimmed, prod.title),
+      tokenSortRatio(normQuery, prod.title)
+    );
     const entityMatch = matchProductEntities(trimmed, prod.title);
 
     const allTokensMatch = qTokens.length > 0 && qTokens.every((tok) => searchable.includes(tok));
-    const exactSubstr = titleLower.includes(trimmed.toLowerCase()) || tagsLower.includes(trimmed.toLowerCase());
+    const isBrandMatch =
+      brandLower.includes(trimmed.toLowerCase()) ||
+      trimmed.toLowerCase().includes(brandLower) ||
+      qTokens.some((t) => t.length >= 3 && brandLower.includes(t));
+    const isTagMatch =
+      tagsLower.includes(trimmed.toLowerCase()) ||
+      tagsLower.includes(normQuery) ||
+      qTokens.some((t) => t.length >= 3 && tagsLower.includes(t));
+    const exactSubstr =
+      titleLower.includes(trimmed.toLowerCase()) ||
+      titleLower.includes(normQuery) ||
+      tagsLower.includes(trimmed.toLowerCase()) ||
+      tagsLower.includes(normQuery);
 
     let finalScore = fuzzyScore;
     if (entityMatch.isMatch) finalScore = Math.max(finalScore, entityMatch.confidenceScore);
     if (allTokensMatch) finalScore = Math.max(finalScore, 85);
+    if (isBrandMatch) finalScore = Math.max(finalScore, 82);
+    if (isTagMatch) finalScore = Math.max(finalScore, 80);
     if (exactSubstr) finalScore = Math.max(finalScore, 92);
 
-    return { prod, score: finalScore };
-  }).filter((item) => item.score >= 50);
+    const hasMeaningfulMatch =
+      entityMatch.isMatch || allTokensMatch || isBrandMatch || isTagMatch || exactSubstr || fuzzyScore >= 70;
+
+    return { prod, score: hasMeaningfulMatch ? finalScore : 0 };
+  }).filter((item) => item.score >= 70);
 
   canonicalMatches.sort((a, b) => b.score - a.score);
 
   if (canonicalMatches.length > 0) {
-    const isTopExactMatch = canonicalMatches[0].score >= 70;
+    const isBroadSearch =
+      [
+        "xiaomi",
+        "xiaomi phones",
+        "vivo",
+        "vivo phones",
+        "facewash",
+        "face wash",
+        "shampoo",
+        "shampoos",
+        "phone",
+        "phones",
+        "smartphones",
+        "laptops",
+      ].includes(trimmed.toLowerCase().trim()) ||
+      isPhoneQuery ||
+      isFaceWashQuery ||
+      isShampooQuery;
+    const isTopExactMatch = !isBroadSearch && canonicalMatches[0].score >= 75;
     const matchedProducts: MultiPlatformProductItem[] = canonicalMatches.map((item, idx) => {
       const p = item.prod;
       const cOffers = CANONICAL_OFFERS.filter((o) => o.productId === p.id);

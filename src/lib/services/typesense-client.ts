@@ -10,6 +10,7 @@
 
 import { CANONICAL_PRODUCTS, CANONICAL_OFFERS } from "@/data/canonicalCatalogData";
 import { tokenSortRatio } from "./entity-matcher";
+import { BRAND_ALIASES, extractExplicitBrand } from "./multi-platform-search";
 
 export interface TypesenseProductDocument {
   id: string;
@@ -26,6 +27,7 @@ export interface TypesenseProductDocument {
   rating?: number;
   reviewCount?: number;
   inStock: boolean;
+  tags?: string[];
   offers?: Array<{
     storeId: string;
     storeName: string;
@@ -84,6 +86,7 @@ for (const p of CANONICAL_PRODUCTS) {
     rating: p.rating,
     reviewCount: p.reviewCount,
     inStock: true,
+    tags: p.tags,
     offers: pOffers.map((o) => ({
       storeId: o.storeId,
       storeName: o.storeName,
@@ -116,25 +119,86 @@ export async function searchLocalProducts(
   }
 
   // 1. High-speed in-memory RapidFuzz & token search (<2ms)
-  const queryTokens = q.split(/\s+/).filter(Boolean);
+  // Normalize synonyms (e.g. facewash -> face wash, phones -> phone)
+  const normalizedQuery = q
+    .replace(/\bfacewash\b/g, "face wash")
+    .replace(/\bphones\b/g, "phone")
+    .replace(/\bmobiles\b/g, "phone");
+
+  const rawTokens = q.split(/\s+/).filter(Boolean);
+  const normTokens = normalizedQuery.split(/\s+/).filter(Boolean);
+  const queryTokens = Array.from(new Set([...rawTokens, ...normTokens]));
   const scoredHits: Array<{ doc: TypesenseProductDocument; score: number }> = [];
 
+  const explicitBrand = extractExplicitBrand(q);
+  const isFaceWashQuery = /\b(facewash|face wash|cleanser|face cleanser)\b/i.test(q);
+  const isShampooQuery = /\b(shampoo|shampoos|conditioner|hair wash)\b/i.test(q);
+  const isPhoneQuery = /\b(phone|phones|mobile|mobiles|smartphone|smartphones)\b/i.test(q);
+
   for (const doc of memoryProductStore.values()) {
-    const targetText = `${doc.title} ${doc.brand} ${doc.category}`.toLowerCase();
+    const docTags = (doc.tags || []).join(" ").toLowerCase();
     const titleLower = doc.title.toLowerCase();
-    
-    // Check if all query tokens appear in target text
-    const tokenMatch = queryTokens.every((token) => targetText.includes(token));
-    
+    const brandLower = doc.brand.toLowerCase();
+
+    // 1. If query specified an explicit brand, enforce brand compatibility
+    if (explicitBrand) {
+      const allowed = BRAND_ALIASES[explicitBrand] || [explicitBrand];
+      const matchBrand =
+        allowed.includes(brandLower) ||
+        allowed.some((a) => brandLower.includes(a) || titleLower.includes(a));
+      if (!matchBrand) continue;
+    }
+
+    // 2. If query specified facewash/shampoo/phone, enforce subcategory compatibility
+    if (isFaceWashQuery) {
+      const isDocFaceWash = /\b(facewash|face wash|cleanser)\b/i.test(`${titleLower} ${docTags}`);
+      if (!isDocFaceWash) continue;
+    }
+    if (isShampooQuery) {
+      const isDocShampoo = /\b(shampoo|conditioner)\b/i.test(`${titleLower} ${docTags}`);
+      if (!isDocShampoo) continue;
+    }
+    if (isPhoneQuery) {
+      const isDocPhone =
+        doc.category.toLowerCase().includes("mobile") ||
+        /\b(phone|smartphone)\b/i.test(`${titleLower} ${docTags}`);
+      if (!isDocPhone) continue;
+    }
+
+    const targetText = `${doc.title} ${doc.brand} ${doc.category} ${docTags}`.toLowerCase();
+
+    // Check if brand matches query directly (e.g. "xiaomi", "vivo")
+    const isBrandDirectMatch =
+      brandLower.includes(q) ||
+      q.includes(brandLower) ||
+      queryTokens.some((t) => t.length >= 3 && brandLower.includes(t));
+
+    // Check if category or tag matches query directly (e.g. "facewash", "shampoo")
+    const isTagOrCategoryMatch =
+      docTags.includes(q) ||
+      docTags.includes(normalizedQuery) ||
+      queryTokens.some((t) => t.length >= 3 && docTags.includes(t));
+
+    // Check if query tokens appear in target text
+    const allTokensMatch = queryTokens.every((token) => targetText.includes(token));
+    const tokenMatch = rawTokens.every((token) => targetText.includes(token));
+
     // Compute RapidFuzz similarity score (0-100)
-    const fuzzyScore = tokenSortRatio(q, doc.title);
-    
-    if (tokenMatch || fuzzyScore >= 55) {
-      let score = (tokenMatch ? 50 : 0) + fuzzyScore;
-      
-      // Exact substring boost
-      if (titleLower.includes(q)) {
+    const fuzzyScore = Math.max(tokenSortRatio(q, doc.title), tokenSortRatio(normalizedQuery, doc.title));
+
+    if (tokenMatch || allTokensMatch || isBrandDirectMatch || isTagOrCategoryMatch || fuzzyScore >= 50) {
+      let score = fuzzyScore;
+
+      if (tokenMatch || allTokensMatch) score += 40;
+      if (isBrandDirectMatch) score += 55;
+      if (isTagOrCategoryMatch) score += 50;
+
+      // Exact substring boost in title or tags
+      if (titleLower.includes(q) || titleLower.includes(normalizedQuery)) {
         score += 35;
+      }
+      if (docTags.includes(q) || docTags.includes(normalizedQuery)) {
+        score += 25;
       }
 
       // Strict variant modifier alignment (pro, ultra, max, plus)
