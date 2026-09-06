@@ -27,12 +27,15 @@ export function Hero() {
       <div className="relative mx-auto max-w-4xl px-4 sm:px-6 pt-5 sm:pt-8 text-center">
         {/* Main Headline */}
         <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">
-          Find Your Lowest Price Across Stores with Your Bank Card in 1 Second
+          Find Your Lowest Price Across Stores in 1 Second
+          <span className="block mt-1 sm:mt-2 text-xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-primary to-emerald-600 bg-clip-text text-transparent">
+            — Save Even More with Bank Cards
+          </span>
         </h1>
 
         {/* Sub-Headline / Authoritative Entity Intro */}
-        <p className="mx-auto mt-3 max-w-3xl text-sm sm:text-base md:text-lg font-normal text-muted-foreground text-balance">
-          Stores will never tell you a competitor is cheaper. GoCoupon is store-agnostic—we instantly cross-check Amazon, Flipkart, Walmart, Best Buy &amp; 200+ stores against your exact credit cards, bank discounts, and financing to reveal your true net price.
+        <p className="mx-auto mt-3.5 max-w-3xl text-sm sm:text-base md:text-lg font-normal text-muted-foreground text-balance">
+          Stores will never tell you a competitor is cheaper. GoCoupon is store-agnostic—we instantly cross-check Amazon, Flipkart, Walmart, Best Buy &amp; 200+ stores for the lowest price. Have a bank card? Auto-apply extra instant discounts and financing in 1 click.
         </p>
 
         {/* Centered Search Box — Prioritized directly below heading */}
@@ -44,7 +47,7 @@ export function Hero() {
         <div className="mt-7 inline-flex items-center gap-2 rounded-full border border-blue-500/25 bg-blue-500/5 px-4 sm:px-5 py-2 text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-400 shadow-2xs">
           <span>💡</span>
           <span>
-            <strong>Pro Tip:</strong> Paste any product link or search—GoCoupon auto-applies HDFC, SBI, ICICI, Chase, Amex &amp; Affirm discounts in 1 click
+            <strong>Pro Tip:</strong> Works for everyone! Compare store prices instantly, and optionally select your bank card to unlock extra ₹2,500+ / $50+ instant savings.
           </span>
         </div>
 

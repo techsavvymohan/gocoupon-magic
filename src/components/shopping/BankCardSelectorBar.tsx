@@ -26,7 +26,7 @@ export function BankCardSelectorBar() {
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-display text-sm font-bold tracking-tight text-foreground">
-                {isIndia ? "Bank Card Discounts & EMI" : "US Credit Cards & BNPL Financing"}
+                {isIndia ? "Bank Card Discounts & EMI (Optional)" : "Credit Cards & Financing (Optional)"}
               </span>
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -35,8 +35,8 @@ export function BankCardSelectorBar() {
             </div>
             <p className="text-[11px] text-muted-foreground hidden sm:block mt-0.5">
               {isIndia
-                ? "Select your card to see personalized checkout discounts and rewards"
-                : "Select your US card to calculate cash back rewards & Affirm installment plans"}
+                ? "Have a bank card? Select it to calculate extra instant checkout discounts & rewards"
+                : "Have a US card? Select it to calculate extra cash back rewards & Affirm installment plans"}
             </p>
           </div>
         </div>
@@ -77,7 +77,7 @@ export function BankCardSelectorBar() {
           }`}
         >
           <BankLogoIcon cardId="all" className="h-5 w-5 rounded-md shrink-0" />
-          <span>All Cards (Best Deal)</span>
+          <span>All Cards / Any Payment</span>
           {selectedCardId === "all" && <Check className="h-3.5 w-3.5 text-background" />}
         </button>
 

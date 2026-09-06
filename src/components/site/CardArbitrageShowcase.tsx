@@ -175,15 +175,15 @@ export function CardArbitrageShowcase() {
           </div>
 
           <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">
-            Amazon Will Never Tell You When a Competitor Is Cheaper with Your Card.
+            Find the Lowest Store Price in 1 Second.
             <br />
             <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-primary bg-clip-text text-transparent">
-              GoCoupon Shows You in 1 Second.
+              And Save Even More with Your Bank Card.
             </span>
           </h2>
 
           <p className="mt-3.5 text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto text-balance">
-            Retailers are locked into exclusive bank partnerships. Missing a competitor&apos;s card discount means throwing away thousands on the exact same product.
+            Amazon will never tell you a competitor is cheaper—or that an HDFC or Chase card cuts another ₹2,500 to $60 off. GoCoupon finds the lowest price for everyone, then auto-applies extra bank discounts.
           </p>
 
           {/* Region Switcher */}
@@ -329,13 +329,13 @@ export function CardArbitrageShowcase() {
                   Arbitrage Outcome:
                 </span>
                 <h3 className="text-lg sm:text-xl font-bold text-foreground">
-                  &ldquo;For your{" "}
-                  <span className="text-emerald-600 dark:text-emerald-400">
-                    {activeMarket === "india" ? currentDeal.inCardName : currentDeal.usCardName}
-                  </span>{" "}
-                  → Lowest on{" "}
+                  &ldquo;Lowest on{" "}
                   <span className="text-emerald-600 dark:text-emerald-400">
                     {activeMarket === "india" ? currentDeal.inStoreB : currentDeal.usStoreB}
+                  </span>
+                  {" "}
+                  <span className="text-xs sm:text-sm font-normal text-muted-foreground">
+                    (Save extra with {activeMarket === "india" ? currentDeal.inCardName : currentDeal.usCardName})
                   </span>
                   &rdquo;
                 </h3>
@@ -361,7 +361,7 @@ export function CardArbitrageShowcase() {
                         {activeMarket === "india" ? currentDeal.inPriceB : currentDeal.usPriceB}
                       </span>
                       <span className="block text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-1">
-                        ✓ {activeMarket === "india" ? currentDeal.inCardDiscount : currentDeal.usCardDiscount}
+                        ✓ Lower base store price + optional {activeMarket === "india" ? currentDeal.inCardDiscount : currentDeal.usCardDiscount}
                       </span>
                     </div>
                     <div>

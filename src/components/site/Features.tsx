@@ -9,8 +9,8 @@ import {
 
 const features = [
   {
-    title: "Card-Linked Net Price Intelligence",
-    body: "Calculates real checkout prices factoring in instant discounts from HDFC, SBI, ICICI, Axis and cash back rewards from Chase, Amex, Capital One, or Affirm 0% APR.",
+    title: "Store Price + Optional Card Discounts",
+    body: "Finds the lowest merchant price across stores and automatically calculates extra instant discounts if you hold an HDFC, SBI, ICICI card or Chase, Amex, Capital One rewards.",
     icon: Zap,
   },
   {
@@ -19,8 +19,8 @@ const features = [
     icon: Layers,
   },
   {
-    title: "1-Second Instant Arbitrage",
-    body: "Stores will never tell you when a competitor is cheaper. In 1 second, GoCoupon highlights the single best store for your specific card so you can click and save.",
+    title: "1-Second Store Comparison",
+    body: "Stores will never tell you when a competitor is cheaper. In 1 second, GoCoupon highlights the cheapest store for everyone, plus bonus savings if you have a partner bank card.",
     icon: Ticket,
   },
   {

@@ -8,8 +8,8 @@ const steps = [
   },
   {
     n: "02",
-    title: "Select your bank card or financing",
-    body: "Choose your card (HDFC, SBI, ICICI, Axis / Chase, Amex, Capital One) or 0% APR with Affirm. GoCoupon automatically factors in instant bank offers and reward points.",
+    title: "Select your bank card (optional)",
+    body: "Have an HDFC, SBI, ICICI, Chase, or Amex card? Select it to stack extra instant bank discounts and cash back. No card? We still find you the cheapest store price automatically.",
   },
   {
     n: "03",
