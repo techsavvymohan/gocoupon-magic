@@ -62,6 +62,11 @@ function ProductDetailsPage() {
   const { productId } = Route.useParams();
   const product = CANONICAL_PRODUCTS.find((p) => p.id === productId);
 
+  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
+  const [isWatched, setIsWatched] = useState(() => (productId ? isProductInWatchlist(productId) : false));
+  const { formatPrice, formatSaving } = useCurrency();
+  const [imageError, setImageError] = useState(false);
+
   if (!product) {
     return (
       <SiteShell>
@@ -94,10 +99,6 @@ function ProductDetailsPage() {
     (i) => i.productId === product.id,
   );
 
-  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
-  const [isWatched, setIsWatched] = useState(() => isProductInWatchlist(product.id));
-  const { formatPrice, formatSaving } = useCurrency();
-
   const bestDeal = comparison?.bestDeal;
   const currentPrice = bestDeal?.effectiveNetPrice || 28990;
 
@@ -123,8 +124,6 @@ function ProductDetailsPage() {
     { name: "Compare", path: "/compare" },
     { name: product.title, path: `/product/${product.id}` },
   ]);
-
-  const [imageError, setImageError] = useState(false);
   const fallbackStoreLogo = bestDeal?.storeLogo || "/Brand logos/Amazon_logo.svg.webp";
   const displayImage = imageError || !product.imageUrl ? fallbackStoreLogo : product.imageUrl;
   const isLogo =

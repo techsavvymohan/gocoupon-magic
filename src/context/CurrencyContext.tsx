@@ -41,7 +41,9 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         if (tz.toLowerCase().includes("kolkata") || tz.toLowerCase().includes("calcutta") || tz.toLowerCase().includes("india")) {
           return "INR";
         }
-      } catch {}
+      } catch {
+        // Fallback to USD if timezone resolution fails
+      }
     }
     // Default for international is USD until IP confirms otherwise
     return "USD";
@@ -169,7 +171,9 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem(STORAGE_KEY_CURRENCY, targetCurrency);
         if (detectedIp) localStorage.setItem(STORAGE_KEY_IP, detectedIp);
         localStorage.setItem(STORAGE_KEY_TIMESTAMP, Date.now().toString());
-      } catch {}
+      } catch {
+        // Ignore localStorage write errors in private mode
+      }
     }
 
     detectCountryByIp();
@@ -184,7 +188,9 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     setCurrencyState(newCurrency);
     try {
       localStorage.setItem(STORAGE_KEY_CURRENCY, newCurrency);
-    } catch {}
+    } catch {
+      // Ignore localStorage write errors
+    }
   }, []);
 
   // Helpers

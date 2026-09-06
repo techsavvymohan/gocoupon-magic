@@ -19,13 +19,14 @@ interface ProductHeroCardProps {
 }
 
 export function ProductHeroCard({ product }: ProductHeroCardProps) {
+  const { formatPrice } = useCurrency();
+  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
+  const [isWatched, setIsWatched] = useState(() => (product ? isProductInWatchlist(product.id) : false));
+
   if (!product) return null;
 
-  const { formatPrice } = useCurrency();
   const comparison = compareProductOffers(product.id);
   const metrics = calculatePriceMetrics(product.id);
-  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
-  const [isWatched, setIsWatched] = useState(() => isProductInWatchlist(product.id));
 
   const bestDeal = comparison?.bestDeal;
   const currentPrice = bestDeal?.effectiveNetPrice || metrics.currentPrice;

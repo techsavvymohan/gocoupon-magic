@@ -191,6 +191,55 @@ const routeConfigs = [
     h1: "Thank You for Reaching Out to GoCoupon!",
     lead: "Our support team has received your message and will reply within 2 hours during active business hours.",
   },
+  {
+    path: "contact",
+    title: "Contact GoCoupon – Customer Support, Partnerships & Press Inquiries",
+    description: "Get in touch with the GoCoupon team. Contact our customer support, partnership specialists, or editorial team for prompt assistance.",
+    h1: "Contact GoCoupon Team",
+    lead: "Have a question, feedback, or partnership proposal? Reach out to our dedicated team and we'll reply promptly.",
+  },
+  {
+    path: "help",
+    title: "GoCoupon Help Center – Extension Setup, Coupon Troubleshooting & FAQs",
+    description: "Official GoCoupon Help Center. Guides on installing the Chrome extension, auto-applying coupons at checkout, earning cashback, and tracking prices.",
+    h1: "GoCoupon Help Center & Knowledge Base",
+    lead: "Step-by-step guides, troubleshooting tips, and FAQs to get the most out of GoCoupon across supported online stores worldwide.",
+  },
+  {
+    path: "press",
+    title: "GoCoupon Press & Media Kit – Brand Assets, Company Story & Fast Facts",
+    description: "Official press resources, logos, brand guidelines, leadership bios, and media inquiries for GoCoupon.",
+    h1: "Press & Media Kit",
+    lead: "Everything you need to write about GoCoupon: brand assets, company milestones, mission, and media contact information.",
+  },
+  {
+    path: "resources",
+    title: "Shopping Resources, Discount Hacks & Coupon Guides – GoCoupon",
+    description: "Comprehensive consumer guides, sale calendars, discount formulas, and online shopping resources curated by GoCoupon.",
+    h1: "Smart Shopping Resources & Discount Guides",
+    lead: "Curated shopping resources, discount formulas, sale calendars, and guides to help you maximize your savings on every order.",
+  },
+  {
+    path: "sitemap",
+    title: "Directory Sitemap – All Stores, Categories & Guides | GoCoupon",
+    description: "Complete directory sitemap of GoCoupon. Browse all supported online stores, coupon categories, product comparisons, and shopping guides.",
+    h1: "GoCoupon Directory Sitemap",
+    lead: "Comprehensive index of all store discount pages, categories, product comparisons, and shopping guides on GoCoupon.",
+  },
+  {
+    path: "uninstall",
+    title: "We're Sorry to See You Go – GoCoupon Extension Feedback",
+    description: "We're sorry to see you uninstall GoCoupon. Share your feedback so we can continue improving our coupon automation and price comparison tools.",
+    h1: "Help Us Improve GoCoupon",
+    lead: "Thank you for trying the GoCoupon Chrome extension. Tell us what went wrong so we can make it better.",
+  },
+  {
+    path: "welcome",
+    title: "Welcome to GoCoupon – Chrome Extension Quick Start Guide",
+    description: "Welcome to GoCoupon! Follow this 1-minute quick start guide to pin the extension and start auto-applying coupons and tracking prices.",
+    h1: "Welcome to GoCoupon!",
+    lead: "Your smart shopping assistant is ready. Pin the extension to your browser toolbar to automatically save on 200+ stores worldwide.",
+  },
 ];
 
 // Add collection routes
@@ -344,6 +393,7 @@ console.log(`Successfully generated ${generatedCount} rich pre-rendered static r
 const sitemapUrls = allRoutes.map((r) => {
   let priority = "0.8";
   let changefreq = "weekly";
+  const today = new Date().toISOString().split("T")[0];
   if (r.path === "") {
     priority = "1.0";
     changefreq = "daily";
@@ -357,6 +407,9 @@ const sitemapUrls = allRoutes.map((r) => {
       "flipkart-coupons",
       "amazon-coupons",
       "myntra-coupons",
+      "help",
+      "resources",
+      "press",
     ].includes(r.path)
   ) {
     priority = "0.95";
@@ -365,7 +418,7 @@ const sitemapUrls = allRoutes.map((r) => {
     priority = "0.85";
     changefreq = "weekly";
   }
-  return `  <url>\n    <loc>https://gocoupon.io/${r.path ? r.path : ""}</loc>\n    <lastmod>2026-09-05</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
+  return `  <url>\n    <loc>https://gocoupon.io/${r.path ? r.path : ""}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
 });
 
 const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.join(

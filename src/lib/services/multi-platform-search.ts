@@ -741,7 +741,9 @@ export async function searchProductsAcrossPlatforms(
             else if (host.includes("purplle")) storeName = "Purplle";
             else if (host.includes("reliancedigital")) storeName = "Reliance Digital";
             else storeName = host.split(".")[0].toUpperCase();
-          } catch {}
+          } catch {
+            // Ignore URL parsing failure
+          }
 
           const cleanTitle = cleanProductTitle(res.title);
           const brand = detectProductBrand(cleanTitle, trimmed);
