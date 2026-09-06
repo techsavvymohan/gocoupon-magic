@@ -507,6 +507,34 @@ export function UrlResolverSearch({
         </div>
       )}
 
+      {/* Popular High-Ticket Search Chips */}
+      {showPopularChips && (
+        <div className="mt-3.5 flex flex-wrap items-center justify-center gap-1.5 text-xs">
+          <span className="font-mono text-[11px] text-muted-foreground uppercase tracking-wider mr-1">
+            Compare High-Ticket:
+          </span>
+          {[
+            "iPhone 16",
+            "MacBook Air M3",
+            "Sony WH-1000XM5",
+            "Samsung Galaxy S24",
+            "iPad Air",
+          ].map((chip) => (
+            <button
+              key={chip}
+              type="button"
+              onClick={() => {
+                setQuery(chip);
+                handleExecuteSearch(chip);
+              }}
+              className="inline-flex items-center gap-1 rounded-full border border-border bg-card/80 px-3 py-1 text-[11px] font-medium text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors shadow-2xs cursor-pointer active:scale-95"
+            >
+              <span>{chip}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Trust Badges Connected with Dashed Lines (Optional & Configurable) */}
       {showTrustBadges && (
         <div className="mt-6 sm:mt-7 flex flex-wrap items-center justify-center sm:justify-between gap-3 sm:gap-4 text-xs select-none">
