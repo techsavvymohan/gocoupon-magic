@@ -32,7 +32,7 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // Sort by highest verified success rate
-  filtered.sort((a, b) => b.successRate - a.successRate);
+  filtered.sort((a, b) => (b.successRate ?? 0) - (a.successRate ?? 0));
 
   // Set CORS headers for browser extension access
   res.setHeader("Access-Control-Allow-Origin", "*");

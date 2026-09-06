@@ -244,7 +244,8 @@ export function filterCompatibleOffers(
   const rejectedOffers: Array<{ offer: MerchantOffer; reason: string }> = [];
 
   for (const offer of rawOffers) {
-    const titleToTest = offer.title || offer.productTitle || "";
+    const rawObj = offer as unknown as { title?: string; productTitle?: string };
+    const titleToTest = rawObj.title || rawObj.productTitle || "";
     if (!titleToTest) {
       verifiedOffers.push(offer);
       continue;

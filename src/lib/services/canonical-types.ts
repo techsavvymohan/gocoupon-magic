@@ -190,3 +190,44 @@ export interface UserWatchItem {
     email?: string;
   };
 }
+
+export interface ProductOffer {
+  id: string;
+  storeId: string;
+  storeName: string;
+  storeLogo?: string;
+  productUrl: string;
+  originalPrice: number;
+  currentPrice: number;
+  guaranteedCheckoutPrice: number;
+  effectiveNetPrice: number;
+  estimatedCashback: number;
+  appliedCoupons: Array<{
+    id: string;
+    code: string;
+    discountType: string;
+    discountValue: number;
+    description: string;
+    isStackable: boolean;
+    verificationStatus: string;
+    lastVerified: string;
+  }>;
+  inStock: boolean;
+  deliveryDays: number;
+  rating: number;
+  reviewsCount: number;
+  lastUpdated: string;
+}
+
+export function normalizeCommerceCategory(category?: string, query?: string): CommerceCategory {
+  const text = `${category || ""} ${query || ""}`.toLowerCase();
+  if (/phone|iphone|samsung|mobile|pixel|oneplus|realme|redmi|poco|vivo|oppo/.test(text)) return "Mobiles";
+  if (/laptop|macbook|headphone|earbud|audio|camera|playstation|ps5|xbox|monitor|tv|electronics/.test(text)) return "Electronics";
+  if (/shoe|sneaker|shirt|t-shirt|pant|jeans|dress|clothing|wear|jacket|fashion/.test(text)) return "Fashion";
+  if (/perfume|cologne|makeup|lipstick|shampoo|skincare|serum|beauty/.test(text)) return "Beauty";
+  if (/kitchen|vacuum|blender|dyson|bed|furniture|home/.test(text)) return "Home";
+  if (/pizza|burger|snack|food|beverage|tea|coffee/.test(text)) return "Food";
+  if (/flight|hotel|tour|travel|trip/.test(text)) return "Travel";
+  return "General";
+}
+

@@ -38,6 +38,12 @@ import {
   X,
   Store,
   Percent,
+  Sparkles,
+  Bell,
+  ChevronDown,
+  ChevronUp,
+  Truck,
+  Award,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -133,6 +139,13 @@ export function ComparePage() {
   // Comparison & Price History Modal state
   const [selectedProduct, setSelectedProduct] = useState<MultiPlatformProductItem | null>(null);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
+  const [showSpotlightHistory, setShowSpotlightHistory] = useState(false);
+  const [alertTargetProduct, setAlertTargetProduct] = useState<MultiPlatformProductItem | null>(null);
+
+  const openAlertFor = (product: MultiPlatformProductItem) => {
+    setAlertTargetProduct(product);
+    setIsAlertModalOpen(true);
+  };
 
   // When search query or URL changes, fetch products from all shopping platforms
   useEffect(() => {
@@ -219,6 +232,24 @@ export function ComparePage() {
 
     return list;
   }, [searchResult, selectedPlatform, sortBy, priceRange]);
+
+  // Identify exact SKU match (if found)
+  const exactMatchProduct = useMemo(() => {
+    if (!searchResult) return null;
+    if (searchResult.exactMatchProduct) return searchResult.exactMatchProduct;
+    if (searchResult.products.length > 0 && searchResult.products[0].isExactSkuMatch) {
+      return searchResult.products[0];
+    }
+    return null;
+  }, [searchResult]);
+
+  // Secondary products list (excluding exact match when in "All" platform view)
+  const secondaryProducts = useMemo(() => {
+    if (!exactMatchProduct || selectedPlatform !== "All") {
+      return displayedProducts;
+    }
+    return displayedProducts.filter((p) => p.id !== exactMatchProduct.id);
+  }, [displayedProducts, exactMatchProduct, selectedPlatform]);
 
   const breadcrumb = breadcrumbSchema([
     { name: "Home", path: "/" },
@@ -386,120 +417,444 @@ export function ComparePage() {
               </div>
             </div>
 
-            {/* Product Cards Grid */}
-            {displayedProducts.length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {displayedProducts.map((product) => (
-                  <article
-                    key={product.id}
-                    className="group relative flex flex-col justify-between rounded-3xl border border-border/80 bg-card p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl"
-                  >
-                    <div>
-                      {/* Product Thumbnail Container */}
-                      <div
-                        onClick={() => setSelectedProduct(product)}
-                        className="relative aspect-square w-full overflow-hidden rounded-2xl bg-muted/30 p-2 flex items-center justify-center cursor-pointer"
-                        title="Click to compare prices across stores"
-                      >
-                        <ProductCardImg src={product.imageUrl} alt={product.title} />
+            {/* Spotlight Exact Product Comparison Matrix (when exact match SKU is identified) */}
+            {exactMatchProduct && selectedPlatform === "All" && (
+              <section
+                aria-label="Exact Product Match Spotlight"
+                className="relative overflow-hidden rounded-3xl border-2 border-emerald-500/40 bg-gradient-to-br from-card via-card to-emerald-500/5 p-5 sm:p-8 shadow-xl mb-10 transition-all"
+              >
+                {/* Ambient background glow accents */}
+                <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl" />
+                <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
 
-                        {/* Origin Store Badge */}
-                        <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-full bg-background/95 backdrop-blur-md px-2.5 py-1 text-[10px] font-bold text-foreground border border-border shadow-xs">
-                          <StoreLogoImg src={product.primaryStoreLogo} alt={product.primaryStore} className="h-3.5 w-3.5 object-contain" />
-                          <span>{product.primaryStore}</span>
+                {/* Top Verification Header */}
+                <div className="relative flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-4 mb-6">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                      <Sparkles className="h-3.5 w-3.5" />
+                      <span>Verified Exact Match</span>
+                    </div>
+                    <span className="rounded-full bg-muted/80 px-2.5 py-1 font-mono text-[11px] text-muted-foreground flex items-center gap-1">
+                      <Store className="h-3 w-3" />
+                      <span>Live Comparison Across {exactMatchProduct.offers.length} Verified Stores</span>
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                    </span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Live Out-of-Pocket Pricing</span>
+                  </div>
+                </div>
+
+                {/* Spotlight Hero: Thumbnail + Specs & Best Price Callout */}
+                <div className="relative grid gap-6 md:grid-cols-12 items-center mb-8">
+                  {/* Thumbnail Column */}
+                  <div className="md:col-span-4 lg:col-span-3 flex justify-center">
+                    <div className="relative aspect-square w-full max-w-[240px] rounded-2xl bg-white p-3 border border-border/80 shadow-md flex items-center justify-center group overflow-hidden">
+                      <ProductCardImg src={exactMatchProduct.imageUrl} alt={exactMatchProduct.title} />
+                      {exactMatchProduct.discountPercent > 0 && (
+                        <div className="absolute top-2.5 right-2.5 rounded-full bg-emerald-500 px-2.5 py-0.5 font-mono text-[10px] font-black text-white shadow-xs">
+                          {exactMatchProduct.discountPercent}% OFF
                         </div>
+                      )}
+                    </div>
+                  </div>
 
-                        {/* Top Trusted Store Badge */}
-                        {(product.isTrustedStore || isTopTrustedPlatform(product.primaryStore)) && (
-                          <div className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full bg-amber-500/95 backdrop-blur-md px-2 py-0.5 font-mono text-[9px] font-extrabold text-amber-950 shadow-xs">
-                            <ShieldCheck className="h-2.5 w-2.5" />
-                            <span>Top Trusted</span>
-                          </div>
-                        )}
-
-                        {/* Discount Badge */}
-                        {product.discountPercent > 0 && (
-                          <div className="absolute top-3 right-3 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-                            {product.discountPercent}% OFF
-                          </div>
-                        )}
+                  {/* Info Column */}
+                  <div className="md:col-span-8 lg:col-span-9 space-y-4">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <span className="rounded-md bg-primary/10 text-primary px-2.5 py-0.5 font-mono text-xs font-bold">
+                          {exactMatchProduct.brand}
+                        </span>
+                        <span className="rounded-md bg-muted px-2.5 py-0.5 font-mono text-xs font-medium text-foreground">
+                          {exactMatchProduct.category}
+                        </span>
+                        <span className="flex items-center gap-1 text-amber-500 font-bold text-xs">
+                          <Star className="h-3.5 w-3.5 fill-amber-500" />
+                          {exactMatchProduct.rating.toFixed(1)}
+                          <span className="text-muted-foreground font-normal">
+                            ({exactMatchProduct.reviewCount.toLocaleString()}&nbsp;reviews)
+                          </span>
+                        </span>
                       </div>
 
-                      {/* Product Info */}
-                      <div className="mt-4">
-                        <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
-                          <div className="flex items-center gap-1.5 min-w-0">
-                            <span className="rounded-md bg-muted px-2 py-0.5 font-mono text-[10px] font-bold text-foreground shrink-0">
-                              {product.brand}
+                      <h2 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-foreground text-balance">
+                        {exactMatchProduct.title}
+                      </h2>
+                    </div>
+
+                    {/* Best Offer Callout Banner */}
+                    {(() => {
+                      const lowestOffer = exactMatchProduct.offers[0] || {
+                        storeName: exactMatchProduct.primaryStore,
+                        effectiveNetPrice: exactMatchProduct.price,
+                        affiliateUrl: exactMatchProduct.directUrl,
+                        couponCode: undefined,
+                      };
+                      const maxSavings = exactMatchProduct.originalPrice > lowestOffer.effectiveNetPrice
+                        ? exactMatchProduct.originalPrice - lowestOffer.effectiveNetPrice
+                        : 0;
+
+                      return (
+                        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div>
+                            <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block">
+                              Guaranteed Lowest Net Checkout Price:
                             </span>
-                            <span className="rounded-md bg-primary/5 text-primary px-1.5 py-0.5 font-mono text-[9px] font-semibold truncate">
-                              {product.category}
+                            <div className="flex flex-wrap items-baseline gap-2.5 mt-1">
+                              <span className="font-display text-3xl sm:text-4xl font-extrabold text-emerald-600 dark:text-emerald-400 tabular-nums">
+                                {formatPrice(lowestOffer.effectiveNetPrice)}
+                              </span>
+                              {exactMatchProduct.originalPrice > lowestOffer.effectiveNetPrice && (
+                                <span className="font-mono text-sm sm:text-base text-muted-foreground line-through tabular-nums">
+                                  {formatPrice(exactMatchProduct.originalPrice)}
+                                </span>
+                              )}
+                              {maxSavings > 0 && (
+                                <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                                  Save {formatPrice(maxSavings)}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-xs text-foreground font-medium mt-1 block">
+                              Live offer on <strong>{lowestOffer.storeName}</strong>
                             </span>
                           </div>
-                          <span className="flex items-center gap-1 text-amber-500 font-bold shrink-0 ml-2">
-                            <Star className="h-3 w-3 fill-amber-500" />
-                            {product.rating.toFixed(1)}
-                            <span className="text-muted-foreground font-normal">({product.reviewCount})</span>
-                          </span>
+
+                          <div className="flex flex-wrap items-center gap-2.5">
+                            <button
+                              type="button"
+                              id="spotlight-set-alert-btn"
+                              onClick={() => openAlertFor(exactMatchProduct)}
+                              className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2.5 min-h-[44px] text-xs font-bold text-foreground hover:bg-muted transition-colors touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
+                            >
+                              <Bell className="h-4 w-4 text-amber-500" />
+                              <span>Set Price Alert</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              id="spotlight-toggle-history-btn"
+                              onClick={() => setShowSpotlightHistory(!showSpotlightHistory)}
+                              className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2.5 min-h-[44px] text-xs font-bold text-foreground hover:bg-muted transition-colors touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
+                            >
+                              <TrendingDown className="h-4 w-4 text-primary" />
+                              <span>{showSpotlightHistory ? "Hide Price Chart" : "90-Day Trend"}</span>
+                              {showSpotlightHistory ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+                            </button>
+
+                            <a
+                              id="spotlight-best-deal-cta"
+                              href={lowestOffer.affiliateUrl || exactMatchProduct.directUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 dark:bg-emerald-500 px-5 py-2.5 min-h-[44px] text-xs font-bold text-white shadow-md hover:bg-emerald-700 dark:hover:bg-emerald-600 transition-all touch-manipulation focus-visible:ring-2 focus-visible:ring-emerald-400"
+                            >
+                              <span>Buy on {lowestOffer.storeName}</span>
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </a>
+                          </div>
                         </div>
+                      );
+                    })()}
+                  </div>
+                </div>
 
-                        <h3
+                {/* Inline 90-Day Price History Graph (Toggleable) */}
+                {showSpotlightHistory && (
+                  <div className="mb-8 rounded-2xl border border-border/80 bg-background/60 p-4 sm:p-6 backdrop-blur-xs transition-all">
+                    <PriceHistoryChart
+                      productId={exactMatchProduct.id}
+                      productTitle={exactMatchProduct.title}
+                      currentPrice={exactMatchProduct.price}
+                      onSetAlertClick={() => openAlertFor(exactMatchProduct)}
+                    />
+                  </div>
+                )}
+
+                {/* Cross-Merchant Price Comparison Table */}
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-display text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+                      <Award className="h-4 w-4 text-emerald-500" />
+                      <span>Cross-Merchant Price Matrix ({exactMatchProduct.offers.length} Stores)</span>
+                    </h3>
+                    <span className="font-mono text-xs text-muted-foreground hidden sm:inline">
+                      Net Price = List Price − Instant Coupon − Cashback
+                    </span>
+                  </div>
+
+                  <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+                    <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                      <thead>
+                        <tr className="border-b border-border bg-muted/40 font-mono text-[11px] text-muted-foreground uppercase">
+                          <th className="py-3 px-4">Merchant Store</th>
+                          <th className="py-3 px-4">Base Price</th>
+                          <th className="py-3 px-4">Instant Coupon</th>
+                          <th className="py-3 px-4">goCoupon Cashback</th>
+                          <th className="py-3 px-4">Delivery Speed</th>
+                          <th className="py-3 px-4 font-bold text-foreground">Final Net Cost</th>
+                          <th className="py-3 px-4 text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {exactMatchProduct.offers.map((offer, idx) => {
+                          const isBest = offer.isLowest || idx === 0;
+                          return (
+                            <tr
+                              key={offer.storeId + idx}
+                              className={`transition-colors ${
+                                isBest
+                                  ? "bg-emerald-500/5 dark:bg-emerald-950/25 font-medium"
+                                  : "hover:bg-muted/30"
+                              }`}
+                            >
+                              {/* Store Name & Logo */}
+                              <td className="py-3.5 px-4">
+                                <div className="flex items-center gap-2.5">
+                                  <StoreLogoImg
+                                    src={offer.storeLogo}
+                                    alt={offer.storeName}
+                                    className="h-6 w-6 object-contain shrink-0"
+                                  />
+                                  <div>
+                                    <div className="flex items-center gap-1.5">
+                                      <span className="font-bold text-foreground text-xs sm:text-sm">
+                                        {offer.storeName}
+                                      </span>
+                                      {isBest && (
+                                        <span className="rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 font-mono text-[9px] font-extrabold uppercase">
+                                          Best Price
+                                        </span>
+                                      )}
+                                    </div>
+                                    <span className="font-mono text-[10px] text-muted-foreground">
+                                      Verified Partner
+                                    </span>
+                                  </div>
+                                </div>
+                              </td>
+
+                              {/* Base Price */}
+                              <td className="py-3.5 px-4 font-mono tabular-nums text-muted-foreground">
+                                {formatPrice(offer.price)}
+                              </td>
+
+                              {/* Coupon Code */}
+                              <td className="py-3.5 px-4">
+                                {offer.couponCode ? (
+                                  <div className="inline-flex items-center gap-1.5">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleCopy(offer.couponCode!)}
+                                      title="Click to copy coupon code"
+                                      className="inline-flex items-center gap-1 rounded-lg border border-primary/30 bg-primary/5 px-2 py-1 font-mono text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
+                                    >
+                                      {copiedCode === offer.couponCode ? (
+                                        <Check className="h-3 w-3 text-emerald-500" />
+                                      ) : (
+                                        <Copy className="h-3 w-3" />
+                                      )}
+                                      <span>{offer.couponCode}</span>
+                                    </button>
+                                    {offer.couponSavings && offer.couponSavings > 0 ? (
+                                      <span className="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                                        - {formatPrice(offer.couponSavings)}
+                                      </span>
+                                    ) : null}
+                                  </div>
+                                ) : (
+                                  <span className="text-muted-foreground text-[11px] italic">No code needed</span>
+                                )}
+                              </td>
+
+                              {/* Cashback */}
+                              <td className="py-3.5 px-4">
+                                {offer.cashbackAmount && offer.cashbackAmount > 0 ? (
+                                  <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-2 py-0.5 font-mono text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                                    + {formatPrice(offer.cashbackAmount)}
+                                  </span>
+                                ) : (
+                                  <span className="text-muted-foreground font-mono text-[11px]">—</span>
+                                )}
+                              </td>
+
+                              {/* Delivery */}
+                              <td className="py-3.5 px-4">
+                                <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+                                  <Truck className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                                  <span>{offer.deliveryTime}</span>
+                                </span>
+                              </td>
+
+                              {/* Effective Net Price */}
+                              <td className="py-3.5 px-4">
+                                <span
+                                  className={`font-display text-sm sm:text-base font-extrabold tabular-nums ${
+                                    isBest ? "text-emerald-600 dark:text-emerald-400" : "text-foreground"
+                                  }`}
+                                >
+                                  {formatPrice(offer.effectiveNetPrice)}
+                                </span>
+                              </td>
+
+                              {/* CTA Action */}
+                              <td className="py-3.5 px-4 text-right">
+                                <a
+                                  href={offer.affiliateUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 min-h-[36px] text-xs font-bold transition-colors touch-manipulation focus-visible:ring-2 ${
+                                    isBest
+                                      ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs focus-visible:ring-emerald-400"
+                                      : "bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 focus-visible:ring-primary"
+                                  }`}
+                                >
+                                  <span>Shop</span>
+                                  <ExternalLink className="h-3 w-3" />
+                                </a>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {/* Product Cards Grid: Secondary or Standard Results */}
+            {secondaryProducts.length > 0 ? (
+              <div className="space-y-4">
+                {exactMatchProduct && selectedPlatform === "All" && (
+                  <div className="flex items-center justify-between border-b border-border pb-3 pt-2">
+                    <h3 className="font-display text-base sm:text-lg font-bold text-foreground">
+                      Other Models &amp; Related Products ({secondaryProducts.length})
+                    </h3>
+                    <span className="text-xs text-muted-foreground font-mono">
+                      Explore alternative variants
+                    </span>
+                  </div>
+                )}
+
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {secondaryProducts.map((product) => (
+                    <article
+                      key={product.id}
+                      className="group relative flex flex-col justify-between rounded-3xl border border-border/80 bg-card p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl"
+                    >
+                      <div>
+                        {/* Product Thumbnail Container */}
+                        <div
                           onClick={() => setSelectedProduct(product)}
-                          className="font-display text-sm font-bold text-foreground line-clamp-2 leading-snug group-hover:text-primary transition-colors cursor-pointer"
-                          title="Click to view all stores & price history"
+                          className="relative aspect-square w-full overflow-hidden rounded-2xl bg-muted/30 p-2 flex items-center justify-center cursor-pointer"
+                          title="Click to compare prices across stores"
                         >
-                          {product.title}
-                        </h3>
+                          <ProductCardImg src={product.imageUrl} alt={product.title} />
 
-                        {/* Pricing Row */}
-                        <div className="mt-3 flex items-baseline gap-2">
-                          <span className="font-display text-xl font-bold text-foreground tabular-nums">
-                            {formatPrice(product.price)}
-                          </span>
-                          {product.originalPrice > product.price && (
-                            <span className="font-mono text-xs text-muted-foreground line-through tabular-nums">
-                              {formatPrice(product.originalPrice)}
-                            </span>
+                          {/* Origin Store Badge */}
+                          <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-full bg-background/95 backdrop-blur-md px-2.5 py-1 text-[10px] font-bold text-foreground border border-border shadow-xs">
+                            <StoreLogoImg src={product.primaryStoreLogo} alt={product.primaryStore} className="h-3.5 w-3.5 object-contain" />
+                            <span>{product.primaryStore}</span>
+                          </div>
+
+                          {/* Top Trusted Store Badge */}
+                          {(product.isTrustedStore || isTopTrustedPlatform(product.primaryStore)) && (
+                            <div className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full bg-amber-500/95 backdrop-blur-md px-2 py-0.5 font-mono text-[9px] font-extrabold text-amber-950 shadow-xs">
+                              <ShieldCheck className="h-2.5 w-2.5" />
+                              <span>Top Trusted</span>
+                            </div>
+                          )}
+
+                          {/* Discount Badge */}
+                          {product.discountPercent > 0 && (
+                            <div className="absolute top-3 right-3 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                              {product.discountPercent}% OFF
+                            </div>
                           )}
                         </div>
 
-                        {/* Compared Stores Pill */}
-                        <div className="mt-2 text-[11px] text-muted-foreground flex items-center justify-between">
-                          <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-                            Compared in {product.offers.length} stores
-                          </span>
-                          <span className="font-mono text-[10px]">
-                            Lowest: {formatPrice(product.offers[0]?.effectiveNetPrice || product.price)}
-                          </span>
+                        {/* Product Info */}
+                        <div className="mt-4">
+                          <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className="rounded-md bg-muted px-2 py-0.5 font-mono text-[10px] font-bold text-foreground shrink-0">
+                                {product.brand}
+                              </span>
+                              <span className="rounded-md bg-primary/5 text-primary px-1.5 py-0.5 font-mono text-[9px] font-semibold truncate">
+                                {product.category}
+                              </span>
+                            </div>
+                            <span className="flex items-center gap-1 text-amber-500 font-bold shrink-0 ml-2">
+                              <Star className="h-3 w-3 fill-amber-500" />
+                              {product.rating.toFixed(1)}
+                              <span className="text-muted-foreground font-normal">({product.reviewCount})</span>
+                            </span>
+                          </div>
+
+                          <h3
+                            onClick={() => setSelectedProduct(product)}
+                            className="font-display text-sm font-bold text-foreground line-clamp-2 leading-snug group-hover:text-primary transition-colors cursor-pointer"
+                            title="Click to view all stores & price history"
+                          >
+                            {product.title}
+                          </h3>
+
+                          {/* Pricing Row */}
+                          <div className="mt-3 flex items-baseline gap-2">
+                            <span className="font-display text-xl font-bold text-foreground tabular-nums">
+                              {formatPrice(product.price)}
+                            </span>
+                            {product.originalPrice > product.price && (
+                              <span className="font-mono text-xs text-muted-foreground line-through tabular-nums">
+                                {formatPrice(product.originalPrice)}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Compared Stores Pill */}
+                          <div className="mt-2 text-[11px] text-muted-foreground flex items-center justify-between">
+                            <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                              Compared in {product.offers.length} stores
+                            </span>
+                            <span className="font-mono text-[10px]">
+                              Lowest: {formatPrice(product.offers[0]?.effectiveNetPrice || product.price)}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Card Actions */}
-                    <div className="mt-5 pt-3 border-t border-border flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedProduct(product)}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-muted/30 px-3 py-2 min-h-[38px] text-xs font-bold text-foreground hover:bg-primary/10 hover:border-primary/40 transition-colors touch-manipulation"
-                      >
-                        <Layers className="h-3.5 w-3.5 text-primary" />
-                        <span>Compare Prices</span>
-                      </button>
+                      {/* Card Actions */}
+                      <div className="mt-5 pt-3 border-t border-border flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedProduct(product)}
+                          className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-muted/30 px-3 py-2 min-h-[38px] text-xs font-bold text-foreground hover:bg-primary/10 hover:border-primary/40 transition-colors touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
+                        >
+                          <Layers className="h-3.5 w-3.5 text-primary" />
+                          <span>Compare Prices</span>
+                        </button>
 
-                      <a
-                        href={product.directUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-1 rounded-xl bg-primary px-3.5 py-2 min-h-[38px] text-xs font-bold text-primary-foreground shadow-xs hover:bg-primary/90 transition-colors touch-manipulation"
-                      >
-                        <span>Buy</span>
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    </div>
-                  </article>
-                ))}
+                        <a
+                          href={product.directUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-1 rounded-xl bg-primary px-3.5 py-2 min-h-[38px] text-xs font-bold text-primary-foreground shadow-xs hover:bg-primary/90 transition-colors touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
+                        >
+                          <span>Buy</span>
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </div>
+                    </article>
+                  ))}
+                </div>
               </div>
-            ) : (
+            ) : !exactMatchProduct ? (
               <div className="rounded-3xl border border-dashed border-border bg-card/40 p-12 text-center max-w-lg mx-auto">
                 <Filter className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-50" />
                 <h3 className="font-display text-lg font-bold text-foreground">No matching products found</h3>
@@ -517,7 +872,7 @@ export function ComparePage() {
                   Reset Filters
                 </button>
               </div>
-            )}
+            ) : null}
           </div>
         )}
 
@@ -778,11 +1133,14 @@ export function ComparePage() {
       {/* Price Alert Modal */}
       <PriceAlertModal
         isOpen={isAlertModalOpen}
-        onClose={() => setIsAlertModalOpen(false)}
-        productId={selectedProduct?.id || "product"}
-        productTitle={selectedProduct?.title || "Product"}
-        productImage={selectedProduct?.imageUrl || "/gc-logo.webp"}
-        currentPrice={selectedProduct?.price || 1499}
+        onClose={() => {
+          setIsAlertModalOpen(false);
+          setAlertTargetProduct(null);
+        }}
+        productId={alertTargetProduct?.id || selectedProduct?.id || "product"}
+        productTitle={alertTargetProduct?.title || selectedProduct?.title || "Product"}
+        productImage={alertTargetProduct?.imageUrl || selectedProduct?.imageUrl || "/gc-logo.webp"}
+        currentPrice={alertTargetProduct?.price || selectedProduct?.price || 1499}
       />
     </SiteShell>
   );

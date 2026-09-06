@@ -8,6 +8,9 @@
  * - Instant faceting by merchant, price range, and category
  */
 
+import { CANONICAL_PRODUCTS, CANONICAL_OFFERS } from "@/data/canonicalCatalogData";
+import { tokenSortRatio } from "./entity-matcher";
+
 export interface TypesenseProductDocument {
   id: string;
   title: string;
@@ -55,180 +58,41 @@ const COLLECTION_NAME = "products";
 // High-speed in-memory LRU / catalog cache to guarantee <15ms response even if Typesense server is offline
 const memoryProductStore = new Map<string, TypesenseProductDocument>();
 
-// Pre-seed popular catalog items for instant zero-latency keystroke search
-const SEED_CATALOG_ITEMS: TypesenseProductDocument[] = [
-  {
-    id: "prod-sony-xm5",
-    title: "Sony WH-1000XM5 Wireless Noise Cancelling Headphones (Black)",
-    brand: "Sony",
-    category: "Audio & Headphones",
-    price: 26990,
-    originalPrice: 34990,
-    discountPercent: 23,
-    storeName: "Amazon India",
-    storeLogo: "/Brand logos/Amazon_logo.svg.webp",
-    directUrl: "https://amazon.in/dp/B09XS7JWHH",
-    imageUrl: "/amazon-deals-gadgets.webp",
-    rating: 4.8,
-    reviewCount: 14200,
-    inStock: true,
-    offers: [
-      {
-        storeId: "amazon",
-        storeName: "Amazon India",
-        price: 26990,
-        affiliateUrl: "/compare?q=Sony+XM5",
-        couponCode: "AMZAUDIO15",
-      },
-      {
-        storeId: "flipkart",
-        storeName: "Flipkart",
-        price: 27999,
-        affiliateUrl: "/compare?q=Sony+XM5",
-        couponCode: "FKTECH1500",
-      },
-      { storeId: "croma", storeName: "Croma", price: 28490, affiliateUrl: "/compare?q=Sony+XM5" },
-    ],
-    updatedAt: Date.now(),
-  },
-  {
-    id: "prod-iphone-15-128",
-    title: "Apple iPhone 15 (128 GB) - Black / Blue / Pink",
-    brand: "Apple",
-    category: "Smartphones & Mobiles",
-    price: 65999,
-    originalPrice: 79900,
-    discountPercent: 17,
-    storeName: "Flipkart",
-    storeLogo: "/Brand logos/flipkart.webp",
-    directUrl: "https://flipkart.com",
-    imageUrl: "/gc-logo.webp",
-    rating: 4.7,
-    reviewCount: 28900,
-    inStock: true,
-    offers: [
-      {
-        storeId: "flipkart",
-        storeName: "Flipkart",
-        price: 65999,
-        affiliateUrl: "/compare?q=iPhone+15",
-        couponCode: "FKTECH1500",
-      },
-      {
-        storeId: "amazon",
-        storeName: "Amazon India",
-        price: 66900,
-        affiliateUrl: "/compare?q=iPhone+15",
-      },
-    ],
-    updatedAt: Date.now(),
-  },
-  {
-    id: "prod-macbook-air-m3",
-    title: "Apple MacBook Air 13-inch M3 Chip (16GB RAM, 256GB SSD) - Space Grey",
-    brand: "Apple",
-    category: "Laptops & Computers",
-    price: 104900,
-    originalPrice: 114900,
-    discountPercent: 9,
-    storeName: "Amazon India",
-    storeLogo: "/Brand logos/Amazon_logo.svg.webp",
-    directUrl: "https://amazon.in",
-    imageUrl: "/gc-logo.webp",
-    rating: 4.9,
-    reviewCount: 4200,
-    inStock: true,
-    offers: [
-      {
-        storeId: "amazon",
-        storeName: "Amazon India",
-        price: 104900,
-        affiliateUrl: "/compare?q=MacBook+Air+M3",
-        couponCode: "HDFC5000",
-      },
-      {
-        storeId: "croma",
-        storeName: "Croma",
-        price: 106990,
-        affiliateUrl: "/compare?q=MacBook+Air+M3",
-      },
-    ],
-    updatedAt: Date.now(),
-  },
-  {
-    id: "prod-galaxy-s24",
-    title: "Samsung Galaxy S24 5G (Onyx Black, 256GB Storage, 8GB RAM)",
-    brand: "Samsung",
-    category: "Smartphones & Mobiles",
-    price: 64999,
-    originalPrice: 79999,
-    discountPercent: 19,
-    storeName: "Amazon India",
-    storeLogo: "/Brand logos/Amazon_logo.svg.webp",
-    directUrl: "https://amazon.in",
-    imageUrl: "/gc-logo.webp",
-    rating: 4.6,
-    reviewCount: 8900,
-    inStock: true,
-    offers: [
-      {
-        storeId: "amazon",
-        storeName: "Amazon India",
-        price: 64999,
-        affiliateUrl: "/compare?q=Galaxy+S24",
-      },
-      {
-        storeId: "flipkart",
-        storeName: "Flipkart",
-        price: 65499,
-        affiliateUrl: "/compare?q=Galaxy+S24",
-      },
-    ],
-    updatedAt: Date.now(),
-  },
-  {
-    id: "prod-boat-airdopes-141",
-    title: "boAt Airdopes 141 Bluetooth Truly Wireless in Ear Earbuds with 42H Playtime",
-    brand: "boAt",
-    category: "Audio & Headphones",
-    price: 999,
-    originalPrice: 4490,
-    discountPercent: 78,
-    storeName: "Amazon India",
-    storeLogo: "/Brand logos/Amazon_logo.svg.webp",
-    directUrl: "https://amazon.in",
-    imageUrl: "/amazon-deals-gadgets.webp",
-    rating: 4.2,
-    reviewCount: 198000,
-    inStock: true,
-    offers: [
-      {
-        storeId: "amazon",
-        storeName: "Amazon India",
-        price: 999,
-        affiliateUrl: "/compare?q=boAt+Airdopes+141",
-      },
-      {
-        storeId: "flipkart",
-        storeName: "Flipkart",
-        price: 1099,
-        affiliateUrl: "/compare?q=boAt+Airdopes+141",
-      },
-      {
-        storeId: "boat",
-        storeName: "boAt Lifestyle",
-        price: 1199,
-        affiliateUrl: "/compare?q=boAt+Airdopes+141",
-        couponCode: "BOATMAGIC15",
-      },
-    ],
-    updatedAt: Date.now(),
-  },
-];
+// Seed high-speed in-memory product store from canonical products catalog
+for (const p of CANONICAL_PRODUCTS) {
+  const pOffers = CANONICAL_OFFERS.filter((o) => o.productId === p.id);
+  const bestOffer = pOffers.find((o) => o.isBestPrice) || pOffers[0];
+  const price = bestOffer?.itemPrice || 0;
+  const originalPrice =
+    bestOffer?.originalPrice || Math.round(price * 1.25);
+  const discountPercent =
+    bestOffer?.discountPercentage ||
+    (originalPrice > price ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0);
 
-// Seed memory store
-for (const item of SEED_CATALOG_ITEMS) {
-  memoryProductStore.set(item.id, item);
+  memoryProductStore.set(p.id, {
+    id: p.id,
+    title: p.title,
+    brand: p.brand,
+    category: p.category,
+    price,
+    originalPrice,
+    discountPercent,
+    storeName: bestOffer?.storeName || "Amazon India",
+    storeLogo: bestOffer?.storeLogo || "/Brand logos/Amazon_logo.svg.webp",
+    directUrl: bestOffer?.rawUrl || `/compare?q=${encodeURIComponent(p.title)}`,
+    imageUrl: p.imageUrl,
+    rating: p.rating,
+    reviewCount: p.reviewCount,
+    inStock: true,
+    offers: pOffers.map((o) => ({
+      storeId: o.storeId,
+      storeName: o.storeName,
+      price: o.itemPrice,
+      affiliateUrl: o.affiliateUrl,
+      couponCode: o.couponSavings ? "ACTIVE_COUPON" : undefined,
+    })),
+    updatedAt: Date.now(),
+  });
 }
 
 /**
@@ -251,7 +115,58 @@ export async function searchLocalProducts(
     };
   }
 
-  // 1. Attempt Typesense HTTP Search API (<15ms)
+  // 1. High-speed in-memory RapidFuzz & token search (<2ms)
+  const queryTokens = q.split(/\s+/).filter(Boolean);
+  const scoredHits: Array<{ doc: TypesenseProductDocument; score: number }> = [];
+
+  for (const doc of memoryProductStore.values()) {
+    const targetText = `${doc.title} ${doc.brand} ${doc.category}`.toLowerCase();
+    const titleLower = doc.title.toLowerCase();
+    
+    // Check if all query tokens appear in target text
+    const tokenMatch = queryTokens.every((token) => targetText.includes(token));
+    
+    // Compute RapidFuzz similarity score (0-100)
+    const fuzzyScore = tokenSortRatio(q, doc.title);
+    
+    if (tokenMatch || fuzzyScore >= 55) {
+      let score = (tokenMatch ? 50 : 0) + fuzzyScore;
+      
+      // Exact substring boost
+      if (titleLower.includes(q)) {
+        score += 35;
+      }
+
+      // Strict variant modifier alignment (pro, ultra, max, plus)
+      const modifiers = ["pro", "ultra", "max", "plus", "mini"];
+      for (const mod of modifiers) {
+        const qHas = q.includes(mod);
+        const titleHas = titleLower.includes(mod);
+        if (qHas && titleHas) {
+          score += 20;
+        } else if (!qHas && titleHas) {
+          score -= 30; // Penalize e.g. "Pro" when user specifically asked for base model
+        }
+      }
+
+      scoredHits.push({ doc, score });
+    }
+  }
+
+  if (scoredHits.length > 0) {
+    // Sort highest score first so exact SKU match is always at index 0
+    scoredHits.sort((a, b) => b.score - a.score);
+    const hits = scoredHits.slice(0, limit).map((s) => s.doc);
+
+    return {
+      hits,
+      found: scoredHits.length,
+      searchTimeMs: Math.round(performance.now() - startTime),
+      source: "local_memory_cache",
+    };
+  }
+
+  // 2. Fallback to Typesense container if available
   try {
     const searchUrl = new URL(`${TYPESENSE_HOST}/collections/${COLLECTION_NAME}/documents/search`);
     searchUrl.searchParams.set("q", q);
@@ -265,7 +180,7 @@ export async function searchLocalProducts(
         "X-TYPESENSE-API-KEY": TYPESENSE_API_KEY,
         Accept: "application/json",
       },
-      signal: AbortSignal.timeout(350), // Ultra-fast timeout to never block UI
+      signal: AbortSignal.timeout(200),
     });
 
     if (response.ok) {
@@ -283,25 +198,12 @@ export async function searchLocalProducts(
       }
     }
   } catch {
-    // Typesense container cold or not running; seamlessly use local memory store
-  }
-
-  // 2. High-speed in-memory fuzzy/token search (<5ms)
-  const queryTokens = q.split(/\s+/).filter(Boolean);
-  const memoryHits: TypesenseProductDocument[] = [];
-
-  for (const doc of memoryProductStore.values()) {
-    const targetText = `${doc.title} ${doc.brand} ${doc.category}`.toLowerCase();
-    const isMatch = queryTokens.every((token) => targetText.includes(token));
-    if (isMatch) {
-      memoryHits.push(doc);
-    }
-    if (memoryHits.length >= limit) break;
+    // Typesense container cold or not running
   }
 
   return {
-    hits: memoryHits,
-    found: memoryHits.length,
+    hits: [],
+    found: 0,
     searchTimeMs: Math.round(performance.now() - startTime),
     source: "local_memory_cache",
   };

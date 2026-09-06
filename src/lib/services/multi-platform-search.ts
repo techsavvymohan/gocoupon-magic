@@ -7,6 +7,12 @@
 
 import { searchSearXNG } from "./searxng-service";
 import { resolveLiveUrlAndCompetitors } from "./url-metadata-extractor";
+import {
+  CANONICAL_PRODUCTS,
+  CANONICAL_OFFERS,
+  CANONICAL_COUPONS,
+} from "@/data/canonicalCatalogData";
+import { tokenSortRatio, matchProductEntities } from "./entity-matcher";
 
 export interface MultiPlatformStoreOffer {
   storeId: string;
@@ -44,6 +50,10 @@ export interface MultiPlatformProductItem {
   offers: MultiPlatformStoreOffer[];
   lowestPriceStore: string;
   maxSavingsVsOriginal: number;
+  isExactSkuMatch?: boolean;
+  matchConfidence?: number;
+  specs?: Record<string, string | number | boolean>;
+  tags?: string[];
 }
 
 export interface MultiPlatformSearchResult {
@@ -54,6 +64,7 @@ export interface MultiPlatformSearchResult {
   lowestOverallPrice: number;
   highestOverallSavings: number;
   isDirectUrl: boolean;
+  exactMatchProduct?: MultiPlatformProductItem;
 }
 
 export const TRUSTED_PLATFORMS = [
@@ -361,6 +372,50 @@ function generateStoreOffers(
   return offers;
 }
 
+function mapCanonicalOffersToStoreOffers(
+  productId: string,
+  basePrice: number,
+  baseTitle: string,
+  directUrl: string
+): MultiPlatformStoreOffer[] {
+  const cOffers = CANONICAL_OFFERS.filter((o) => o.productId === productId);
+  if (cOffers.length > 0) {
+    const mapped: MultiPlatformStoreOffer[] = cOffers.map((o) => {
+      const cCoupon = CANONICAL_COUPONS.find((c) => c.storeId === o.storeId);
+      const couponSavings =
+        o.couponSavings ||
+        (cCoupon?.discountAmount
+          ? Math.min(o.itemPrice * 0.15, cCoupon.discountAmount)
+          : 0);
+      const cashbackRate =
+        o.storeId === "amazon" ? "Up to 5%" : o.storeId === "flipkart" ? "Up to 6%" : "Up to 4%";
+      const cashbackAmount = Math.round(o.itemPrice * 0.04);
+      const effectiveNetPrice =
+        o.effectiveNetPrice || Math.max(99, o.itemPrice - couponSavings - cashbackAmount);
+
+      return {
+        storeId: o.storeId,
+        storeName: o.storeName,
+        storeLogo: o.storeLogo || getStoreLogo(o.storeId),
+        price: o.itemPrice,
+        effectiveNetPrice,
+        couponCode: cCoupon?.code,
+        couponSavings,
+        cashbackRate,
+        cashbackAmount,
+        affiliateUrl: o.affiliateUrl || o.rawUrl,
+        deliveryTime: o.deliveryTime || "Fast Express Delivery",
+        isLowest: o.isBestPrice || false,
+      };
+    });
+
+    mapped.sort((a, b) => a.effectiveNetPrice - b.effectiveNetPrice);
+    if (mapped.length > 0) mapped[0].isLowest = true;
+    return mapped;
+  }
+  return generateStoreOffers("Amazon India", basePrice, baseTitle, directUrl);
+}
+
 /**
  * Searches across all Indian shopping platforms for a given query or URL.
  */
@@ -418,6 +473,8 @@ export async function searchProductsAcrossPlatforms(
         offers: offers.length > 0 ? offers : generateStoreOffers(meta.storeName, price, meta.title, trimmed),
         lowestPriceStore: res.bestDeal?.storeName || meta.storeName,
         maxSavingsVsOriginal: res.maxSavings,
+        isExactSkuMatch: true,
+        matchConfidence: 100,
       };
 
       const stores = Array.from(new Set(productItem.offers.map((o) => o.storeName)));
@@ -430,18 +487,103 @@ export async function searchProductsAcrossPlatforms(
         lowestOverallPrice: productItem.offers[0]?.effectiveNetPrice || price,
         highestOverallSavings: productItem.maxSavingsVsOriginal,
         isDirectUrl: true,
+        exactMatchProduct: productItem,
       };
     } catch {
       // Fall through to query search
     }
   }
 
-  // 2. Query Search: Proxy through /api/shopping for Google Shopping (India)
+  // 2. Query Search: First Priority — Check Verified Canonical Catalog (<5ms)
+  const qTokens = trimmed.toLowerCase().split(/\s+/).filter(Boolean);
+  const canonicalMatches = CANONICAL_PRODUCTS.map((prod) => {
+    const titleLower = prod.title.toLowerCase();
+    const brandLower = prod.brand.toLowerCase();
+    const tagsLower = (prod.tags || []).join(" ").toLowerCase();
+    const searchable = `${titleLower} ${brandLower} ${tagsLower}`;
+
+    const fuzzyScore = tokenSortRatio(trimmed, prod.title);
+    const entityMatch = matchProductEntities(trimmed, prod.title);
+
+    const allTokensMatch = qTokens.length > 0 && qTokens.every((tok) => searchable.includes(tok));
+    const exactSubstr = titleLower.includes(trimmed.toLowerCase()) || tagsLower.includes(trimmed.toLowerCase());
+
+    let finalScore = fuzzyScore;
+    if (entityMatch.isMatch) finalScore = Math.max(finalScore, entityMatch.confidenceScore);
+    if (allTokensMatch) finalScore = Math.max(finalScore, 85);
+    if (exactSubstr) finalScore = Math.max(finalScore, 92);
+
+    return { prod, score: finalScore };
+  }).filter((item) => item.score >= 50);
+
+  canonicalMatches.sort((a, b) => b.score - a.score);
+
+  if (canonicalMatches.length > 0) {
+    const isTopExactMatch = canonicalMatches[0].score >= 70;
+    const matchedProducts: MultiPlatformProductItem[] = canonicalMatches.map((item, idx) => {
+      const p = item.prod;
+      const cOffers = CANONICAL_OFFERS.filter((o) => o.productId === p.id);
+      const bestOffer = cOffers.find((o) => o.isBestPrice) || cOffers[0];
+      const price = bestOffer?.itemPrice || 1999;
+      const originalPrice = bestOffer?.originalPrice || Math.round(price * 1.25);
+      const discountPercent =
+        bestOffer?.discountPercentage ||
+        Math.round(((originalPrice - price) / originalPrice) * 100);
+      const storeOffers = mapCanonicalOffersToStoreOffers(p.id, price, p.title, bestOffer?.rawUrl || "");
+
+      return {
+        id: p.id,
+        title: p.title,
+        brand: p.brand,
+        category: p.category,
+        primaryStore: bestOffer?.storeName || "Amazon India",
+        primaryStoreLogo: bestOffer?.storeLogo || getStoreLogo(bestOffer?.storeId || "amazon"),
+        isTrustedStore: true,
+        trustTier: 1,
+        price,
+        originalPrice,
+        discountPercent,
+        imageUrl: p.imageUrl,
+        rating: p.rating,
+        reviewCount: p.reviewCount,
+        directUrl: bestOffer?.rawUrl || `/compare?q=${encodeURIComponent(p.title)}`,
+        deliveryInfo: bestOffer?.deliveryTime || "Fast Express Delivery",
+        isBestPrice: idx === 0,
+        offers: storeOffers,
+        lowestPriceStore: storeOffers[0]?.storeName || (bestOffer?.storeName || "Amazon India"),
+        maxSavingsVsOriginal: originalPrice - (storeOffers[0]?.effectiveNetPrice || price),
+        isExactSkuMatch: idx === 0 && isTopExactMatch,
+        matchConfidence: item.score,
+        specs: p.specs,
+        tags: p.tags,
+      };
+    });
+
+    const allStores = Array.from(
+      new Set(matchedProducts.flatMap((p) => [p.primaryStore, ...p.offers.map((o) => o.storeName)]))
+    ).filter(Boolean);
+
+    const lowestOverallPrice = Math.min(...matchedProducts.map((p) => p.price));
+    const highestOverallSavings = Math.max(...matchedProducts.map((p) => p.maxSavingsVsOriginal));
+
+    return {
+      query: trimmed,
+      products: matchedProducts,
+      availableStores: allStores,
+      totalFound: matchedProducts.length,
+      lowestOverallPrice,
+      highestOverallSavings,
+      isDirectUrl: false,
+      exactMatchProduct: isTopExactMatch ? matchedProducts[0] : undefined,
+    };
+  }
+
+  // 3. Fallback to Web Discovery if not pre-seeded in canonical catalog
   const products: MultiPlatformProductItem[] = [];
 
   try {
     const shoppingApiUrl = `/api/shopping?q=${encodeURIComponent(trimmed)}`;
-    const serpRes = await fetch(shoppingApiUrl, { signal: AbortSignal.timeout(12000) });
+    const serpRes = await fetch(shoppingApiUrl, { signal: AbortSignal.timeout(6000) });
     if (serpRes.ok) {
       const data = await serpRes.json();
       const rawShopping = (data.shopping_results || []).filter(
@@ -455,7 +597,6 @@ export async function searchProductsAcrossPlatforms(
         const directUrl =
           item.product_link || item.link || `https://www.google.com/search?q=${encodeURIComponent(item.title)}`;
 
-        // Strict shopping-only check
         if (!isValidShoppingProduct(item.title, storeName, directUrl, rawPrice)) {
           continue;
         }
@@ -494,17 +635,17 @@ export async function searchProductsAcrossPlatforms(
       }
     }
   } catch (err) {
-    console.warn("Shopping proxy search timeout/error:", err);
+    console.warn("Shopping proxy search error:", err);
   }
 
-  // 3. Fallback to SearXNG Shopping Search if SerpAPI returned few results
-  if (products.length < 3) {
+  // 4. SearXNG Shopping Search
+  if (products.length < 2) {
     try {
       const shoppingQuery = `${trimmed} (site:amazon.in OR site:flipkart.com OR site:myntra.com OR site:croma.com OR site:tatacliq.com OR site:reliancedigital.in OR site:meesho.com)`;
       const searxData = await searchSearXNG(shoppingQuery, {
         categories: "shopping",
         language: "en",
-        timeoutMs: 4500,
+        timeoutMs: 4000,
       });
 
       if (searxData.results && searxData.results.length > 0) {
@@ -518,7 +659,7 @@ export async function searchProductsAcrossPlatforms(
           }
         });
 
-        validShoppingItems.slice(0, 8).forEach((res, idx) => {
+        validShoppingItems.slice(0, 6).forEach((res, idx) => {
           let storeName = "Online Merchant";
           try {
             const host = new URL(res.url).hostname.replace(/^www\./, "");
@@ -572,41 +713,43 @@ export async function searchProductsAcrossPlatforms(
     }
   }
 
-  // 4. Default Seed Fallback if completely offline
+  // 5. Clean Single Product Fallback (No cloned titles)
   if (products.length === 0) {
     const fallbackCategory = detectProductCategory(trimmed, trimmed);
     const fallbackBrand = detectProductBrand(trimmed, trimmed);
-    const basePrice = fallbackCategory === "Smartphones & Mobiles" ? 49999 : fallbackCategory === "Laptops & Computers" ? 64999 : 2499;
+    const basePrice =
+      fallbackCategory === "Smartphones & Mobiles"
+        ? 49999
+        : fallbackCategory === "Laptops & Computers"
+        ? 64999
+        : 2499;
+    const orig = Math.round(basePrice * 1.25);
+    const cleanTitle = cleanProductTitle(trimmed);
+    const offers = generateStoreOffers("Amazon India", basePrice, cleanTitle, "https://amazon.in");
 
-    const dummyStores = ["Amazon India", "Flipkart", "Croma", "Myntra"];
-    dummyStores.forEach((store, i) => {
-      const price = Math.round(basePrice * (1 + (i * 0.05 - 0.03)));
-      const orig = Math.round(price * 1.25);
-      const cleanTitle = `${trimmed} (${store} Verified)`;
-      const offers = generateStoreOffers(store, price, cleanTitle, "https://amazon.in");
-
-      products.push({
-        id: `offline_${i}`,
-        title: cleanTitle,
-        brand: fallbackBrand,
-        category: fallbackCategory,
-        primaryStore: store,
-        primaryStoreLogo: getStoreLogo(store),
-        isTrustedStore: true,
-        trustTier: store.includes("Amazon") || store.includes("Flipkart") ? 1 : 2,
-        price,
-        originalPrice: orig,
-        discountPercent: Math.round(((orig - price) / orig) * 100),
-        imageUrl: getCategoryImageByCategory(fallbackCategory, cleanTitle),
-        rating: 4.6,
-        reviewCount: 890,
-        directUrl: "https://amazon.in",
-        deliveryInfo: "Free 1-Day Delivery",
-        isBestPrice: i === 0,
-        offers,
-        lowestPriceStore: offers[0]?.storeName || store,
-        maxSavingsVsOriginal: orig - (offers[0]?.effectiveNetPrice || price),
-      });
+    products.push({
+      id: `fallback_${Date.now()}`,
+      title: cleanTitle,
+      brand: fallbackBrand,
+      category: fallbackCategory,
+      primaryStore: "Amazon India",
+      primaryStoreLogo: getStoreLogo("amazon"),
+      isTrustedStore: true,
+      trustTier: 1,
+      price: basePrice,
+      originalPrice: orig,
+      discountPercent: Math.round(((orig - basePrice) / orig) * 100),
+      imageUrl: getCategoryImageByCategory(fallbackCategory, cleanTitle),
+      rating: 4.6,
+      reviewCount: 890,
+      directUrl: "https://amazon.in",
+      deliveryInfo: "Free 1-Day Delivery",
+      isBestPrice: true,
+      offers,
+      lowestPriceStore: offers[0]?.storeName || "Amazon India",
+      maxSavingsVsOriginal: orig - (offers[0]?.effectiveNetPrice || basePrice),
+      isExactSkuMatch: true,
+      matchConfidence: 80,
     });
   }
 
@@ -616,89 +759,13 @@ export async function searchProductsAcrossPlatforms(
     p.isTrustedStore = p.trustTier <= 3;
   });
 
-  // Guarantee Top Results from Most Trusted Platforms: Amazon India & Flipkart
-  const hasAmazon = products.some((p) => p.primaryStore.toLowerCase().includes("amazon"));
-  const hasFlipkart = products.some((p) => p.primaryStore.toLowerCase().includes("flipkart"));
-  const benchmarkItem = products[0];
-  const benchmarkCategory = benchmarkItem?.category || detectProductCategory(trimmed, trimmed);
-  const benchmarkBrand = benchmarkItem?.brand || detectProductBrand(trimmed, trimmed);
-  const benchmarkPrice = products.length > 0 ? Math.min(...products.map((p) => p.price)) : 2499;
-
-  if (!hasAmazon) {
-    const amzPrice = benchmarkPrice;
-    const amzOrig = Math.round(amzPrice * 1.25);
-    const cleanTitle = benchmarkItem ? `${benchmarkItem.title}` : `${trimmed}`;
-    const amzOffers = generateStoreOffers(
-      "Amazon India",
-      amzPrice,
-      cleanTitle,
-      `https://www.amazon.in/s?k=${encodeURIComponent(trimmed)}`
-    );
-    products.unshift({
-      id: `amz_verified_${Date.now()}`,
-      title: `${cleanTitle} (Amazon India)`,
-      brand: benchmarkBrand,
-      category: benchmarkCategory,
-      primaryStore: "Amazon India",
-      primaryStoreLogo: getStoreLogo("amazon"),
-      isTrustedStore: true,
-      trustTier: 1,
-      price: amzPrice,
-      originalPrice: amzOrig,
-      discountPercent: Math.round(((amzOrig - amzPrice) / amzOrig) * 100),
-      imageUrl: benchmarkItem?.imageUrl || getCategoryImageByCategory(benchmarkCategory, cleanTitle),
-      rating: 4.6,
-      reviewCount: 1250,
-      directUrl: `https://www.amazon.in/s?k=${encodeURIComponent(trimmed)}`,
-      deliveryInfo: "Prime Fast 1-Day Delivery",
-      isBestPrice: true,
-      offers: amzOffers,
-      lowestPriceStore: amzOffers[0]?.storeName || "Amazon India",
-      maxSavingsVsOriginal: amzOrig - (amzOffers[0]?.effectiveNetPrice || amzPrice),
-    });
-  }
-
-  if (!hasFlipkart) {
-    const flipPrice = Math.round(benchmarkPrice * 0.98);
-    const flipOrig = Math.round(flipPrice * 1.26);
-    const cleanTitle = benchmarkItem ? `${benchmarkItem.title}` : `${trimmed}`;
-    const flipOffers = generateStoreOffers(
-      "Flipkart",
-      flipPrice,
-      cleanTitle,
-      `https://www.flipkart.com/search?q=${encodeURIComponent(trimmed)}`
-    );
-    products.splice(1, 0, {
-      id: `flip_verified_${Date.now()}`,
-      title: `${cleanTitle} (Flipkart Assured)`,
-      brand: benchmarkBrand,
-      category: benchmarkCategory,
-      primaryStore: "Flipkart",
-      primaryStoreLogo: getStoreLogo("flipkart"),
-      isTrustedStore: true,
-      trustTier: 1,
-      price: flipPrice,
-      originalPrice: flipOrig,
-      discountPercent: Math.round(((flipOrig - flipPrice) / flipOrig) * 100),
-      imageUrl: benchmarkItem?.imageUrl || getCategoryImageByCategory(benchmarkCategory, cleanTitle),
-      rating: 4.5,
-      reviewCount: 940,
-      directUrl: `https://www.flipkart.com/search?q=${encodeURIComponent(trimmed)}`,
-      deliveryInfo: "Plus 2-Day Delivery",
-      isBestPrice: false,
-      offers: flipOffers,
-      lowestPriceStore: flipOffers[0]?.storeName || "Flipkart",
-      maxSavingsVsOriginal: flipOrig - (flipOffers[0]?.effectiveNetPrice || flipPrice),
-    });
-  }
-
-  // Sort: Top Trusted Platforms (Amazon, Flipkart -> Croma, Tata CLiQ, Myntra, Reliance -> Meesho) first
+  // Sort by rating and trust tier
   products.sort((a, b) => {
+    if (a.isExactSkuMatch && !b.isExactSkuMatch) return -1;
+    if (!a.isExactSkuMatch && b.isExactSkuMatch) return 1;
     const rankA = a.trustTier ?? getPlatformTrustRank(a.primaryStore);
     const rankB = b.trustTier ?? getPlatformTrustRank(b.primaryStore);
-    if (rankA !== rankB) {
-      return rankA - rankB;
-    }
+    if (rankA !== rankB) return rankA - rankB;
     return b.rating - a.rating;
   });
 
@@ -721,5 +788,6 @@ export async function searchProductsAcrossPlatforms(
     lowestOverallPrice,
     highestOverallSavings,
     isDirectUrl: false,
+    exactMatchProduct: products[0]?.isExactSkuMatch ? products[0] : undefined,
   };
 }

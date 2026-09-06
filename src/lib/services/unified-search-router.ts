@@ -23,10 +23,13 @@ export interface UnifiedProductSuggestion {
   brand?: string;
   price?: number;
   originalPrice?: number;
+  discountPercent?: number;
   storeName?: string;
   storeLogo?: string;
+  imageUrl?: string;
   url: string;
   isLocalHit: boolean;
+  isExactMatch?: boolean;
   score?: number;
 }
 
@@ -61,16 +64,19 @@ export async function unifiedProductSearch(
 
   if (localResult.hits.length > 0) {
     const suggestions = localResult.hits.map((h) => h.title);
-    const results: UnifiedProductSuggestion[] = localResult.hits.map((doc) => ({
+    const results: UnifiedProductSuggestion[] = localResult.hits.map((doc, idx) => ({
       id: doc.id,
       title: doc.title,
       brand: doc.brand,
       price: doc.price,
       originalPrice: doc.originalPrice,
+      discountPercent: doc.discountPercent,
       storeName: doc.storeName,
       storeLogo: doc.storeLogo,
+      imageUrl: doc.imageUrl,
       url: `/compare?q=${encodeURIComponent(doc.title)}`,
       isLocalHit: true,
+      isExactMatch: idx === 0,
     }));
 
     return {

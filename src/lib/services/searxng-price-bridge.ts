@@ -250,11 +250,12 @@ export async function bridgeSearXNGPriceOffers(
 
     // Apply GoCoupon Category-Aware Cashback tiering
     let cashbackRatePct = 1.5;
-    if (resolvedCategory === "fashion") cashbackRatePct = 7.5;
-    else if (resolvedCategory === "mobiles") cashbackRatePct = 0.5;
-    else if (resolvedCategory === "electronics") cashbackRatePct = 1.8;
-    else if (resolvedCategory === "beauty") cashbackRatePct = 4.5;
-    else if (resolvedCategory === "home") cashbackRatePct = 3.5;
+    const catLower = resolvedCategory.toLowerCase();
+    if (catLower === "fashion") cashbackRatePct = 7.5;
+    else if (catLower === "mobiles") cashbackRatePct = 0.5;
+    else if (catLower === "electronics") cashbackRatePct = 1.8;
+    else if (catLower === "beauty") cashbackRatePct = 4.5;
+    else if (catLower === "home") cashbackRatePct = 3.5;
 
     const cashbackEstimate = Math.round(itemPrice * (cashbackRatePct / 100));
     const originalPrice = Math.round(itemPrice * 1.15); // standard anchor
