@@ -26,7 +26,7 @@ const extensionFaqs = [
   {
     question: "What is the official GoCoupon Chrome Extension?",
     answer:
-      "The GoCoupon Chrome extension is the official, 100% free browser tool created by GoCoupon (https://gocoupon.io/). It automatically tests verified discount coupon codes, auto-clips Amazon vouchers, compares live store prices, and tracks 90-day price history across 200+ online stores worldwide.",
+      "The GoCoupon Chrome extension is the official, 100% free browser tool created by GoCoupon (https://gocoupon.io/). It automatically tests verified discount coupon codes, auto-clips Amazon vouchers, compares live store prices, and tracks 30-day price history across 200+ online stores worldwide.",
   },
   {
     question: "How does GoCoupon find and auto-apply working coupons so quickly?",

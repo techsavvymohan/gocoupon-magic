@@ -18,12 +18,12 @@ export const Route = createFileRoute("/price-history")({
   component: PriceHistoryHubPage,
   head: () =>
     createSeoHead({
-      title: "Price Tracking India: 90-Day Price Tracker & Historical Low Checker – goCoupon",
+      title: "Price Tracking India: 30-Day Price Tracker & Historical Low Checker – goCoupon",
       description:
-        "Track 90-day price trends across Amazon and Flipkart. Spot fake pre-sale discount hikes, set instant price drop alerts, and buy at the all-time lowest price in India.",
+        "Track 30-day price trends across Amazon and Flipkart. Spot fake pre-sale discount hikes, set instant price drop alerts, and buy at the all-time lowest price in India.",
       path: "/price-history",
       keywords:
-        "price tracking, price tracker india, amazon price tracker, flipkart price graph, 90 day price history, price drop alert, fake discount detector, price tracking tool india, lowest price tracker",
+        "price tracking, price tracker india, amazon price tracker, flipkart price graph, 30 day price history, price drop alert, fake discount detector, price tracking tool india, lowest price tracker",
     }),
 });
 
@@ -97,7 +97,7 @@ function PriceHistoryHubPage() {
                   <div className="rounded-3xl border border-border bg-card p-6 shadow-sm min-h-[380px] flex flex-col items-center justify-center gap-3">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     <span className="text-sm font-medium text-muted-foreground">
-                      Rendering 90-day price history matrix…
+                      Rendering 30-day price history matrix…
                     </span>
                   </div>
                 }
@@ -145,7 +145,7 @@ function PriceHistoryHubPage() {
                 Live Price Tracking Engine Ready
               </h2>
               <p className="mt-3 text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed text-balance">
-                Search above by product name or paste any product link from Amazon, Flipkart, Myntra, or Croma to generate real-time 90-day price trends, fake inflation checks, and instant drop alerts.
+                Search above by product name or paste any product link from Amazon, Flipkart, Myntra, or Croma to generate real-time 30-day price trends, fake inflation checks, and instant drop alerts.
               </p>
             </div>
           )}

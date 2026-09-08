@@ -16,7 +16,7 @@ priceHistoryRouter.get("/", async (req: Request, res: Response) => {
   const asin = req.query.asin as string;
   const url = req.query.url as string;
   const rawDays = parseInt(req.query.days as string, 10);
-  const days = isNaN(rawDays) ? 90 : Math.min(180, Math.max(7, rawDays));
+  const days = isNaN(rawDays) ? 30 : Math.min(180, Math.max(7, rawDays));
 
   let targetProductId = productId;
   let targetTitle = "Tracked Product";
@@ -43,6 +43,9 @@ priceHistoryRouter.get("/", async (req: Request, res: Response) => {
     days,
     timeSeries,
     metrics: {
+      lowestPrice30d: timeSeries.lowestPrice90d,
+      highestPrice30d: timeSeries.highestPrice90d,
+      averagePrice30d: timeSeries.averagePrice90d,
       lowestPrice90d: timeSeries.lowestPrice90d,
       highestPrice90d: timeSeries.highestPrice90d,
       averagePrice90d: timeSeries.averagePrice90d,

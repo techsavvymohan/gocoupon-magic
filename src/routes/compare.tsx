@@ -705,7 +705,7 @@ export function ComparePage() {
                               className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2.5 min-h-[44px] text-xs font-bold text-foreground hover:bg-muted transition-colors touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
                             >
                               <TrendingDown className="h-4 w-4 text-primary" />
-                              <span>{showSpotlightHistory ? "Hide Chart" : "90-Day Trend"}</span>
+                              <span>{showSpotlightHistory ? "Hide Chart" : "30-Day Trend"}</span>
                               {showSpotlightHistory ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
                             </button>
 
@@ -1175,7 +1175,7 @@ export function ComparePage() {
         )}
       </div>
 
-      {/* Product Comparison & 90-Day History Modal */}
+      {/* Product Comparison & 30-Day History Modal */}
       {selectedProduct && (
         <div
           role="dialog"
@@ -1360,7 +1360,7 @@ export function ComparePage() {
                 </div>
               </div>
 
-              {/* 90-Day Interactive Price History Graph */}
+              {/* 30-Day Interactive Price History Graph */}
               <div>
                 <PriceHistoryChart
                   productId={selectedProduct.id}

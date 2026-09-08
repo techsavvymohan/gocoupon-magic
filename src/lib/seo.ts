@@ -55,7 +55,7 @@ export function createSeoHead(input: SeoInput) {
       { property: "og:image:height", content: "630" },
       {
         property: "og:image:alt",
-        content: `${SITE_NAME} — Deals, Discounts, Coupons, 90-Day Price Tracker & Live Cross-Store Comparison`,
+        content: `${SITE_NAME} — Deals, Discounts, Coupons, 30-Day Price Tracker & Live Cross-Store Comparison`,
       },
       { property: "og:locale", content: "en_IN" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -175,11 +175,11 @@ export function softwareAppSchema() {
     installUrl: "https://chromewebstore.google.com/detail/gocoupon-%E2%80%93-coupon-finder/bbdcjoadldgankjdhdlmncacpkengnid",
     downloadUrl: "https://chromewebstore.google.com/detail/gocoupon-%E2%80%93-coupon-finder/bbdcjoadldgankjdhdlmncacpkengnid",
     description:
-      "GoCoupon automatically tests and applies valid promo codes at checkout, tracks 90-day price drop graphs, and compares real-time prices across Amazon, Walmart, Target, Flipkart, and 200+ stores worldwide.",
+      "GoCoupon automatically tests and applies valid promo codes at checkout, tracks 30-day price drop graphs, and compares real-time prices across Amazon, Walmart, Target, Flipkart, and 200+ stores worldwide.",
     featureList: [
       "1-Click Automated Coupon Testing at Checkout in 850ms",
       "Live Cross-Store Price Comparison (Amazon, Walmart, Target, Flipkart, and more)",
-      "90-Day Price Drop Tracker & Historical Low Checker",
+      "30-Day Price Drop Tracker & Historical Low Checker",
       "Fake Discount & Pre-Sale Markup Detection",
       "Instant Price Drop Watchlist & Target Price Alerts",
       "Manifest V3 Sandboxed Security (Zero Remote Code)",
@@ -212,12 +212,12 @@ export function organizationSchema() {
     url: "https://gocoupon.io/",
     logo: absoluteUrl("/gc-logo.webp"),
     description:
-      "GoCoupon is the official shopping intelligence platform and browser extension for online shoppers worldwide, providing coupon automation, price comparison, 90-day price tracking, and cashback stacking.",
+      "GoCoupon is the official shopping intelligence platform and browser extension for online shoppers worldwide, providing coupon automation, price comparison, 30-day price tracking, and cashback stacking.",
     email: "support@gocoupon.io",
     knowsAbout: [
       "Automated Coupon Testing",
       "Live Price Comparison",
-      "90-Day Price History Graphs",
+      "30-Day Price History Graphs",
       "Manifest V3 Chrome Extension Security",
       "Landed Cost Stacking",
       "E-commerce Deals & Discount Vouchers",

@@ -57,7 +57,7 @@ export function AboutPage() {
           </h1>
           <p className="mx-auto mt-6 max-w-3xl text-lg text-muted-foreground sm:text-xl leading-relaxed">
             GoCoupon is an official free Chrome extension and shopping intelligence platform for online shoppers worldwide.
-            We empower consumers with real-time multi-store price comparison, 90-day price history tracking,
+            We empower consumers with real-time multi-store price comparison, 30-day price history tracking,
             and 1-click verified coupon code auto-application at checkout across 200+ global and regional online stores.
           </p>
 
@@ -300,7 +300,7 @@ export function AboutPage() {
                 desc: "Real-time Amazon vs. Flipkart vs. Croma checkout comparison.",
               },
               {
-                title: "90-Day Price Tracker",
+                title: "30-Day Price Tracker",
                 to: "/price-history",
                 desc: "Historical low checker and fake discount detector.",
               },

@@ -35,7 +35,7 @@ export const Route = createFileRoute("/blog/")({
     createSeoHead({
       title: "The Savings Intelligence Journal – goCoupon Engineering & Arbitrage Desk",
       description:
-        "Deconstructing e-commerce pricing algorithms, coupon mechanics, 90-day price tracking graphs, and discount stacking secrets from the goCoupon research lab.",
+        "Deconstructing e-commerce pricing algorithms, coupon mechanics, 30-day price tracking graphs, and discount stacking secrets from the goCoupon research lab.",
       path: "/blog",
       keywords:
         "savings intelligence blog, price tracking india, coupon stacking secrets, amazon flipkart price comparison, gocoupon research, consumer arbitrage india",
@@ -165,7 +165,7 @@ function BlogIndex() {
             <span className="hidden sm:inline text-muted-foreground/50">|</span>
             <span className="hidden sm:inline">24,180+ Active Promo Codes Verified</span>
             <span className="hidden md:inline text-muted-foreground/50">|</span>
-            <span className="hidden md:inline">90-Day Anomaly Sensors Active</span>
+            <span className="hidden md:inline">30-Day Anomaly Sensors Active</span>
           </div>
           <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
             <span className="hidden lg:inline">COORD 12.9716° N / 77.5946° E</span>
@@ -188,7 +188,7 @@ function BlogIndex() {
                 </span>
               </h1>
               <p className="mt-6 text-base sm:text-xl text-muted-foreground leading-relaxed max-w-2xl text-balance font-normal">
-                Technical checkout dissections, 90-day historical trend benchmarks, coupon auto-apply protocols, and mathematical discount stacking from the goCoupon research team.
+                Technical checkout dissections, 30-day historical trend benchmarks, coupon auto-apply protocols, and mathematical discount stacking from the goCoupon research team.
               </p>
             </div>
 

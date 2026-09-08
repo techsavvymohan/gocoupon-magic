@@ -45,11 +45,11 @@ export const Route = createFileRoute("/product/$productId")({
     const product = CANONICAL_PRODUCTS.find((p) => p.id === params.productId);
     return createSeoHead({
       title: product
-        ? `${product.title} – Best Price, Coupons & 90-Day History | goCoupon`
+        ? `${product.title} – Best Price, Coupons & 30-Day History | goCoupon`
         : "Product Price Comparison & Price History – goCoupon",
       description: product
-        ? `Compare prices on ${product.title} across Amazon, Flipkart, Croma and more. View 90-day price history and auto-apply valid coupons.`
-        : "Compare live prices, coupons, and 90-day price history across top online stores worldwide.",
+        ? `Compare prices on ${product.title} across Amazon, Flipkart, Croma and more. View 30-day price history and auto-apply valid coupons.`
+        : "Compare live prices, coupons, and 30-day price history across top online stores worldwide.",
       path: `/product/${params.productId}`,
       keywords: product
         ? `${product.title} price comparison, ${product.brand} discount code, lowest price ${product.title}, price tracker`

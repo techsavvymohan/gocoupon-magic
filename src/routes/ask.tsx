@@ -15,7 +15,7 @@ export const Route = createFileRoute("/ask")({
     createSeoHead({
       title: "Ask goCoupon – Evidence-Backed Shopping Assistant",
       description:
-        "Ask goCoupon anything about prices, discounts, and product comparisons. Powered by grounded catalog data, 90-day price history, and verified tech reviews.",
+        "Ask goCoupon anything about prices, discounts, and product comparisons. Powered by grounded catalog data, 30-day price history, and verified tech reviews.",
       path: "/ask",
       keywords:
         "shopping assistant, ask gocoupon, product recommendation, grounded shopping agent india, price research",

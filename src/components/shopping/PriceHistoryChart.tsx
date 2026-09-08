@@ -37,7 +37,7 @@ interface PriceHistoryChartProps {
 
 export function PriceHistoryChart({ productId, productTitle, currentPrice, onSetAlertClick }: PriceHistoryChartProps) {
   const { formatPrice, isIndia } = useCurrency();
-  const [days, setDays] = useState<30 | 60 | 90 | 180>(90);
+  const [days, setDays] = useState<30 | 60 | 90 | 180>(30);
 
   const historyData = getProductPriceHistory(productId, days, currentPrice);
   const metrics: PriceHistoryMetrics = calculatePriceMetrics(productId, currentPrice);

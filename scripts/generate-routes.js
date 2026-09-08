@@ -60,10 +60,10 @@ const routeConfigs = [
   },
   {
     path: "price-history",
-    title: "Price Tracking: 90-Day Price Tracker & Historical Low Checker – GoCoupon",
-    description: "Track 90-day price trends across Amazon, Walmart, Target, and Flipkart. Spot fake pre-sale discount hikes, set instant price drop alerts, and buy at the all-time lowest price.",
-    h1: "90-Day Price History Tracker & Fake Discount Anomaly Detector",
-    lead: "Analyze historical daily price snapshots across 90 days, identify all-time lowest prices, and detect artificial pre-sale price markups.",
+    title: "Price Tracking: 30-Day Price Tracker & Historical Low Checker – GoCoupon",
+    description: "Track 30-day price trends across Amazon, Walmart, Target, and Flipkart. Spot fake pre-sale discount hikes, set instant price drop alerts, and buy at the all-time lowest price.",
+    h1: "30-Day Price History Tracker & Fake Discount Anomaly Detector",
+    lead: "Analyze historical daily price snapshots across 30 days, identify all-time lowest prices, and detect artificial pre-sale price markups.",
   },
   {
     path: "ask",
@@ -96,7 +96,7 @@ const routeConfigs = [
   {
     path: "how-it-works",
     title: "How goCoupon Works – Automated Coupon Testing & Price Tracking Guide",
-    description: "Learn how the goCoupon Chrome extension tests promo codes in parallel, unlocks cashback, and tracks 90-day price trends at zero cost.",
+    description: "Learn how the goCoupon Chrome extension tests promo codes in parallel, unlocks cashback, and tracks 30-day price trends at zero cost.",
     h1: "How goCoupon Auto-Applies Coupons & Tracks Prices",
     lead: "Step-by-step guide on how goCoupon detects coupon boxes, tests codes in parallel, applies the biggest discount, and unlocks cashback.",
   },
@@ -117,9 +117,9 @@ const routeConfigs = [
   {
     path: "collections",
     title: "Curated Shopping Shortlists & Best Tech Gadgets – GoCoupon",
-    description: "Expert product shortlists with price comparison, 90-day price history graphs, and verified coupon codes for top headphones, laptops, and phones.",
+    description: "Expert product shortlists with price comparison, 30-day price history graphs, and verified coupon codes for top headphones, laptops, and phones.",
     h1: "Curated Shopping Shortlists & Buying Guides",
-    lead: "Researched shortlists and product comparisons backed by 90-day price tracker evidence, review sentiment, and live store availability.",
+    lead: "Researched shortlists and product comparisons backed by 30-day price tracker evidence, review sentiment, and live store availability.",
   },
   {
     path: "watchlist",
@@ -247,9 +247,9 @@ const collectionRoutes = [
   {
     path: "collections/best-wireless-headphones-under-30000",
     title: "Best Wireless ANC Headphones Under ₹30,000 in India (Feb 2026) – goCoupon",
-    description: "Compare Sony WH-1000XM5 vs Bose QC Ultra vs Sennheiser Momentum 4 with 90-day price history and lowest store prices.",
+    description: "Compare Sony WH-1000XM5 vs Bose QC Ultra vs Sennheiser Momentum 4 with 30-day price history and lowest store prices.",
     h1: "Best Wireless Noise-Cancelling Headphones Under ₹30,000",
-    lead: "Comprehensive comparison of flagship wireless headphones featuring 90-day price trends, active coupon discounts, and store availability.",
+    lead: "Comprehensive comparison of flagship wireless headphones featuring 30-day price trends, active coupon discounts, and store availability.",
   },
   {
     path: "collections/best-flagship-laptops-india",
@@ -355,7 +355,7 @@ for (const route of allRoutes) {
       <div style="background-color: #090d16; color: #f1f5f9; padding: 32px; font-family: system-ui, sans-serif;">
         <h1>${route.h1}</h1>
         <p>${route.lead}</p>
-        <p>Visit <a href="https://gocoupon.io/" style="color: #38bdf8;">goCoupon.io</a> to access working coupon codes, auto-apply discounts, and live 90-day price tracking across Amazon, Flipkart, Myntra, and 200+ stores in India.</p>
+        <p>Visit <a href="https://gocoupon.io/" style="color: #38bdf8;">goCoupon.io</a> to access working coupon codes, auto-apply discounts, and live 30-day price tracking across Amazon, Flipkart, Myntra, and 200+ stores in India.</p>
       </div>
     </noscript>
   `;

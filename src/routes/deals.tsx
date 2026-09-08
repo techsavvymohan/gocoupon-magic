@@ -122,7 +122,7 @@ function DealsHubPage() {
             Today's Verified Deals, Price Drops &amp; Shopping Discounts in India
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base sm:text-lg text-muted-foreground text-balance">
-            Every deal is benchmarked against 90-day price history graphs and verified with working coupon codes so you never fall for fake sale markups.
+            Every deal is benchmarked against 30-day price history graphs and verified with working coupon codes so you never fall for fake sale markups.
           </p>
 
           {/* Search & External Platform Launch */}
@@ -328,9 +328,9 @@ function DealsHubPage() {
               <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
                 <TrendingDown className="h-5 w-5" />
               </div>
-              <h3 className="font-display text-lg font-bold text-foreground">90-Day Fake Sale Detection</h3>
+              <h3 className="font-display text-lg font-bold text-foreground">30-Day Fake Sale Detection</h3>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                Before highlighting a deal, our algorithm inspects 90 days of historical pricing across Amazon and Flipkart to confirm the discount is genuine and not an artificial pre-sale price hike.
+                Before highlighting a deal, our algorithm inspects 30 days of historical pricing across Amazon and Flipkart to confirm the discount is genuine and not an artificial pre-sale price hike.
               </p>
             </div>
 
