@@ -35,7 +35,7 @@ export function Hero() {
 
         {/* Sub-Headline / Authoritative Entity Intro */}
         <p className="mx-auto mt-3.5 max-w-3xl text-sm sm:text-base md:text-lg font-normal text-muted-foreground text-balance">
-          Stores will never tell you a competitor is cheaper or that a sale price was inflated. GoCoupon is store-agnostic—we cross-check 500+ stores (Amazon, Flipkart, Walmart &amp; Best Buy), auto-test working promo codes at checkout, expose fake discounts with 30-day price history, and stack your bank card&apos;s highest instant rebate in 1 click. Zero card numbers required. 100% free.
+          Stores will never tell you a competitor is cheaper. GoCoupon cross-checks 500+ stores, auto-applies working coupons, exposes fake sales, and stacks your bank card discounts in 1 click. 100% free &amp; private.
         </p>
 
         {/* Centered Search Box — Prioritized directly below heading */}

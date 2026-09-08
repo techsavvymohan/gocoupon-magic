@@ -21,7 +21,7 @@ const routeConfigs = [
     title: "GoCoupon: Coupons, Price Comparison & Cashback Extension",
     description: "Find your lowest price across 500+ stores in 1 second. GoCoupon auto-applies working promo codes, exposes fake discounts with 30-day price history, and stacks bank card discounts. 100% free.",
     h1: "Find Your Lowest Price in 1 Second — Auto-Apply Coupons, Track Real Prices & Stack Card Discounts",
-    lead: "Stores will never tell you a competitor is cheaper or that a sale price was inflated. GoCoupon is store-agnostic—we cross-check 500+ stores (Amazon, Flipkart, Walmart & Best Buy), auto-test working promo codes at checkout, expose fake discounts with 30-day price history, and stack your bank card's highest instant rebate in 1 click. Zero card numbers required. 100% free.",
+    lead: "Stores will never tell you a competitor is cheaper. GoCoupon cross-checks 500+ stores, auto-applies working coupons, exposes fake sales, and stacks your bank card discounts in 1 click. 100% free & private.",
   },
   {
     path: "flipkart-coupons",
