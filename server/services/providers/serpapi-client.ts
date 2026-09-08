@@ -83,7 +83,7 @@ export async function searchGoogleShopping(options: {
     url.searchParams.set("api_key", apiKey);
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 6000); // 6s timeout
+    const timeout = setTimeout(() => controller.abort(), 20000); // 20s timeout
 
     const res = await fetch(url.toString(), { signal: controller.signal });
     clearTimeout(timeout);

@@ -234,7 +234,7 @@ shoppingRouter.get("/", async (req: Request, res: Response) => {
     if (freeShipping) serpUrl.searchParams.set("free_shipping", "true");
     if (smallBusiness) serpUrl.searchParams.set("small_business", "true");
 
-    const upstream = await fetch(serpUrl.toString(), { signal: AbortSignal.timeout(12000) });
+    const upstream = await fetch(serpUrl.toString(), { signal: AbortSignal.timeout(25000) });
     if (upstream.ok) {
       const data = await upstream.json();
 
