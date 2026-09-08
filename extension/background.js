@@ -6,7 +6,7 @@
  * and proxies API requests for stack evaluation.
  */
 
-const API_BASE_URL = "http://localhost:3000";
+const API_BASE_URL = "https://gocoupon.io";
 
 // Refresh remote selectors from VPS on installation / startup
 async function refreshRemoteSelectors() {

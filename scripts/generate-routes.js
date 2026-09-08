@@ -350,7 +350,7 @@ for (const route of allRoutes) {
 
   // 8. Add Crawler-friendly <noscript> fallback after <div id="root"></div>
   // This is completely invisible to real users (JS enabled), but fully parsed by text-only bots & search engines.
-  const noscriptFallback = `
+  let noscriptFallback = `
     <noscript>
       <div style="background-color: #090d16; color: #f1f5f9; padding: 32px; font-family: system-ui, sans-serif;">
         <h1>${route.h1}</h1>
@@ -359,6 +359,24 @@ for (const route of allRoutes) {
       </div>
     </noscript>
   `;
+
+  if (route.path === "privacy") {
+    const privacyStaticPath = path.resolve(__dirname, "../public/privacy.html");
+    if (fs.existsSync(privacyStaticPath)) {
+      const fullPrivacyHtml = fs.readFileSync(privacyStaticPath, "utf-8");
+      const containerMatch = fullPrivacyHtml.match(/<div class="container">([\s\S]*?)<\/div>\s*<\/body>/i);
+      if (containerMatch) {
+        noscriptFallback = `
+          <noscript>
+            <div style="background-color: #090d16; color: #f1f5f9; padding: 40px 24px; font-family: system-ui, sans-serif; max-width: 860px; margin: 0 auto; line-height: 1.65;">
+              ${containerMatch[1]}
+            </div>
+          </noscript>
+        `;
+      }
+    }
+  }
+
   pageHtml = pageHtml.replace('<div id="root"></div>', `<div id="root"></div>\n${noscriptFallback}`);
 
   if (route.path === "") {

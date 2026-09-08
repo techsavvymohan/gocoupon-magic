@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "GoCoupon: Instant Price Drop & Auto-Apply Savings",
+  "name": "GoCoupon – Coupon Finder",
   "version": "1.0.0",
   "description": "Never overpay. Instant Landed Cost stacking with verified coupons, bank card maximizer, and 2-second checkout auto-apply.",
   "permissions": [
@@ -14,7 +14,6 @@
     "*://*.walmart.com/*",
     "*://*.bestbuy.com/*",
     "*://*.croma.com/*",
-    "http://localhost:3000/*",
     "https://gocoupon.io/*"
   ],
   "background": {
