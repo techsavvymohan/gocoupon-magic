@@ -53,6 +53,111 @@ function monetizeProductLink(originalLink: string, source: string, country: stri
   return originalLink;
 }
 
+/**
+ * Endpoint: GET /api/shopping/immersive?page_token=...
+ * Retrieves deep product specification sheets, verified multi-seller stores,
+ * customer review sentiment, and landed delivery pricing via SerpAPI Google Immersive Product engine.
+ */
+shoppingRouter.get("/immersive", async (req: Request, res: Response) => {
+  const clientIp =
+    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+    req.socket.remoteAddress ||
+    "127.0.0.1";
+
+  const rateCheck = apiRateLimiter.check(clientIp, 40, 60 * 1000);
+  if (!rateCheck.allowed) {
+    res.setHeader("Retry-After", String(rateCheck.retryAfterSeconds));
+    res.status(429).json({
+      error: "Rate limit exceeded. Please slow down your requests.",
+      retryAfterSeconds: rateCheck.retryAfterSeconds,
+    });
+    return;
+  }
+
+  const pageToken = (req.query.page_token as string)?.trim();
+  if (!pageToken) {
+    res.status(400).json({ error: "Parameter 'page_token' is required" });
+    return;
+  }
+
+  const country = ((req.query.gl || req.query.country) as string)?.trim().toLowerCase() || "in";
+  const moreStores = req.query.more_stores === "1" || req.query.more_stores === "true";
+  const nextPageToken = (req.query.next_page_token as string)?.trim();
+
+  // Multi-tier 60-minute cache by page_token protects user API quota
+  const cacheKey = `immersive:${country}:${pageToken}:${moreStores}:${nextPageToken || ""}`;
+  const cached = await globalCache.get<any>(cacheKey);
+  if (cached) {
+    res.setHeader("X-Cache", "HIT");
+    res.setHeader("Cache-Control", "public, s-maxage=1800, stale-while-revalidate=3600");
+    res.json(cached);
+    return;
+  }
+
+  const serpApiKey = process.env.SERPAPI_API_KEY || process.env.SERPAPI_KEY || "";
+  if (!serpApiKey) {
+    res.json({ error: "SerpAPI key not configured", product_results: null });
+    return;
+  }
+
+  try {
+    const url = new URL("https://serpapi.com/search.json");
+    url.searchParams.set("engine", "google_immersive_product");
+    url.searchParams.set("page_token", pageToken);
+    url.searchParams.set("api_key", serpApiKey);
+    if (moreStores) url.searchParams.set("more_stores", "1");
+    if (nextPageToken) url.searchParams.set("next_page_token", nextPageToken);
+
+    const upstream = await fetch(url.toString(), { signal: AbortSignal.timeout(22000) });
+    if (upstream.ok) {
+      const data = await upstream.json();
+
+      // Enrich and monetize all merchant stores
+      if (data.product_results?.stores && Array.isArray(data.product_results.stores)) {
+        data.product_results.stores = data.product_results.stores.map((store: any) => {
+          const rawLink = store.link || "";
+          const storeName = store.name || "";
+          const monetizedLink = monetizeProductLink(rawLink, storeName, country);
+
+          return {
+            ...store,
+            affiliate_link: monetizedLink,
+            monetized: monetizedLink !== rawLink,
+          };
+        });
+
+        // Record the lowest landed store price to Supabase price tracking
+        const bestStore = data.product_results.stores[0];
+        if (bestStore && typeof bestStore.extracted_price === "number") {
+          const sku = `immersive_${encodeURIComponent(data.product_results.title || "product").slice(0, 20)}`;
+          recordPriceSnapshot(
+            sku,
+            data.product_results.title || "Product",
+            bestStore.name || "Online Store",
+            bestStore.extracted_price,
+            bestStore.extracted_total || bestStore.extracted_price,
+            bestStore.coupon || null
+          ).catch(() => {});
+        }
+      }
+
+      // Cache for 60 minutes to protect SerpAPI quota
+      await globalCache.set(cacheKey, data, 60 * 60 * 1000);
+
+      res.setHeader("X-Cache", "MISS");
+      res.setHeader("Cache-Control", "public, s-maxage=1800, stale-while-revalidate=3600");
+      res.json(data);
+      return;
+    } else {
+      console.warn(`[SerpAPI Immersive] Upstream HTTP error ${upstream.status}`);
+    }
+  } catch (err: any) {
+    console.warn("SerpAPI immersive product error in server/routes/shopping.ts:", err.message);
+  }
+
+  res.status(500).json({ error: "Failed to retrieve immersive product details", product_results: null });
+});
+
 shoppingRouter.get("/", async (req: Request, res: Response) => {
   const clientIp =
     (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
