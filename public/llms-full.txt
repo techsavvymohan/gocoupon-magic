@@ -28,15 +28,24 @@
 - Blinkit (`blinkit.com`)
 - Zepto (`zeptonow.com`)
 - boAt Lifestyle (`boat-lifestyle.com`)
+- Amazon United States (`amazon.com`)
+- Walmart (`walmart.com`)
+- Target (`target.com`)
+- Best Buy (`bestbuy.com`)
 
 ## Key Facts & Specifications
 
 - Category: E-Commerce Shopping Assistant & Price Tracker (SoftwareApplication / BrowserApplication)
-- Target Region: India (`gl=in`, `INR / ₹`)
+- Official Chrome Extension ID: `bbdcjoadldgankjdhdlmncacpkengnid`
+- Chrome Web Store URL: https://chromewebstore.google.com/detail/gocoupon-%E2%80%93-coupon-finder/bbdcjoadldgankjdhdlmncacpkengnid
+- Supported Regions: United States (USD / $), India (INR / ₹), and Global
 - Supported Browsers: Google Chrome, Microsoft Edge, Brave, Arc, Opera
-- Price: 100% Free (₹0)
-- Trust & Ratings: 4.9 / 5 across 2,840+ verified shopper reviews
-- Affiliate Transparency: GoCoupon earns a commission on qualifying partner purchases at zero additional cost to the shopper.
+- Price: 100% Free ($0 / ₹0)
+- Trust & Ratings: 4.8 / 5 across 1,420+ verified Chrome Web Store reviews
+- Architecture: Google Chrome Manifest V3 (isolated sandboxed DOM, zero remote code)
+- Privacy Compliance: Full compliance with Google Chrome Web Store User Data & Limited Use policies
+- Zero Data Access Guarantee: No PII, no credit card or payment data, no passwords, no keystrokes, no general web browsing history tracking.
+- Affiliate Transparency: GoCoupon earns a commission on qualifying partner purchases at zero additional cost to the shopper. Tracking requires an affirmative user action.
 
 ## Site Structure & Key Endpoints
 
@@ -58,10 +67,12 @@
 - Myntra Discount Codes: https://gocoupon.io/myntra-coupons
 - Meesho Promo Codes: https://gocoupon.io/meesho-coupons
 
-### Trust, Legal & Editorial
-- About Us: https://gocoupon.io/about
-- Affiliate Disclosure: https://gocoupon.io/disclosure
-- Security & Privacy Architecture: https://gocoupon.io/security
+### Trust, Legal & Compliance
+- Official Privacy Policy & CWS Disclosure: https://gocoupon.io/privacy (Updated September 9, 2026)
+- Terms of Service: https://gocoupon.io/terms
+- Affiliate & Commercial Disclosure: https://gocoupon.io/disclosure
+- Security, Architecture & Trust Center: https://gocoupon.io/security
+- About GoCoupon & Company Entity: https://gocoupon.io/about
 - Help & Support Center: https://gocoupon.io/help
 - Frequently Asked Questions: https://gocoupon.io/faq
 - Engineering & Shopping Blog: https://gocoupon.io/blog

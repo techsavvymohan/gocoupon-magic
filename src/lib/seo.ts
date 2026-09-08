@@ -166,11 +166,14 @@ export function softwareAppSchema() {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "@id": "https://gocoupon.io/#softwareapplication",
-    name: "GoCoupon Chrome Extension",
+    name: "GoCoupon – Coupon Finder",
     operatingSystem: "Chrome, Edge, Brave, Opera",
     applicationCategory: "ShoppingApplication",
     applicationSubCategory: "Price Comparison, Price Tracking, Coupon Automation",
+    softwareVersion: "1.2.0",
     url: "https://gocoupon.io/chrome-extension",
+    installUrl: "https://chromewebstore.google.com/detail/gocoupon-%E2%80%93-coupon-finder/bbdcjoadldgankjdhdlmncacpkengnid",
+    downloadUrl: "https://chromewebstore.google.com/detail/gocoupon-%E2%80%93-coupon-finder/bbdcjoadldgankjdhdlmncacpkengnid",
     description:
       "GoCoupon automatically tests and applies valid promo codes at checkout, tracks 90-day price drop graphs, and compares real-time prices across Amazon, Walmart, Target, Flipkart, and 200+ stores worldwide.",
     featureList: [
@@ -179,7 +182,16 @@ export function softwareAppSchema() {
       "90-Day Price Drop Tracker & Historical Low Checker",
       "Fake Discount & Pre-Sale Markup Detection",
       "Instant Price Drop Watchlist & Target Price Alerts",
+      "Manifest V3 Sandboxed Security (Zero Remote Code)",
+      "Zero PII & Payment Information Access Guarantee",
     ],
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "4.8",
+      reviewCount: "1420",
+      bestRating: "5",
+      worstRating: "1",
+    },
     offers: {
       "@type": "Offer",
       price: "0",
@@ -200,17 +212,27 @@ export function organizationSchema() {
     url: "https://gocoupon.io/",
     logo: absoluteUrl("/gc-logo.webp"),
     description:
-      "GoCoupon provides coupon discovery, price comparison, price history tracking, cashback and a browser extension for online shoppers worldwide.",
+      "GoCoupon is the official shopping intelligence platform and browser extension for online shoppers worldwide, providing coupon automation, price comparison, 90-day price tracking, and cashback stacking.",
     email: "support@gocoupon.io",
+    knowsAbout: [
+      "Automated Coupon Testing",
+      "Live Price Comparison",
+      "90-Day Price History Graphs",
+      "Manifest V3 Chrome Extension Security",
+      "Landed Cost Stacking",
+      "E-commerce Deals & Discount Vouchers",
+    ],
     sameAs: [
+      "https://chromewebstore.google.com/detail/gocoupon-%E2%80%93-coupon-finder/bbdcjoadldgankjdhdlmncacpkengnid",
+      "https://github.com/techsavvymohan/gocoupon-magic",
+      "https://github.com/techsavvymohan/gocoupon_extension",
       "https://facebook.com/gocouponapp",
       "https://twitter.com/gocoupon_in",
       "https://instagram.com/gocoupon.io",
-      "https://github.com/techsavvymohan/gocoupon-magic",
     ],
     contactPoint: {
       "@type": "ContactPoint",
-      contactType: "Customer Support",
+      contactType: "Customer Support & Privacy Inquiries",
       email: "support@gocoupon.io",
     },
   };

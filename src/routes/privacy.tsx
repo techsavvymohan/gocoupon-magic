@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
-import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
+import { breadcrumbSchema, createSeoHead, faqSchema } from "@/lib/seo";
 import {
   ShieldCheck,
   Lock,
@@ -19,6 +19,7 @@ import {
   Clock,
   Globe,
   Database,
+  HelpCircle,
 } from "lucide-react";
 
 const LAST_UPDATED = "September 9, 2026";
@@ -26,6 +27,39 @@ const PRODUCT_NAME = "GoCoupon – Coupon Finder";
 const EXTENSION_ID = "bbdcjoadldgankjdhdlmncacpkengnid";
 const CONTACT_EMAIL = "support@gocoupon.io";
 const SECONDARY_EMAIL = "gocoupon13@gmail.com";
+
+export const privacyFaqs = [
+  {
+    question: "What user data does the GoCoupon Chrome extension collect?",
+    answer:
+      "GoCoupon accesses shopping URLs on supported merchant domains to detect checkout pages, interacts with discount code input boxes to test coupons, and logs anonymous coupon success or failure telemetry with a cryptographic one-way domain hash. GoCoupon never collects personally identifiable information (PII), names, emails, phone numbers, passwords, or payment credentials.",
+  },
+  {
+    question: "Does GoCoupon sell, rent, or monetize my personal data?",
+    answer:
+      "No. GoCoupon maintains an absolute zero-sale policy. We never sell, rent, trade, or transfer personal user data, browsing histories, or shopping patterns to third-party data brokers or advertising networks under any circumstances.",
+  },
+  {
+    question: "How does GoCoupon securely transmit and store data?",
+    answer:
+      "All network queries to our backend database (hosted by Supabase Inc.) are encrypted in transit using modern cryptography over Transport Layer Security (TLS 1.3 / HTTPS). Data is never sent via unencrypted HTTP or encoded into URL query parameters.",
+  },
+  {
+    question: "How can I delete my data or revoke permissions from GoCoupon?",
+    answer:
+      "You can immediately delete all locally stored preferences and cached data by uninstalling the extension via chrome://extensions or clearing browser site data at chrome://settings/siteData. Since telemetry is strictly anonymous and has no user accounts, no personal identity is tied to our database.",
+  },
+  {
+    question: "Does GoCoupon comply with Google Chrome Web Store Limited Use policies?",
+    answer:
+      "Yes. GoCoupon fully complies with the Chrome Web Store User Data Policy, including the Limited Use requirements. Data access is confined exclusively to providing prominent user-facing coupon auto-apply and price comparison features, with zero advertising transfers and strict human review restrictions.",
+  },
+  {
+    question: "How does GoCoupon earn revenue if it is 100% free for consumers?",
+    answer:
+      "GoCoupon is free for all users. When you complete a qualifying purchase after explicitly activating cash back or using an affiliate-supported coupon, retail affiliate networks (such as Amazon Associates or Cuelinks) may pay GoCoupon a small referral commission at zero additional cost to you.",
+  },
+];
 
 export const Route = createFileRoute("/privacy")({
   component: PrivacyPage,
@@ -85,6 +119,10 @@ function PrivacyPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(privacyFaqs)) }}
       />
 
       {/* Header / Hero */}
@@ -217,6 +255,7 @@ function PrivacyPage() {
               <li><a href="#limited-use" className="hover:text-primary">Chrome Web Store Limited Use Compliance</a></li>
               <li><a href="#permissions" className="hover:text-primary">Chrome Extension Permissions Justification</a></li>
               <li><a href="#affiliate" className="hover:text-primary">Affiliate &amp; Commercial Transparency</a></li>
+              <li><a href="#privacy-faqs" className="hover:text-primary">Frequently Asked Privacy Questions</a></li>
               <li><a href="#contact" className="hover:text-primary">Contact Information &amp; Privacy Desk</a></li>
             </ol>
           </div>
@@ -473,7 +512,27 @@ function PrivacyPage() {
           </ul>
 
           {/* Section 9 */}
-          <h2 id="contact">9. Contact Information &amp; Privacy Desk</h2>
+          <h2 id="privacy-faqs">9. Frequently Asked Privacy &amp; Data Questions</h2>
+          <p>
+            Quick answers to the most common questions regarding GoCoupon&apos;s user data handling, security architecture, and Chrome Web Store policies:
+          </p>
+
+          <div className="not-prose my-6 space-y-4">
+            {privacyFaqs.map((faq, index) => (
+              <div key={index} className="rounded-xl border border-border bg-card p-5 shadow-xs">
+                <h3 className="font-display text-base font-bold text-foreground flex items-start gap-2.5">
+                  <HelpCircle size={18} className="text-primary shrink-0 mt-0.5" />
+                  <span>{faq.question}</span>
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground pl-7">
+                  {faq.answer}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Section 10 */}
+          <h2 id="contact">10. Contact Information &amp; Privacy Desk</h2>
           <p>
             For questions, feedback, or privacy inquiries regarding this policy or GoCoupon&apos;s Chrome Web Store compliance:
           </p>

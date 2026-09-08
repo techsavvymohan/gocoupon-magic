@@ -364,6 +364,10 @@ for (const route of allRoutes) {
     const privacyStaticPath = path.resolve(__dirname, "../public/privacy.html");
     if (fs.existsSync(privacyStaticPath)) {
       const fullPrivacyHtml = fs.readFileSync(privacyStaticPath, "utf-8");
+      const faqMatch = fullPrivacyHtml.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/i);
+      if (faqMatch) {
+        pageHtml = pageHtml.replace("</head>", `  <script type="application/ld+json">${faqMatch[1]}</script>\n  </head>`);
+      }
       const containerMatch = fullPrivacyHtml.match(/<div class="container">([\s\S]*?)<\/div>\s*<\/body>/i);
       if (containerMatch) {
         noscriptFallback = `
