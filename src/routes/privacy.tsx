@@ -275,13 +275,21 @@ function PrivacyPage() {
           {/* Section 3 */}
           <h2 id="data-handling">3. User Data Handling &amp; Processing</h2>
           <p>
-            GoCoupon processes accessed data strictly under the following rules:
+            GoCoupon processes accessed data strictly under the following rules and Chrome Web Store requirements:
           </p>
           <ul>
-            <li><strong>Purpose Limitation:</strong> All data handling is confined exclusively to retrieving verified promo codes, testing them in parallel on merchant forms, and applying the code with the highest dollar savings.</li>
-            <li><strong>Local Client-Side Processing:</strong> Coupon injection and testing occur locally within your active browser tab through sandboxed content scripts.</li>
+            <li><strong>Purpose Limitation (Single Purpose):</strong> All data handling is confined exclusively to retrieving verified promo codes, testing them in parallel on merchant forms, and applying the code with the highest dollar savings.</li>
+            <li><strong>Local Client-Side Processing &amp; Offline Resilience:</strong> Coupon injection and testing occur locally within your active browser tab through sandboxed content scripts. The extension is designed to operate locally using cached data even when offline or disconnected from our API.</li>
             <li><strong>No User Profiling:</strong> We do not build personal behavioral profiles, cross-device graphs, or device fingerprints.</li>
             <li><strong>Fair &amp; Unbiased Algorithm:</strong> The coupon engine sorts and selects coupons strictly by highest calculated savings. Working non-affiliate codes are never deprioritized or replaced with lower-value affiliate codes.</li>
+            <li><strong>Affirmative User Consent &amp; Opt-Out (Purple Nickel):</strong> Affirmative user consent is established when you install and enable the extension. Users maintain complete control: you may opt out of anonymous coupon telemetry reporting at any time via the extension popup settings, or completely revoke consent and purge all data by uninstalling the extension.</li>
+            <li><strong>Protection of Sensitive Categories (Purple Magnesium):</strong> In strict compliance with Chrome Web Store handling requirements, GoCoupon never publicly discloses or abuses sensitive data:
+              <ul className="mt-1 space-y-1 text-xs text-muted-foreground">
+                <li>• <em>Web Browsing Activity:</em> Scoped strictly to verifying store URLs on supported merchant checkout pages solely to deliver our core coupon savings feature. General browsing history is never tracked, stored, or shared.</li>
+                <li>• <em>Financial &amp; Payment Data:</em> Zero collection and zero disclosure. All transactions happen directly on merchant gateways.</li>
+                <li>• <em>Authentication Information:</em> Zero collection and zero disclosure. Passwords, session cookies, and login credentials are completely untouched.</li>
+              </ul>
+            </li>
           </ul>
 
           {/* Section 4 */}
@@ -360,6 +368,7 @@ function PrivacyPage() {
             <li><strong>No Personalized Advertising:</strong> We never transfer user data to third parties for targeted, retargeted, or interest-based advertising.</li>
             <li><strong>No Credit Scoring:</strong> We never use or disclose user data to evaluate creditworthiness or for lending assessments.</li>
             <li><strong>Authorized Technical Service Providers:</strong> We transmit anonymous API queries exclusively to our secure backend database hosted by <strong>Supabase Inc.</strong> (PostgreSQL API over TLS 1.3 / HTTPS) to fetch verified coupons and store anonymous aggregate success metrics. Supabase acts strictly as a data processor bound by strict confidentiality and data protection obligations.</li>
+            <li><strong>Secure Transmission via Modern Cryptography (Purple Copper):</strong> All data communication between the extension and backend database is encrypted in transit using modern cryptography (TLS 1.3 over HTTPS). In accordance with CWS security guidelines, GoCoupon never transmits data over insecure HTTP, and strictly avoids encoding user data into URL query parameters or unencrypted headers.</li>
             <li><strong>Legal Compliance:</strong> We will disclose information only if strictly compelled by a valid legal subpoena, warrant, or court order from a competent judicial authority.</li>
           </ul>
 
@@ -450,14 +459,17 @@ function PrivacyPage() {
           </div>
 
           {/* Section 8 */}
-          <h2 id="affiliate">8. Affiliate &amp; Commercial Monetization Transparency</h2>
+          <h2 id="affiliate">8. Affiliate &amp; Commercial Monetization Transparency (Grey Titanium Compliance)</h2>
           <p>
-            GoCoupon is 100% free for consumers. To maintain servers and engineering operations, GoCoupon may receive an affiliate commission from merchant affiliate networks (e.g., Amazon Associates, Cuelinks, Skimlinks, Impact) when a user applies a working coupon and completes a qualifying purchase.
+            GoCoupon is 100% free for consumers. To maintain servers and engineering operations, GoCoupon may receive an affiliate commission from merchant affiliate networks (e.g., Amazon Associates, Cuelinks, Skimlinks, Impact) when a user applies a working coupon and completes a qualifying purchase. In accordance with Chrome Web Store Affiliate Ads policy (Grey Titanium):
           </p>
           <ul>
-            <li><strong>Amazon Disclosure:</strong> <em>&ldquo;As an Amazon Associate, GoCoupon earns from qualifying purchases.&rdquo;</em></li>
+            <li><strong>Prominently Disclosed Before Installation:</strong> All affiliate monetization is prominently disclosed in our Chrome Web Store listing page, on our website, and prior to installation.</li>
+            <li><strong>Related User Action Strictly Required:</strong> In accordance with CWS policy, inclusion of any affiliate code, link, or cookie is strictly preceded by an explicit, affirmative user action (e.g., clicking &ldquo;Activate Cash Back Bonus&rdquo; or clicking to apply an affiliate-supported coupon).</li>
+            <li><strong>Zero Involuntary Cookie Stuffing:</strong> Affiliate links or cookies are never loaded in background iframes or on passive web browsing. We never update or inject cookies without your explicit knowledge and interaction.</li>
+            <li><strong>Amazon Associates Disclosure:</strong> <em>&ldquo;As an Amazon Associate, GoCoupon earns from qualifying purchases.&rdquo;</em></li>
             <li><strong>No Added Cost:</strong> Affiliate monetization occurs at <strong>zero additional cost</strong> to the consumer.</li>
-            <li><strong>Zero Involuntary Cookie Stuffing:</strong> Affiliate links are never loaded in background iframes or on passive browsing. Tracking is triggered <strong>solely</strong> when the user explicitly clicks &ldquo;Activate Cash Back Bonus&rdquo; or uses an affiliate coupon.</li>
+            <li><strong>Unbiased Algorithm:</strong> The coupon engine always sorts and applies codes strictly by highest calculated net savings. We never deprioritize working non-affiliate codes in favor of affiliate codes.</li>
           </ul>
 
           {/* Section 9 */}
