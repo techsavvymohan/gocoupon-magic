@@ -5,7 +5,8 @@
   "description": "Never overpay. Instant Landed Cost stacking with verified coupons, bank card maximizer, and 2-second checkout auto-apply.",
   "permissions": [
     "storage",
-    "activeTab"
+    "activeTab",
+    "alarms"
   ],
   "host_permissions": [
     "*://*.amazon.in/*",
@@ -14,6 +15,7 @@
     "*://*.walmart.com/*",
     "*://*.bestbuy.com/*",
     "*://*.croma.com/*",
+    "https://*.supabase.co/*",
     "https://gocoupon.io/*"
   ],
   "background": {

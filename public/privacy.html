@@ -16,6 +16,7 @@
       --primary: #f59e0b;
       --primary-light: #fbbf24;
       --success: #10b981;
+      --danger: #f87171;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -83,6 +84,7 @@
     strong { color: #ffffff; }
     a { color: var(--primary-light); text-decoration: underline; }
     a:hover { color: #ffffff; }
+    code { background: #1f2937; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 13px; color: #f3f4f6; }
     .box-declaration {
       background: rgba(245, 158, 11, 0.08);
       border: 2px solid rgba(245, 158, 11, 0.3);
@@ -122,6 +124,7 @@
       font-weight: 600;
     }
     td { color: #d1d5db; }
+    .never-list li { color: #fca5a5; }
     .footer-box {
       margin-top: 48px;
       padding-top: 24px;
@@ -136,105 +139,164 @@
     <span class="badge">Official Compliance Document</span>
     <h1>Privacy Policy & Chrome Web Store User Data Disclosure</h1>
     <div class="meta-date">
-      <strong>Product:</strong> GoCoupon – Coupon Finder (Chrome Browser Extension)<br>
-      <strong>Website:</strong> <a href="https://gocoupon.io">https://gocoupon.io</a><br>
-      <strong>Last Updated & Effective Date:</strong> September 8, 2026
+      <strong>Product Name:</strong> GoCoupon – Coupon Finder<br>
+      <strong>Extension ID:</strong> <code>bbdcjoadldgankjdhdlmncacpkengnid</code><br>
+      <strong>Official Website:</strong> <a href="https://gocoupon.io">https://gocoupon.io</a><br>
+      <strong>Effective Date & Last Updated:</strong> September 9, 2026<br>
+      <strong>Contact Email:</strong> <a href="mailto:support@gocoupon.io">support@gocoupon.io</a>
     </div>
 
-    <!-- Mandatory Overview for Chrome Web Store Compliance -->
+    <!-- Section 1 -->
+    <h2>1. Overview & Single Purpose Statement</h2>
     <p>
-      This Privacy Policy applies to the <strong>GoCoupon – Coupon Finder</strong> browser extension and the <strong>gocoupon.io</strong> web platform. We are committed to transparency, user privacy, and strict compliance with the <strong>Google Chrome Web Store Developer Program Policies</strong>, the <strong>Chrome Web Store User Data FAQ</strong>, and the <strong>Limited Use Requirements</strong>.
+      This Privacy Policy governs the <strong>GoCoupon – Coupon Finder</strong> browser extension (ID: <code>bbdcjoadldgankjdhdlmncacpkengnid</code>) and the <strong>gocoupon.io</strong> web platform. GoCoupon is committed to consumer transparency, data minimization, and strict compliance with the <strong>Google Chrome Web Store Developer Program Policies</strong>, the <strong>Chrome Web Store User Data FAQ</strong>, and the <strong>Limited Use Requirements</strong>.
+    </p>
+    <div class="box-declaration">
+      <h3>Single Purpose Statement</h3>
+      <p style="font-size: 15px; color: #ffffff; margin-bottom: 0;">
+        GoCoupon has a single, narrow purpose: <strong>automatically finding, testing, and applying promotional discount coupon codes and comparing product prices at checkout on supported online retail stores to save consumers money.</strong>
+      </p>
+    </div>
+
+    <!-- Section 2 -->
+    <h2>2. User Data Collection & Access</h2>
+    <p>
+      In accordance with Chrome Web Store Minimal Data requirements, GoCoupon accesses and collects only the technical data strictly necessary to execute coupon testing:
     </p>
 
-    <!-- SECTION 1: DATA COLLECTION -->
-    <h2>1. User Data Collection & Access</h2>
+    <h3>2.1 Data Categories We Access or Collect:</h3>
+    <ol>
+      <li>
+        <strong>Shopping URLs and Merchant Domains (Web History / Scoped URLs):</strong><br>
+        <em>What is accessed:</em> When you navigate to a supported e-commerce store (e.g., Amazon, Flipkart, Myntra, Meesho, Tata CLiQ, Croma, Reliance Digital, Walmart, Target, Best Buy), the extension detects the merchant hostname and checkout path to verify if coupon codes exist for that retailer.<br>
+        <em>Scope:</em> GoCoupon <strong>never</strong> tracks, logs, or inspects broad web browsing history across non-supported or non-shopping websites.
+      </li>
+      <li>
+        <strong>Website Content & Checkout Form Fields (Website Content):</strong><br>
+        <em>What is accessed:</em> On checkout pages, our sandboxed content scripts locate the discount/coupon code input box and the order total element to test candidate coupons and calculate savings.<br>
+        <em>Scope:</em> GoCoupon only interacts with coupon input fields and order total numbers. We never read, capture, or inspect private cart items, personal customer details, or shipping addresses.
+      </li>
+      <li>
+        <strong>Coupon Telemetry & Anonymized Savings Results (User Activity):</strong><br>
+        <em>What is collected:</em> When coupon codes are auto-applied, the extension transmits anonymous performance telemetry: the merchant name, the coupon code tested, whether it succeeded or failed, and the discount amount. Telemetry includes a cryptographic one-way hash of the checkout domain (<code>page_url_hash</code>). This contains <strong>zero</strong> personal identifiers.
+      </li>
+      <li>
+        <strong>Local Extension Preferences (Local Storage):</strong><br>
+        <em>What is collected:</em> User interface preferences (e.g., sound toggles, auto-apply preferences, recent store cache) stored locally on your device via <code>chrome.storage.local</code>.
+      </li>
+      <li>
+        <strong>Affiliate Click Audit Records (User-Initiated Action):</strong><br>
+        <em>What is collected:</em> If and only when a user explicitly clicks the &ldquo;Activate Cash Back Bonus&rdquo; button, an audit log containing the merchant identifier, affiliate network tag, and timestamp is recorded to ensure compliance with merchant operating agreements.
+      </li>
+    </ol>
+
+    <h3>2.2 Data We NEVER Collect (Zero-Access Guarantee):</h3>
+    <ul class="never-list">
+      <li><strong>NO Personally Identifiable Information (PII):</strong> No names, email addresses, phone numbers, home addresses, government IDs, or age.</li>
+      <li><strong>NO Financial or Payment Data:</strong> We never read, touch, log, or transmit credit/debit card numbers, CVVs, expiration dates, UPI PINs, bank accounts, or billing information. All checkout transactions occur directly and securely on the merchant&apos;s platform.</li>
+      <li><strong>NO Passwords or Authentication Data:</strong> We never access passwords, session cookies, login credentials, or two-factor authentication (2FA/OTP) tokens.</li>
+      <li><strong>NO Keystroke Logging:</strong> We do not track general keyboard input. Script interaction is strictly limited to injecting coupon strings into merchant promo code boxes.</li>
+      <li><strong>NO General Browsing Monitoring:</strong> Search queries, private emails, social media, and web browsing on non-shopping websites are completely inaccessible and invisible to GoCoupon.</li>
+    </ul>
+
+    <!-- Section 3 -->
+    <h2>3. User Data Handling & Processing</h2>
     <p>
-      GoCoupon adheres to strict data minimization. We only access the minimal technical data strictly necessary to test discount coupons and compare product prices on supported shopping websites.
+      GoCoupon processes accessed data strictly under the following rules:
     </p>
-
-    <h3>1.1 What We Collect & Access:</h3>
     <ul>
-      <li>
-        <strong>Active Shopping Page Domain & URL:</strong> When you navigate to a supported merchant website (e.g. Amazon, Flipkart, Walmart, Target, Best Buy, Croma), the extension detects the current page domain to determine whether verified coupons or price comparisons are available for that merchant.
-      </li>
-      <li>
-        <strong>Coupon Test Results:</strong> When testing promo codes on a supported cart or checkout page, the extension notes whether candidate discount codes were accepted or rejected by the merchant form, in order to apply the highest savings code for you.
-      </li>
-      <li>
-        <strong>Local User Preferences:</strong> Your UI preferences (such as auto-apply toggles or notification preferences) are saved locally on your device via <code>chrome.storage.local</code>.
-      </li>
+      <li><strong>Purpose Limitation:</strong> All data handling is confined exclusively to retrieving verified promo codes, testing them in parallel on merchant forms, and applying the code with the highest dollar savings.</li>
+      <li><strong>Local Client-Side Processing:</strong> Coupon injection and testing occur locally within your active browser tab through sandboxed content scripts.</li>
+      <li><strong>No User Profiling:</strong> We do not build personal behavioral profiles, cross-device graphs, or device fingerprints.</li>
+      <li><strong>Fair & Unbiased Algorithm:</strong> The coupon engine sorts and selects coupons strictly by highest calculated savings. Working non-affiliate codes are never deprioritized or replaced with lower-value affiliate codes.</li>
     </ul>
 
-    <h3>1.2 What We NEVER Collect (Zero-Access Guarantee):</h3>
-    <ul>
-      <li><strong>NO Personally Identifiable Information (PII):</strong> We do not collect your name, email address, phone number, physical address, or national ID.</li>
-      <li><strong>NO Financial or Payment Data:</strong> We never inspect, capture, store, or transmit credit/debit card numbers, CVVs, expiration dates, UPI PINs, bank accounts, or billing information. All payments remain 100% between you and the retailer.</li>
-      <li><strong>NO Passwords or Credentials:</strong> We never access login credentials, passwords, session tokens, authentication cookies, or two-factor authentication (2FA/OTP) codes.</li>
-      <li><strong>NO General Browsing History:</strong> We do not track, record, or monitor your web browsing on non-shopping websites, search engine histories, personal emails, or social media accounts.</li>
-      <li><strong>NO Keystroke Logging:</strong> We never monitor general typing or form inputs. Interaction is strictly confined to entering discount promo codes in merchant checkout coupon boxes.</li>
-    </ul>
-
-    <!-- SECTION 2: DATA HANDLING & USAGE -->
-    <h2>2. User Data Handling & Processing</h2>
+    <!-- Section 4 -->
+    <h2>4. User Data Storage, Retention & Deletion</h2>
     <p>
-      Any technical information accessed by GoCoupon is handled strictly to provide its single, core user-facing functionality:
+      We maintain strict data retention and storage boundaries:
     </p>
-    <ul>
-      <li><strong>Single Purpose:</strong> Automatically finding, testing, and applying discount coupon codes and comparing product prices at checkout across supported e-commerce retailers to save shoppers money.</li>
-      <li><strong>Local Processing:</strong> Coupon testing occurs locally in your active browser tab via sandboxed content scripts.</li>
-      <li><strong>No Cross-Site Profiling:</strong> We do not build behavioral profiles, cross-device graphs, or device fingerprints of our users.</li>
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Data Type</th>
+          <th>Storage Location</th>
+          <th>Retention Period</th>
+          <th>Deletion & Revocation Mechanism</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>User Settings & UI Preferences</strong></td>
+          <td>Local Device (<code>chrome.storage.local</code>)</td>
+          <td>Until extension is uninstalled or cleared by user</td>
+          <td>Automatically deleted by Chrome upon uninstall, or cleared via Chrome Settings.</td>
+        </tr>
+        <tr>
+          <td><strong>Temporary Checkout Memory</strong></td>
+          <td>Ephemeral Browser RAM</td>
+          <td>Duration of active checkout tab session</td>
+          <td>Erased immediately upon tab or browser closure.</td>
+        </tr>
+        <tr>
+          <td><strong>Local Coupon Cache</strong></td>
+          <td>Local Device (<code>chrome.storage.session</code>)</td>
+          <td>Max 30 minutes</td>
+          <td>Automatically wiped every 30 minutes via background alarm (<code>gocoupon_cache_cleanup</code>).</td>
+        </tr>
+        <tr>
+          <td><strong>Anonymous Coupon Telemetry</strong></td>
+          <td>Secure Cloud DB (Supabase Inc.)</td>
+          <td>90 days for aggregate code ranking</td>
+          <td>Aggregated and purged on automated 90-day cycles.</td>
+        </tr>
+        <tr>
+          <td><strong>Server Security & Access Logs</strong></td>
+          <td>Encrypted Cloud Server</td>
+          <td>30 days</td>
+          <td>Automatically deleted after 30 days.</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <!-- SECTION 3: DATA STORAGE & RETENTION -->
-    <h2>3. User Data Storage & Retention</h2>
-    <ul>
-      <li>
-        <strong>Local Storage on Device:</strong> All user settings (such as UI preferences and cached coupon lists) are stored locally in your browser using Chrome's sandboxed <code>chrome.storage.local</code> API.
-      </li>
-      <li>
-        <strong>Session Data:</strong> Temporary coupon calculation data resides exclusively in browser memory during an active checkout tab session and is instantly erased when the tab or browser is closed.
-      </li>
-      <li>
-        <strong>Server Logs:</strong> Anonymized server access logs maintained solely for network security and DDoS mitigation are automatically pruned and deleted within thirty (30) days.
-      </li>
-      <li>
-        <strong>Immediate Deletion on Uninstall:</strong> If you remove the GoCoupon extension from Chrome (via <code>chrome://extensions</code>), all locally stored data, cached files, and preferences are immediately and permanently erased by the browser.
-      </li>
-    </ul>
+    <h3>How Users Can Delete Data & Revoke Access:</h3>
+    <ol>
+      <li><strong>Immediate Local Data Deletion:</strong> Users can completely delete all locally stored data, cached files, and preferences at any time by uninstalling the extension via <code>chrome://extensions</code> (click &ldquo;Remove&rdquo;).</li>
+      <li><strong>Clearing Browser Extension Data:</strong> Users can manually purge extension storage via Chrome Settings at <code>chrome://settings/siteData</code>.</li>
+      <li><strong>Data Inquiries & Server Deletion Requests:</strong> Because GoCoupon does not collect PII or require user accounts, telemetry is anonymous and cannot be tied to individual identities. However, users may contact <a href="mailto:support@gocoupon.io">support@gocoupon.io</a> for any data handling inquiries or deletion assistance.</li>
+    </ol>
 
-    <!-- SECTION 4: DATA SHARING & DISCLOSURE -->
-    <h2>4. User Data Sharing & Third-Party Disclosure</h2>
+    <!-- Section 5 -->
+    <h2>5. User Data Sharing & Third-Party Disclosure</h2>
     <p>
       <strong>GoCoupon does NOT sell, rent, trade, or monetize personal user data under any circumstances.</strong>
     </p>
     <ul>
-      <li><strong>Zero Data Selling:</strong> We do not sell user data to data brokers, ad networks, or third parties.</li>
-      <li><strong>No Advertising Transfers:</strong> We never transfer user data to third parties for personalized, retargeted, or interest-based advertising.</li>
-      <li><strong>No Credit Scoring:</strong> We never use or transfer user data to determine creditworthiness or for lending assessments.</li>
-      <li><strong>Processors Only:</strong> We communicate solely with our secure, encrypted servers (via TLS 1.3 / HTTPS) to fetch verified coupon codes. Standard cloud hosting infrastructure providers act strictly as data processors under binding data confidentiality agreements.</li>
-      <li><strong>Legal Disclosures:</strong> We disclose information only if required by a valid legal subpoena, warrant, or court order issued by a competent legal authority.</li>
+      <li><strong>Zero Data Selling:</strong> We never sell user data, shopping patterns, or browsing habits to data brokers, advertising networks, or third parties.</li>
+      <li><strong>No Personalized Advertising:</strong> We never transfer user data to third parties for targeted, retargeted, or interest-based advertising.</li>
+      <li><strong>No Credit Scoring:</strong> We never use or disclose user data to evaluate creditworthiness or for lending assessments.</li>
+      <li><strong>Authorized Technical Service Providers:</strong> We transmit anonymous API queries exclusively to our secure backend database hosted by <strong>Supabase Inc.</strong> (PostgreSQL API over TLS 1.3 / HTTPS) to fetch verified coupons and store anonymous aggregate success metrics. Supabase acts strictly as a data processor bound by strict confidentiality and data protection obligations.</li>
+      <li><strong>Legal Compliance:</strong> We will disclose information only if strictly compelled by a valid legal subpoena, warrant, or court order from a competent judicial authority.</li>
     </ul>
 
-    <!-- SECTION 5: LIMITED USE DECLARATION -->
+    <!-- Section 6 -->
     <div class="box-declaration">
-      <h3>5. Chrome Web Store Limited Use Compliance Declaration</h3>
+      <h3>6. Chrome Web Store Limited Use Compliance Declaration</h3>
       <p style="font-size: 16px; font-weight: 600; color: #ffffff;">
         &ldquo;GoCoupon's use and transfer to any other app of information received from Google APIs will adhere to the 
         <a href="https://developer.chrome.com/docs/webstore/program-policies" target="_blank" rel="noopener noreferrer">Chrome Web Store User Data Policy</a>, 
         including the Limited Use requirements.&rdquo;
       </p>
       <div style="margin-top: 16px;">
-        <div class="check-item"><span class="check-icon">&#10003;</span><span><strong>Purpose Limitation:</strong> Data accessed is used exclusively to provide and improve the user-facing coupon testing and price comparison features.</span></div>
-        <div class="check-item"><span class="check-icon">&#10003;</span><span><strong>No Unrelated Data Transfers:</strong> Data is never transferred to third parties except as strictly necessary to deliver the single purpose or comply with the law.</span></div>
-        <div class="check-item"><span class="check-icon">&#10003;</span><span><strong>No Advertising or Profiling:</strong> Data is never used or transferred for serving personalized advertising or user tracking.</span></div>
-        <div class="check-item"><span class="check-icon">&#10003;</span><span><strong>No Creditworthiness Scoring:</strong> Data is never used or transferred for lending or credit evaluation.</span></div>
-        <div class="check-item"><span class="check-icon">&#10003;</span><span><strong>No Human Access:</strong> No human reads user data unless explicit permission is granted for troubleshooting or required by law.</span></div>
-        <div class="check-item"><span class="check-icon">&#10003;</span><span><strong>Zero Data Selling:</strong> GoCoupon never sells or commercializes user data.</span></div>
+        <div class="check-item"><span class="check-icon">&#10003;</span><span><strong>Prominent Feature Usage:</strong> Data access is restricted to providing and improving prominent, user-facing features (auto-applying coupons and verifying checkout discounts).</span></div>
+        <div class="check-item"><span class="check-icon">&#10003;</span><span><strong>Prohibited Transfers:</strong> Data is never transferred to third parties except as strictly necessary to provide or improve these core features, comply with applicable law, or as part of a merger/acquisition with user notification.</span></div>
+        <div class="check-item"><span class="check-icon">&#10003;</span><span><strong>Zero Advertising Transfers:</strong> Data is never used or transferred to serve personalized ads.</span></div>
+        <div class="check-item"><span class="check-icon">&#10003;</span><span><strong>Human Review Restrictions:</strong> No humans are permitted to read user data unless affirmative consent is granted for debugging, it is necessary to respond to security incidents, or it is required to comply with law.</span></div>
       </div>
     </div>
 
-    <!-- SECTION 6: PERMISSIONS BREAKDOWN -->
-    <h2>6. Chrome Extension Permissions & Technical Justifications</h2>
+    <!-- Section 7 -->
+    <h2>7. Chrome Extension Permissions Justification Table</h2>
     <p>
       In accordance with Chrome Web Store Minimal Permissions guidelines, GoCoupon requests only the permissions necessary to deliver savings:
     </p>
@@ -242,45 +304,62 @@
       <thead>
         <tr>
           <th>Permission</th>
-          <th>Type</th>
-          <th>Exact Technical Purpose</th>
+          <th>Permission Type</th>
+          <th>Exact Technical Justification</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td><code>activeTab</code></td>
-          <td>User Action</td>
-          <td>Allows the extension to read the URL of the active shopping tab when you view a supported store, enabling coupon testing on checkout.</td>
+          <td>User Interaction</td>
+          <td>Granted only when user interacts with the extension on an active shopping tab to read the merchant URL and locate checkout coupon boxes.</td>
         </tr>
         <tr>
           <td><code>storage</code></td>
           <td>Local Device</td>
-          <td>Saves user preferences (auto-apply enabled, audio sound toggle) locally on your machine without transmitting them to external servers.</td>
+          <td>Required to store user preferences (e.g., sound toggles, notification settings) locally on your device without transmitting them externally.</td>
         </tr>
         <tr>
-          <td><code>host_permissions</code></td>
-          <td>Specific Stores</td>
-          <td>Restricted exclusively to supported shopping domains (e.g. Amazon, Flipkart, Walmart, Target, Best Buy, Croma) to inject the coupon helper at checkout.</td>
+          <td><code>alarms</code></td>
+          <td>System Utility</td>
+          <td>Used to run an idempotent 30-minute background job (<code>gocoupon_cache_cleanup</code>) to prune expired coupon entries and release memory.</td>
+        </tr>
+        <tr>
+          <td><code>https://*.supabase.co/*</code></td>
+          <td>Backend Host</td>
+          <td>Required to fetch real-time verified coupons from our database and log anonymous aggregate code success rates.</td>
+        </tr>
+        <tr>
+          <td>Merchant Shopping Hosts</td>
+          <td>Content Scripts</td>
+          <td>Strictly scoped to supported retail checkout pages (Amazon, Flipkart, Myntra, Walmart, Target, Best Buy, Croma) to display the savings overlay and test discount codes.</td>
         </tr>
       </tbody>
     </table>
 
-    <!-- SECTION 7: AFFILIATE DISCLOSURE -->
-    <h2>7. Affiliate & Commercial Disclosure</h2>
+    <!-- Section 8 -->
+    <h2>8. Affiliate & Commercial Monetization Transparency</h2>
     <p>
-      GoCoupon is 100% free for users. To cover infrastructure and engineering costs, we may receive an affiliate referral commission from merchant partner networks (e.g., Amazon Associates, Cuelinks, Skimlinks) when a user applies a valid discount coupon and completes a qualifying purchase. This never affects the price you pay and never involves sharing your personal browsing information with merchants.
+      GoCoupon is 100% free for consumers. To maintain servers and engineering operations, GoCoupon may receive an affiliate commission from merchant affiliate networks (e.g., Amazon Associates, Cuelinks, Skimlinks, Impact) when a user applies a working coupon and completes a qualifying purchase.
     </p>
+    <ul>
+      <li><strong>Amazon Disclosure:</strong> <em>&ldquo;As an Amazon Associate, GoCoupon earns from qualifying purchases.&rdquo;</em></li>
+      <li><strong>No Added Cost:</strong> Affiliate monetization occurs at <strong>zero additional cost</strong> to the consumer.</li>
+      <li><strong>Zero Involuntary Cookie Stuffing:</strong> Affiliate links are never loaded in background iframes or on passive browsing. Tracking is triggered <strong>solely</strong> when the user explicitly clicks &ldquo;Activate Cash Back Bonus&rdquo; or uses an affiliate coupon.</li>
+    </ul>
 
-    <!-- SECTION 8: CONTACT INFORMATION -->
-    <h2>8. Contact Information & Privacy Inquiries</h2>
+    <!-- Section 9 -->
+    <h2>9. Contact Information & Privacy Inquiries</h2>
     <p>
-      If you have any questions, concerns, or data privacy requests regarding this Privacy Policy or GoCoupon's Chrome Web Store compliance, please contact our dedicated team:
+      For questions, feedback, or privacy inquiries regarding this policy or GoCoupon&apos;s Chrome Web Store compliance:
     </p>
     <ul>
       <li><strong>Product:</strong> GoCoupon – Coupon Finder</li>
+      <li><strong>Operator:</strong> GoCoupon Team</li>
       <li><strong>Official Website:</strong> <a href="https://gocoupon.io">https://gocoupon.io</a></li>
-      <li><strong>Email:</strong> <a href="mailto:support@gocoupon.io">support@gocoupon.io</a> (or <a href="mailto:gocoupon13@gmail.com">gocoupon13@gmail.com</a>)</li>
-      <li><strong>Location:</strong> Bengaluru, Karnataka, India</li>
+      <li><strong>Primary Support:</strong> <a href="mailto:support@gocoupon.io">support@gocoupon.io</a></li>
+      <li><strong>Secondary Contact:</strong> <a href="mailto:gocoupon13@gmail.com">gocoupon13@gmail.com</a></li>
+      <li><strong>Headquarters:</strong> Bengaluru, Karnataka, India</li>
     </ul>
 
     <div class="footer-box">
