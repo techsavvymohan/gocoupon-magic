@@ -27,15 +27,15 @@ export function Hero() {
       <div className="relative mx-auto max-w-4xl px-4 sm:px-6 pt-5 sm:pt-8 text-center">
         {/* Main Headline */}
         <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">
-          Find Your Lowest Price Across Stores in 1 Second
+          Find Your Lowest Price in 1 Second
           <span className="block mt-1 sm:mt-2 text-xl sm:text-3xl md:text-4xl font-bold text-primary">
-            — Save Even More with Bank Cards
+            — Auto-Apply Coupons, Track Real Prices &amp; Stack Card Discounts
           </span>
         </h1>
 
         {/* Sub-Headline / Authoritative Entity Intro */}
         <p className="mx-auto mt-3.5 max-w-3xl text-sm sm:text-base md:text-lg font-normal text-muted-foreground text-balance">
-          Stores will never tell you a competitor is cheaper. GoCoupon is store-agnostic—we instantly cross-check Amazon, Flipkart, Walmart, Best Buy &amp; 200+ stores for the lowest price. Have a bank card? Auto-apply extra instant discounts and financing in 1 click.
+          Stores will never tell you a competitor is cheaper or that a sale price was inflated. GoCoupon is store-agnostic—we cross-check 500+ stores (Amazon, Flipkart, Walmart &amp; Best Buy), auto-test working promo codes at checkout, expose fake discounts with 30-day price history, and stack your bank card&apos;s highest instant rebate in 1 click. Zero card numbers required. 100% free.
         </p>
 
         {/* Centered Search Box — Prioritized directly below heading */}
@@ -49,7 +49,7 @@ export function Hero() {
             <Sparkles className="h-3 w-3" aria-hidden="true" />
           </span>
           <span>
-            <strong className="font-semibold text-foreground">Pro Tip:</strong> Works for everyone! Compare store prices instantly, and optionally select your bank card to unlock extra savings.
+            <strong className="font-semibold text-foreground">Pro Tip:</strong> Works for everyone! Compare store prices instantly, auto-apply coupons, and optionally select your bank card to unlock extra savings.
           </span>
         </div>
 

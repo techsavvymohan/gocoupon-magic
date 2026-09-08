@@ -19,9 +19,9 @@ const routeConfigs = [
   {
     path: "",
     title: "GoCoupon: Coupons, Price Comparison & Cashback Extension",
-    description: "GoCoupon is the free shopping extension for working coupons, live price comparison, 90-day price history and cashback across online stores worldwide.",
-    h1: "GoCoupon: Compare Prices, Track Drops & Auto-Apply Coupons Across 200+ Stores",
-    lead: "GoCoupon is the official free Chrome extension and shopping intelligence platform for online shoppers worldwide. Compare prices, track 90-day price history, find working coupons, and apply the best available savings at checkout.",
+    description: "Find your lowest price across 500+ stores in 1 second. GoCoupon auto-applies working promo codes, exposes fake discounts with 30-day price history, and stacks bank card discounts. 100% free.",
+    h1: "Find Your Lowest Price in 1 Second — Auto-Apply Coupons, Track Real Prices & Stack Card Discounts",
+    lead: "Stores will never tell you a competitor is cheaper or that a sale price was inflated. GoCoupon is store-agnostic—we cross-check 500+ stores (Amazon, Flipkart, Walmart & Best Buy), auto-test working promo codes at checkout, expose fake discounts with 30-day price history, and stack your bank card's highest instant rebate in 1 click. Zero card numbers required. 100% free.",
   },
   {
     path: "flipkart-coupons",
