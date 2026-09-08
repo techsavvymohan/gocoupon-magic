@@ -165,19 +165,13 @@ export function CardArbitrageShowcase() {
   };
 
   return (
-    <section className="relative overflow-hidden border-t border-border bg-gradient-to-b from-card/30 via-background to-card/20 px-4 sm:px-6 py-20 sm:py-28">
+    <section className="relative overflow-hidden border-t border-border bg-card/10 px-4 sm:px-6 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary mb-4">
-            <Zap className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>Practical Reality: The Arbitrage Engine</span>
-          </div>
-
           <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">
             Find the Lowest Store Price in 1 Second.
-            <br />
-            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-primary bg-clip-text text-transparent">
+            <span className="text-primary block mt-1">
               And Save Even More with Your Bank Card.
             </span>
           </h2>
@@ -191,25 +185,23 @@ export function CardArbitrageShowcase() {
             <button
               type="button"
               onClick={() => handleMarketToggle("india")}
-              className={`flex items-center gap-2 rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold transition-all ${
+              className={`flex items-center gap-2 rounded-full px-4 py-1.5 text-xs sm:text-sm font-semibold transition-all ${
                 activeMarket === "india"
                   ? "bg-card text-foreground shadow-xs"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <span>🇮🇳</span>
               <span>India Market (₹)</span>
             </button>
             <button
               type="button"
               onClick={() => handleMarketToggle("us")}
-              className={`flex items-center gap-2 rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold transition-all ${
+              className={`flex items-center gap-2 rounded-full px-4 py-1.5 text-xs sm:text-sm font-semibold transition-all ${
                 activeMarket === "us"
                   ? "bg-card text-foreground shadow-xs"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <span>🇺🇸</span>
               <span>US &amp; Global ($)</span>
             </button>
           </div>

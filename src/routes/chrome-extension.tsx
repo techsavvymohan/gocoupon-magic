@@ -46,7 +46,7 @@ const extensionFaqs = [
   {
     question: "Is the GoCoupon Chrome Extension safe and private?",
     answer:
-      "Yes. GoCoupon is built strictly on Google Chrome Manifest V3 standards. It operates locally in your browser sandboxed environment, requires zero account or sign-up, never sells or logs your browsing history, and cannot view sensitive financial data like passwords or credit card numbers.",
+      "Yes. GoCoupon is built with strict privacy-first sandboxed browser security standards. It operates locally in your browser environment, requires zero account or sign-up, never sells or logs your browsing history, and cannot view sensitive financial data like passwords, CVVs, or credit card numbers.",
   },
   {
     question: "How do I install or uninstall the extension?",
@@ -116,22 +116,9 @@ export function ChromeExtensionPage() {
       />
 
       {/* Hero Section */}
-      <section className="relative border-b border-border px-6 pb-20 pt-20 sm:pt-28 overflow-hidden text-center">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[500px] w-[800px] -translate-x-1/2 opacity-25 blur-[120px]"
-          style={{
-            background: "radial-gradient(circle at center, var(--accent-glow-strong), transparent 70%)",
-          }}
-        />
-
+      <section className="relative border-b border-border px-6 pb-20 pt-20 sm:pt-28 overflow-hidden text-center bg-background">
         <div className="mx-auto max-w-5xl">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.2em] text-primary shadow-xs">
-            <ShieldCheck className="h-4 w-4" />
-            <span>Official Browser Utility • Manifest V3 Verified</span>
-          </div>
-
-          <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl text-balance">
+          <h1 className="font-display text-4xl font-extrabold tracking-tight text-foreground sm:text-6xl lg:text-7xl text-balance">
             GoCoupon Chrome Extension
           </h1>
 

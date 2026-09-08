@@ -2,26 +2,35 @@ import { Link } from "@tanstack/react-router";
 import { posts } from "@/data/posts";
 
 export function Blog() {
-  const featured = posts.slice(0, 3);
+  // Select top consumer-centric expense-saving articles
+  const featured = [
+    posts.find((p) => p.slug === "why-other-coupon-apps-fail-and-how-gocoupon-saves-thousands"),
+    posts.find((p) => p.slug === "how-to-stack-coupons-and-cashback"),
+    posts.find((p) => p.slug === "amazon-clip-coupons-vs-promo-codes"),
+  ].filter(Boolean) as typeof posts;
 
   return (
     <section id="blog" className="border-t border-border px-6 py-24">
       <div className="mx-auto max-w-7xl">
         <div className="mb-14 flex flex-wrap items-end justify-between gap-6">
           <div>
-            <div className="reveal mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-              From the blog
+            <div className="reveal mb-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-primary font-bold">
+              <span>Why Us Only • The Expense Saviour</span>
             </div>
-            <h2 className="reveal max-w-2xl font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-              Save smarter with guides, deal breakdowns and product updates.
+            <h2 className="reveal max-w-3xl font-display text-3xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
+              Stop Donating Your Hard-Earned Money to Overpriced Checkouts.
             </h2>
+            <p className="reveal mt-3 max-w-2xl text-sm sm:text-base text-muted-foreground leading-relaxed">
+              Online stores count on you being too busy to cross-check competing stores or dig for hidden card discounts. We expose the real shopping math and rescue your monthly budget.
+            </p>
           </div>
           <Link
             to="/blog"
-            className="reveal text-sm font-medium text-primary transition-opacity hover:opacity-80"
-            aria-label="View all blog posts"
+            className="reveal inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-primary transition-opacity hover:opacity-80"
+            aria-label="View all shopping guides"
           >
-            View all posts →
+            <span>Read All Expense Guides</span>
+            <span>→</span>
           </Link>
         </div>
 

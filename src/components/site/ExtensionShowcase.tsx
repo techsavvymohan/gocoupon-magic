@@ -14,6 +14,7 @@ import {
   ArrowRight,
   ShoppingBag,
   Percent,
+  Star,
 } from "lucide-react";
 
 export function ExtensionShowcase() {
@@ -27,53 +28,37 @@ export function ExtensionShowcase() {
   };
 
   return (
-    <section id="extension-showcase" className="relative border-t border-border px-4 sm:px-6 py-24 sm:py-32 overflow-hidden bg-card/30">
-      {/* Ambient glow backdrop */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute right-1/4 top-1/2 -z-10 h-[450px] w-[600px] -translate-y-1/2 opacity-25 blur-[130px]"
-        style={{
-          background: "radial-gradient(circle, var(--primary), transparent 70%)",
-        }}
-      />
-
+    <section id="extension-showcase" className="relative border-t border-border px-4 sm:px-6 py-20 sm:py-28 overflow-hidden bg-card/20">
       <div className="mx-auto max-w-7xl">
         <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
           {/* Copy Column (7 cols) */}
           <div className="reveal lg:col-span-7">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-primary">
-              <Zap className="h-3.5 w-3.5 text-primary" />
-              <span>Free Chrome Extension</span>
-            </div>
-
-            <h2 className="font-display text-3xl font-bold leading-tight text-foreground sm:text-4xl md:text-5xl text-balance">
+            <h2 className="font-display text-3xl font-extrabold leading-tight text-foreground sm:text-4xl md:text-5xl text-balance">
               Pops up at checkout.
-              <br />
-              <span className="text-primary">Tests every coupon code.</span>
-              <br />
-              Saves you money in 2 seconds.
+              <span className="text-primary block mt-1">Tests every coupon code.</span>
+              Stacks instant card savings in 2 seconds.
             </h2>
 
             <p className="mt-5 max-w-xl text-sm sm:text-base leading-relaxed text-muted-foreground">
-              Stop hunting through spammy coupon websites for expired promo codes. When you reach checkout on Amazon, Flipkart, Walmart, Best Buy, or 200+ partner stores worldwide, the GoCoupon extension tests every verified discount code in parallel and auto-applies the highest savings.
+              Stop hunting through spammy coupon websites for expired promo codes. When you reach checkout on Amazon, Flipkart, Walmart, Best Buy, or 500+ partner stores worldwide, GoCoupon's Savings Capsule HUD auto-tests every verified code in parallel and stacks your highest bank rebate.
             </p>
 
             {/* Feature Highlights Grid */}
-            <div className="mt-8 grid gap-4 sm:grid-cols-2">
-              <div className="flex items-start gap-3 rounded-2xl border border-border/80 bg-background/80 p-4 shadow-2xs">
-                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+            <div className="mt-8 grid gap-3.5 sm:grid-cols-2">
+              <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-4 shadow-xs">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <Zap className="h-4 w-4" />
                 </div>
                 <div>
                   <h4 className="text-xs sm:text-sm font-bold text-foreground">1-Click Auto-Apply</h4>
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                    Tests all active codes in 1.8 seconds and applies the highest net savings automatically.
+                    Tests all active codes in under 1.8 seconds and applies the highest net savings automatically.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 rounded-2xl border border-border/80 bg-background/80 p-4 shadow-2xs">
-                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-emerald-500/10 text-emerald-500">
+              <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-4 shadow-xs">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
                   <Ticket className="h-4 w-4" />
                 </div>
                 <div>
@@ -84,26 +69,26 @@ export function ExtensionShowcase() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 rounded-2xl border border-border/80 bg-background/80 p-4 shadow-2xs">
-                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-blue-500/10 text-blue-500">
+              <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-4 shadow-xs">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500">
                   <Percent className="h-4 w-4" />
                 </div>
                 <div>
                   <h4 className="text-xs sm:text-sm font-bold text-foreground">Bank Card &amp; Financing Stacking</h4>
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                    Stacks promo codes with eligible HDFC, SBI, Chase, Amex &amp; Affirm financing for maximum savings.
+                    Stacks promo codes with eligible HDFC, SBI, ICICI, Chase, Amex &amp; Affirm financing for maximum savings.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 rounded-2xl border border-border/80 bg-background/80 p-4 shadow-2xs">
-                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-amber-500/10 text-amber-500">
+              <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-4 shadow-xs">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-500">
                   <ShieldCheck className="h-4 w-4" />
                 </div>
                 <div>
                   <h4 className="text-xs sm:text-sm font-bold text-foreground">100% Safe &amp; Private</h4>
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                    Manifest V3 compliant. Zero access to credit cards, passwords, or personal data.
+                    Bank-grade sandboxed security. Zero access to credit cards, passwords, or personal browsing data.
                   </p>
                 </div>
               </div>
@@ -116,16 +101,22 @@ export function ExtensionShowcase() {
                 href="https://chromewebstore.google.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2.5 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-md transition-all hover:scale-105 active:scale-95"
+                className="inline-flex items-center gap-2.5 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-xs transition-all hover:scale-105 active:scale-95"
               >
                 <ChromeIcon />
                 <span>Add to Chrome — It&apos;s 100% Free</span>
               </MagneticButton>
 
-              <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
-                <span className="text-amber-500">★★★★★</span>
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <div className="flex items-center text-amber-400">
+                  <Star className="h-3.5 w-3.5 fill-current" />
+                  <Star className="h-3.5 w-3.5 fill-current" />
+                  <Star className="h-3.5 w-3.5 fill-current" />
+                  <Star className="h-3.5 w-3.5 fill-current" />
+                  <Star className="h-3.5 w-3.5 fill-current" />
+                </div>
                 <span className="font-semibold text-foreground">4.9 / 5</span>
-                <span>(180,000+ active users)</span>
+                <span>(180k+ users)</span>
               </div>
             </div>
           </div>

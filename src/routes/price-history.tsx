@@ -44,15 +44,12 @@ function PriceHistoryHubPage() {
       />
 
       {/* Hero Header */}
-      <section className="relative border-b border-border/70 bg-gradient-to-b from-background via-background/95 to-muted/20 px-4 sm:px-6 pb-16 pt-16 sm:pt-24">
+      <section className="relative border-b border-border bg-background px-4 sm:px-6 pb-16 pt-16 sm:pt-24">
         <div className="mx-auto max-w-4xl text-center">
-          <div className="mb-3 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            PRICE HISTORY &amp; TRACKER
-          </div>
-          <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-indigo-600 dark:text-indigo-400 text-balance">
+          <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground text-balance">
             Compare prices &amp; track drops across 100+ stores
           </h1>
-          <p className="mx-auto mt-3 max-w-2xl text-base sm:text-xl font-normal text-foreground/80 dark:text-muted-foreground text-balance">
+          <p className="mx-auto mt-3 max-w-2xl text-base sm:text-xl font-normal text-muted-foreground text-balance">
             Save instantly, everytime you shop!
           </p>
 

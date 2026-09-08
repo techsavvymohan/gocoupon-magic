@@ -31,6 +31,8 @@ export interface ComparisonRow {
   savingsVsWorst: number;
   deliveryEstimate: string;
   affiliateUrl: string;
+  condition?: "NEW" | "REFURBISHED" | "USED";
+  stack?: any;
 }
 
 export interface UnavailableStoreNotice {
@@ -45,6 +47,8 @@ export interface ProductComparisonSummary {
   maxSavings: number; // difference between highest store price and lowest store net price
   storesComparedCount: number;
   unavailableStores?: UnavailableStoreNotice[];
+  dealHonesty?: any;
+  geo?: any;
 }
 
 /**

@@ -28,7 +28,7 @@ export function Hero() {
         {/* Main Headline */}
         <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">
           Find Your Lowest Price Across Stores in 1 Second
-          <span className="block mt-1 sm:mt-2 text-xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-primary to-emerald-600 bg-clip-text text-transparent">
+          <span className="block mt-1 sm:mt-2 text-xl sm:text-3xl md:text-4xl font-bold text-primary">
             — Save Even More with Bank Cards
           </span>
         </h1>
@@ -43,11 +43,13 @@ export function Hero() {
           <UrlResolverSearch size="large" showPopularChips={true} showTrustBadges={true} />
         </div>
 
-        {/* Pro Tip Pill */}
-        <div className="mt-7 inline-flex items-center gap-2 rounded-full border border-blue-500/25 bg-blue-500/5 px-4 sm:px-5 py-2 text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-400 shadow-2xs">
-          <span>💡</span>
+        {/* Advisory Callout */}
+        <div className="mt-7 inline-flex items-center gap-2.5 rounded-full border border-border bg-card/90 px-4 sm:px-5 py-2 text-xs sm:text-sm text-foreground/80 shadow-2xs">
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Sparkles className="h-3 w-3" aria-hidden="true" />
+          </span>
           <span>
-            <strong>Pro Tip:</strong> Works for everyone! Compare store prices instantly, and optionally select your bank card to unlock extra ₹2,500+ / $50+ instant savings.
+            <strong className="font-semibold text-foreground">Pro Tip:</strong> Works for everyone! Compare store prices instantly, and optionally select your bank card to unlock extra savings.
           </span>
         </div>
 

@@ -82,23 +82,9 @@ function PrivacyPage() {
       />
 
       {/* Header / Hero */}
-      <section className="relative border-b border-border px-6 pb-16 pt-20 sm:pt-28 overflow-hidden">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[400px] w-[700px] -translate-x-1/2 opacity-20 blur-[100px]"
-          style={{
-            background:
-              "radial-gradient(circle at center, var(--accent-glow-strong), transparent 70%)",
-          }}
-        />
-
+      <section className="relative border-b border-border px-6 pb-16 pt-20 sm:pt-28 overflow-hidden bg-background">
         <div className="mx-auto max-w-4xl">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground shadow-xs">
-            <ShieldCheck size={14} className="text-primary" />
-            <span>Chrome Web Store Compliant · Single Purpose</span>
-          </div>
-
-          <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+          <h1 className="font-display text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
             Privacy Policy &amp; User Data Policy
           </h1>
 

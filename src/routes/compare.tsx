@@ -299,10 +299,10 @@ export function ComparePage() {
             Multi-Platform Price Search Engine
           </div>
           <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
-            Search Products Across All Shopping Platforms
+            Compare 500+ Stores &amp; Calculate True Landed Cost
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-sm sm:text-base text-muted-foreground text-balance">
-            Find the lowest price across Amazon, Flipkart, Myntra, Croma, and Tata CLiQ with instant coupon application and 90-day price history.
+            Our Instant Price Drop engine benchmarks Amazon, Flipkart, Walmart, Best Buy, and 500+ verified retailers with 4-tier stacked savings and 30-day deal honesty verification.
           </p>
 
           <div className="mx-auto mt-6 sm:mt-8 max-w-3xl">
@@ -1085,9 +1085,9 @@ export function ComparePage() {
                 <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
                   <Store className="h-5 w-5" />
                 </div>
-                <h3 className="font-display text-base font-bold text-foreground">1. Multi-Store Search</h3>
+                <h3 className="font-display text-base font-bold text-foreground">1. Universal Store Network</h3>
                 <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">
-                  We check Amazon, Flipkart, Myntra, Croma, Meesho, and Tata CLiQ in real time so you don&apos;t have to open 10 browser tabs.
+                  We check Amazon, Flipkart, Walmart, Best Buy, Myntra, Croma, and 500+ direct brand stores in real time with zero sponsored bias.
                 </p>
               </div>
 
@@ -1095,9 +1095,9 @@ export function ComparePage() {
                 <div className="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-4">
                   <Percent className="h-5 w-5" />
                 </div>
-                <h3 className="font-display text-base font-bold text-foreground">2. Net Price Calculation</h3>
+                <h3 className="font-display text-base font-bold text-foreground">2. 4-Tier True Landed Cost</h3>
                 <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">
-                  We automatically deduct verified store promo codes, bank card discounts, and goCoupon cashback to show the true checkout cost.
+                  We automatically stack merchant discounts, auto-applied promo codes, instant bank card rebates, and cashback to show the true checkout cost.
                 </p>
               </div>
 
@@ -1105,9 +1105,9 @@ export function ComparePage() {
                 <div className="h-10 w-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center mb-4">
                   <TrendingDown className="h-5 w-5" />
                 </div>
-                <h3 className="font-display text-base font-bold text-foreground">3. 90-Day Price Tracker</h3>
+                <h3 className="font-display text-base font-bold text-foreground">3. 30-Day Deal Honesty Radar</h3>
                 <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">
-                  Spot artificial pre-sale price hikes and get notified instantly via price drop alerts when the price hits an all-time low.
+                  Exposes artificial pre-festival price hikes using moving baseline analytics and alerts you when a product is an authentic all-time bargain.
                 </p>
               </div>
             </div>

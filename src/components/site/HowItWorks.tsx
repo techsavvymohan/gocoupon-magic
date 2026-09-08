@@ -25,38 +25,38 @@ import {
 const SHOPPING_STEPS = [
   {
     step: "01",
-    tag: "PRICE COMPARISON",
-    title: "Find the Lowest Price Across 200+ Stores",
+    tag: "STORE COMPARISON",
+    title: "Find the Lowest Price Across 500+ Stores",
     summary:
-      "Never overpay because you didn't check another tab. When you browse or search any product, GoCoupon instantly checks Amazon, Flipkart, Walmart, Best Buy, Target, and Croma so you always buy from the cheapest verified store.",
-    proof: "Compares 200+ stores in 1 second with zero paid ads or sponsored bias.",
+      "Never overpay because you didn't check another tab. When you browse or search any product, GoCoupon compares Amazon, Flipkart, Walmart, Best Buy, Target, Croma, and direct brand stores so you always buy from the verified lowest merchant.",
+    proof: "Benchmarks 500+ verified stores in 1 second with zero sponsored bias.",
     icon: Layers,
   },
   {
     step: "02",
-    tag: "FAKE SALE DETECTOR",
-    title: "Spot Fake Discounts with 90-Day Price History",
+    tag: "DEAL HONESTY RADAR",
+    title: "Expose Fake Sales with 30-Day Price Baselines",
     summary:
-      "Ever notice how stores quietly raise prices right before a big sale just to advertise a fake '40% discount'? Our 90-day price tracker exposes artificial price hikes so you know if a deal is truly at its all-time low.",
-    proof: "Real-time price history graphs show what the product actually sold for.",
+      "Ever notice how sellers inflate prices right before a big festival sale just to claim a fake '50% off'? Our 30-day moving baseline analysis separates authentic bargains from artificial marketing markups.",
+    proof: "Real-time baseline graphs show what the product actually sold for.",
     icon: TrendingDown,
   },
   {
     step: "03",
-    tag: "EXTRA BANK DISCOUNTS",
-    title: "Save Even More with Your Credit & Debit Cards",
+    tag: "BANK ARBITRAGE",
+    title: "Unlock Instant Bank & Card Discounts",
     summary:
-      "Stores have exclusive bank deals that other websites never tell you about. An iPhone might be ₹5,000 cheaper on Flipkart with HDFC, or a laptop $120 cheaper at Best Buy with Chase. GoCoupon automatically finds these hidden savings for you.",
-    proof: "Extra savings with HDFC, SBI, ICICI, Chase, or Amex. (No card? You still get the lowest store price).",
+      "Stores offer exclusive bank promotions that most shoppers miss. An iPhone might be ₹5,000 cheaper on Flipkart with HDFC, or a laptop $120 cheaper at Best Buy with Chase. GoCoupon identifies the highest-saving card in your wallet automatically.",
+    proof: "Instant savings with HDFC, SBI, ICICI, Axis, Chase, or Amex. (No card? Still lowest store price).",
     icon: CreditCard,
   },
   {
     step: "04",
-    tag: "AUTOMATIC COUPONS",
-    title: "Auto-Apply Working Coupons in 1 Click",
+    tag: "INSTANT PRICE DROP",
+    title: "4-Tier Stacked Savings at Checkout",
     summary:
-      "Stop wasting 15 minutes typing in expired coupon codes from sketchy websites. GoCoupon automatically tests verified promo codes and on-page discount vouchers at checkout in under 2 seconds.",
-    proof: "100% verified codes applied automatically with zero dead codes or popup spam.",
+      "Why wait weeks for a price alert? GoCoupon triggers an Instant Price Drop (IPD) by stacking your store discount, auto-applied promo codes, instant bank rebates, and cashback rewards simultaneously.",
+    proof: "Calculates True Landed Cost in 1 click with zero dead codes or popup spam.",
     icon: CheckCircle2,
   },
 ];
@@ -101,23 +101,17 @@ export function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="relative scroll-mt-12 border-t border-border/70 bg-gradient-to-b from-background via-card/20 to-background px-4 sm:px-6 py-20 sm:py-28"
+      className="relative scroll-mt-12 border-t border-border bg-background px-4 sm:px-6 py-20 sm:py-28"
     >
       {/* Anchor alias for backwards compatibility */}
       <div id="how" className="absolute -top-12 left-0 h-0 w-0" aria-hidden="true" />
 
       <div className="mx-auto max-w-6xl">
-        {/* Clear, Human, High-SEO Header */}
+        {/* Clear, Human Header */}
         <div className="max-w-3xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1 text-xs font-medium text-foreground/80 mb-4 shadow-2xs">
-            <Zap className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
-            <span>Why You Need Only 1 Tool to Shop Online</span>
-          </div>
-
           <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">
             Stop Juggling 5 Different Shopping Apps.
-            <br />
-            <span className="bg-gradient-to-r from-blue-600 via-primary to-emerald-600 bg-clip-text text-transparent">
+            <span className="text-primary block mt-1">
               GoCoupon Does It All in 1 Second.
             </span>
           </h2>
@@ -134,7 +128,7 @@ export function HowItWorks() {
             return (
               <article
                 key={pillar.step}
-                className="group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card/60 p-6 sm:p-7 shadow-xs backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card/90"
+                className="group relative flex flex-col justify-between rounded-xl border border-border bg-card p-6 shadow-xs transition-colors hover:border-primary/50"
               >
                 <div>
                   {/* Step Number & Clean Icon */}

@@ -40,22 +40,9 @@ function SecurityPage() {
       />
 
       {/* Hero Header */}
-      <section className="relative border-b border-border px-6 pb-16 pt-20 sm:pt-28 overflow-hidden text-center">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[450px] w-[750px] -translate-x-1/2 opacity-25 blur-[120px]"
-          style={{
-            background:
-              "radial-gradient(circle at center, var(--accent-glow-strong), transparent 70%)",
-          }}
-        />
-
+      <section className="relative border-b border-border px-6 pb-16 pt-20 sm:pt-28 overflow-hidden text-center bg-background">
         <div className="mx-auto max-w-4xl">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1 font-mono text-xs uppercase tracking-[0.2em] text-emerald-500">
-            <ShieldCheck className="h-4 w-4" />
-            <span>Security &amp; Trust Center</span>
-          </div>
-          <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+          <h1 className="font-display text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
             Your Privacy &amp; Safety Come First. Always.
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg leading-relaxed">

@@ -1,7 +1,6 @@
 import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "@tanstack/react-router";
-import { Analytics } from "@vercel/analytics/react";
 import "./styles.css";
 import { getRouter } from "./router";
 
@@ -38,9 +37,9 @@ class RootErrorBoundary extends React.Component<
             <p style={{ marginTop: "12px", color: "#94a3b8", fontSize: "14px" }}>A new update has just been deployed. Click below to load the latest version.</p>
             <button
               onClick={() => window.location.reload()}
-              style={{ marginTop: "20px", padding: "10px 24px", borderRadius: "9999px", backgroundColor: "#0284c7", color: "#ffffff", border: "none", fontWeight: "bold", cursor: "pointer" }}
+              style={{ marginTop: "16px", padding: "8px 16px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: 500 }}
             >
-              Refresh to Update
+              Refresh App
             </button>
           </div>
         </div>
@@ -56,9 +55,7 @@ if (rootEl) {
     <StrictMode>
       <RootErrorBoundary>
         <RouterProvider router={router} />
-        <Analytics />
       </RootErrorBoundary>
     </StrictMode>,
   );
 }
-

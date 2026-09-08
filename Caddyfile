@@ -1,19 +1,42 @@
-# Caddy reverse proxy with automatic SSL (Let's Encrypt)
-# Replace {$DOMAIN:localhost} with your actual domain (e.g. gocoupon.io) in your .env or run command.
+# GoCoupon Caddy Reverse Proxy — Auto SSL via Let's Encrypt
+# Set DOMAIN in your .env (e.g. DOMAIN=gocoupon.io) or replace inline below.
+#
+# Handles:
+#   - HTTPS termination (auto cert from Let's Encrypt)
+#   - www → apex redirect
+#   - gzip / zstd compression
+#   - Security headers (HSTS, CSP, etc.)
+
+# Redirect www to apex
+www.{$DOMAIN:localhost} {
+    redir https://{$DOMAIN:localhost}{uri} permanent
+}
 
 {$DOMAIN:localhost} {
-    # Proxy all traffic to the GoCoupon Node application
-    reverse_proxy app:3000
+    # Proxy to the GoCoupon Node.js app
+    reverse_proxy app:3000 {
+        health_uri     /api/health
+        health_interval 30s
+    }
 
-    # Enable Gzip and Zstandard compression
+    # Compression
     encode gzip zstd
 
     # Security Headers
     header {
-        X-Content-Type-Options "nosniff"
-        X-Frame-Options "DENY"
-        X-XSS-Protection "1; mode=block"
-        Referrer-Policy "strict-origin-when-cross-origin"
+        X-Content-Type-Options  "nosniff"
+        X-Frame-Options         "DENY"
+        X-XSS-Protection        "1; mode=block"
+        Referrer-Policy         "strict-origin-when-cross-origin"
+        Permissions-Policy      "camera=(), microphone=(), geolocation=()"
         Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        -Server
+    }
+
+    # Log requests
+    log {
+        output stderr
+        format console
+        level  WARN
     }
 }

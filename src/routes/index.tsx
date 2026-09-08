@@ -9,6 +9,7 @@ import { Features } from "@/components/site/Features";
 import { AnimatedDealsCarousel } from "@/components/site/AnimatedDealsCarousel";
 import { CardArbitrageShowcase } from "@/components/site/CardArbitrageShowcase";
 import { ShoppingIntelligenceSpotlight } from "@/components/shopping/ShoppingIntelligenceSpotlight";
+import { WhyUsExpenseSaviour } from "@/components/site/WhyUsExpenseSaviour";
 import { FAQ } from "@/components/site/FAQ";
 import { Blog } from "@/components/site/Blog";
 import { CTA } from "@/components/site/CTA";
@@ -63,6 +64,7 @@ function Index() {
       <Stats />
       <AnimatedDealsCarousel />
       <ShoppingIntelligenceSpotlight />
+      <WhyUsExpenseSaviour />
       <ExtensionShowcase />
       <HowItWorks />
       <Features />

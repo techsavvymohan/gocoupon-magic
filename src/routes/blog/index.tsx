@@ -177,29 +177,13 @@ function BlogIndex() {
       </div>
 
       {/* Stylish & Conceptual Editorial Hero */}
-      <section className="relative border-b border-border px-4 sm:px-6 pb-16 pt-16 sm:pt-24 overflow-hidden bg-gradient-to-b from-background via-background/95 to-muted/20">
-        {/* Ambient atmospheric glows */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/4 top-0 -z-10 h-[500px] w-[500px] rounded-full opacity-20 blur-[130px]"
-          style={{ background: "radial-gradient(circle, #6366f1, transparent 70%)" }}
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute right-1/4 top-10 -z-10 h-[450px] w-[450px] rounded-full opacity-15 blur-[120px]"
-          style={{ background: "radial-gradient(circle, #f59e0b, transparent 70%)" }}
-        />
-
+      <section className="relative border-b border-border px-4 sm:px-6 pb-16 pt-16 sm:pt-24 overflow-hidden bg-background">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
             <div className="max-w-3xl">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
-                <BookOpen className="h-3.5 w-3.5" />
-                The Savings Intelligence Journal
-              </div>
               <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground leading-[1.08] text-balance">
                 Deconstructing algorithms, pricing anomalies &amp;{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-emerald-400 to-indigo-400">
+                <span className="text-primary block sm:inline">
                   consumer arbitrage.
                 </span>
               </h1>

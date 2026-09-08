@@ -9,71 +9,67 @@ import {
 
 const features = [
   {
-    title: "Store Price + Optional Card Discounts",
-    body: "Finds the lowest merchant price across stores and automatically calculates extra instant discounts if you hold an HDFC, SBI, ICICI card or Chase, Amex, Capital One rewards.",
+    title: "Instant Price Drop (IPD) Engine",
+    body: "Don't wait weeks for a passive price drop alert. GoCoupon calculates instant savings right when you buy by combining live merchant discounts, hidden promo codes, and card offers immediately.",
     icon: Zap,
   },
   {
-    title: "Unbiased Multi-Store Comparison",
-    body: "Real-time pricing across Amazon, Flipkart, Walmart, Best Buy, Target, Croma, and 200+ stores. Completely store-agnostic—finding your lowest price is our only objective.",
+    title: "4-Tier True Landed Cost Calculation",
+    body: "Sticker Price minus Auto-Coupon minus Bank Instant Rebate minus Cashback reward. We calculate the exact out-of-pocket payment before you complete checkout.",
     icon: Layers,
   },
   {
-    title: "1-Second Store Comparison",
-    body: "Stores will never tell you when a competitor is cheaper. In 1 second, GoCoupon highlights the cheapest store for everyone, plus bonus savings if you have a partner bank card.",
-    icon: Ticket,
-  },
-  {
-    title: "Interactive 90-Day Price Tracker",
-    body: "Historical price curves expose fake pre-sale markups and artificial discounts, revealing the true lowest price ever recorded so you buy at the optimal moment.",
+    title: "30-Day Deal Honesty Radar",
+    body: "Exposes fake sales and pre-festival price hikes using our 30-day baseline analysis. Instantly flags whether a product is a Real Bargain or an artificial marketing markup.",
     icon: TrendingDown,
   },
   {
-    title: "1-Click Auto-Apply Coupons",
-    body: "Automatically tests every verified promo code and clips on-page voucher checkboxes in under 2 seconds at checkout across all major retail platforms.",
+    title: "Bank Card & Payment Arbitrage",
+    body: "Dynamically checks which card in your wallet (HDFC, SBI, ICICI, Axis, Amex, Chase, Citi) unlocks the highest instant checkout rebate, without ever asking for card numbers.",
+    icon: Ticket,
+  },
+  {
+    title: "Universal Multi-Store Intelligence",
+    body: "Real-time pricing across Amazon, Flipkart, Walmart, Best Buy, Target, Croma, and 500+ direct brand stores worldwide. 100% unbiased—finding you the lowest price is our only objective.",
     icon: ShieldCheck,
   },
   {
-    title: "100% Free & Privacy-First",
-    body: "Zero signup required, no credit cards stored, and no personal data collection. Free forever—partner stores pay our referral fee when you successfully save.",
+    title: "Bank-Grade Privacy & 1-Click Savings",
+    body: "Tests every working code in under 2 seconds. Operates in a local sandboxed browser environment with zero keystroke logging, zero personal data harvesting, and zero cost.",
     icon: Lock,
   },
 ];
 
 export function Features() {
   return (
-    <section id="features" className="relative px-6 py-32 overflow-hidden">
+    <section id="features" className="relative px-4 sm:px-6 py-20 sm:py-28 overflow-hidden border-t border-border">
       <div className="mx-auto max-w-7xl">
-        <div className="reveal mb-16 max-w-2xl">
-          <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
-            Commerce Intelligence
-          </p>
-          <h2 className="font-display text-4xl font-bold leading-tight text-foreground md:text-5xl">
-            Everything you need to buy smart.
-            <br />
-            <span className="text-primary">Nothing you don&apos;t.</span>
+        <div className="reveal mb-14 max-w-2xl">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">
+            Instant savings when you buy.
+            <span className="text-primary block mt-1">Not weeks later.</span>
           </h2>
-          <p className="mt-4 text-base text-muted-foreground sm:text-lg">
-            From real-time multi-store price comparisons and 90-day price history curves to auto-applied coupon codes — all built to ensure you never overpay.
+          <p className="mt-4 text-sm sm:text-base text-muted-foreground leading-relaxed">
+            From our Instant Price Drop engine and 4-tier stacked savings calculator to 30-day Deal Honesty verification — engineered to guarantee you never overpay online.
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f, i) => {
             const Icon = f.icon;
             return (
               <div
                 key={f.title}
-                className="reveal group relative rounded-2xl border border-border bg-card p-8 transition-all hover:border-primary/50 hover:shadow-lg"
+                className="reveal group relative rounded-xl border border-border bg-card p-6 sm:p-7 shadow-xs transition-colors hover:border-primary/50"
                 style={{ transitionDelay: `${(i % 3) * 0.08}s` }}
               >
-                <div className="mb-5 grid h-11 w-11 place-items-center rounded-xl border border-border bg-secondary/80 text-primary transition-colors group-hover:border-primary/40 group-hover:bg-primary/10">
-                  <Icon className="h-5 w-5" />
+                <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Icon className="h-4 w-4" aria-hidden="true" />
                 </div>
-                <h3 className="font-display text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                <h3 className="font-display text-base sm:text-lg font-bold text-foreground">
                   {f.title}
                 </h3>
-                <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">{f.body}</p>
+                <p className="mt-2 text-xs sm:text-sm leading-relaxed text-muted-foreground">{f.body}</p>
               </div>
             );
           })}

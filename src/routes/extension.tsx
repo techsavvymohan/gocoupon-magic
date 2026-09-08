@@ -20,6 +20,7 @@ import {
   ChevronDown,
   ShoppingBag,
   HeartHandshake,
+  TrendingDown,
 } from "lucide-react";
 
 const faqs = [
@@ -96,22 +97,8 @@ function ExtensionPage() {
       />
 
       {/* Hero Header */}
-      <section className="relative border-b border-border px-6 pb-20 pt-20 sm:pt-28 overflow-hidden text-center">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[500px] w-[800px] -translate-x-1/2 opacity-25 blur-[120px]"
-          style={{
-            background:
-              "radial-gradient(circle at center, var(--accent-glow-strong), transparent 70%)",
-          }}
-        />
-
+      <section className="relative border-b border-border px-6 pb-20 pt-20 sm:pt-28 overflow-hidden text-center bg-background">
         <div className="mx-auto max-w-5xl">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.2em] text-primary shadow-xs">
-            <ShieldCheck className="h-4 w-4" />
-            <span>100% Free · Safe &amp; Private · 1-Click Savings</span>
-          </div>
-
           <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl">
             Never Pay Full Price Online Again.{" "}
             <span className="text-primary font-extrabold">
@@ -491,26 +478,26 @@ function ExtensionPage() {
             {/* Benefit 5 */}
             <div className="rounded-3xl border border-border bg-card p-8 shadow-sm hover:border-primary/40 transition-colors">
               <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-500">
-                <HeartHandshake className="h-6 w-6" />
+                <Layers className="h-6 w-6" />
               </div>
               <h3 className="font-display text-xl font-bold text-foreground">
-                100% Fair Savings Promise
+                4-Tier Stacked Savings
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                We always give you the biggest discount code first, with zero exceptions. Your savings always come first.
+                Combines merchant price drops, auto-applied promo codes, instant bank card rebates, and cashback for the true lowest landed cost.
               </p>
             </div>
 
             {/* Benefit 6 */}
             <div className="rounded-3xl border border-border bg-card p-8 shadow-sm hover:border-primary/40 transition-colors">
               <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-500">
-                <Layers className="h-6 w-6" />
+                <TrendingDown className="h-6 w-6" />
               </div>
               <h3 className="font-display text-xl font-bold text-foreground">
-                Ultra Lightweight &amp; Fast
+                30-Day Deal Honesty Radar
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Smaller than a single photo on your phone. GoCoupon stays asleep while you browse and never slows down your computer.
+                Plots 30-day baseline price trends to expose artificial pre-festival price spikes and verify authentic bargains in real time.
               </p>
             </div>
           </div>

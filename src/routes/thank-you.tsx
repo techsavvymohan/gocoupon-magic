@@ -43,17 +43,7 @@ function ThankYouPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />
 
-      <section className="relative min-h-[85vh] flex items-center justify-center px-4 sm:px-6 py-20 sm:py-28 overflow-hidden">
-        {/* Glow ambient background */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[500px] w-[750px] -translate-x-1/2 -translate-y-1/2 opacity-25 blur-[140px]"
-          style={{
-            background:
-              "radial-gradient(circle at center, var(--accent-glow-strong), transparent 70%)",
-          }}
-        />
-
+      <section className="relative min-h-[85vh] flex items-center justify-center px-4 sm:px-6 py-20 sm:py-28 overflow-hidden bg-background">
         <div className="mx-auto max-w-3xl text-center">
           {/* Success Animated Icon */}
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-emerald-500/15 text-emerald-500 ring-8 ring-emerald-500/10 animate-in zoom-in-75 duration-300">

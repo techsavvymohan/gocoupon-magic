@@ -29,6 +29,16 @@ const faqs = [
       "Yes! GoCoupon is 100% free to install and use. You will never be asked for a subscription or credit card. When we help you find a great discount, retail stores (like Amazon or Flipkart) sometimes pay us a small referral bonus from their advertising budget. You always pay the lowest price possible, and it costs you nothing.",
   },
   {
+    question: "How does the Instant Price Drop (IPD) Engine differ from normal price trackers?",
+    answer:
+      "Traditional price tracking tools make you passively wait weeks for an email alert that may never trigger. GoCoupon's Instant Price Drop engine works immediately at checkout by simultaneously testing promo codes, clipping vouchers, and applying eligible bank card rebates for an instant price reduction.",
+  },
+  {
+    question: "How does GoCoupon calculate my True Landed Cost?",
+    answer:
+      "Sticker prices can be deceiving due to hidden delivery charges or unapplied payment deals. GoCoupon calculates True Landed Cost: (Sticker Price) − (Auto-Applied Store Coupon) − (Card Instant Rebate) − (Cashback Reward) + (Shipping). You see the net out-of-pocket amount before paying.",
+  },
+  {
     question: "Do I have to search, copy, or paste coupon codes myself?",
     answer:
       "No! You never have to hunt for codes again. When you reach the checkout page of any supported store, GoCoupon automatically tests all active discounts in seconds and applies the one that saves you the most money.",
@@ -81,6 +91,8 @@ const STORES = [
     clipDiscount: 20.0,
     bestPromo: "SAVE25TECH",
     promoDiscount: 25.0,
+    cardName: "Chase / Prime Visa",
+    cardDiscount: 15.0,
   },
   {
     id: "flipkart",
@@ -93,6 +105,8 @@ const STORES = [
     clipDiscount: 500,
     bestPromo: "BIGSAVER20",
     promoDiscount: 450,
+    cardName: "HDFC / SBI Card",
+    cardDiscount: 350,
   },
   {
     id: "myntra",
@@ -105,6 +119,8 @@ const STORES = [
     clipDiscount: 0,
     bestPromo: "MYNTRAFIRST",
     promoDiscount: 600,
+    cardName: "ICICI / Axis Bank",
+    cardDiscount: 250,
   },
   {
     id: "walmart",
@@ -117,6 +133,8 @@ const STORES = [
     clipDiscount: 15.0,
     bestPromo: "HOMECHEF10",
     promoDiscount: 10.0,
+    cardName: "Capital One / Amex",
+    cardDiscount: 10.0,
   },
 ];
 
@@ -142,7 +160,9 @@ function HowItWorksPage() {
   };
 
   const totalSaved =
-    simStep === "done" ? selectedStore.clipDiscount + selectedStore.promoDiscount : 0;
+    simStep === "done"
+      ? selectedStore.clipDiscount + selectedStore.promoDiscount + selectedStore.cardDiscount
+      : 0;
   const finalPrice =
     simStep === "done" ? selectedStore.price - totalSaved : selectedStore.price;
 
@@ -164,22 +184,8 @@ function HowItWorksPage() {
       />
 
       {/* Hero Header */}
-      <section className="relative border-b border-border px-6 pb-20 pt-20 sm:pt-28 overflow-hidden text-center">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[450px] w-[750px] -translate-x-1/2 opacity-25 blur-[120px]"
-          style={{
-            background:
-              "radial-gradient(circle at center, var(--accent-glow-strong), transparent 70%)",
-          }}
-        />
-
+      <section className="relative border-b border-border px-6 pb-20 pt-20 sm:pt-28 overflow-hidden text-center bg-background">
         <div className="mx-auto max-w-4xl">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.2em] text-primary">
-            <Zap className="h-4 w-4" />
-            <span>Effortless Savings in 3 Easy Steps</span>
-          </div>
-
           <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl">
             How GoCoupon Saves You Money{" "}
             <span className="text-primary font-extrabold">
@@ -262,8 +268,7 @@ function HowItWorksPage() {
                 Shop Like You Always Do
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Browse your favorite stores like Amazon, Flipkart, Myntra, or Meesho. When you view products, GoCoupon
-                automatically clicks green coupon discount boxes for you.
+                Browse stores like Amazon, Flipkart, Walmart, or Nike. GoCoupon automatically verifies price honesty against 30-day baselines and auto-clips hidden store vouchers.
               </p>
             </div>
 
@@ -274,15 +279,14 @@ function HowItWorksPage() {
                   3
                 </span>
                 <span className="font-mono text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  Instant Savings
+                  Instant Price Drop
                 </span>
               </div>
               <h3 className="mt-6 font-display text-xl font-bold text-foreground">
-                1-Click Savings at Checkout
+                4-Tier Stack at Checkout
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                When you go to checkout, GoCoupon pops up with one button: &ldquo;Apply Best Savings&rdquo;.
-                It tests all working codes in seconds and gives you the cheapest price.
+                At checkout, our Savings Capsule tests all promo codes in 1.8s and stacks your best bank card discount for the true lowest landed cost.
               </p>
             </div>
           </div>
@@ -439,14 +443,14 @@ function HowItWorksPage() {
                       {totalSaved.toLocaleString()}!
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Applied winning coupon <strong>{selectedStore.bestPromo}</strong> + Green Voucher
+                      Applied winning coupon <strong>{selectedStore.bestPromo}</strong> + Bank Card Offer
                     </p>
                   </div>
 
                   {/* Price Summary Breakdown */}
                   <div className="rounded-2xl border border-border bg-muted/40 p-4 space-y-2 font-mono text-xs sm:text-sm">
                     <div className="flex justify-between text-muted-foreground">
-                      <span>Original Subtotal:</span>
+                      <span>1. Original Subtotal:</span>
                       <span className="line-through">
                         {selectedStore.currency}
                         {selectedStore.price.toLocaleString()}
@@ -454,7 +458,7 @@ function HowItWorksPage() {
                     </div>
                     {selectedStore.hasClipCoupon && (
                       <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
-                        <span>Green Voucher Discount:</span>
+                        <span>2. On-Page Voucher:</span>
                         <span>
                           – {selectedStore.currency}
                           {selectedStore.clipDiscount.toLocaleString()}
@@ -462,14 +466,21 @@ function HowItWorksPage() {
                       </div>
                     )}
                     <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
-                      <span>Promo Code Discount:</span>
+                      <span>3. Auto-Applied Promo Code:</span>
                       <span>
                         – {selectedStore.currency}
                         {selectedStore.promoDiscount.toLocaleString()}
                       </span>
                     </div>
+                    <div className="flex justify-between text-blue-600 dark:text-blue-400">
+                      <span>4. Bank Instant Rebate ({selectedStore.cardName}):</span>
+                      <span>
+                        – {selectedStore.currency}
+                        {selectedStore.cardDiscount.toLocaleString()}
+                      </span>
+                    </div>
                     <div className="border-t border-border pt-2 flex justify-between font-bold text-foreground text-base">
-                      <span>Your Final Price:</span>
+                      <span>True Landed Cost:</span>
                       <span className="text-primary tabular-nums">
                         {selectedStore.currency}
                         {finalPrice.toLocaleString()}

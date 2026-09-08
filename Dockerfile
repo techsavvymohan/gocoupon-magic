@@ -23,7 +23,6 @@ RUN npm ci --omit=dev && npm install -g tsx
 
 # Copy built application and server
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/api ./api
 COPY --from=builder /app/src ./src
 COPY --from=builder /app/server ./server
 COPY --from=builder /app/scripts ./scripts

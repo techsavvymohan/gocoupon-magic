@@ -205,6 +205,44 @@ export async function searchAmazonProducts(
   if (!AMAZON_ENABLED) return [];
 
   const config = getAmazonConfig(query.country ?? "IN");
+  // Phase 2: Live API call in browser environment
+  if (typeof window !== "undefined") {
+    try {
+      const params = new URLSearchParams({
+        provider: "amazon",
+        country: query.country ?? "IN",
+      });
+      if (query.keyword) params.set("keyword", query.keyword);
+      if (query.category) params.set("category", query.category);
+      if (query.minPrice !== undefined) params.set("minPrice", String(query.minPrice));
+      if (query.maxPrice !== undefined) params.set("maxPrice", String(query.maxPrice));
+      if (query.limit) params.set("limit", String(query.limit));
+
+      const res = await fetch(`/api/affiliates/products?${params.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.products && Array.isArray(data.products) && data.products.length > 0) {
+          return data.products.map((p: any) => ({
+            ...p,
+            affiliateUrl: config.partnerTag
+              ? ensureAffiliateTag(p.affiliateUrl, config.country)
+              : p.affiliateUrl,
+            availability: normalizeAvailability(p.availability),
+            metadata: {
+              badge: p.badge,
+              couponCode: p.couponCode,
+              tags: p.tags,
+              savingLabel: p.savingLabel,
+            },
+          }));
+        }
+      }
+    } catch {
+      // Fallback to local catalog
+    }
+  }
+
+  // Phase 1 / SSR Static Fallback
   let results = AMAZON_IN_PRODUCTS_RAW;
 
   // Apply keyword filter

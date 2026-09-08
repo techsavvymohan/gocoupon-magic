@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { useCurrency } from "@/context/CurrencyContext";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
+import { useDeals } from "@/hooks/use-deals";
+import type { DealSortField } from "@/lib/api/deals-api";
+import { DealGridSkeleton, FetchError } from "@/components/ui/DataSkeleton";
 import {
   Flame,
   Tag,
@@ -19,6 +22,7 @@ import {
   Search,
   Store,
   Clock,
+  ArrowUpDown,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -43,92 +47,32 @@ const DEAL_CATEGORIES = [
   { id: "fashion", label: "Fashion & Lifestyle", icon: ShoppingBag },
 ];
 
-const CURATED_DEALS = [
-  {
-    id: "deal_sony_xm5",
-    title: "Sony WH-1000XM5 Wireless Noise Cancelling Headphones",
-    store: "Amazon India",
-    category: "audio",
-    dealPrice: "₹24,990",
-    originalPrice: "₹34,990",
-    discount: "29% OFF",
-    couponCode: "AMZAUDIO15",
-    badge: "Lowest in 90 Days",
-    verifiedTime: "Verified 2 hrs ago",
-    link: "https://deals.gocoupon.io",
-  },
-  {
-    id: "deal_macbook_m3",
-    title: "Apple MacBook Air M3 Chip (13.6-inch, 8GB Unified Memory, 256GB SSD)",
-    store: "Flipkart",
-    category: "laptops",
-    dealPrice: "₹94,990",
-    originalPrice: "₹1,14,900",
-    discount: "17% OFF",
-    couponCode: "FKTECH1500",
-    badge: "Bank Discount Stackable",
-    verifiedTime: "Verified 1 hr ago",
-    link: "https://deals.gocoupon.io",
-  },
-  {
-    id: "deal_s24_ultra",
-    title: "Samsung Galaxy S24 Ultra 5G (Titanium Gray, 256GB)",
-    store: "Amazon India",
-    category: "electronics",
-    dealPrice: "₹1,19,999",
-    originalPrice: "₹1,34,999",
-    discount: "₹15,000 OFF",
-    couponCode: "PRIMEBONUS500",
-    badge: "Includes ₹500 Coupon",
-    verifiedTime: "Verified 30 mins ago",
-    link: "https://deals.gocoupon.io",
-  },
-  {
-    id: "deal_boat_nirvana",
-    title: "boAt Nirvana Ion ANC True Wireless Earbuds (120H Playtime)",
-    store: "boAt Lifestyle",
-    category: "audio",
-    dealPrice: "₹1,999",
-    originalPrice: "₹7,990",
-    discount: "75% OFF",
-    couponCode: "BOATMAGIC15",
-    badge: "Extra 15% at Checkout",
-    verifiedTime: "Verified 4 hrs ago",
-    link: "https://deals.gocoupon.io",
-  },
-  {
-    id: "deal_nike_jordan",
-    title: "Nike Air Jordan 1 Low Men's Sneakers (Triple White)",
-    store: "Myntra",
-    category: "fashion",
-    dealPrice: "₹6,895",
-    originalPrice: "₹8,295",
-    discount: "17% OFF",
-    couponCode: "MYNTRA500",
-    badge: "Flat ₹500 Coupon",
-    verifiedTime: "Verified 3 hrs ago",
-    link: "https://deals.gocoupon.io",
-  },
-  {
-    id: "deal_croma_tv",
-    title: "LG 55-inch 4K Ultra HD Smart OLED TV (4K Cinema HDR)",
-    store: "Croma",
-    category: "electronics",
-    dealPrice: "₹89,990",
-    originalPrice: "₹1,39,990",
-    discount: "36% OFF",
-    couponCode: "CROMAOFF3000",
-    badge: "₹3,000 Instant Card Off",
-    verifiedTime: "Verified 1 hr ago",
-    link: "https://deals.gocoupon.io",
-  },
-];
 
 function DealsHubPage() {
-  const { formatPriceString } = useCurrency();
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortBy, setSortBy] = useState<DealSortField>("trending");
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
+  // ── Live API fetch — deals come from /api/deals, dynamically sorted and categorized ──
+  const { deals: allDeals, isLoading, isError, refetch } = useDeals({
+    category: selectedCategory !== "all" ? selectedCategory : undefined,
+    sortBy,
+    order: "desc",
+    limit: 50,
+  });
+
+  const filteredDeals = useMemo(() => {
+    return allDeals.filter((deal) => {
+      const matchesCategory =
+        selectedCategory === "all" || deal.category.toLowerCase() === selectedCategory;
+      const matchesSearch =
+        deal.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        deal.storeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        deal.code.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [allDeals, selectedCategory, searchQuery]);
 
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code);
@@ -136,16 +80,6 @@ function DealsHubPage() {
     toast.success(`Coupon code ${code} copied to clipboard!`);
     setTimeout(() => setCopiedCode(null), 2500);
   };
-
-  const filteredDeals = CURATED_DEALS.filter((deal) => {
-    const matchesCategory =
-      selectedCategory === "all" || deal.category === selectedCategory;
-    const matchesSearch =
-      deal.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      deal.store.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      deal.couponCode.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
 
   const breadcrumb = breadcrumbSchema([
     { name: "Home", path: "/" },
@@ -155,12 +89,13 @@ function DealsHubPage() {
   const itemListSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    itemListElement: CURATED_DEALS.map((deal, idx) => ({
+    // Uses live API data from useDeals() hook — not a hardcoded array
+    itemListElement: allDeals.slice(0, 10).map((deal, idx) => ({
       "@type": "ListItem",
       position: idx + 1,
       name: deal.title,
-      description: `${deal.discount} at ${deal.store} with coupon ${deal.couponCode}`,
-      url: "https://deals.gocoupon.io",
+      description: `${deal.discount} at ${deal.storeName} with coupon ${deal.code}`,
+      url: deal.link,
     })),
   };
 
@@ -249,14 +184,52 @@ function DealsHubPage() {
                 Showing {filteredDeals.length} active verified bargains with working coupon codes
               </p>
             </div>
-            <Link
-              to="/compare"
-              className="inline-flex items-center gap-1.5 font-mono text-xs text-primary hover:underline font-semibold"
-            >
-              Compare Live Prices Across Stores <ArrowRight className="h-3 w-3" />
-            </Link>
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+              <div className="flex items-center gap-2">
+                <label htmlFor="deal-sort-select" className="inline-flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
+                  <ArrowUpDown className="h-3.5 w-3.5 text-primary" />
+                  <span>Sort:</span>
+                </label>
+                <select
+                  id="deal-sort-select"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as DealSortField)}
+                  className="rounded-xl border border-border bg-card/90 px-3 py-1.5 text-xs font-semibold text-foreground shadow-xs focus:border-primary focus:outline-hidden focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                >
+                  <option value="trending">🔥 Trending Deals</option>
+                  <option value="discount">🏷️ Highest Discount</option>
+                  <option value="verified">🛡️ Verified First</option>
+                  <option value="expiry">⏰ Expiring Soon</option>
+                  <option value="store">🏬 Store Name (A-Z)</option>
+                </select>
+              </div>
+              <Link
+                to="/compare"
+                className="inline-flex items-center gap-1.5 font-mono text-xs text-primary hover:underline font-semibold"
+              >
+                Compare Prices <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
           </div>
 
+          {isLoading ? (
+            <DealGridSkeleton count={6} />
+          ) : isError ? (
+            <FetchError
+              message="Could not load deals from the server. Please try again."
+              onRetry={refetch}
+            />
+          ) : filteredDeals.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border py-12 text-center px-4">
+              <p className="text-sm font-semibold text-foreground">No deals found matching &ldquo;{searchQuery}&rdquo;.</p>
+              <button
+                onClick={() => { setSearchQuery(""); setSelectedCategory("all"); }}
+                className="mt-4 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground"
+              >
+                Reset filters
+              </button>
+            </div>
+          ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filteredDeals.map((deal) => (
               <div
@@ -267,10 +240,10 @@ function DealsHubPage() {
                   <div className="flex items-center justify-between gap-2 mb-3">
                     <span className="inline-flex items-center gap-1 rounded-md border border-primary/20 bg-primary/10 px-2 py-0.5 font-mono text-[11px] font-semibold text-primary">
                       <Store className="h-3 w-3" />
-                      {deal.store}
+                      {deal.storeName}
                     </span>
                     <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[10px] font-bold text-emerald-500">
-                      {formatPriceString(deal.badge)}
+                      {deal.badge}
                     </span>
                   </div>
 
@@ -278,16 +251,13 @@ function DealsHubPage() {
                     {deal.title}
                   </h3>
 
-                  <div className="mt-4 flex items-baseline gap-2">
-                    <span className="text-2xl font-extrabold text-foreground font-mono">
-                      {formatPriceString(deal.dealPrice)}
-                    </span>
-                    <span className="text-sm line-through text-muted-foreground font-mono">
-                      {formatPriceString(deal.originalPrice)}
-                    </span>
-                    <span className="ml-auto rounded bg-red-500/10 px-2 py-0.5 text-xs font-bold text-red-500">
+                  <div className="mt-3 flex items-center gap-2">
+                    <span className="text-xl font-extrabold text-foreground font-mono">
                       {deal.discount}
                     </span>
+                    {deal.minOrder && (
+                      <span className="text-xs text-muted-foreground">min. {deal.minOrder}</span>
+                    )}
                   </div>
 
                   {/* Coupon Strip */}
@@ -296,14 +266,14 @@ function DealsHubPage() {
                       <div className="flex items-center gap-2">
                         <Tag className="h-3.5 w-3.5 text-primary" />
                         <span className="font-mono text-xs font-bold tracking-wide text-foreground">
-                          {deal.couponCode}
+                          {deal.code}
                         </span>
                       </div>
                       <button
-                        onClick={() => handleCopyCode(deal.couponCode)}
+                        onClick={() => handleCopyCode(deal.code)}
                         className="inline-flex items-center gap-1 rounded-md bg-card px-2 py-1 text-[11px] font-medium border border-border hover:bg-muted transition-colors"
                       >
-                        {copiedCode === deal.couponCode ? (
+                        {copiedCode === deal.code ? (
                           <>
                             <Check className="h-3 w-3 text-emerald-500" />
                             <span className="text-emerald-500">Copied</span>
@@ -322,7 +292,7 @@ function DealsHubPage() {
                 <div className="mt-5 pt-4 border-t border-border flex items-center justify-between">
                   <span className="inline-flex items-center gap-1 font-mono text-[11px] text-muted-foreground">
                     <Clock className="h-3 w-3" />
-                    {deal.verifiedTime}
+                    {deal.expiresIn}
                   </span>
                   <a
                     href={deal.link}
@@ -337,6 +307,7 @@ function DealsHubPage() {
               </div>
             ))}
           </div>
+          )}
         </div>
       </section>
 

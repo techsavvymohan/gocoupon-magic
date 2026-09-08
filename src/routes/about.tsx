@@ -188,25 +188,25 @@ export function AboutPage() {
               At the same time, online pricing has become increasingly dynamic. Sellers frequently adjust prices or advertise misleading percentage discounts right before major sales events like Black Friday, Cyber Monday, Prime Day, or festive sales.
             </p>
             <p>
-              We built <strong className="text-foreground">GoCoupon</strong> to solve both problems with transparent, automated browser intelligence:
+              We built <strong className="text-foreground">GoCoupon</strong> to solve both problems with transparent, automated shopping intelligence:
             </p>
             <ul className="space-y-3 pl-2">
               <li className="flex items-start gap-3">
-                <TrendingDown className="h-5 w-5 text-primary shrink-0 mt-1" />
+                <Zap className="h-5 w-5 text-primary shrink-0 mt-1" />
                 <span>
-                  <strong className="text-foreground">90-Day Historical Price Tracking:</strong> Exposes artificial price markups by plotting real historical price curves so you always buy at genuine lows.
+                  <strong className="text-foreground">Instant Price Drop (IPD) Engine:</strong> While other tools make you passively wait weeks for an alert, GoCoupon engineers immediate savings right at checkout by combining live seller discounts, hidden coupon codes, and bank card rebates.
                 </span>
               </li>
               <li className="flex items-start gap-3">
                 <Layers className="h-5 w-5 text-primary shrink-0 mt-1" />
                 <span>
-                  <strong className="text-foreground">Real-Time Multi-Store Price Comparison:</strong> Directly compares checkout costs between Amazon, Walmart, Target, Flipkart, and partner stores including delivery fees and payment discounts.
+                  <strong className="text-foreground">4-Tier True Landed Cost Calculator:</strong> Factors in store sticker price, auto-applied promo codes, instant payment card rebates, and cashback to calculate the net out-of-pocket price before you pay.
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <Zap className="h-5 w-5 text-primary shrink-0 mt-1" />
+                <TrendingDown className="h-5 w-5 text-primary shrink-0 mt-1" />
                 <span>
-                  <strong className="text-foreground">Automated Coupon Testing:</strong> Runs verified discount codes in parallel at checkout in under 850 milliseconds and automatically clips on-page green coupon boxes.
+                  <strong className="text-foreground">30-Day Deal Honesty Verification:</strong> Exposes artificial pre-sale price hikes with moving baseline analytics so you always know whether a deal is an authentic bargain or an inflated marketing trick.
                 </span>
               </li>
             </ul>
@@ -232,13 +232,13 @@ export function AboutPage() {
                 icon: Zap,
                 title: "1. Sub-Second Performance",
                 description:
-                  "Nobody wants checkout delay. Our lightweight asynchronous engine tests candidate codes in parallel in under 850 milliseconds without slowing down your computer.",
+                  "Nobody wants checkout delay. Our lightweight engine tests candidate codes in parallel in under 850 milliseconds without slowing down your computer.",
               },
               {
                 icon: Shield,
-                title: "2. Privacy by Design (Manifest V3)",
+                title: "2. Privacy by Design & Sandboxed Safety",
                 description:
-                  "We never sell your browsing history, track search queries outside checkout, or log keystrokes. GoCoupon strictly minimizes data and works locally.",
+                  "We never sell your browsing history, track search queries outside checkout, or log keystrokes. GoCoupon operates in a secure, sandboxed browser environment.",
               },
               {
                 icon: Target,

@@ -129,25 +129,11 @@ export function ContactForm() {
   };
 
   return (
-    <section id="contact" className="relative px-6 py-24 sm:py-28 overflow-hidden">
-      {/* Background radial glow graphics */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/2 opacity-25 blur-[120px]"
-        style={{
-          background:
-            "radial-gradient(circle at center, var(--accent-glow-strong), transparent 70%)",
-        }}
-      />
-
+    <section id="contact" className="relative px-6 py-20 sm:py-28 overflow-hidden bg-background">
       <div className="mx-auto max-w-7xl">
         {/* Section Header */}
         <div className="mb-14 sm:mb-16 text-center max-w-3xl mx-auto">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3.5 py-1 font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground shadow-xs">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-            Get in Touch
-          </div>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-foreground">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">
             We'd love to hear from you.
           </h2>
           <p className="mt-4 text-sm sm:text-base text-muted-foreground leading-relaxed md:text-lg">

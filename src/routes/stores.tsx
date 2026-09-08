@@ -2,7 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useRef } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
-import { STORES_DATA, type Store } from "@/data/storesData";
+import { useStores } from "@/hooks/use-stores";
+import type { Store, StoreSortField } from "@/lib/api/stores-api";
+import { StoreGridSkeleton, FetchError } from "@/components/ui/DataSkeleton";
 import { useCurrency } from "@/context/CurrencyContext";
 import {
   Search,
@@ -24,6 +26,7 @@ import {
   CheckCircle2,
   Box,
   Flame,
+  ArrowUpDown,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -45,19 +48,27 @@ const CATEGORIES = ["All", "General", "Fashion", "Electronics", "Beauty", "Food"
 function StoresPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [sortBy, setSortBy] = useState<StoreSortField>("popularity");
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const { formatPriceString, isIndia } = useCurrency();
 
+  // ── Live API fetch — data comes from /api/stores, sorted dynamically by backend ──
+  const { stores: allStores, isLoading, isError, refetch } = useStores({
+    category: selectedCategory !== "All" ? selectedCategory.toLowerCase() : undefined,
+    sortBy,
+    order: sortBy === "name" ? "asc" : "desc",
+  });
+
   const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = { All: STORES_DATA.length };
-    STORES_DATA.forEach((s) => {
+    const counts: Record<string, number> = { All: allStores.length };
+    allStores.forEach((s) => {
       counts[s.category] = (counts[s.category] || 0) + 1;
     });
     return counts;
-  }, []);
+  }, [allStores]);
 
   const filteredStores = useMemo(() => {
-    return STORES_DATA.filter((store) => {
+    return allStores.filter((store) => {
       const matchesSearch =
         store.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         store.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -66,7 +77,7 @@ function StoresPage() {
       const matchesCategory = selectedCategory === "All" || store.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, allStores]);
 
   const handleCopy = (code: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -205,10 +216,10 @@ function StoresPage() {
                     key={cat}
                     type="button"
                     onClick={() => setSelectedCategory(cat)}
-                    className={`group relative inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 min-h-[40px] text-xs font-bold transition-all duration-200 touch-manipulation border-b-2 active:border-b-0 active:translate-y-0.5 ${
+                    className={`group relative inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 min-h-[36px] text-xs font-semibold transition-all duration-150 touch-manipulation border ${
                       isActive
-                        ? "bg-primary text-primary-foreground border-primary-hover shadow-md scale-105"
-                        : "border border-border/80 border-b-border bg-card/90 text-muted-foreground hover:border-primary/40 hover:text-foreground hover:bg-muted/40 shadow-2xs"
+                        ? "bg-primary text-primary-foreground border-primary shadow-xs"
+                        : "border-border bg-card text-muted-foreground hover:border-foreground/20 hover:text-foreground hover:bg-muted/50"
                     }`}
                   >
                     <span>{cat}</span>
@@ -258,7 +269,7 @@ function StoresPage() {
       {/* ── STORES GRID MATRIX ── */}
       <section className="px-3.5 sm:px-6 py-10 sm:py-16 perspective-1200">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 border-b border-border pb-4">
+          <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-4">
             <div>
               <h2 className="font-display text-lg sm:text-2xl font-black text-foreground flex items-center gap-2">
                 <Box className="h-5 w-5 text-primary shrink-0" />
@@ -268,13 +279,42 @@ function StoresPage() {
                 {selectedCategory === "All" ? "Showing all verified partner stores" : `Filtered by ${selectedCategory}`}
               </p>
             </div>
-            <span className="inline-flex items-center gap-1.5 font-mono text-[11px] sm:text-xs text-muted-foreground">
-              <Clock className="h-3.5 w-3.5 text-primary shrink-0" />
-              <span>Real-time code test verification</span>
-            </span>
+            
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+              <div className="flex items-center gap-2">
+                <label htmlFor="store-sort-select" className="inline-flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
+                  <ArrowUpDown className="h-3.5 w-3.5 text-primary" />
+                  <span>Sort:</span>
+                </label>
+                <select
+                  id="store-sort-select"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as StoreSortField)}
+                  className="rounded-xl border border-border bg-card/90 px-3 py-1.5 text-xs font-semibold text-foreground shadow-xs focus:border-primary focus:outline-hidden focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                >
+                  <option value="popularity">Most Popular</option>
+                  <option value="rating">Highest Rated (★)</option>
+                  <option value="couponsCount">Most Coupons</option>
+                  <option value="maxDiscount">Max Discount %</option>
+                  <option value="cashback">Highest Cashback</option>
+                  <option value="name">Alphabetical (A–Z)</option>
+                </select>
+              </div>
+              <span className="hidden sm:inline-flex items-center gap-1.5 font-mono text-[11px] sm:text-xs text-muted-foreground">
+                <Clock className="h-3.5 w-3.5 text-primary shrink-0" />
+                <span>Auto-verified daily</span>
+              </span>
+            </div>
           </div>
 
-          {filteredStores.length === 0 ? (
+          {isLoading ? (
+            <StoreGridSkeleton count={6} />
+          ) : isError ? (
+            <FetchError
+              message="Could not load stores from the server. Please try again."
+              onRetry={refetch}
+            />
+          ) : filteredStores.length === 0 ? (
             <div className="rounded-2xl sm:rounded-3xl border border-dashed border-border py-12 sm:py-16 text-center px-4">
               <div className="mx-auto mb-3 h-12 w-12 rounded-2xl bg-muted/50 grid place-items-center text-muted-foreground">
                 <StoreIcon className="h-6 w-6" />
@@ -295,6 +335,7 @@ function StoresPage() {
             <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {filteredStores.map((store) => (
                 <StoreCard
+
                   key={store.id}
                   store={store}
                   onCopy={handleCopy}
