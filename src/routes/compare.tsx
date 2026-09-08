@@ -145,6 +145,7 @@ export function ComparePage() {
   const [sortBy, setSortBy] = useState<SortOption>("relevance");
   const [priceRange, setPriceRange] = useState<PriceRangeOption>("all");
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [activeShoprs, setActiveShoprs] = useState<string>("");
 
   // Comparison & Price History Modal state
   const [selectedProduct, setSelectedProduct] = useState<MultiPlatformProductItem | null>(null);
@@ -161,7 +162,12 @@ export function ComparePage() {
     setIsAlertModalOpen(true);
   };
 
-  // When search query or URL changes, fetch products from all shopping platforms
+  // Reset activeShoprs when search query or URL changes
+  useEffect(() => {
+    setActiveShoprs("");
+  }, [activeSearchParam]);
+
+  // When search query, URL, or activeShoprs changes, fetch products
   useEffect(() => {
     const trimmed = activeSearchParam.trim();
     if (!trimmed) {
@@ -172,7 +178,7 @@ export function ComparePage() {
     let isMounted = true;
     setIsSearching(true);
 
-    searchProductsAcrossPlatforms(trimmed)
+    searchProductsAcrossPlatforms(trimmed, { shoprs: activeShoprs })
       .then((res) => {
         if (!isMounted) return;
         setSearchResult(res);
@@ -192,7 +198,7 @@ export function ComparePage() {
     return () => {
       isMounted = false;
     };
-  }, [activeSearchParam]);
+  }, [activeSearchParam, activeShoprs]);
 
   const handleCopy = (code: string) => {
     navigator.clipboard.writeText(code).catch(() => {});
@@ -246,6 +252,19 @@ export function ComparePage() {
 
     return list;
   }, [searchResult, selectedPlatform, sortBy, priceRange]);
+
+  // Google Shopping & Carousel Filter Chips
+  const quickFilters = useMemo(() => {
+    if (!searchResult?.filters || searchResult.filters.length === 0) return [];
+    const carousel = searchResult.filters.find((f) => f.type === "Carousel Filters");
+    if (carousel && carousel.options.length > 0) {
+      return carousel.options;
+    }
+    return searchResult.filters
+      .flatMap((f) => f.options)
+      .filter((opt, idx, self) => opt.text && self.findIndex((o) => o.text === opt.text) === idx)
+      .slice(0, 16);
+  }, [searchResult?.filters]);
 
   // Identify exact SKU match (if found)
   const exactMatchProduct = useMemo(() => {
@@ -459,6 +478,47 @@ export function ComparePage() {
                 ))}
               </div>
             </div>
+
+            {/* Live Google Shopping & Carousel Filter Chips */}
+            {quickFilters.length > 0 && (
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 scrollbar-none">
+                <span className="text-xs font-mono text-muted-foreground shrink-0 flex items-center gap-1.5 font-semibold">
+                  <Filter className="h-3.5 w-3.5 text-primary" /> Filter:
+                </span>
+                {activeShoprs && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveShoprs("")}
+                    className="inline-flex items-center gap-1 rounded-full border border-destructive/40 bg-destructive/10 px-3 py-1 text-xs font-semibold text-destructive transition-colors shrink-0 hover:bg-destructive/20 cursor-pointer"
+                  >
+                    <X className="h-3 w-3" /> Clear Filter
+                  </button>
+                )}
+                {quickFilters.map((opt) => {
+                  const isSelected = activeShoprs === opt.shoprs || Boolean(opt.selected);
+                  return (
+                    <button
+                      key={opt.shoprs || opt.text}
+                      type="button"
+                      onClick={() => {
+                        if (isSelected) {
+                          setActiveShoprs("");
+                        } else {
+                          setActiveShoprs(opt.shoprs);
+                        }
+                      }}
+                      className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-medium transition-all shrink-0 touch-manipulation cursor-pointer ${
+                        isSelected
+                          ? "bg-primary text-primary-foreground font-bold shadow-xs scale-105"
+                          : "border border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                      }`}
+                    >
+                      {opt.text}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Spotlight Exact Product Comparison Matrix (when exact match SKU is identified) */}
             {exactMatchProduct && selectedPlatform === "All" && (

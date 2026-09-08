@@ -68,6 +68,20 @@ export interface MultiPlatformProductItem {
   tags?: string[];
 }
 
+export interface GoogleShoppingFilterOption {
+  text: string;
+  shoprs: string;
+  serpapi_link?: string;
+  input_type?: string;
+  selected?: boolean;
+}
+
+export interface GoogleShoppingFilterGroup {
+  type?: string;
+  input_type?: string;
+  options: GoogleShoppingFilterOption[];
+}
+
 export interface MultiPlatformSearchResult {
   query: string;
   products: MultiPlatformProductItem[];
@@ -77,6 +91,8 @@ export interface MultiPlatformSearchResult {
   highestOverallSavings: number;
   isDirectUrl: boolean;
   exactMatchProduct?: MultiPlatformProductItem;
+  filters?: GoogleShoppingFilterGroup[];
+  activeShoprs?: string;
 }
 
 export const TRUSTED_PLATFORMS = [
@@ -430,10 +446,12 @@ function mapCanonicalOffersToStoreOffers(
  * Searches across all Indian shopping platforms for a given query or URL.
  */
 export async function searchProductsAcrossPlatforms(
-  queryOrUrl: string
+  queryOrUrl: string,
+  options?: { shoprs?: string; country?: string }
 ): Promise<MultiPlatformSearchResult> {
   const trimmed = queryOrUrl.trim();
   const isUrl = /^https?:\/\//i.test(trimmed);
+  let discoveredFilters: GoogleShoppingFilterGroup[] = [];
 
   // 1. Direct URL Input: Extract metadata & compare competitors directly
   if (isUrl) {
@@ -576,7 +594,7 @@ export async function searchProductsAcrossPlatforms(
 
   canonicalMatches.sort((a, b) => b.score - a.score);
 
-  if (canonicalMatches.length > 0) {
+  if (!options?.shoprs && canonicalMatches.length > 0) {
     // Dynamic Broad vs SKU classification: ZERO preset string arrays
     const isTopExactMatch = intent.isSkuSpecific && canonicalMatches[0].score >= 75;
     const matchedProducts: MultiPlatformProductItem[] = canonicalMatches.map((item, idx) => {
@@ -637,14 +655,19 @@ export async function searchProductsAcrossPlatforms(
     };
   }
 
-  // 3. Fallback to Web Discovery if not pre-seeded in canonical catalog
+  // 3. Fallback to Web Discovery if not pre-seeded in canonical catalog or when filtered
   const products: MultiPlatformProductItem[] = [];
 
   try {
-    const shoppingApiUrl = `/api/shopping?q=${encodeURIComponent(intent.cleanSearchTerm)}`;
-    const serpRes = await fetch(shoppingApiUrl, { signal: AbortSignal.timeout(6000) });
+    const shoppingApiUrl = `/api/shopping?q=${encodeURIComponent(intent.cleanSearchTerm)}${
+      options?.shoprs ? `&shoprs=${encodeURIComponent(options.shoprs)}` : ""
+    }${options?.country ? `&gl=${encodeURIComponent(options.country)}` : ""}`;
+    const serpRes = await fetch(shoppingApiUrl, { signal: AbortSignal.timeout(8000) });
     if (serpRes.ok) {
       const data = await serpRes.json();
+      if (Array.isArray(data.filters)) {
+        discoveredFilters = data.filters;
+      }
       const rawShopping = (data.shopping_results || []).filter(
         (item: any) => typeof item.extracted_price === "number" && item.extracted_price > 0
       );
@@ -888,5 +911,7 @@ export async function searchProductsAcrossPlatforms(
     highestOverallSavings,
     isDirectUrl: false,
     exactMatchProduct: products[0]?.isExactSkuMatch ? products[0] : undefined,
+    filters: discoveredFilters,
+    activeShoprs: options?.shoprs,
   };
 }
