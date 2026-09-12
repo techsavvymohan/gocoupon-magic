@@ -8,6 +8,7 @@ import { wrapAffiliateTracking } from "@/lib/services/store-registry";
 import { DealGridSkeleton } from "@/components/ui/DataSkeleton";
 import { StoreLogo } from "@/components/common/StoreLogo";
 import { resolveStoreLogo } from "@/lib/services/store-logo-resolver";
+import { RedeemCouponButton } from "@/components/common/RedeemCouponButton";
 import {
   Flame,
   Tag,
@@ -164,11 +165,43 @@ function OffersHubPage() {
     return filteredOffers.slice(0, visibleCount);
   }, [filteredOffers, visibleCount]);
 
-  const handleCopyCode = (code: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiedCode(code);
-    toast.success(`Coupon code "${code}" copied to clipboard!`);
-    setTimeout(() => setCopiedCode(null), 2500);
+  const [expandedDealIds, setExpandedDealIds] = useState<Set<string>>(new Set());
+
+  const toggleExpand = (dealId: string) => {
+    setExpandedDealIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(dealId)) {
+        next.delete(dealId);
+      } else {
+        next.add(dealId);
+      }
+      return next;
+    });
+  };
+
+  const handleRedeemDeal = (deal: Deal, e?: React.MouseEvent) => {
+    const hasCode = Boolean(deal.code && deal.code.trim().length > 1);
+    if (hasCode) {
+      const code = deal.code.trim();
+      navigator.clipboard.writeText(code);
+      setCopiedCode(code);
+      toast.success(`Coupon code "${code}" copied! Opening ${deal.storeName} to auto-apply...`);
+      setTimeout(() => setCopiedCode((curr) => (curr === code ? null : curr)), 5000);
+    } else {
+      setCopiedCode(deal.id);
+      toast.success(`Activating ${deal.discount}! Opening ${deal.storeName}...`);
+      setTimeout(() => setCopiedCode((curr) => (curr === deal.id ? null : curr)), 5000);
+    }
+  };
+
+  const handleCardBoxClick = (deal: Deal, e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.closest("button, a, input, select, textarea")) {
+      return;
+    }
+    const affiliateUrl = wrapAffiliateTracking(deal.link, "gocoupon_offers_box");
+    handleRedeemDeal(deal, e);
+    window.open(affiliateUrl, "_blank", "noopener,noreferrer");
   };
 
   const handleLiveSync = async () => {
@@ -415,13 +448,15 @@ function OffersHubPage() {
             <div className="space-y-4">
               {visibleOffers.map((deal, idx) => {
                 const affiliateUrl = wrapAffiliateTracking(deal.link, "gocoupon_offers_list");
-                const isCopied = copiedCode === deal.code;
+                const isCopied = Boolean(copiedCode && (copiedCode === deal.code || copiedCode === deal.id));
+                const isExpanded = expandedDealIds.has(deal.id);
 
                 return (
                   <div
                     key={deal.id}
+                    onClick={(e) => handleCardBoxClick(deal, e)}
                     style={{ animationDelay: `${Math.min(idx * 20, 300)}ms` }}
-                    className="group relative flex flex-col md:flex-row md:items-center justify-between gap-5 rounded-2xl border border-border/80 bg-card/80 backdrop-blur-md p-5 sm:p-6 transition-all duration-300 hover:border-primary/50 hover:shadow-xl hover:-translate-y-0.5 overflow-hidden animate-in fade-in-50 slide-in-from-bottom-2"
+                    className="group relative flex flex-col md:flex-row md:items-center justify-between gap-5 rounded-2xl border border-border/80 bg-card/80 backdrop-blur-md p-5 sm:p-6 transition-all duration-300 hover:border-primary/50 hover:shadow-xl hover:-translate-y-0.5 overflow-hidden animate-in fade-in-50 slide-in-from-bottom-2 cursor-pointer"
                   >
                     {/* Left Accent Indicator Strip */}
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary/80 via-emerald-500/80 to-primary/40 opacity-70 group-hover:opacity-100 transition-opacity" />
@@ -455,10 +490,45 @@ function OffersHubPage() {
                           {deal.title}
                         </h3>
 
+                        {/* Terms + Read more button */}
                         {deal.terms && (
-                          <p className="mt-1 text-xs text-muted-foreground line-clamp-1 max-w-2xl">
-                            {deal.terms}
-                          </p>
+                          <div className="mt-1">
+                            <p className={`text-xs text-muted-foreground ${isExpanded ? "" : "line-clamp-1"} max-w-2xl transition-all leading-relaxed`}>
+                              {deal.terms}
+                            </p>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleExpand(deal.id);
+                              }}
+                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline cursor-pointer pt-1"
+                            >
+                              <span>{isExpanded ? "Read less" : "Read more"}</span>
+                              <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
+                            </button>
+
+                            {isExpanded && (
+                              <div className="mt-2.5 rounded-xl border border-border/80 bg-muted/30 p-3 text-xs space-y-1.5 animate-in fade-in-50 slide-in-from-top-1">
+                                <div className="font-semibold text-foreground flex items-center gap-1.5">
+                                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+                                  <span>Offer Terms &amp; How to Redeem:</span>
+                                </div>
+                                <p className="text-muted-foreground text-[11px] leading-relaxed">
+                                  {deal.terms}
+                                </p>
+                                <ul className="text-muted-foreground text-[11px] space-y-0.5 list-disc list-inside pt-1 border-t border-border/50">
+                                  {deal.minOrder && (
+                                    <li>Minimum purchase: <strong className="text-foreground font-semibold">{deal.minOrder}</strong></li>
+                                  )}
+                                  {deal.endDate && (
+                                    <li>Valid until: <strong className="text-foreground font-semibold">{new Date(deal.endDate).toLocaleDateString()}</strong></li>
+                                  )}
+                                  <li>Click the button to auto-copy code &amp; redirect to {deal.storeName}.</li>
+                                </ul>
+                              </div>
+                            )}
+                          </div>
                         )}
 
                         <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] font-mono text-muted-foreground">
@@ -479,7 +549,7 @@ function OffersHubPage() {
                       </div>
                     </div>
 
-                    {/* Right Action Block: Discount & CTAs */}
+                    {/* Right Action Block: Discount & Reveal Coupon Button */}
                     <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-3 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-border/60">
                       {/* Discount Callout */}
                       <div className="text-left md:text-right">
@@ -491,48 +561,15 @@ function OffersHubPage() {
                         </span>
                       </div>
 
-                      {/* Interactive Actions Group */}
-                      <div className="flex items-center gap-2">
-                        {/* Coupon Strip Button */}
-                        {deal.code && deal.code.length > 1 ? (
-                          <button
-                            type="button"
-                            onClick={() => handleCopyCode(deal.code)}
-                            className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 font-mono text-xs font-bold transition-all cursor-pointer ${
-                              isCopied
-                                ? "border-emerald-500/60 bg-emerald-500/20 text-emerald-400 shadow-xs scale-105"
-                                : "border-dashed border-primary/40 bg-primary/5 text-foreground hover:bg-primary/10 hover:border-primary"
-                            }`}
-                            title="Click to copy coupon code"
-                          >
-                            {isCopied ? (
-                              <>
-                                <Check className="h-3.5 w-3.5 text-emerald-400 stroke-[2.5]" />
-                                <span>COPIED!</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="h-3.5 w-3.5 text-primary" />
-                                <span>{deal.code}</span>
-                              </>
-                            )}
-                          </button>
-                        ) : (
-                          <span className="inline-flex items-center gap-1.5 rounded-xl border border-dashed border-orange-500/40 bg-orange-500/10 px-3 py-2 font-mono text-xs font-bold text-orange-500">
-                            🔥 STEAL DEAL
-                          </span>
-                        )}
-
-                        {/* Instant Open Button */}
-                        <a
-                          href={affiliateUrl}
-                          target="_blank"
-                          rel="noopener noreferrer nofollow"
-                          className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-md hover:bg-primary/90 hover:shadow-primary/25 transition-all group/btn cursor-pointer"
-                        >
-                          <span>Open Store</span>
-                          <ExternalLink className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
-                        </a>
+                      {/* Reveal Code & Auto-Redirect CTA */}
+                      <div className="flex items-center">
+                        <RedeemCouponButton
+                          deal={deal}
+                          affiliateUrl={affiliateUrl}
+                          isCopied={isCopied}
+                          onRedeem={handleRedeemDeal}
+                          className="min-w-[210px]"
+                        />
                       </div>
                     </div>
                   </div>
@@ -546,8 +583,8 @@ function OffersHubPage() {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {visibleOffers.map((deal, idx) => {
                 const affiliateUrl = wrapAffiliateTracking(deal.link, "gocoupon_offers_grid");
-                const isCopied = copiedCode === deal.code;
-                const hasCode = deal.code && deal.code.length > 1;
+                const isCopied = Boolean(copiedCode && (copiedCode === deal.code || copiedCode === deal.id));
+                const isExpanded = expandedDealIds.has(deal.id);
 
                 /* Badge accent colour */
                 const accentClass =
@@ -560,8 +597,9 @@ function OffersHubPage() {
                 return (
                   <div
                     key={deal.id}
+                    onClick={(e) => handleCardBoxClick(deal, e)}
                     style={{ animationDelay: `${Math.min(idx * 15, 250)}ms` }}
-                    className="group flex flex-col rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:border-primary/40 hover:shadow-lg animate-in fade-in-0 slide-in-from-bottom-2"
+                    className="group flex flex-col rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:border-primary/40 hover:shadow-lg animate-in fade-in-0 slide-in-from-bottom-2 cursor-pointer"
                   >
                     {/* ── Store row ── */}
                     <div className="flex items-center justify-between mb-4">
@@ -592,6 +630,34 @@ function OffersHubPage() {
                       </h3>
                     </div>
 
+                    {/* ── Terms + Read more ── */}
+                    {deal.terms && (
+                      <div className="mb-3">
+                        <p className={`text-[11px] text-muted-foreground ${isExpanded ? "" : "line-clamp-1"} transition-all leading-snug`}>
+                          {deal.terms}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleExpand(deal.id);
+                          }}
+                          className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary hover:underline cursor-pointer pt-0.5"
+                        >
+                          <span>{isExpanded ? "Read less" : "Read more"}</span>
+                          <ChevronDown className={`h-2.5 w-2.5 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
+                        </button>
+                        {isExpanded && (
+                          <div className="mt-2 rounded-lg border border-border/80 bg-muted/40 p-2.5 text-[10px] text-muted-foreground space-y-1 animate-in fade-in-50">
+                            <p className="leading-relaxed">{deal.terms}</p>
+                            {deal.minOrder && <div>• Min Order: <strong className="text-foreground">{deal.minOrder}</strong></div>}
+                            {deal.endDate && <div>• Valid Until: <strong className="text-foreground">{new Date(deal.endDate).toLocaleDateString()}</strong></div>}
+                            <div className="text-emerald-600 dark:text-emerald-400 font-medium pt-0.5">• Code copied automatically on click!</div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {/* ── Expiry ── */}
                     <div className="flex items-center gap-1 mb-4">
                       <Clock className="h-3 w-3 text-muted-foreground/60 shrink-0" />
@@ -601,38 +667,15 @@ function OffersHubPage() {
                       </span>
                     </div>
 
-                    {/* ── Coupon + CTA ── */}
-                    <div className="mt-auto flex items-center gap-2">
-                      {hasCode ? (
-                        <button
-                          type="button"
-                          onClick={() => handleCopyCode(deal.code)}
-                          className={`flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-dashed py-2 text-xs font-bold font-mono transition-all cursor-pointer ${
-                            isCopied
-                              ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400"
-                              : "border-border bg-muted/50 text-foreground hover:border-primary hover:bg-primary/5"
-                          }`}
-                        >
-                          {isCopied ? (
-                            <><Check className="h-3.5 w-3.5 stroke-[3]" /><span>COPIED!</span></>
-                          ) : (
-                            <><Copy className="h-3.5 w-3.5" /><span>{deal.code}</span></>
-                          )}
-                        </button>
-                      ) : (
-                        <span className="flex-1 flex items-center justify-center gap-1 rounded-xl border border-dashed border-orange-300 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/30 py-2 text-xs font-bold text-orange-600 dark:text-orange-400">
-                          🔥 STEAL DEAL
-                        </span>
-                      )}
-                      <a
-                        href={affiliateUrl}
-                        target="_blank"
-                        rel="noopener noreferrer nofollow"
-                        className="shrink-0 inline-flex items-center gap-1 rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-primary-foreground hover:bg-primary/90 transition-colors"
-                      >
-                        Open
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
+                    {/* ── Reveal Coupon CTA & Auto-Redirect ── */}
+                    <div className="mt-auto pt-2">
+                      <RedeemCouponButton
+                        deal={deal}
+                        affiliateUrl={affiliateUrl}
+                        isCopied={isCopied}
+                        onRedeem={handleRedeemDeal}
+                        fullWidth
+                      />
                     </div>
                   </div>
                 );
