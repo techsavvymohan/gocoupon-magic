@@ -15,7 +15,7 @@
 [![Affiliate Engines](https://img.shields.io/badge/Affiliate_APIs-Cuelinks_v3_+_Admitad_Global-rose?style=flat-square)](#-dual-engine-affiliate-architecture)
 [![License](https://img.shields.io/badge/License-Proprietary-slate?style=flat-square)](#)
 
-[Live Platform](https://www.gocoupon.io) • [Exclusive Offers](https://www.gocoupon.io/offers) • [Explore Stores](https://www.gocoupon.io/stores) • [Compare Prices](https://www.gocoupon.io/compare) • [Price Tracker](https://www.gocoupon.io/price-history) • [Chrome Extension](https://www.gocoupon.io/chrome-extension) • [Blog Guides](https://www.gocoupon.io/blog)
+[Live Platform](https://www.gocoupon.io) • [Exclusive Offers](https://www.gocoupon.io/offers) • [Explore Stores](https://www.gocoupon.io/stores) • [Compare Prices](https://www.gocoupon.io/compare) • [Chrome Extension](https://www.gocoupon.io/chrome-extension) • [Blog Guides](https://www.gocoupon.io/blog)
 
 </div>
 
@@ -24,12 +24,11 @@
 ## 📖 Executive Summary & Category Monopoly
 
 For over a decade, consumer shopping tools have been fractured into weak, single-feature point solutions:
-- **Keepa / CamelCamelCamel** only track Amazon, blind to outside stores.
 - **Honey / Coupert** only scrape coupons, blind to base store pricing and bank offers.
 - **Google Shopping** operates as an ad auction, selling ranking to the highest bidder.
 - **Retail Banks** (Chase, Amex, HDFC, SBI) hide partner offers inside isolated app portals.
 
-Shoppers were forced to juggle 5 different tools, 10 open browser tabs, and manual calculator math just to buy a single laptop or pair of headphones.
+Shoppers were forced to juggle multiple tools, 10 open browser tabs, and manual calculator math just to buy a single laptop, clothing item, or gadget.
 
 **GoCoupon completely renders this fragmented ecosystem obsolete.** We unify the entire consumer commerce intelligence stack into **ONE sovereign, lightning-fast platform and browser extension**. In under 1 second, shoppers get the mathematical truth before hitting "Place Order."
 
@@ -76,22 +75,22 @@ GoCoupon operates a sovereign, high-concurrency deal ingestion pipeline bridging
 
 ---
 
-## ⚡ The 5-in-1 Unified Architecture
+## ⚡ The Core Unified Commerce Architecture
 
 ### 1. Cross-Store Price Comparison Matrix (`/compare`)
 - **200+ Enterprise Retailers**: Real-time cross-merchant price tracking across Amazon (US/UK/EU/IN), Walmart, Best Buy, Target, Flipkart, Croma, Reliance Digital, and specialized DTC brands.
 - **Instant Product URL Resolver**: Paste any product link from Amazon, Flipkart, or Walmart to extract canonical identifiers and instantly surface competitor pricing.
 - **Unbiased Ranking**: 100% store-agnostic with zero sponsored ad bias. The store with the authentic lowest delivered price always occupies the #1 spot.
 
-### 2. Interactive 90-Day Price Tracker & Fake Sale Detector (`/price-history`)
-- **Continuous Price Telemetry**: Fluid SVG historical price trajectory curves over 30, 60, 90, and 180-day windows.
-- **Fake Discount Shield**: Exposes synthetic "pre-sale" markups where retailers inflate prices by 20%–40% right before Black Friday, Prime Day, or festival sales.
-- **Algorithmic Deal Score (0–100)**: Evaluates current prices against all-time lows, 90-day moving averages, and price volatility indexes.
-
-### 3. Bank Card & Financing Arbitrage Engine
+### 2. Bank Card & Financing Arbitrage Engine
 - **Exclusive Bank Tie-Up Discovery**: Retailers keep competitor card partnerships secret (e.g. Amazon won't tell you Flipkart has ₹5,000 off with HDFC, or Best Buy has $120 off with Chase).
 - **Official Vector SVG Brand Registry**: Authentic vector logos for **Chase, American Express (Amex), Capital One, Citi, Affirm, HDFC Bank, SBI Card, ICICI Bank, Axis Bank, Kotak Mahindra, and IndusInd Bank**.
 - **Universal Pricing + Optional Booster**: Guarantees the lowest store base price for all shoppers (cash, UPI, debit, standard checkout) while stacking extra instant discounts for cardholders.
+
+### 3. Dual-Market Verified Offers & Auto-Pruning Engine (`/offers`)
+- **Combined Ingestion Rails**: Unifies domestic Cuelinks deals with Admitad international campaigns.
+- **Expiry Protection**: Dynamically eliminates expired promo codes so visitors only see working offers.
+- **1-Click Redeem & Auto-Redirect**: Automatically copies codes to clipboard and opens the merchant store.
 
 ### 4. 1-Click Working Coupon Auto-Applier (`/chrome-extension`)
 - **Autonomous DOM Injection**: Parallel-tests candidate promo codes in under 850 milliseconds directly within the checkout sandbox.
@@ -99,7 +98,7 @@ GoCoupon operates a sovereign, high-concurrency deal ingestion pipeline bridging
 - **Zero Dead-Code Spam**: Replaces expired crowd-sourced codes with mathematical savings.
 
 ### 5. "Ask GoCoupon" Grounded AI Commerce Assistant (`/`)
-- **Deterministic Tool Calling**: Integrates internal catalog retrieval, 90-day price history telemetry, and live Google Shopping feeds via SerpAPI.
+- **Deterministic Tool Calling**: Integrates internal catalog retrieval, multi-store pricing feeds, and live Google Shopping data via SerpAPI.
 - **Grounded Verification**: Synthesizes verified purchasing advice with citations, limitation disclaimers, and zero hallucinations.
 
 ---
@@ -185,7 +184,6 @@ gocoupon-magic/
 │   │   ├── index.tsx                # Grounded Homepage & AI search
 │   │   ├── offers.tsx               # Verified Offers Hub (India + Global tabs)
 │   │   ├── compare.tsx              # Multi-store price comparison engine
-│   │   ├── price-history.tsx        # 90-day price tracking hub
 │   │   ├── stores.tsx               # 200+ Merchant Storeverse directory
 │   │   └── blog/                    # In-depth shopping guides & research articles
 │   ├── main.tsx                     # React client entry point
