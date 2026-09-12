@@ -32,7 +32,7 @@ type NavLink = {
   isAction?: boolean;
 };
 
-const primaryLinks: NavLink[] = [
+const desktopLinks: NavLink[] = [
   { label: "Compare", to: "/compare", badge: "NEW", badgeColor: "bg-primary/10 text-primary" },
   { label: "Price Tracker", to: "/price-history" },
   { label: "Ask", to: "/ask" },
@@ -40,6 +40,10 @@ const primaryLinks: NavLink[] = [
   { label: "Deals", href: "https://deals.gocoupon.io", isExternal: true, badge: "HOT", badgeColor: "bg-rose-500/15 text-rose-500" },
   { label: "Extension", to: "/chrome-extension" },
   { label: "Blog", to: "/blog" },
+];
+
+const mobileLinks: NavLink[] = [
+  ...desktopLinks,
   { label: "Chat Assistant", isAction: true },
 ];
 
@@ -89,7 +93,7 @@ export function Navbar() {
 
           {/* Desktop Nav Links (Compact & Responsive) */}
           <ul className="hidden items-center gap-5 lg:gap-6 md:flex">
-            {primaryLinks.map((l) => {
+            {desktopLinks.map((l) => {
               const baseClass =
                 "group relative py-1 text-xs lg:text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-foreground hover:-translate-y-0.5 flex items-center gap-1.5";
 
@@ -191,7 +195,7 @@ export function Navbar() {
         {mobileMenuOpen && (
           <div className="border-b border-border bg-background px-6 py-6 md:hidden animate-fade-in max-h-[80vh] overflow-y-auto">
             <ul className="space-y-3">
-              {primaryLinks.map((l) => {
+              {mobileLinks.map((l) => {
                 if (l.isAction) {
                   return (
                     <li key={l.label}>
