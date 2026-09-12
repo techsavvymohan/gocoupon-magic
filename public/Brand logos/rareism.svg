@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" fill="none">
+
+  <!-- ── Crown ── -->
+  <path
+    d="M88,42 L88,26 L94,34 L100,22 L106,34 L112,26 L112,42"
+    stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"
+  />
+  <line x1="85" y1="42" x2="115" y2="42" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+
+  <!-- ── Geometric Heart ── -->
+  <!--
+    Key vertices:
+      A  = (100,  70)  top-centre indent
+      B  = ( 73,  53)  top-left lobe peak
+      C  = ( 38,  95)  far-left outer
+      D  = ( 58, 128)  lower-left curve
+      F  = (100, 164)  bottom point
+      G  = (142, 128)  lower-right curve
+      H  = (162,  95)  far-right outer
+      J  = (127,  53)  top-right lobe peak
+      
+      Inner facet helpers:
+      ML = ( 70,  95)  mid-left on same row as C/H
+      MR = (130,  95)  mid-right
+  -->
+
+  <!-- Outer heart outline -->
+  <path
+    d="M100,70 L73,53 L38,95 L58,128 L100,164 L142,128 L162,95 L127,53 Z"
+    stroke="currentColor" stroke-width="1.6" stroke-linejoin="miter"
+  />
+
+  <!-- Centre vertical spine -->
+  <line x1="100" y1="70" x2="100" y2="164" stroke="currentColor" stroke-width="1.3"/>
+
+  <!-- Upper-left lobe inner facets -->
+  <!-- From top-left peak down to mid-left point -->
+  <line x1="73" y1="53" x2="70" y2="95"  stroke="currentColor" stroke-width="1.3"/>
+  <!-- From top-centre to far-left -->
+  <line x1="100" y1="70" x2="38"  y2="95"  stroke="currentColor" stroke-width="1.3"/>
+  <!-- Mid-left across to centre (horizontal facet crease) -->
+  <line x1="38"  y1="95" x2="70"  y2="95"  stroke="currentColor" stroke-width="1.3"/>
+  <line x1="70"  y1="95" x2="100" y2="70"  stroke="currentColor" stroke-width="1.3"/>
+
+  <!-- Upper-right lobe inner facets (mirror) -->
+  <line x1="127" y1="53" x2="130" y2="95"  stroke="currentColor" stroke-width="1.3"/>
+  <line x1="100" y1="70" x2="162" y2="95"  stroke="currentColor" stroke-width="1.3"/>
+  <line x1="162" y1="95" x2="130" y2="95"  stroke="currentColor" stroke-width="1.3"/>
+  <line x1="130" y1="95" x2="100" y2="70"  stroke="currentColor" stroke-width="1.3"/>
+
+  <!-- Lower-left facets -->
+  <line x1="38"  y1="95"  x2="58"  y2="128" stroke="currentColor" stroke-width="1.3"/>
+  <line x1="70"  y1="95"  x2="58"  y2="128" stroke="currentColor" stroke-width="1.3"/>
+  <line x1="58"  y1="128" x2="100" y2="164" stroke="currentColor" stroke-width="1.3"/>
+  <line x1="70"  y1="95"  x2="100" y2="128" stroke="currentColor" stroke-width="1.3"/>
+  <line x1="100" y1="128" x2="58"  y2="128" stroke="currentColor" stroke-width="1.3"/>
+
+  <!-- Lower-right facets (mirror) -->
+  <line x1="162" y1="95"  x2="142" y2="128" stroke="currentColor" stroke-width="1.3"/>
+  <line x1="130" y1="95"  x2="142" y2="128" stroke="currentColor" stroke-width="1.3"/>
+  <line x1="142" y1="128" x2="100" y2="164" stroke="currentColor" stroke-width="1.3"/>
+  <line x1="130" y1="95"  x2="100" y2="128" stroke="currentColor" stroke-width="1.3"/>
+  <line x1="100" y1="128" x2="142" y2="128" stroke="currentColor" stroke-width="1.3"/>
+
+  <!-- ── Я (mirrored R) on left, R on right ── -->
+  <!-- Left: Я — drawn as a mirrored R using paths -->
+  <text
+    x="22" y="112"
+    font-family="'Times New Roman', Georgia, serif"
+    font-size="20"
+    font-weight="700"
+    fill="currentColor"
+    transform="scale(-1,1) translate(-44,0)"
+  >R</text>
+
+  <!-- Right: R -->
+  <text
+    x="174" y="112"
+    font-family="'Times New Roman', Georgia, serif"
+    font-size="20"
+    font-weight="700"
+    fill="currentColor"
+  >R</text>
+
+  <!-- ── RAREISM wordmark ── -->
+  <text
+    x="100" y="208"
+    text-anchor="middle"
+    font-family="'Arial', 'Helvetica Neue', sans-serif"
+    font-size="22"
+    font-weight="700"
+    letter-spacing="6"
+    fill="currentColor"
+  >RAREISM</text>
+
+</svg>
