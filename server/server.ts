@@ -159,8 +159,10 @@ const server = app.listen(PORT, HOST, () => {
   console.log(`🚀 GoCoupon Dedicated Express Server Running`);
   console.log(`📍 URL:          http://${HOST}:${PORT}`);
   console.log(`📊 Health:       http://${HOST}:${PORT}/api/health`);
+  console.log(`🔗 Cuelinks:     http://${HOST}:${PORT}/api/cuelinks/status`);
   console.log(`🏢 Stores API:   http://${HOST}:${PORT}/api/stores`);
   console.log(`🔥 Deals API:    http://${HOST}:${PORT}/api/deals`);
+  console.log(`⚖️ Compare API:  http://${HOST}:${PORT}/api/compare`);
   console.log(`📁 Static Dir:   ${fs.existsSync(distDir) ? distDir : "dist/ (build first)"}`);
   console.log(`⚡ Mode:         Persistent 24/7 VPS Server`);
   console.log(`=================================================\n`);

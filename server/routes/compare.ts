@@ -21,6 +21,10 @@ import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
 import { calculateStackedSavings } from "../services/stack-calculator.js";
 import { evaluateDealHonesty } from "../services/deal-honesty.js";
 import { resolveGeoProfile } from "../services/geo-resolver.js";
+import {
+  fetchCuelinksCoupons,
+  normalizeCuelinksToStoreCoupon,
+} from "../services/providers/cuelinks-client.js";
 
 export const compareRouter = Router();
 
@@ -55,6 +59,13 @@ compareRouter.get("/", async (req: Request, res: Response) => {
     }
   }
 
+  // 0. Fetch live Cuelinks coupons pool for real-time stacking
+  let liveCuelinksCoupons: any[] = [];
+  try {
+    const cueOffers = await fetchCuelinksCoupons({ limit: 40 });
+    liveCuelinksCoupons = cueOffers.map(normalizeCuelinksToStoreCoupon);
+  } catch {}
+
   // 1. Try resolving locally from canonical seed catalog first
   let targetProductId = productId;
   if (!targetProductId && rawQuery && !isUrl) {
@@ -68,16 +79,26 @@ compareRouter.get("/", async (req: Request, res: Response) => {
     const comparison = compareProductOffers(targetProductId);
     if (comparison) {
       const geo = resolveGeoProfile(req.headers);
-      comparison.rows = comparison.rows.map((r) => ({
-        ...r,
-        condition: "NEW",
-        stack: calculateStackedSavings({
+      comparison.rows = comparison.rows.map((r) => {
+        const stack = calculateStackedSavings({
           storeName: r.storeName,
           stickerPrice: r.itemPrice,
           currency: geo.currency,
           region: geo.region,
-        }),
-      }));
+          availableCoupons: liveCuelinksCoupons,
+        });
+        const bestCouponCode = stack.coupon.applied ? stack.coupon.code : r.bestCouponCode;
+        const couponSavings = Math.max(r.couponSavings, stack.coupon.discountAmount);
+
+        return {
+          ...r,
+          bestCouponCode: bestCouponCode || undefined,
+          couponSavings,
+          effectiveNetPrice: stack.trueNetLandedCost,
+          condition: "NEW",
+          stack,
+        };
+      });
       comparison.geo = geo;
       comparison.dealHonesty = evaluateDealHonesty({
         currentPrice: comparison.bestDeal?.itemPrice || 25000,
@@ -129,21 +150,32 @@ compareRouter.get("/", async (req: Request, res: Response) => {
             effectiveNetPrice: c.effectiveNetPrice,
           };
 
+          const stack = calculateStackedSavings({
+            storeName: c.storeName,
+            stickerPrice: c.price,
+            currency: "INR",
+            availableCoupons: liveCuelinksCoupons,
+          });
+          const bestCouponCode = stack.coupon.applied ? stack.coupon.code : c.bestCouponCode;
+          const couponSavings = Math.max(c.couponSavings, stack.coupon.discountAmount);
+
           return {
             offer: merchantOffer,
             storeName: c.storeName,
             storeLogo: c.storeLogo || undefined,
             cashbackRate: c.cashbackRate,
             cashbackAmount: c.cashbackAmount,
-            bestCouponCode: c.bestCouponCode || undefined,
-            couponSavings: c.couponSavings,
+            bestCouponCode: bestCouponCode || undefined,
+            couponSavings,
             shippingFee: 0,
             itemPrice: c.price,
-            effectiveNetPrice: c.effectiveNetPrice,
+            effectiveNetPrice: stack.trueNetLandedCost,
             isBestDeal: c.isBestDeal,
             savingsVsWorst: c.savingsVsOriginal,
             deliveryEstimate: "Free Standard Delivery",
             affiliateUrl: c.affiliateUrl,
+            condition: "NEW",
+            stack,
           };
         });
 
@@ -206,7 +238,17 @@ compareRouter.get("/", async (req: Request, res: Response) => {
     }
 
     const formattedRows: ComparisonRow[] = offers.map((offer, idx) => {
-      const isBest = offer.effectiveNetPrice === bestDeal?.effectiveNetPrice;
+      const stack = calculateStackedSavings({
+        storeName: offer.storeName,
+        stickerPrice: offer.itemPrice,
+        currency: "INR",
+        availableCoupons: liveCuelinksCoupons,
+      });
+      const rawCouponCode = stack.coupon.applied ? stack.coupon.code : offer.couponCode;
+      const bestCouponCode = rawCouponCode ? String(rawCouponCode) : undefined;
+      const couponSavings = Math.max(offer.couponSavings || 0, stack.coupon.discountAmount);
+      const effectiveNet = stack.trueNetLandedCost;
+
       const merchantOffer: MerchantOffer = {
         id: `offer_${idx}`,
         productId: canonicalId,
@@ -221,38 +263,42 @@ compareRouter.get("/", async (req: Request, res: Response) => {
         stockStatus: offer.inStock ? "In Stock" : "Out of Stock",
         deliveryTime: offer.deliveryEstimate,
         lastCheckedAt: Date.now(),
-        isBestPrice: isBest,
-        couponSavings: offer.couponSavings,
-        cashbackEstimated: offer.cashbackAmount,
-        effectiveNetPrice: offer.effectiveNetPrice,
+        isBestPrice: false,
+        couponSavings,
+        cashbackEstimated: stack.cashback.amount,
+        effectiveNetPrice: effectiveNet,
       };
 
       return {
         offer: merchantOffer,
         storeName: offer.storeName,
         storeLogo: offer.storeLogo || undefined,
-        cashbackRate: offer.cashbackRate,
-        cashbackAmount: offer.cashbackAmount,
-        bestCouponCode: offer.couponCode || undefined,
-        couponSavings: offer.couponSavings,
+        cashbackRate: `${stack.cashback.ratePercent}%`,
+        cashbackAmount: stack.cashback.amount,
+        bestCouponCode: bestCouponCode || undefined,
+        couponSavings,
         shippingFee: 0,
         itemPrice: offer.itemPrice,
-        effectiveNetPrice: offer.effectiveNetPrice,
-        isBestDeal: isBest,
-        savingsVsWorst: Math.max(
-          0,
-          Math.max(...offers.map((o) => o.itemPrice)) - offer.effectiveNetPrice
-        ),
+        effectiveNetPrice: effectiveNet,
+        isBestDeal: false,
+        savingsVsWorst: 0,
         deliveryEstimate: offer.deliveryEstimate,
         affiliateUrl: offer.affiliateUrl,
         condition: "NEW",
-        stack: calculateStackedSavings({
-          storeName: offer.storeName,
-          stickerPrice: offer.itemPrice,
-          currency: "INR",
-        }),
+        stack,
       };
     });
+
+    // Sort by true net landed cost ascending
+    formattedRows.sort((a, b) => a.effectiveNetPrice - b.effectiveNetPrice);
+    if (formattedRows.length > 0) {
+      formattedRows[0].isBestDeal = true;
+      formattedRows[0].offer.isBestPrice = true;
+      const highestPrice = Math.max(...formattedRows.map((r) => r.itemPrice));
+      for (const row of formattedRows) {
+        row.savingsVsWorst = Math.max(0, highestPrice - row.effectiveNetPrice);
+      }
+    }
 
     const lowestPrice = formattedRows[0]?.itemPrice || 25000;
     const geo = resolveGeoProfile(req.headers);

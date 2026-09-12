@@ -12,10 +12,10 @@ module.exports = {
   apps: [
     {
       name: "gocoupon-web",
-      script: "node_modules/.bin/tsx",
-      args: "server/server.ts",
-      instances: "max",
-      exec_mode: "cluster",
+      script: "./server/server.ts",
+      interpreter: "./node_modules/.bin/tsx",
+      instances: 1,
+      exec_mode: "fork",
       autorestart: true,
       watch: false,
       max_memory_restart: "1G",
@@ -24,7 +24,6 @@ module.exports = {
         PORT: 3000,
         HOST: "127.0.0.1",
       },
-      env_file: ".env",
       exp_backoff_restart_delay: 100,
     },
   ],

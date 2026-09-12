@@ -344,7 +344,7 @@ export function getCategoryImageByCategory(category: string, title = ""): string
   }
 }
 
-import { getRelevantStoresForCategory } from "./store-registry";
+import { getRelevantStoresForCategory, wrapAffiliateTracking } from "./store-registry";
 
 /**
  * Generates authentic cross-store competitor offers with direct search URLs and verified discounts.
@@ -369,10 +369,11 @@ function generateStoreOffers(
     const cashbackAmount = Math.round(storePrice * store.cashbackPct);
     const effectiveNetPrice = Math.max(99, storePrice - couponSavings - cashbackAmount);
 
-    const directStoreUrl =
+    const rawTarget =
       isPrimary && directUrl && !directUrl.includes("google.com/search")
         ? directUrl
         : store.buildSearchUrl(title);
+    const directStoreUrl = wrapAffiliateTracking(rawTarget);
 
     return {
       storeId: store.id,

@@ -19,6 +19,7 @@ import { categoriesRouter } from "./categories.js";
 import { stackRouter, bankOffersRouter } from "./stack.js";
 import { extensionRouter } from "./extension-config.js";
 import { contactRouter } from "./contact.js";
+import { cuelinksRouter } from "./cuelinks.js";
 
 export const apiRouter = Router();
 
@@ -38,3 +39,4 @@ apiRouter.use("/contact", contactRouter);
 apiRouter.use("/stack", stackRouter);
 apiRouter.use("/bank-offers", bankOffersRouter);
 apiRouter.use("/extension", extensionRouter);
+apiRouter.use("/cuelinks", cuelinksRouter);

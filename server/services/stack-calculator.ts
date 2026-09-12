@@ -24,6 +24,7 @@ export interface StackRequest {
   region?: RegionCode;
   preferredBankCard?: string;
   userCashbackRate?: number; // e.g. 0.05 for 5%
+  availableCoupons?: any[];  // Live Cuelinks or store-specific coupons
   isCrossBorderImport?: boolean;
   internationalShippingFee?: number;
   customsDutyPercent?: number;
@@ -84,17 +85,18 @@ export function calculateStackedSavings(req: StackRequest): StackSavingsBreakdow
   const normalizedStore = req.storeName.toLowerCase().replace(/[^a-z0-9]/g, "");
 
   // ── Tier 1: Auto-Coupon Matching ──────────────────────────────────────────
-  let matchedCoupon: (typeof CANONICAL_COUPONS)[number] | null = null;
-  const storeCoupons = CANONICAL_COUPONS.filter((c) => {
-    const cStore = (c.storeName || c.storeId).toLowerCase().replace(/[^a-z0-9]/g, "");
+  let matchedCoupon: any = null;
+  const pool = [...CANONICAL_COUPONS, ...(req.availableCoupons || [])];
+  const storeCoupons = pool.filter((c) => {
+    const cStore = (c.storeName || c.storeId || "").toLowerCase().replace(/[^a-z0-9]/g, "");
     return normalizedStore.includes(cStore) || cStore.includes(normalizedStore);
   });
 
   if (storeCoupons.length > 0) {
     // Pick the coupon that gives the highest discount for this sticker price
     storeCoupons.sort((a, b) => {
-      const aVal = a.discountPercent ? (sticker * a.discountPercent) / 100 : a.maxDiscount || 0;
-      const bVal = b.discountPercent ? (sticker * b.discountPercent) / 100 : b.maxDiscount || 0;
+      const aVal = a.discountPercent ? (sticker * a.discountPercent) / 100 : a.discountAmount || a.maxDiscount || 0;
+      const bVal = b.discountPercent ? (sticker * b.discountPercent) / 100 : b.discountAmount || b.maxDiscount || 0;
       return bVal - aVal;
     });
     matchedCoupon = storeCoupons[0];
@@ -107,6 +109,8 @@ export function calculateStackedSavings(req: StackRequest): StackSavingsBreakdow
       if (matchedCoupon.maxDiscount && couponDiscount > matchedCoupon.maxDiscount) {
         couponDiscount = matchedCoupon.maxDiscount;
       }
+    } else if (matchedCoupon.discountAmount) {
+      couponDiscount = Math.min(sticker, matchedCoupon.discountAmount);
     } else if (matchedCoupon.maxDiscount) {
       couponDiscount = Math.min(matchedCoupon.maxDiscount, Math.round(sticker * 0.2));
     }
@@ -125,9 +129,96 @@ export function calculateStackedSavings(req: StackRequest): StackSavingsBreakdow
   const bankDiscount = bestBankEval ? bestBankEval.discountAmount : 0;
   const priceAfterBank = Math.max(0, priceAfterCoupon - bankDiscount);
 
-  // ── Tier 3: Instant Cashback Kickback ──────────────────────────────────────
-  const cashbackRate = req.userCashbackRate !== undefined ? req.userCashbackRate : 0.05; // 5% standard
-  const cashbackAmount = Math.round(priceAfterBank * cashbackRate);
+  // ── Tier 3: Instant Cashback Kickback (Cuelinks Commission Tiers) ─────────
+  const CUELINKS_COMMISSION_RATES: Record<string, number> = {
+    flipkart: 0.06,          // 6.0% CPS
+    myntra: 0.075,           // 7.5% CPS
+    ajio: 0.09,              // 9.0% CPS
+    boat: 0.055,             // 5.5% CPS
+    tatacliq: 0.0375,        // 3.75% CPS
+    croma: 0.04,             // 4.0% CPS
+    nykaa: 0.042,            // 4.2% CPS
+    bewakoof: 0.1155,        // 11.55% CPS
+    levi: 0.1275,            // 12.75% CPS
+    marksandspencer: 0.1364, // 13.64% CPS
+    lenovo: 0.03,            // 3.0% CPS
+    netmeds: 0.0473,         // 4.73% CPS
+    pepperfry: 0.06,         // 6.0% CPS
+    firstcry: 0.04,          // 4.0% CPS
+    dell: 0.0225,            // 2.25% CPS
+    godaddy: 0.06,           // 6.0% CPS
+    udemy: 0.075,            // 7.5% CPS
+    coursera: 0.0713,        // 7.13% CPS
+    reliance: 0.05,          // 5.0% CPS
+    amazon: 0.05,            // 5.0%
+  };
+
+  let defaultRate = 0.05;
+  for (const [storeKey, rate] of Object.entries(CUELINKS_COMMISSION_RATES)) {
+    if (normalizedStore.includes(storeKey)) {
+      defaultRate = rate;
+      break;
+    }
+  }
+
+  let cashbackRate = req.userCashbackRate !== undefined ? req.userCashbackRate : defaultRate;
+  let cashbackAmount = Math.round(priceAfterBank * cashbackRate);
+
+  // Flipkart official tier & cap policy per Cuelinks contract
+  if (normalizedStore.includes("flipkart") && req.userCashbackRate === undefined) {
+    const title = (req.productTitle || "").toLowerCase();
+    if (/\b(phone|iphone|samsung galaxy|smartphone|mobile|pixel|oneplus|realme|redmi|poco|vivo|oppo|motorola|nothing phone)\b/i.test(title)) {
+      cashbackRate = 0.0075; // 0.75%
+      cashbackAmount = Math.min(75, Math.round(priceAfterBank * cashbackRate));
+    } else if (/\b(laptop|desktop|camera|tablet|headphone|earbud|audio|tv|television|refrigerator|washing machine|ac|air conditioner|appliance|gaming|power bank)\b/i.test(title)) {
+      cashbackRate = 0.0225; // 2.25%
+      cashbackAmount = Math.min(150, Math.round(priceAfterBank * cashbackRate));
+    } else if (/\b(shoe|shoes|sneaker|footwear|shirt|t-shirt|dress|clothing|fashion|jeans|jacket|saree|kurti)\b/i.test(title)) {
+      cashbackRate = 0.06; // 6.0% (Kids 7.5%)
+      cashbackAmount = Math.round(priceAfterBank * cashbackRate);
+    } else if (/\b(book|books|makeup|fragrance|baby|toy|grooming|fitness)\b/i.test(title)) {
+      cashbackRate = 0.0375; // 3.75%
+      cashbackAmount = Math.round(priceAfterBank * cashbackRate);
+    } else {
+      cashbackRate = 0.0225;
+      cashbackAmount = Math.min(150, Math.round(priceAfterBank * cashbackRate));
+    }
+  }
+
+  // Myntra official tier policy per Cuelinks contract
+  if (normalizedStore.includes("myntra") && req.userCashbackRate === undefined) {
+    const title = (req.productTitle || "").toLowerCase();
+    if (/\b(kitchen|home|furnishing|decor|bedsheet|curtain)\b/i.test(title)) {
+      cashbackRate = 0.055; // 3.75% - 7.5%
+      cashbackAmount = Math.round(priceAfterBank * cashbackRate);
+    } else if (/\b(beauty|makeup|perfume|fragrance|skincare|serum|shampoo|grooming)\b/i.test(title)) {
+      cashbackRate = 0.05; // 3.0% - 6.75%
+      cashbackAmount = Math.round(priceAfterBank * cashbackRate);
+    } else if (/\b(shoe|shoes|sneaker|sneakers|footwear|sandals|heels)\b/i.test(title)) {
+      cashbackRate = 0.042; // 2.25% - 6.0%
+      cashbackAmount = Math.round(priceAfterBank * cashbackRate);
+    } else if (/\b(kid|kids|boy|boys|girl|girls|baby|toys)\b/i.test(title)) {
+      cashbackRate = 0.045; // 3.0% - 6.0%
+      cashbackAmount = Math.round(priceAfterBank * cashbackRate);
+    } else {
+      cashbackRate = 0.0225; // standard apparel 2.25%
+      cashbackAmount = Math.round(priceAfterBank * cashbackRate);
+    }
+  }
+
+  // Ajio official tier policy per Cuelinks contract
+  if (normalizedStore.includes("ajio") && req.userCashbackRate === undefined) {
+    const title = (req.productTitle || "").toLowerCase();
+    if (/\b(gold|silver|coin|coins|bar|bars|tech)\b/i.test(title)) {
+      cashbackRate = 0.0; // 0.0% on gold, silver, coins, tech
+      cashbackAmount = 0;
+    } else {
+      // 9.00% New User / 4.50% Existing User
+      cashbackRate = 0.0675;
+      cashbackAmount = Math.round(priceAfterBank * cashbackRate);
+    }
+  }
+
   const priceAfterCashback = Math.max(0, priceAfterBank - cashbackAmount);
 
   // ── Tier 4: Cross-Border Logistics & Duties ───────────────────────────────

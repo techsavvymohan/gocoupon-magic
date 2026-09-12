@@ -12,7 +12,9 @@
     "server:dev": "tsx watch --env-file=.env server/server.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test:cuelinks": "tsx --env-file=.env scripts/test-cuelinks.ts",
+    "audit:cuelinks": "tsx --env-file=.env scripts/audit-cuelinks-applications.ts"
   },
   "overrides": {
     "undici": ">=7.28.1"

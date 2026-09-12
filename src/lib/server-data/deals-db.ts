@@ -242,16 +242,28 @@ function parseExpiryDays(expiresIn: string): number {
  * Returns deals, optionally filtered by category, search query, badge, and pagination,
  * sorted by discount, trending (popularity), verified status, expiry, or store name.
  */
-export function queryDeals(options: {
-  category?: string;
-  q?: string;
-  badge?: DealBadge;
-  sortBy?: DealSortOption;
-  order?: "asc" | "desc";
-  limit?: number;
-  offset?: number;
-}): { deals: DealRecord[]; total: number } {
-  let results = [...DEALS_DB];
+export function queryDeals(
+  options: {
+    category?: string;
+    q?: string;
+    store?: string;
+    badge?: DealBadge;
+    sortBy?: DealSortOption;
+    order?: "asc" | "desc";
+    limit?: number;
+    offset?: number;
+  },
+  customDeals?: DealRecord[]
+): { deals: DealRecord[]; total: number } {
+  let results = customDeals ? [...customDeals] : [...DEALS_DB];
+
+  if (options.store && options.store.toLowerCase() !== "all") {
+    const s = options.store.toLowerCase().replace(/[^a-z0-9]/g, "");
+    results = results.filter((d) => {
+      const dStore = (d.storeName || d.storeSlug).toLowerCase().replace(/[^a-z0-9]/g, "");
+      return dStore.includes(s) || s.includes(dStore);
+    });
+  }
 
   if (options.category && options.category.toLowerCase() !== "all") {
     const catLower = options.category.toLowerCase();

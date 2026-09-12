@@ -8,15 +8,28 @@ import { calculateStackedSavings, type StackRequest } from "../services/stack-ca
 import { getActiveBankOffers, type RegionCode } from "../services/bank-offers.js";
 import { resolveGeoProfile } from "../services/geo-resolver.js";
 
+import {
+  fetchCuelinksCoupons,
+  normalizeCuelinksToStoreCoupon,
+} from "../services/providers/cuelinks-client.js";
+
 export const stackRouter = Router();
 
 /**
  * POST /api/stack/evaluate
  * Evaluates 4-tier stacked savings: (Sticker - Coupon - Bank Offer - Cashback + Shipping/Duty)
  */
-stackRouter.post("/evaluate", (req: Request, res: Response) => {
+stackRouter.post("/evaluate", async (req: Request, res: Response) => {
   const body = req.body || {};
   const geo = resolveGeoProfile(req.headers);
+
+  let liveCoupons = body.availableCoupons;
+  if (!liveCoupons || !Array.isArray(liveCoupons) || liveCoupons.length === 0) {
+    try {
+      const cueOffers = await fetchCuelinksCoupons({ limit: 40 });
+      liveCoupons = cueOffers.map(normalizeCuelinksToStoreCoupon);
+    } catch {}
+  }
 
   const stackRequest: StackRequest = {
     productId: body.productId,
@@ -31,6 +44,7 @@ stackRouter.post("/evaluate", (req: Request, res: Response) => {
     isCrossBorderImport: Boolean(body.isCrossBorderImport),
     internationalShippingFee: parseFloat(body.internationalShippingFee) || 0,
     customsDutyPercent: parseFloat(body.customsDutyPercent) || undefined,
+    availableCoupons: liveCoupons,
   };
 
   const result = calculateStackedSavings(stackRequest);
