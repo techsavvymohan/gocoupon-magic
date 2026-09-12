@@ -50,7 +50,7 @@ dealsRouter.get("/", async (req: Request, res: Response) => {
   const sortBy = (req.query.sortBy as any) || "trending";
   const order = (req.query.order as "asc" | "desc") || "desc";
   const rawLimit = parseInt(req.query.limit as string, 10);
-  const limit = isNaN(rawLimit) ? 20 : Math.min(rawLimit, 100);
+  const limit = isNaN(rawLimit) ? 100 : rawLimit <= 0 ? 2000 : Math.min(rawLimit, 2000);
   const rawOffset = parseInt(req.query.offset as string, 10);
   const offset = isNaN(rawOffset) ? 0 : rawOffset;
 
@@ -104,7 +104,7 @@ dealsRouter.get("/", async (req: Request, res: Response) => {
  */
 async function handleSync(req: Request, res: Response) {
   try {
-    const pages = parseInt(req.query.pages as string, 10) || 5;
+    const pages = parseInt(req.query.pages as string, 10) || 0;
     const result = await syncLiveCuelinksDeals(pages);
     res.json({
       success: true,

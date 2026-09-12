@@ -519,19 +519,21 @@ export function normalizeCuelinksToDealRecord(offer: CuelinksCouponOffer): DealR
 
   // Category mapping
   let cat: DealCategory = "General";
-  const catStr = (offer.categories || []).join(" ").toLowerCase() + " " + offer.title.toLowerCase();
-  if (/fashion|apparel|clothing|denim|shirt|dress|footwear|shoes/i.test(catStr)) {
+  const catStr = ((offer.categories || []).join(" ") + " " + (offer.title || "") + " " + (offer.description || "")).toLowerCase();
+  if (/fashion|apparel|clothing|denim|shirt|dress|footwear|shoes|sneaker|saree|ethnic|lingerie|kurti|tshirt|jeans/i.test(catStr)) {
     cat = "Fashion";
-  } else if (/electronic|mobile|phone|laptop|headphone|earbud|audio|tv/i.test(catStr)) {
+  } else if (/electronic|mobile|phone|laptop|headphone|earbud|audio|tv|smartwatch|watch|tablet|charger|gadget|camera/i.test(catStr)) {
     cat = "Electronics";
-  } else if (/beauty|cosmetics|skincare|makeup/i.test(catStr)) {
+  } else if (/beauty|cosmetics|skincare|makeup|hair|perfume|fragrance|wellness|personal care|serum|lotion|glow/i.test(catStr)) {
     cat = "Beauty";
-  } else if (/home|kitchen|appliance|furniture/i.test(catStr)) {
+  } else if (/home|kitchen|appliance|furniture|decor|bedding|cookware|mattress|lighting/i.test(catStr)) {
     cat = "Home";
-  } else if (/food|grocery|dining|swiggy|zomato/i.test(catStr)) {
+  } else if (/food|grocery|dining|swiggy|zomato|snack|beverage|meal|pizza|burger|tea|coffee/i.test(catStr)) {
     cat = "Food";
-  } else if (/travel|flight|hotel|bus/i.test(catStr)) {
+  } else if (/travel|flight|hotel|bus|tour|holiday|train|booking|resort/i.test(catStr)) {
     cat = "Travel";
+  } else if (/recharge|bill|utility|telecom|broadband|dth/i.test(catStr)) {
+    cat = "Recharge";
   }
 
   const STORE_LOGOS_MAP: Record<string, string> = {
@@ -689,14 +691,14 @@ export function getLiveSyncStats() {
  * Executes a live 24/7 sync cycle against Cuelinks API v3 (/offers).
  * Automatically purges expired deals and persists the fresh snapshot.
  */
-export async function syncLiveCuelinksDeals(maxPages: number = 5): Promise<{
+export async function syncLiveCuelinksDeals(maxPages: number = 0): Promise<{
   updatedAt: string;
   totalFetched: number;
   activeCount: number;
   expiredCount: number;
   deals: DealRecord[];
 }> {
-  console.log(`⏱️ [Cuelinks 24/7 Syncer] Ingesting live offers from Cuelinks API v3 (pages 1-${maxPages})...`);
+  console.log(`⏱️ [Cuelinks 24/7 Syncer] Ingesting live offers from Cuelinks API v3 (fetching all active pages)...`);
   const config = getCuelinksConfig();
 
   if (!config.isConfigured) {
@@ -711,31 +713,64 @@ export async function syncLiveCuelinksDeals(maxPages: number = 5): Promise<{
   }
 
   const rawDeals: any[] = [];
-  for (let page = 1; page <= maxPages; page++) {
-    try {
-      const url = new URL(`${CUELINKS_V3_BASE_URL}/offers`);
-      url.searchParams.set("page", String(page));
-      url.searchParams.set("per_page", "50");
+  let totalPages = 1;
 
-      const res = await fetch(url.toString(), {
-        headers: getV3Headers(config.apiKey),
-        signal: AbortSignal.timeout(8000),
-      });
+  // 1. Fetch Page 1 to inspect total available pages
+  try {
+    const url = new URL(`${CUELINKS_V3_BASE_URL}/offers`);
+    url.searchParams.set("page", "1");
+    url.searchParams.set("per_page", "50");
 
-      if (!res.ok) {
-        console.warn(`[Cuelinks 24/7 Syncer] Page ${page} responded HTTP ${res.status}`);
-        break;
-      }
+    const res = await fetch(url.toString(), {
+      headers: getV3Headers(config.apiKey),
+      signal: AbortSignal.timeout(10000),
+    });
 
+    if (res.ok) {
       const json = await res.json();
       if (Array.isArray(json.data) && json.data.length > 0) {
         rawDeals.push(...json.data);
-      } else {
-        break;
       }
-    } catch (err: any) {
-      console.warn(`[Cuelinks 24/7 Syncer] Page ${page} fetch failed:`, err?.message);
-      break;
+      if (json.meta?.total_pages) {
+        totalPages = json.meta.total_pages;
+      }
+    }
+  } catch (err: any) {
+    console.warn("[Cuelinks 24/7 Syncer] Page 1 fetch failed:", err?.message);
+  }
+
+  const targetPages = maxPages > 0 ? Math.min(maxPages, totalPages) : totalPages;
+  console.log(`⏱️ [Cuelinks 24/7 Syncer] Ingesting up to ${targetPages} pages (reported ${totalPages} total pages)...`);
+
+  // 2. Fetch remaining pages in concurrent batches of 4
+  const remainingPages: number[] = [];
+  for (let p = 2; p <= targetPages; p++) {
+    remainingPages.push(p);
+  }
+
+  const BATCH_SIZE = 4;
+  for (let i = 0; i < remainingPages.length; i += BATCH_SIZE) {
+    const batch = remainingPages.slice(i, i + BATCH_SIZE);
+    const batchResults = await Promise.allSettled(
+      batch.map(async (page) => {
+        const url = new URL(`${CUELINKS_V3_BASE_URL}/offers`);
+        url.searchParams.set("page", String(page));
+        url.searchParams.set("per_page", "50");
+
+        const res = await fetch(url.toString(), {
+          headers: getV3Headers(config.apiKey),
+          signal: AbortSignal.timeout(10000),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        return Array.isArray(json.data) ? json.data : [];
+      })
+    );
+
+    for (const r of batchResults) {
+      if (r.status === "fulfilled" && Array.isArray(r.value)) {
+        rawDeals.push(...r.value);
+      }
     }
   }
 

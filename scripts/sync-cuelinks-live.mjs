@@ -75,18 +75,18 @@ function mapCategory(categories, title) {
     ? categories.map((c) => (typeof c === "object" ? c.name : c) || "")
     : [];
   const text = (catNames.join(" ") + " " + (title || "")).toLowerCase();
-  if (/fashion|apparel|clothing|shoes|footwear|sneaker|shirt|denim|saree|ethnic|dress|lingerie/i.test(text)) return "Fashion";
-  if (/electronic|mobile|laptop|computer|phone|audio|headphone|earbud|gadget|camera|tv/i.test(text)) return "Electronics";
-  if (/beauty|cosmetic|skincare|hair|makeup|perfume|fragrance|wellness/i.test(text)) return "Beauty";
-  if (/home|kitchen|furniture|decor|bedding|appliance|cookware/i.test(text)) return "Home";
-  if (/food|dining|grocery|snack|beverage|meal|hotel|restaurant/i.test(text)) return "Food";
-  if (/travel|flight|hotel|tour|bus|holiday|train/i.test(text)) return "Travel";
-  if (/recharge|bill|utility|telecom/i.test(text)) return "Recharge";
+  if (/fashion|apparel|clothing|shoes|footwear|sneaker|shirt|denim|saree|ethnic|dress|lingerie|kurti|tshirt|jeans/i.test(text)) return "Fashion";
+  if (/electronic|mobile|laptop|computer|phone|audio|headphone|earbud|gadget|camera|tv|smartwatch|watch|tablet|charger/i.test(text)) return "Electronics";
+  if (/beauty|cosmetic|skincare|hair|makeup|perfume|fragrance|wellness|personal care|serum|lotion|glow/i.test(text)) return "Beauty";
+  if (/home|kitchen|furniture|decor|bedding|appliance|cookware|mattress|lighting/i.test(text)) return "Home";
+  if (/food|dining|grocery|snack|beverage|meal|hotel|restaurant|pizza|burger|tea|coffee/i.test(text)) return "Food";
+  if (/travel|flight|hotel|tour|bus|holiday|train|booking|resort/i.test(text)) return "Travel";
+  if (/recharge|bill|utility|telecom|broadband|dth/i.test(text)) return "Recharge";
   return "General";
 }
 
-export async function runCuelinksSync(maxPages = 5) {
-  console.log(`[Cuelinks Sync] Starting 24/7 dynamic sync (API v3, maxPages: ${maxPages})...`);
+export async function runCuelinksSync(maxPages = 0) {
+  console.log(`[Cuelinks Sync] Starting 24/7 dynamic sync (API v3, fetching all active pages)...`);
   const headers = {
     Authorization: `Token ${apiKey}`,
     "Content-Type": "application/json",
@@ -94,27 +94,59 @@ export async function runCuelinksSync(maxPages = 5) {
   };
 
   const rawDeals = [];
-  for (let page = 1; page <= maxPages; page++) {
-    try {
-      const res = await fetch(`${CUELINKS_V3_BASE_URL}/offers?page=${page}&per_page=50`, {
-        headers,
-        signal: AbortSignal.timeout(8000),
-      });
-      if (!res.ok) {
-        console.warn(`[Cuelinks Sync] Page ${page} failed: ${res.status}`);
-        break;
-      }
+  let totalPages = 1;
+
+  // 1. Fetch Page 1 to inspect total available pages
+  try {
+    const res = await fetch(`${CUELINKS_V3_BASE_URL}/offers?page=1&per_page=50`, {
+      headers,
+      signal: AbortSignal.timeout(10000),
+    });
+    if (res.ok) {
       const json = await res.json();
       if (Array.isArray(json.data) && json.data.length > 0) {
         rawDeals.push(...json.data);
-      } else {
-        break;
       }
-    } catch (err) {
-      console.warn(`[Cuelinks Sync] Page ${page} error:`, err?.message || err);
-      break;
+      if (json.meta?.total_pages) {
+        totalPages = json.meta.total_pages;
+      }
+    }
+  } catch (err) {
+    console.warn("[Cuelinks Sync] Page 1 error:", err?.message || err);
+  }
+
+  const targetPages = maxPages > 0 ? Math.min(maxPages, totalPages) : totalPages;
+  console.log(`[Cuelinks Sync] Total offers reported: ${rawDeals.length} from page 1. Target pages: ${targetPages} (all live offers).`);
+
+  // 2. Fetch remaining pages in concurrent batches of 4
+  const remainingPages = [];
+  for (let p = 2; p <= targetPages; p++) {
+    remainingPages.push(p);
+  }
+
+  const BATCH_SIZE = 4;
+  for (let i = 0; i < remainingPages.length; i += BATCH_SIZE) {
+    const batch = remainingPages.slice(i, i + BATCH_SIZE);
+    const batchResults = await Promise.allSettled(
+      batch.map(async (page) => {
+        const res = await fetch(`${CUELINKS_V3_BASE_URL}/offers?page=${page}&per_page=50`, {
+          headers,
+          signal: AbortSignal.timeout(10000),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        return Array.isArray(json.data) ? json.data : [];
+      })
+    );
+
+    for (const r of batchResults) {
+      if (r.status === "fulfilled" && Array.isArray(r.value)) {
+        rawDeals.push(...r.value);
+      }
     }
   }
+
+  console.log(`[Cuelinks Sync] Ingested ${rawDeals.length} raw offers across ${targetPages} pages. Parsing & validating...`);
 
   const now = Date.now();
   let expiredCount = 0;
@@ -230,7 +262,7 @@ export async function runCuelinksSync(maxPages = 5) {
 }
 
 if (process.argv[1] && process.argv[1].endsWith("sync-cuelinks-live.mjs")) {
-  runCuelinksSync(5)
+  runCuelinksSync(0)
     .then((res) => {
       console.log(`Sync complete! Live Active: ${res.activeCount}, Expired Pruned: ${res.expiredCount}`);
       process.exit(0);

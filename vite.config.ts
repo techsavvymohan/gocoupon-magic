@@ -74,6 +74,127 @@ function searxngDevPlugin() {
           return;
         }
 
+        if (req.url?.startsWith("/api/deals")) {
+          try {
+            const fs = await import("node:fs");
+            const path = await import("node:path");
+            const dataPath = path.resolve(process.cwd(), "src/data/live-deals.json");
+
+            if (req.url.startsWith("/api/deals/sync")) {
+              try {
+                // @ts-ignore
+                const { runCuelinksSync } = (await import("./scripts/sync-cuelinks-live.mjs")) as any;
+                const syncRes = await runCuelinksSync(0);
+                res.statusCode = 200;
+                res.setHeader("Content-Type", "application/json");
+                res.setHeader("Access-Control-Allow-Origin", "*");
+                res.end(JSON.stringify({
+                  success: true,
+                  message: `Synced ${syncRes.activeCount} live deals from Cuelinks API v3`,
+                  ...syncRes,
+                }));
+                return;
+              } catch (syncErr: any) {
+                console.warn("[Vite Deals Dev] Sync error:", syncErr?.message);
+              }
+            }
+
+            let snapshot: any = {};
+            if (fs.existsSync(dataPath)) {
+              snapshot = JSON.parse(fs.readFileSync(dataPath, "utf-8"));
+            }
+
+            const now = Date.now();
+            let deals: any[] = Array.isArray(snapshot.deals) ? snapshot.deals : [];
+            deals = deals.filter((d: any) => {
+              if (d.expiresIn === "Expired") return false;
+              if (d.endDate) {
+                const end = new Date(d.endDate).getTime();
+                if (!isNaN(end) && end < now) return false;
+              }
+              return true;
+            });
+
+            const urlObj = new URL(req.url, "http://localhost:8080");
+            const category = (urlObj.searchParams.get("category") || "").toLowerCase().trim();
+            const q = (urlObj.searchParams.get("q") || "").toLowerCase().trim();
+            const store = (urlObj.searchParams.get("store") || urlObj.searchParams.get("merchant") || "").toLowerCase().trim();
+            const badge = urlObj.searchParams.get("badge") || "";
+            const sortBy = urlObj.searchParams.get("sortBy") || "trending";
+            const order = urlObj.searchParams.get("order") || "desc";
+            const rawLimit = parseInt(urlObj.searchParams.get("limit") || "", 10);
+            const limit = isNaN(rawLimit) ? 100 : rawLimit <= 0 ? 2000 : Math.min(rawLimit, 2000);
+            const rawOffset = parseInt(urlObj.searchParams.get("offset") || "", 10);
+            const offset = isNaN(rawOffset) ? 0 : rawOffset;
+
+            if (category && category !== "all") {
+              deals = deals.filter((d: any) => {
+                const dCat = (d.category || "").toLowerCase();
+                return dCat === category || dCat.includes(category) || category.includes(dCat);
+              });
+            }
+
+            if (store && store !== "all") {
+              const cleanStore = store.replace(/[^a-z0-9]/g, "");
+              deals = deals.filter((d: any) => {
+                const dStore = (d.storeName || d.storeSlug || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+                return dStore.includes(cleanStore) || cleanStore.includes(dStore);
+              });
+            }
+
+            if (badge && badge !== "all") {
+              deals = deals.filter((d: any) => (d.badge || "").toLowerCase() === badge.toLowerCase());
+            }
+
+            if (q) {
+              deals = deals.filter(
+                (d: any) =>
+                  (d.title || "").toLowerCase().includes(q) ||
+                  (d.storeName || "").toLowerCase().includes(q) ||
+                  (d.code || "").toLowerCase().includes(q) ||
+                  (d.discount || "").toLowerCase().includes(q)
+              );
+            }
+
+            deals.sort((a: any, b: any) => {
+              let comp = 0;
+              if (sortBy === "discount") {
+                const aD = parseInt((a.discount || "").replace(/[^\d]/g, ""), 10) || 0;
+                const bD = parseInt((b.discount || "").replace(/[^\d]/g, ""), 10) || 0;
+                comp = aD - bD;
+              } else if (sortBy === "verified") {
+                comp = ((a.badge || "").toLowerCase() === "verified" ? 1 : 0) - ((b.badge || "").toLowerCase() === "verified" ? 1 : 0);
+              } else if (sortBy === "store") {
+                comp = (a.storeName || "").localeCompare(b.storeName || "");
+              } else {
+                comp = (a.usesCount || 0) - (b.usesCount || 0);
+              }
+              return order === "asc" ? comp : -comp;
+            });
+
+            const total = deals.length;
+            const paginated = deals.slice(offset, offset + limit);
+
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.setHeader("Access-Control-Allow-Origin", "*");
+            res.end(JSON.stringify({
+              deals: paginated,
+              total,
+              count: paginated.length,
+              page: Math.floor(offset / limit) + 1,
+              hasMore: offset + limit < total,
+              isDynamic: true,
+              provider: "Cuelinks API v3 (Live Dynamic Feed)",
+              lastSyncedAt: snapshot.updatedAt || new Date().toISOString(),
+              cached: false,
+            }));
+            return;
+          } catch (err: any) {
+            console.warn("[Vite Deals Dev] Route error:", err?.message);
+          }
+        }
+
         if (!req.url?.startsWith("/api/searxng")) {
           return next();
         }

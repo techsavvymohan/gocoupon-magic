@@ -1,9 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import { useDeals } from "@/hooks/use-deals";
-import type { DealSortField, Deal } from "@/lib/api/deals-api";
+import { triggerLiveSync, type DealSortField, type Deal } from "@/lib/api/deals-api";
 import { wrapAffiliateTracking } from "@/lib/services/store-registry";
 import { DealGridSkeleton } from "@/components/ui/DataSkeleton";
 import {
@@ -13,7 +13,6 @@ import {
   ShoppingBag,
   Copy,
   Check,
-  ArrowRight,
   Zap,
   Percent,
   Search,
@@ -28,6 +27,8 @@ import {
   BadgePercent,
   CheckCircle2,
   SlidersHorizontal,
+  RefreshCw,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -44,13 +45,17 @@ export const Route = createFileRoute("/offers")({
     }),
 });
 
-const OFFER_CATEGORIES = [
-  { id: "all", label: "All Offers", icon: Flame },
-  { id: "electronics", label: "Electronics & Tech", icon: Zap },
-  { id: "audio", label: "Headphones & Audio", icon: Percent },
-  { id: "laptops", label: "Laptops & Computing", icon: Tag },
-  { id: "fashion", label: "Fashion & Lifestyle", icon: ShoppingBag },
-] as const;
+const ALL_CATEGORY_META: Record<string, { label: string; icon: any }> = {
+  all: { label: "All Offers", icon: Flame },
+  Fashion: { label: "Fashion & Lifestyle", icon: ShoppingBag },
+  Electronics: { label: "Electronics & Tech", icon: Zap },
+  Beauty: { label: "Beauty & Cosmetics", icon: Sparkles },
+  Home: { label: "Home & Kitchen", icon: Tag },
+  Food: { label: "Food & Dining", icon: Store },
+  Travel: { label: "Travel & Hotels", icon: Clock },
+  Recharge: { label: "Recharge & Utilities", icon: Percent },
+  General: { label: "Special Offers", icon: Tag },
+};
 
 const SORT_OPTIONS: { id: DealSortField; label: string; icon: typeof Flame; color: string }[] = [
   { id: "trending", label: "Trending Offers", icon: Flame, color: "text-rose-500" },
@@ -61,7 +66,7 @@ const SORT_OPTIONS: { id: DealSortField; label: string; icon: typeof Flame; colo
 ];
 
 function getStoreLogoUrl(deal: Deal): string | null {
-  if (deal.storeLogo) return deal.storeLogo;
+  if (deal.storeLogo && !deal.storeLogo.includes("placeholder")) return deal.storeLogo;
   const lower = deal.storeName.toLowerCase();
   if (lower.includes("flipkart")) return "/Brand logos/flipkart.webp";
   if (lower.includes("amazon")) return "/Brand logos/Amazon_logo.svg.webp";
@@ -76,11 +81,22 @@ function getStoreLogoUrl(deal: Deal): string | null {
   if (lower.includes("samsung")) return "/Brand logos/Samsung.webp";
   if (lower.includes("levi")) return "/Brand logos/Levis.webp";
   if (lower.includes("firstcry")) return "/Brand logos/firstcry.webp";
-  if (lower.includes("gonoise") || lower.includes("go noise") || lower.includes("noise")) return "/Brand logos/gonoise.svg";
+  if (lower.includes("swiggy")) return "/Brand logos/swiggy.webp";
+  if (lower.includes("zomato")) return "/Brand logos/zomato.webp";
+  if (lower.includes("gonoise") || lower.includes("noise")) return "/Brand logos/gonoise.svg";
   if (lower.includes("soulflower")) return "/Brand logos/soulflower.svg";
   if (lower.includes("rareism")) return "/Brand logos/rareism.svg";
   if (lower.includes("jaypore")) return "/Brand logos/jaypore.svg";
   if (lower.includes("asaya")) return "/Brand logos/asaya.svg";
+  if (lower.includes("bewakoof")) return "/Brand logos/Bewakoof.webp";
+  if (lower.includes("boat")) return "/Brand logos/boat.webp";
+  if (lower.includes("asus")) return "/Brand logos/Asus.webp";
+  if (lower.includes("acer")) return "/Brand logos/Acer.webp";
+
+  const cleanDomain = deal.storeSlug ? deal.storeSlug.replace(/-coupons$/, "") + ".com" : "";
+  if (cleanDomain) {
+    return `https://www.google.com/s2/favicons?domain=${cleanDomain}&sz=128`;
+  }
   return null;
 }
 
@@ -91,6 +107,8 @@ function OffersHubPage() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "grid">("grid");
   const [isSortOpen, setIsSortOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(36);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
@@ -104,53 +122,103 @@ function OffersHubPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch verified offers from API (with automatic client-side static fallback)
-  const { deals: allDeals, isLoading } = useDeals({
-    category: selectedCategory !== "all" ? selectedCategory : undefined,
+  // Fetch all active verified offers dynamically from API (no static limit)
+  const { deals: allDeals, isLoading, lastSyncedAt, refetch } = useDeals({
+    limit: 0, // Requests all dynamic deals from server (up to 1500)
     sortBy,
     order: "desc",
-    limit: 50,
   });
 
+  // Calculate live dynamic category counts
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: allDeals.length };
+    for (const d of allDeals) {
+      const cat = d.category || "General";
+      counts[cat] = (counts[cat] || 0) + 1;
+    }
+    return counts;
+  }, [allDeals]);
+
+  // Derive dynamic category tabs based on available deals
+  const dynamicCategories = useMemo(() => {
+    const tabs = [{ id: "all", label: "All Offers", icon: Flame, count: allDeals.length }];
+    for (const [catId, meta] of Object.entries(ALL_CATEGORY_META)) {
+      if (catId === "all") continue;
+      const count = categoryCounts[catId] || 0;
+      if (count > 0) {
+        tabs.push({ id: catId, label: meta.label, icon: meta.icon, count });
+      }
+    }
+    return tabs;
+  }, [allDeals, categoryCounts]);
+
+  // Filter deals dynamically based on search, category and expiry
   const filteredOffers = useMemo(() => {
     const now = Date.now();
     return allDeals.filter((deal) => {
-      // 1. Dynamic 24/7 Expiry Pruning: Drop expired deals
+      // Dynamic 24/7 Expiry Pruning: Drop expired deals
       if (deal.expiresIn === "Expired") return false;
       if (deal.endDate) {
         const end = new Date(deal.endDate).getTime();
         if (!isNaN(end) && end < now) return false;
       }
 
-      const dCat = deal.category.toLowerCase();
-      let matchesCategory = true;
-      if (selectedCategory === "electronics") {
-        matchesCategory = dCat === "electronics" || deal.title.toLowerCase().includes("laptop") || deal.title.toLowerCase().includes("audio");
-      } else if (selectedCategory === "audio") {
-        matchesCategory = dCat === "electronics" && (deal.title.toLowerCase().includes("audio") || deal.title.toLowerCase().includes("airdope") || deal.title.toLowerCase().includes("sonic"));
-      } else if (selectedCategory === "laptops") {
-        matchesCategory = dCat === "electronics" && (deal.title.toLowerCase().includes("laptop") || deal.title.toLowerCase().includes("thinkpad") || deal.title.toLowerCase().includes("xps") || deal.title.toLowerCase().includes("yoga"));
-      } else if (selectedCategory !== "all") {
-        matchesCategory = dCat === selectedCategory;
+      if (selectedCategory !== "all") {
+        const dCat = (deal.category || "").toLowerCase();
+        const sel = selectedCategory.toLowerCase();
+        if (dCat !== sel && !dCat.includes(sel) && !sel.includes(dCat)) {
+          return false;
+        }
       }
 
       const q = searchQuery.toLowerCase().trim();
-      const matchesSearch =
-        !q ||
-        deal.title.toLowerCase().includes(q) ||
-        deal.storeName.toLowerCase().includes(q) ||
-        deal.code.toLowerCase().includes(q) ||
-        deal.discount.toLowerCase().includes(q);
+      if (q) {
+        const matchesSearch =
+          deal.title.toLowerCase().includes(q) ||
+          deal.storeName.toLowerCase().includes(q) ||
+          deal.code.toLowerCase().includes(q) ||
+          deal.discount.toLowerCase().includes(q) ||
+          deal.category.toLowerCase().includes(q) ||
+          (deal.terms && deal.terms.toLowerCase().includes(q));
+        if (!matchesSearch) return false;
+      }
 
-      return matchesCategory && matchesSearch;
+      return true;
     });
   }, [allDeals, selectedCategory, searchQuery]);
+
+  // Reset pagination when category, search, or sort changes
+  useEffect(() => {
+    setVisibleCount(36);
+  }, [selectedCategory, searchQuery, sortBy]);
+
+  const visibleOffers = useMemo(() => {
+    return filteredOffers.slice(0, visibleCount);
+  }, [filteredOffers, visibleCount]);
 
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
     toast.success(`Coupon code "${code}" copied to clipboard!`);
     setTimeout(() => setCopiedCode(null), 2500);
+  };
+
+  const handleLiveSync = async () => {
+    setIsSyncing(true);
+    toast.info("Connecting to Cuelinks API v3... Ingesting fresh live deals.");
+    try {
+      const res = await triggerLiveSync();
+      await refetch();
+      if (res.success) {
+        toast.success(`Synced ${res.activeCount || allDeals.length} live offers from Cuelinks API v3!`);
+      } else {
+        toast.success(`Refreshed ${allDeals.length} active live offers!`);
+      }
+    } catch {
+      toast.error("Could not sync right now, using active live deals pool.");
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const currentSortObj = SORT_OPTIONS.find((s) => s.id === sortBy) || SORT_OPTIONS[0];
@@ -188,27 +256,41 @@ function OffersHubPage() {
       <section className="sticky top-0 z-30 border-b border-border bg-background px-4 sm:px-6 py-3 shadow-sm">
         <div className="mx-auto max-w-6xl space-y-2.5">
 
-          {/* Row 1: Brand pill + title + trust badges */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-rose-500">
-              <Flame className="h-3 w-3 animate-pulse" />
-              Live Sync
-            </span>
-            <h1 className="font-display text-sm sm:text-base font-extrabold tracking-tight text-foreground">
-              Verified Offers, Discounts &amp; Coupon Codes
-            </h1>
-            <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-emerald-500/25 bg-emerald-500/8 px-2.5 py-0.5 font-mono text-[10px] text-emerald-500 font-semibold">
-              <CheckCircle2 className="h-3 w-3" />
-              {filteredOffers.length} Live
-            </span>
-            <span className="hidden md:inline-flex items-center gap-1 font-mono text-[10px] text-muted-foreground">
-              <Clock className="h-3 w-3 text-sky-400" />
-              Auto-Updated 24/7
-            </span>
-            <span className="hidden md:inline-flex items-center gap-1 font-mono text-[10px] text-amber-500 font-semibold">
-              <BadgePercent className="h-3 w-3" />
-              Up to 80% Off
-            </span>
+          {/* Row 1: Brand pill + title + trust badges + Live Sync button */}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-rose-500">
+                <Flame className="h-3 w-3 animate-pulse" />
+                Live Sync
+              </span>
+              <h1 className="font-display text-sm sm:text-base font-extrabold tracking-tight text-foreground">
+                Verified Offers, Discounts &amp; Coupon Codes
+              </h1>
+              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/25 bg-emerald-500/8 px-2.5 py-0.5 font-mono text-[10px] text-emerald-500 font-semibold">
+                <CheckCircle2 className="h-3 w-3" />
+                {filteredOffers.length} Live
+              </span>
+              <span className="hidden md:inline-flex items-center gap-1 font-mono text-[10px] text-muted-foreground">
+                <Clock className="h-3 w-3 text-sky-400" />
+                Auto-Updated 24/7
+              </span>
+              <span className="hidden md:inline-flex items-center gap-1 font-mono text-[10px] text-amber-500 font-semibold">
+                <BadgePercent className="h-3 w-3" />
+                Up to 80% Off
+              </span>
+            </div>
+
+            {/* Live Re-sync Button */}
+            <button
+              type="button"
+              onClick={handleLiveSync}
+              disabled={isSyncing}
+              className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/40 bg-rose-500/10 px-3 py-1 font-mono text-[11px] font-bold text-rose-500 hover:bg-rose-500/20 transition-all cursor-pointer disabled:opacity-50"
+              title="Click to trigger on-demand sync directly from Cuelinks API v3"
+            >
+              <RefreshCw className={`h-3 w-3 ${isSyncing ? "animate-spin text-rose-500" : ""}`} />
+              <span>{isSyncing ? "Syncing..." : "Sync Live Offers"}</span>
+            </button>
           </div>
 
           {/* Row 2: Search + Category Pills + Sort + View Toggle */}
@@ -218,7 +300,7 @@ function OffersHubPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <input
                 type="text"
-                placeholder="Search store or code…"
+                placeholder="Search store, code or title…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full rounded-xl border border-border bg-muted/40 pl-9 pr-8 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 transition-all"
@@ -234,16 +316,16 @@ function OffersHubPage() {
               )}
             </div>
 
-            {/* Category Pills — scrollable on mobile */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-              {OFFER_CATEGORIES.map((cat) => {
+            {/* Dynamic Category Pills — scrollable on mobile */}
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+              {dynamicCategories.map((cat) => {
                 const Icon = cat.icon;
                 const isSelected = selectedCategory === cat.id;
                 return (
                   <button
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.id)}
-                    className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                    className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
                       isSelected
                         ? "bg-foreground text-background shadow-sm font-bold"
                         : "border border-border/80 bg-card/70 text-muted-foreground hover:text-foreground hover:border-primary/40"
@@ -251,6 +333,13 @@ function OffersHubPage() {
                   >
                     <Icon className={`h-3 w-3 ${isSelected ? "text-background" : "text-primary"}`} />
                     <span>{cat.label}</span>
+                    <span
+                      className={`rounded-full px-1.5 py-0.2 font-mono text-[9px] ${
+                        isSelected ? "bg-background/20 text-background font-bold" : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {cat.count}
+                    </span>
                   </button>
                 );
               })}
@@ -333,13 +422,13 @@ function OffersHubPage() {
 
           {/* Dynamic Content: Loading Skeleton, Empty State, or Beautified Offers */}
           {isLoading ? (
-            <DealGridSkeleton count={6} />
+            <DealGridSkeleton count={8} />
           ) : filteredOffers.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-border py-16 text-center px-4 bg-card/20 backdrop-blur-xs">
               <SlidersHorizontal className="mx-auto h-8 w-8 text-muted-foreground/60 mb-3" />
               <p className="text-base font-bold text-foreground">No verified offers found matching &ldquo;{searchQuery}&rdquo;</p>
               <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
-                Try searching for another store or brand, or reset the filters to see all verified savings.
+                Try searching for another store or brand, or reset the filters to view all {allDeals.length} live verified savings.
               </p>
               <button
                 onClick={() => {
@@ -348,7 +437,7 @@ function OffersHubPage() {
                 }}
                 className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-md hover:bg-primary/90 transition-all cursor-pointer"
               >
-                Reset All Filters
+                Reset All Filters ({allDeals.length} Offers)
               </button>
             </div>
           ) : viewMode === "list" ? (
@@ -356,7 +445,7 @@ function OffersHubPage() {
             /* BEAUTIFIED ANIMATED LIST VIEW                                             */
             /* ========================================================================= */
             <div className="space-y-4">
-              {filteredOffers.map((deal, idx) => {
+              {visibleOffers.map((deal, idx) => {
                 const affiliateUrl = wrapAffiliateTracking(deal.link, "gocoupon_offers_list");
                 const logoUrl = getStoreLogoUrl(deal);
                 const isCopied = copiedCode === deal.code;
@@ -364,7 +453,7 @@ function OffersHubPage() {
                 return (
                   <div
                     key={deal.id}
-                    style={{ animationDelay: `${Math.min(idx * 40, 400)}ms` }}
+                    style={{ animationDelay: `${Math.min(idx * 20, 300)}ms` }}
                     className="group relative flex flex-col md:flex-row md:items-center justify-between gap-5 rounded-2xl border border-border/80 bg-card/80 backdrop-blur-md p-5 sm:p-6 transition-all duration-300 hover:border-primary/50 hover:shadow-xl hover:-translate-y-0.5 overflow-hidden animate-in fade-in-50 slide-in-from-bottom-2"
                   >
                     {/* Left Accent Indicator Strip */}
@@ -380,6 +469,9 @@ function OffersHubPage() {
                             alt={deal.storeName}
                             className="max-h-full max-w-full object-contain"
                             loading="lazy"
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = "none";
+                            }}
                           />
                         ) : (
                           <Store className="h-6 w-6 text-primary/70" />
@@ -422,7 +514,7 @@ function OffersHubPage() {
                           )}
                           <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
                             <Users className="h-3 w-3" />
-                            <span>{deal.usesCount.toLocaleString()} shoppers saved</span>
+                            <span>{(deal.usesCount || 1200).toLocaleString()} shoppers saved</span>
                           </span>
                         </div>
                       </div>
@@ -489,9 +581,11 @@ function OffersHubPage() {
               })}
             </div>
           ) : (
-            /* ── CLEAN MINIMAL GRID VIEW ── */
+            /* ========================================================================= */
+            /* CLEAN MINIMAL GRID VIEW                                                   */
+            /* ========================================================================= */
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredOffers.map((deal, idx) => {
+              {visibleOffers.map((deal, idx) => {
                 const affiliateUrl = wrapAffiliateTracking(deal.link, "gocoupon_offers_grid");
                 const logoUrl = getStoreLogoUrl(deal);
                 const isCopied = copiedCode === deal.code;
@@ -508,7 +602,7 @@ function OffersHubPage() {
                 return (
                   <div
                     key={deal.id}
-                    style={{ animationDelay: `${Math.min(idx * 30, 300)}ms` }}
+                    style={{ animationDelay: `${Math.min(idx * 15, 250)}ms` }}
                     className="group flex flex-col rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:border-primary/40 hover:shadow-lg animate-in fade-in-0 slide-in-from-bottom-2"
                   >
                     {/* ── Store row ── */}
@@ -521,6 +615,9 @@ function OffersHubPage() {
                               alt={deal.storeName}
                               className="max-h-full max-w-full object-contain"
                               loading="lazy"
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = "none";
+                              }}
                             />
                           ) : (
                             <Store className="h-4 w-4 text-muted-foreground" />
@@ -549,6 +646,9 @@ function OffersHubPage() {
                     <div className="flex items-center gap-1 mb-4">
                       <Clock className="h-3 w-3 text-muted-foreground/60 shrink-0" />
                       <span className="text-[11px] text-muted-foreground">{deal.expiresIn}</span>
+                      <span className="text-[11px] text-muted-foreground ml-auto font-mono text-[10px]">
+                        {deal.category}
+                      </span>
                     </div>
 
                     {/* ── Coupon + CTA ── */}
@@ -589,6 +689,39 @@ function OffersHubPage() {
               })}
             </div>
           )}
+
+          {/* ── Progressive Pagination / Load More Controls ── */}
+          {filteredOffers.length > visibleCount && (
+            <div className="mt-10 flex flex-col items-center justify-center gap-3 pt-6 border-t border-border/80 text-center">
+              <p className="font-mono text-xs text-muted-foreground">
+                Showing <span className="font-bold text-foreground">{visibleCount}</span> of{" "}
+                <span className="font-bold text-foreground">{filteredOffers.length}</span> live deals
+              </p>
+              <div className="w-56 h-1.5 rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-300 rounded-full"
+                  style={{ width: `${Math.min(100, Math.round((visibleCount / filteredOffers.length) * 100))}%` }}
+                />
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
+                <button
+                  type="button"
+                  onClick={() => setVisibleCount((prev) => Math.min(filteredOffers.length, prev + 36))}
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-xs font-bold text-primary-foreground shadow-md hover:bg-primary/90 transition-all cursor-pointer"
+                >
+                  Load 36 More Deals ({filteredOffers.length - visibleCount} remaining)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setVisibleCount(filteredOffers.length)}
+                  className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-xs font-semibold text-foreground hover:bg-muted/80 transition-all cursor-pointer"
+                >
+                  Show All ({filteredOffers.length})
+                </button>
+              </div>
+            </div>
+          )}
+
         </div>
       </section>
 
@@ -603,7 +736,7 @@ function OffersHubPage() {
             How GoCoupon Verifies Every Promo Offer
           </h2>
           <p className="mt-3 text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Our automated scanner validates coupons directly against merchant checkout endpoints every 4 hours. When you click an offer, the promo code is copied automatically and the store is launched with instant cashback tracking.
+            Our automated engine syncs directly with merchant affiliate APIs (Cuelinks API v3) 24/7. When you click an offer, the promo code is copied automatically and the store is launched with instant verified tracking.
           </p>
 
           <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">

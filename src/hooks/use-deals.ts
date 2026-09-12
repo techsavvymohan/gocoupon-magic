@@ -31,6 +31,9 @@ export interface UseDealsResult {
   isFetching: boolean;
   isError: boolean;
   error: Error | null;
+  lastSyncedAt?: string;
+  isDynamic?: boolean;
+  provider?: string;
   refetch: () => void;
 }
 
@@ -79,6 +82,9 @@ export function useDeals(options: FetchDealsOptions = {}): UseDealsResult {
     isFetching: result.isFetching,
     isError: result.isError,
     error: result.error,
+    lastSyncedAt: result.data?.lastSyncedAt,
+    isDynamic: result.data?.isDynamic,
+    provider: result.data?.provider,
     refetch: result.refetch,
   };
 }

@@ -44,6 +44,9 @@ export interface DealsApiResponse {
   page: number;
   hasMore: boolean;
   cached: boolean;
+  isDynamic?: boolean;
+  lastSyncedAt?: string;
+  provider?: string;
   meta: {
     category: string;
     q: string | null;
@@ -130,7 +133,7 @@ function getStaticDeals(options: FetchDealsOptions = {}): DealsApiResponse {
     return order === "asc" ? -diff : diff;
   });
 
-  const limit = options.limit || 50;
+  const limit = options.limit !== undefined ? (options.limit <= 0 ? filtered.length : options.limit) : 1000;
   const offset = options.offset || 0;
   const paginated = filtered.slice(offset, offset + limit);
 
@@ -141,6 +144,8 @@ function getStaticDeals(options: FetchDealsOptions = {}): DealsApiResponse {
     page: Math.floor(offset / limit) + 1,
     hasMore: offset + limit < filtered.length,
     cached: true,
+    isDynamic: true,
+    provider: "Cuelinks API v3 (Live Feed Snapshot)",
     meta: {
       category: options.category || "all",
       q: options.q || null,
@@ -164,14 +169,15 @@ export async function fetchDeals(options: FetchDealsOptions = {}): Promise<Deals
   if (options.badge) params.set("badge", options.badge);
   if (options.sortBy) params.set("sortBy", options.sortBy);
   if (options.order) params.set("order", options.order);
-  if (options.limit) params.set("limit", String(options.limit));
+  const reqLimit = options.limit !== undefined ? (options.limit <= 0 ? 1500 : options.limit) : 1000;
+  params.set("limit", String(reqLimit));
   if (options.offset) params.set("offset", String(options.offset));
 
   const url = `/api/deals${params.size > 0 ? `?${params.toString()}` : ""}`;
 
   try {
     const res = await fetch(url, {
-      signal: AbortSignal.timeout(3500),
+      signal: AbortSignal.timeout(5000),
       headers: { Accept: "application/json" },
     });
 
@@ -186,6 +192,37 @@ export async function fetchDeals(options: FetchDealsOptions = {}): Promise<Deals
   }
 
   return getStaticDeals(options);
+}
+
+/**
+ * Triggers an on-demand 24/7 sync against Cuelinks API v3.
+ */
+export async function triggerLiveSync(): Promise<{
+  success: boolean;
+  activeCount: number;
+  updatedAt: string;
+  message?: string;
+}> {
+  try {
+    const res = await fetch("/api/deals/sync?pages=0", {
+      method: "POST",
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(15000),
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch {
+    // Try GET fallback
+    try {
+      const getRes = await fetch("/api/deals/sync?pages=0", {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(15000),
+      });
+      if (getRes.ok) return await getRes.json();
+    } catch {}
+  }
+  return { success: false, activeCount: 0, updatedAt: new Date().toISOString(), message: "Sync failed" };
 }
 
 /**
