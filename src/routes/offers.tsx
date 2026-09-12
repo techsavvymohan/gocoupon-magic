@@ -19,7 +19,6 @@ import {
   Search,
   Store,
   Clock,
-  ArrowUpDown,
   ShieldCheck,
   LayoutGrid,
   List,
@@ -180,200 +179,152 @@ function OffersHubPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
 
-      {/* Hero Header */}
-      <section className="relative border-b border-border bg-gradient-to-b from-background via-background/95 to-muted/20 px-4 sm:px-6 pb-12 sm:pb-16 pt-12 sm:pt-18 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(56,189,248,0.12),transparent)] pointer-events-none" />
-        
-        <div className="relative mx-auto max-w-5xl text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-rose-500/30 bg-rose-500/10 px-3.5 py-1 font-mono text-xs uppercase tracking-[0.2em] text-rose-500 shadow-xs">
-            <Flame className="h-3.5 w-3.5 animate-pulse" />
-            <span>24/7 LIVE CUELINKS SYNC • VERIFIED BARGAINS</span>
+      {/* ── Compact Page Header + Controls ── */}
+      <section className="sticky top-0 z-30 border-b border-border/80 bg-background/95 backdrop-blur-lg px-4 sm:px-6 py-3 shadow-sm">
+        <div className="mx-auto max-w-6xl space-y-2.5">
+
+          {/* Row 1: Brand pill + title + trust badges */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-rose-500">
+              <Flame className="h-3 w-3 animate-pulse" />
+              Live Sync
+            </span>
+            <h1 className="font-display text-sm sm:text-base font-extrabold tracking-tight text-foreground">
+              Verified Offers, Discounts &amp; Coupon Codes
+            </h1>
+            <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-emerald-500/25 bg-emerald-500/8 px-2.5 py-0.5 font-mono text-[10px] text-emerald-500 font-semibold">
+              <CheckCircle2 className="h-3 w-3" />
+              {filteredOffers.length} Live
+            </span>
+            <span className="hidden md:inline-flex items-center gap-1 font-mono text-[10px] text-muted-foreground">
+              <Clock className="h-3 w-3 text-sky-400" />
+              Auto-Updated 24/7
+            </span>
+            <span className="hidden md:inline-flex items-center gap-1 font-mono text-[10px] text-amber-500 font-semibold">
+              <BadgePercent className="h-3 w-3" />
+              Up to 80% Off
+            </span>
           </div>
 
-          <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground text-balance">
-            Hand-Tested Online Offers, Discounts &amp; Coupon Codes
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base sm:text-lg text-muted-foreground text-balance leading-relaxed">
-            Every offer is tested with live checkout auto-apply, benchmarked against 30-day price history graphs, and bundled with instant store cashback.
-          </p>
-
-          {/* Search Input */}
-          <div className="mx-auto mt-8 max-w-xl">
-            <div className="relative w-full group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+          {/* Row 2: Search + Category Pills + Sort + View Toggle */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Search */}
+            <div className="relative flex-1 min-w-[160px] max-w-xs group">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <input
                 type="text"
-                placeholder="Search by store, gadget, fashion brand, or promo code…"
+                placeholder="Search store or code…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-2xl border border-border/80 bg-card/80 backdrop-blur-md pl-11 pr-10 py-3.5 text-base sm:text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 transition-all shadow-md"
+                className="w-full rounded-xl border border-border/80 bg-card/80 pl-9 pr-8 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 transition-all"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full text-muted-foreground hover:text-foreground transition-colors"
                   aria-label="Clear search"
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <X className="h-3 w-3" />
                 </button>
               )}
             </div>
+
+            {/* Category Pills — scrollable on mobile */}
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+              {OFFER_CATEGORIES.map((cat) => {
+                const Icon = cat.icon;
+                const isSelected = selectedCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                      isSelected
+                        ? "bg-foreground text-background shadow-sm font-bold"
+                        : "border border-border/80 bg-card/70 text-muted-foreground hover:text-foreground hover:border-primary/40"
+                    }`}
+                  >
+                    <Icon className={`h-3 w-3 ${isSelected ? "text-background" : "text-primary"}`} />
+                    <span>{cat.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Sort Dropdown */}
+            <div className="relative ml-auto" ref={sortDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsSortOpen(!isSortOpen)}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-border/80 bg-card/90 px-3 py-1.5 text-[11px] font-semibold text-foreground shadow-xs hover:border-primary/40 hover:bg-card transition-all cursor-pointer"
+                aria-expanded={isSortOpen}
+                aria-haspopup="listbox"
+              >
+                <CurrentSortIcon className={`h-3 w-3 ${currentSortObj.color}`} />
+                <span className="hidden sm:inline font-mono text-[10px] text-muted-foreground">Sort:</span>
+                <span className="font-bold">{currentSortObj.label}</span>
+                <ChevronDown className={`h-3 w-3 text-muted-foreground transition-transform duration-200 ${isSortOpen ? "rotate-180" : ""}`} />
+              </button>
+              {isSortOpen && (
+                <div className="absolute right-0 top-full mt-2 w-52 z-50 rounded-2xl border border-border/90 bg-card/95 backdrop-blur-xl p-1.5 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-150">
+                  <div className="px-2 py-1.5 text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-bold">Order By</div>
+                  {SORT_OPTIONS.map((opt) => {
+                    const OptIcon = opt.icon;
+                    const isSelected = sortBy === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => { setSortBy(opt.id); setIsSortOpen(false); }}
+                        className={`w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-xs font-semibold transition-colors cursor-pointer ${
+                          isSelected ? "bg-primary/10 text-primary font-bold" : "text-foreground hover:bg-muted/60"
+                        }`}
+                      >
+                        <span className="inline-flex items-center gap-2">
+                          <OptIcon className={`h-3.5 w-3.5 ${opt.color}`} />
+                          <span>{opt.label}</span>
+                        </span>
+                        {isSelected && <Check className="h-3.5 w-3.5 text-primary stroke-[3]" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* View Toggle */}
+            <div className="inline-flex items-center rounded-xl border border-border/80 bg-card p-0.5 shadow-xs">
+              <button
+                type="button"
+                onClick={() => setViewMode("list")}
+                className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                  viewMode === "list" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                }`}
+                title="List View"
+              >
+                <List className="h-3 w-3" />
+                <span className="hidden sm:inline">List</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("grid")}
+                className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                  viewMode === "grid" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                }`}
+                title="Grid View"
+              >
+                <LayoutGrid className="h-3 w-3" />
+                <span className="hidden sm:inline">Grid</span>
+              </button>
+            </div>
           </div>
 
-          {/* Category Filter Pills */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
-            {OFFER_CATEGORIES.map((cat) => {
-              const Icon = cat.icon;
-              const isSelected = selectedCategory === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-all cursor-pointer ${
-                    isSelected
-                      ? "bg-foreground text-background shadow-md font-bold scale-[1.03]"
-                      : "border border-border/80 bg-card/70 backdrop-blur-xs text-muted-foreground hover:bg-card hover:text-foreground hover:border-primary/40"
-                  }`}
-                >
-                  <Icon className={`h-3.5 w-3.5 ${isSelected ? "text-background" : "text-primary"}`} />
-                  <span>{cat.label}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Live Verified Trust Ribbon */}
-          <div className="mt-8 inline-flex flex-wrap items-center justify-center gap-4 sm:gap-6 py-2 px-4 rounded-full border border-emerald-500/20 bg-emerald-500/5 text-xs text-muted-foreground font-mono">
-            <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              {filteredOffers.length} Live Verified Offers
-            </span>
-            <span className="hidden sm:inline text-border">•</span>
-            <span className="inline-flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5 text-sky-400" />
-              Auto-Pruned &amp; Updated 24/7
-            </span>
-            <span className="hidden sm:inline text-border">•</span>
-            <span className="inline-flex items-center gap-1.5 text-amber-500 font-semibold">
-              <BadgePercent className="h-3.5 w-3.5" />
-              Up to 80% Instant Savings
-            </span>
-          </div>
         </div>
       </section>
 
-      {/* Featured Offers Content Section */}
-      <section className="px-4 sm:px-6 py-10 sm:py-16">
+      {/* Offers Grid Section */}
+      <section className="px-4 sm:px-6 py-6">
         <div className="mx-auto max-w-6xl">
-          {/* Controls Bar: Heading, Sort Dropdown & Layout Mode Switcher */}
-          <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border/80">
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                  Featured Verified Offers &amp; Discounts
-                </h2>
-                <span className="hidden sm:inline-flex items-center justify-center rounded-full bg-primary/10 border border-primary/20 text-primary font-mono text-xs px-2.5 py-0.5 font-bold">
-                  {filteredOffers.length} Active
-                </span>
-              </div>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Showing {filteredOffers.length} verified promotions with working coupon codes and instant store activation
-              </p>
-            </div>
-
-            {/* Right Controls: Sort & View Mode */}
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Custom Glassmorphic Sort Dropdown */}
-              <div className="relative" ref={sortDropdownRef}>
-                <button
-                  type="button"
-                  onClick={() => setIsSortOpen(!isSortOpen)}
-                  className="inline-flex items-center gap-2 rounded-xl border border-border/80 bg-card/90 px-3.5 py-2 text-xs font-semibold text-foreground shadow-xs hover:border-primary/40 hover:bg-card transition-all cursor-pointer"
-                  aria-expanded={isSortOpen}
-                  aria-haspopup="listbox"
-                >
-                  <ArrowUpDown className="h-3.5 w-3.5 text-primary" />
-                  <span className="text-muted-foreground font-mono text-[11px]">Sort:</span>
-                  <span className="inline-flex items-center gap-1.5 font-bold">
-                    <CurrentSortIcon className={`h-3.5 w-3.5 ${currentSortObj.color}`} />
-                    {currentSortObj.label}
-                  </span>
-                  <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 ${isSortOpen ? "rotate-180" : ""}`} />
-                </button>
-
-                {/* Animated Dropdown Menu */}
-                {isSortOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-56 z-50 rounded-2xl border border-border/90 bg-card/95 backdrop-blur-xl p-1.5 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-150">
-                    <div className="px-2 py-1.5 text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-bold">
-                      Order Offers By
-                    </div>
-                    {SORT_OPTIONS.map((opt) => {
-                      const OptIcon = opt.icon;
-                      const isSelected = sortBy === opt.id;
-                      return (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => {
-                            setSortBy(opt.id);
-                            setIsSortOpen(false);
-                          }}
-                          className={`w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-xs font-semibold transition-colors cursor-pointer ${
-                            isSelected
-                              ? "bg-primary/10 text-primary font-bold"
-                              : "text-foreground hover:bg-muted/60"
-                          }`}
-                        >
-                          <span className="inline-flex items-center gap-2">
-                            <OptIcon className={`h-3.5 w-3.5 ${opt.color}`} />
-                            <span>{opt.label}</span>
-                          </span>
-                          {isSelected && <Check className="h-3.5 w-3.5 text-primary stroke-[3]" />}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* View Mode Toggle Button */}
-              <div className="inline-flex items-center rounded-xl border border-border/80 bg-card p-1 shadow-xs">
-                <button
-                  type="button"
-                  onClick={() => setViewMode("list")}
-                  className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
-                    viewMode === "list"
-                      ? "bg-primary text-primary-foreground shadow-xs font-bold"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                  title="List View"
-                >
-                  <List className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">List</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode("grid")}
-                  className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
-                    viewMode === "grid"
-                      ? "bg-primary text-primary-foreground shadow-xs font-bold"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                  title="Grid View"
-                >
-                  <LayoutGrid className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Grid</span>
-                </button>
-              </div>
-
-              <Link
-                to="/compare"
-                className="hidden lg:inline-flex items-center gap-1.5 font-mono text-xs text-primary hover:underline font-bold ml-2"
-              >
-                Compare Prices <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
-          </div>
 
           {/* Dynamic Content: Loading Skeleton, Empty State, or Beautified Offers */}
           {isLoading ? (
