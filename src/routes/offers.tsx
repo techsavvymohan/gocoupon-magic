@@ -3,6 +3,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import { useDeals } from "@/hooks/use-deals";
+import { useInternationalDeals } from "@/hooks/use-international-deals";
 import { triggerLiveSync, type DealSortField, type Deal } from "@/lib/api/deals-api";
 import { wrapAffiliateTracking } from "@/lib/services/store-registry";
 import { DealGridSkeleton } from "@/components/ui/DataSkeleton";
@@ -32,6 +33,7 @@ import {
   SlidersHorizontal,
   RefreshCw,
   Sparkles,
+  Globe,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -71,6 +73,7 @@ const SORT_OPTIONS: { id: DealSortField; label: string; icon: typeof Flame; colo
 
 function OffersHubPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [marketRegion, setMarketRegion] = useState<"all" | "in" | "intl">("all");
   const [sortBy, setSortBy] = useState<DealSortField>("trending");
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
@@ -91,12 +94,26 @@ function OffersHubPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch all active verified offers dynamically from API (no static limit)
-  const { deals: allDeals, isLoading, lastSyncedAt, refetch } = useDeals({
+  // Fetch all active verified Indian offers dynamically from Cuelinks API (no static limit)
+  const { deals: indianDeals, isLoading: isIndianLoading, lastSyncedAt, refetch: refetchIndian } = useDeals({
     limit: 0, // Requests all dynamic deals from server (up to 1500)
     sortBy,
     order: "desc",
   });
+
+  // Fetch live international offers dynamically from Admitad API
+  const { deals: intlDeals, isLoading: isIntlLoading, refetch: refetchIntl } = useInternationalDeals({
+    sortBy: sortBy === "discount" ? "discount" : "trending",
+  });
+
+  const isLoading = isIndianLoading && isIntlLoading;
+
+  // Active pool based on selected market region
+  const allDeals = useMemo(() => {
+    if (marketRegion === "in") return indianDeals;
+    if (marketRegion === "intl") return intlDeals;
+    return [...intlDeals, ...indianDeals];
+  }, [marketRegion, indianDeals, intlDeals]);
 
   // Calculate live dynamic category counts
   const categoryCounts = useMemo(() => {
@@ -206,12 +223,12 @@ function OffersHubPage() {
 
   const handleLiveSync = async () => {
     setIsSyncing(true);
-    toast.info("Connecting to Cuelinks API v3... Ingesting fresh live deals.");
+    toast.info("Connecting to Cuelinks & Admitad APIs... Ingesting fresh live deals.");
     try {
       const res = await triggerLiveSync();
-      await refetch();
+      await Promise.allSettled([refetchIndian(), refetchIntl()]);
       if (res.success) {
-        toast.success(`Synced ${res.activeCount || allDeals.length} live offers from Cuelinks API v3!`);
+        toast.success(`Synced live offers from partner networks!`);
       } else {
         toast.success(`Refreshed ${allDeals.length} active live offers!`);
       }
@@ -257,7 +274,7 @@ function OffersHubPage() {
       <section className="sticky top-0 z-30 border-b border-border bg-background px-4 sm:px-6 py-3 shadow-sm">
         <div className="mx-auto max-w-6xl space-y-2.5">
 
-          {/* Row 1: Brand pill + title + trust badges + Live Sync button */}
+          {/* Row 1: Brand pill + title + trust badges + Region Selector + Live Sync button */}
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-rose-500">
@@ -281,17 +298,70 @@ function OffersHubPage() {
               </span>
             </div>
 
-            {/* Live Re-sync Button */}
-            <button
-              type="button"
-              onClick={handleLiveSync}
-              disabled={isSyncing}
-              className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/40 bg-rose-500/10 px-3 py-1 font-mono text-[11px] font-bold text-rose-500 hover:bg-rose-500/20 transition-all cursor-pointer disabled:opacity-50"
-              title="Click to trigger on-demand sync directly from Cuelinks API v3"
-            >
-              <RefreshCw className={`h-3 w-3 ${isSyncing ? "animate-spin text-rose-500" : ""}`} />
-              <span>{isSyncing ? "Syncing..." : "Sync Live Offers"}</span>
-            </button>
+            {/* Region Selector & Live Sync */}
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Market Region Toggle */}
+              <div className="flex items-center gap-1 rounded-full border border-border/80 bg-muted/50 p-0.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMarketRegion("all");
+                    setSelectedCategory("all");
+                  }}
+                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-mono text-[10px] font-semibold transition-all cursor-pointer ${
+                    marketRegion === "all"
+                      ? "bg-foreground text-background shadow-xs font-bold"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Globe className="h-3 w-3" />
+                  <span>All</span>
+                  <span className="opacity-70">({(indianDeals?.length || 0) + (intlDeals?.length || 0)})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMarketRegion("in");
+                    setSelectedCategory("all");
+                  }}
+                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-mono text-[10px] font-semibold transition-all cursor-pointer ${
+                    marketRegion === "in"
+                      ? "bg-foreground text-background shadow-xs font-bold"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <span>🇮🇳 India</span>
+                  <span className="opacity-70">({indianDeals?.length || 0})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMarketRegion("intl");
+                    setSelectedCategory("all");
+                  }}
+                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-mono text-[10px] font-semibold transition-all cursor-pointer ${
+                    marketRegion === "intl"
+                      ? "bg-foreground text-background shadow-xs font-bold"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <span>🌍 Global</span>
+                  <span className="opacity-70">({intlDeals?.length || 0})</span>
+                </button>
+              </div>
+
+              {/* Live Re-sync Button */}
+              <button
+                type="button"
+                onClick={handleLiveSync}
+                disabled={isSyncing}
+                className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/40 bg-rose-500/10 px-3 py-1 font-mono text-[11px] font-bold text-rose-500 hover:bg-rose-500/20 transition-all cursor-pointer disabled:opacity-50"
+                title="Click to trigger on-demand sync directly from Cuelinks and Admitad APIs"
+              >
+                <RefreshCw className={`h-3 w-3 ${isSyncing ? "animate-spin text-rose-500" : ""}`} />
+                <span className="hidden sm:inline">{isSyncing ? "Syncing..." : "Sync Live Offers"}</span>
+              </button>
+            </div>
           </div>
 
           {/* Row 2: Search + Category Pills + Sort + View Toggle */}

@@ -11,7 +11,6 @@ import { compareRouter } from "./compare.js";
 import { shoppingRouter } from "./shopping.js";
 import { searxngRouter } from "./searxng.js";
 import { resolveRouter } from "./resolve.js";
-import { priceHistoryRouter } from "./price-history.js";
 import { searchRouter } from "./search.js";
 import { affiliatesRouter } from "./affiliates.js";
 import { alertsRouter } from "./alerts.js";
@@ -20,6 +19,7 @@ import { stackRouter, bankOffersRouter } from "./stack.js";
 import { extensionRouter } from "./extension-config.js";
 import { contactRouter } from "./contact.js";
 import { cuelinksRouter } from "./cuelinks.js";
+import { internationalDealsRouter } from "./international-deals.js";
 
 export const apiRouter = Router();
 
@@ -31,7 +31,6 @@ apiRouter.use("/compare", compareRouter);
 apiRouter.use("/shopping", shoppingRouter);
 apiRouter.use("/searxng", searxngRouter);
 apiRouter.use("/resolve", resolveRouter);
-apiRouter.use("/price-history", priceHistoryRouter);
 apiRouter.use("/search", searchRouter);
 apiRouter.use("/affiliates", affiliatesRouter);
 apiRouter.use("/alerts", alertsRouter);
@@ -40,3 +39,5 @@ apiRouter.use("/stack", stackRouter);
 apiRouter.use("/bank-offers", bankOffersRouter);
 apiRouter.use("/extension", extensionRouter);
 apiRouter.use("/cuelinks", cuelinksRouter);
+apiRouter.use("/international-deals", internationalDealsRouter);
+
