@@ -30,9 +30,10 @@ export function Footer() {
           <div className="mt-8 flex items-center justify-center">
             <Link
               to="/chrome-extension"
-              className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-white px-6 py-2.5 text-sm font-semibold text-neutral-900 shadow-sm transition-all duration-200 hover:bg-neutral-100 hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black cursor-pointer"
+              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-white px-6 py-2.5 text-sm font-semibold text-neutral-900 shadow-sm transition-all duration-200 hover:bg-neutral-100 hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black cursor-pointer"
             >
-              Start for free
+              <img src="/icons/store_icon_128x128.png" alt="GoCoupon" className="h-4 w-4 rounded-xs object-contain" width={16} height={16} />
+              <span>Start for free</span>
             </Link>
           </div>
         </div>
@@ -51,21 +52,13 @@ export function Footer() {
                   className="inline-flex items-center gap-2.5 group"
                   aria-label="GoCoupon — Home"
                 >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black text-white shadow-xs dark:bg-white dark:text-black">
-                    <svg
-                      className="h-4 w-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
-                      <line x1="7" y1="7" x2="7.01" y2="7" />
-                    </svg>
-                  </div>
+                  <img
+                    src="/icons/store_icon_128x128.png"
+                    alt="GoCoupon"
+                    className="h-8 w-8 rounded-xl object-contain shadow-xs border border-border/40"
+                    width={32}
+                    height={32}
+                  />
                   <span className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">
                     GoCoupon
                   </span>

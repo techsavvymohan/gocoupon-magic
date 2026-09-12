@@ -133,8 +133,9 @@ export function ChromeExtensionPage() {
               href="https://chromewebstore.google.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3.5 text-base font-semibold text-primary-foreground shadow-md transition-all hover:scale-105"
+              className="inline-flex items-center gap-2.5 rounded-full bg-primary px-8 py-3.5 text-base font-semibold text-primary-foreground shadow-md transition-all hover:scale-105"
             >
+              <img src="/icons/store_icon_128x128.png" alt="GoCoupon" className="h-5 w-5 rounded-md object-contain shadow-2xs" width={20} height={20} />
               <span>Add to Chrome — It&apos;s Free</span>
               <ArrowRight className="h-4 w-4" />
             </MagneticButton>
@@ -215,7 +216,8 @@ export function ChromeExtensionPage() {
           {/* Extension Mockup Card */}
           <div className="max-w-2xl mx-auto rounded-3xl border border-primary/30 bg-card p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
             <div className="flex items-center justify-between border-b border-border pb-4">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5">
+                <img src="/icons/store_icon_128x128.png" alt="GoCoupon Extension" className="h-7 w-7 rounded-lg object-contain shadow-xs border border-border/50" width={28} height={28} />
                 <img src="/gc-logo-dark.webp" alt="GoCoupon" className="h-6 w-auto hidden dark:block" />
                 <img src="/gc-logo.webp" alt="GoCoupon" className="h-6 w-auto dark:hidden" />
                 <span className="rounded-full bg-primary/15 px-2 py-0.5 font-mono text-[10px] font-bold text-primary">

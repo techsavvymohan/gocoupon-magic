@@ -100,7 +100,7 @@ function WelcomePage() {
                 Pin to Chrome Toolbar
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Click the puzzle icon <span className="font-mono text-xs font-bold text-foreground">🧩</span> in the top right of Chrome, find <strong>goCoupon</strong>, and click the <strong>Pin 📌</strong> icon so it stays visible.
+                Click the puzzle icon <span className="font-mono text-xs font-bold text-foreground">🧩</span> in the top right of Chrome, find <span className="inline-flex items-center gap-1 font-bold text-foreground"><img src="/icons/store_icon_128x128.png" alt="goCoupon" className="inline-block h-4 w-4 rounded-xs object-contain" width={16} height={16} /> goCoupon</span>, and click the <strong>Pin 📌</strong> icon so it stays visible.
               </p>
             </div>
 
@@ -189,8 +189,8 @@ function WelcomePage() {
 
               {/* Extension Simulator Widget */}
               <div className="flex flex-col items-center justify-center rounded-2xl border border-primary/30 bg-primary/5 p-6 text-center">
-                <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-3">
-                  <Zap className="h-5 w-5" aria-hidden="true" />
+                <div className="h-12 w-12 rounded-2xl bg-card border border-border/80 p-1 flex items-center justify-center mb-3 shadow-xs">
+                  <img src="/icons/store_icon_128x128.png" alt="goCoupon Extension" className="h-full w-full object-contain rounded-xl" width={48} height={48} />
                 </div>
                 <h3 className="font-display text-lg font-bold text-foreground">goCoupon Extension</h3>
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ArrowRight, X, Sparkles } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
 
 export function MobileStickyCta() {
   const [isVisible, setIsVisible] = useState(false);
@@ -53,10 +53,14 @@ export function MobileStickyCta() {
       className="fixed bottom-16 left-3 right-3 z-30 md:hidden rounded-2xl border border-primary/30 bg-card/95 p-2.5 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-3 duration-200"
     >
       <div className="flex items-center justify-between gap-2.5">
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
-            <Sparkles className="h-4 w-4" aria-hidden="true" />
-          </div>
+        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+          <img
+            src="/icons/store_icon_128x128.png"
+            alt="GoCoupon Extension"
+            className="h-8 w-8 shrink-0 rounded-xl object-contain shadow-xs border border-border/60"
+            width={32}
+            height={32}
+          />
           <div className="min-w-0">
             <span className="block truncate text-xs font-bold text-foreground">
               Auto-Apply Working Coupons
