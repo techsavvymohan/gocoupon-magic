@@ -29,14 +29,13 @@ export function RedeemCouponButton({
       .replace(/\s+/g, " ")
       .trim()
       .toUpperCase();
-    // If short enough to fit nicely, use it (e.g. "RS 200 OFF" or "50% OFF")
     if (clean.length <= 16) {
       return clean;
     }
     return "DISCOUNT";
   }, [deal.discount]);
 
-  // Last 2 characters of code peeking out on the right (matching screenshot e.g. "0 0")
+  // Last 2 characters of code peeking out on the right (e.g. "0 0" or "M P")
   const codePeek = React.useMemo(() => {
     if (!hasCode) return "";
     const clean = deal.code.trim().toUpperCase();
@@ -74,55 +73,54 @@ export function RedeemCouponButton({
         target="_blank"
         rel="noopener noreferrer nofollow"
         onClick={(e) => onRedeem(deal, e)}
-        className={`group/btn relative inline-flex items-center justify-between rounded-xl border-2 border-dashed border-orange-500/50 hover:border-orange-500 bg-background/80 p-0.5 shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden select-none ${
+        className={`group/btn relative inline-flex items-center transition-all duration-200 select-none cursor-pointer ${
           fullWidth ? "w-full" : ""
         } ${className}`}
         title={`Activate ${deal.discount} at ${deal.storeName}`}
       >
-        {/* Underlying deal peek */}
-        <div className="absolute inset-0 flex items-center justify-end pr-3 font-mono text-xs font-black text-orange-500 tracking-wider pointer-events-none">
-          DEAL
-        </div>
-
-        {/* Solid cover button */}
-        <div className="relative z-10 flex-1 mr-10 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 group-hover/btn:from-orange-600 group-hover/btn:to-amber-600 text-white px-3.5 py-2 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition-transform duration-200 group-hover/btn:-translate-x-0.5">
+        {/* Solid cover button taking main space */}
+        <div className="relative z-10 flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 group-hover/btn:from-orange-600 group-hover/btn:to-amber-600 text-white font-black text-xs uppercase tracking-wider py-2.5 px-3.5 shadow-sm transition-all duration-200">
           <Flame className="h-3.5 w-3.5 shrink-0 fill-white" />
           <span className="truncate">ACTIVATE {discountLabel}</span>
         </div>
 
-        {/* Peek spacer */}
-        <div className="w-10 shrink-0" aria-hidden="true" />
+        {/* Compact white stub, -3% in size than blue box, shrunk snugly toward the button */}
+        <div className="relative z-0 shrink-0 flex items-center justify-center h-[94%] -ml-1 pl-2.5 pr-3 bg-card border-2 border-l-0 border-dashed border-orange-400/50 group-hover/btn:border-orange-500 rounded-r-xl transition-colors min-w-[42px] max-w-[48px]">
+          <span className="font-mono text-xs font-black text-orange-500 tracking-wider whitespace-nowrap">
+            DEAL
+          </span>
+        </div>
       </a>
     );
   }
 
-  // Hidden Code Voucher Box:
-  // An outer dashed ticket container with the code sitting inside.
-  // The solid blue button sits ON TOP as a cover overlay, hiding all but the last 2 digits peeking out!
+  // Hidden Code Voucher:
+  // - Solid Blue Button covers the coupon code and takes up the main width.
+  // - White peek box is shrunk tightly to the blue button ("little open only")
+  // - White box height is -3% smaller than the blue button (tucked in slightly)
   return (
     <a
       href={affiliateUrl}
       target="_blank"
       rel="noopener noreferrer nofollow"
       onClick={(e) => onRedeem(deal, e)}
-      className={`group/btn relative inline-flex items-center justify-between rounded-xl border-2 border-dashed border-primary/50 hover:border-primary bg-card/60 p-0.5 shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden select-none ${
+      className={`group/btn relative inline-flex items-center transition-all duration-200 select-none cursor-pointer ${
         fullWidth ? "w-full" : ""
       } ${className}`}
       title={`Click to copy code and open ${deal.storeName}`}
     >
-      {/* Underlying hidden code layer - peek showing last 2 digits on the right */}
-      <div className="absolute inset-0 flex items-center justify-end pr-3 font-mono text-xs font-black text-foreground/80 tracking-widest pointer-events-none">
-        <span>{codePeek}</span>
-      </div>
-
-      {/* Solid cover button covering and hiding the coupon code from the left */}
-      <div className="relative z-10 flex-1 mr-9 sm:mr-11 rounded-lg bg-primary group-hover/btn:bg-primary/90 text-primary-foreground px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm transition-transform duration-200 group-hover/btn:-translate-x-0.5">
+      {/* Front Solid Cover Button (dominates width, covers and hides the coupon code) */}
+      <div className="relative z-10 flex-1 flex items-center justify-center gap-2 rounded-xl bg-primary group-hover/btn:bg-primary/90 text-primary-foreground font-black text-xs uppercase tracking-wider py-2.5 px-3.5 shadow-sm transition-all duration-200">
         <Copy className="h-3.5 w-3.5 shrink-0" />
         <span className="truncate">REDEEM {discountLabel} CODE</span>
       </div>
 
-      {/* Spacer matching peek area width */}
-      <div className="w-9 sm:w-11 shrink-0" aria-hidden="true" />
+      {/* Right White Box Stub: "little open only" (compact 42-46px) and "-3% in size than blue box" (h-[94%] / inset) */}
+      <div className="relative z-0 shrink-0 flex items-center justify-center h-[94%] -ml-1 pl-2.5 pr-3 bg-card border-2 border-l-0 border-dashed border-primary/40 group-hover/btn:border-primary rounded-r-xl transition-colors min-w-[42px] max-w-[48px]">
+        <span className="font-mono text-xs font-black text-foreground/85 tracking-widest whitespace-nowrap">
+          {codePeek}
+        </span>
+      </div>
     </a>
   );
 }
