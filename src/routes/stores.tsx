@@ -135,7 +135,7 @@ function StoresPage() {
                 { name: "Amazon", logo: "/Brand logos/Amazon_logo.svg.webp", deal: "75% OFF" },
                 { name: "Walmart", logo: "/icons/WMT-Wordmark-Small-TrueBlue-RGB.png", deal: "Rollback $20" },
                 { name: "Flipkart", logo: "/Brand logos/flipkart.webp", deal: "Flat ₹500" },
-                { name: "Target", icon: "🎯", deal: "Circle 20%" },
+                { name: "Target", logo: "/icons/target.svg", deal: "Circle 20%" },
                 { name: "Myntra", logo: "/Brand logos/myntra.webp", deal: "Flat ₹500" },
                 { name: "Best Buy", icon: "💻", deal: "Save $50" },
               ].map((b, idx) => (

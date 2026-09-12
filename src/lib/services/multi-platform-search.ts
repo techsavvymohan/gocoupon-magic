@@ -137,6 +137,8 @@ const STORE_LOGOS: Record<string, string> = {
   nykaa: "/Brand logos/Nykaa.webp",
   walmart: "/icons/WMT-Wordmark-Small-TrueBlue-RGB.png",
   "walmart.com": "/icons/WMT-Wordmark-Small-TrueBlue-RGB.png",
+  target: "/icons/target.svg",
+  "target.com": "/icons/target.svg",
 };
 
 export function getStoreLogo(storeName: string): string | undefined {

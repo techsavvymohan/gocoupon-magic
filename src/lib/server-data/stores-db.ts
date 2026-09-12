@@ -96,6 +96,7 @@ export const STORES_DB: StoreRecord[] = [
     name: "Target",
     slug: "target-coupons",
     category: "General",
+    logo: "/icons/target.svg",
     fallbackIcon: "🎯",
     badge: "Circle Rewards",
     rating: 4.7,

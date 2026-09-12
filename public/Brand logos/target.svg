@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="100%" height="100%">
+  <!-- Target Official Bullseye Logo -->
+  <circle cx="150" cy="150" r="150" fill="#CC0000" />
+  <circle cx="150" cy="150" r="100" fill="#FFFFFF" />
+  <circle cx="150" cy="150" r="50" fill="#CC0000" />
+</svg>

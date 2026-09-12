@@ -70,6 +70,7 @@ export const STORES_DATA: Store[] = [
     name: "Target",
     slug: "target-coupons",
     category: "General",
+    logo: "/icons/target.svg",
     fallbackIcon: "🎯",
     badge: "Circle Rewards",
     rating: 4.7,

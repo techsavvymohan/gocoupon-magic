@@ -93,7 +93,7 @@ export const INTERNATIONAL_STORES: InternationalStore[] = [
     category: "general",
     region: "US",
     tier: 1,
-    logo: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=100&auto=format&fit=crop&q=80",
+    logo: "/icons/target.svg",
     cashbackRate: "Up to 5.0%",
     cashbackPct: 0.04,
     buildSearchUrl: (q) =>
