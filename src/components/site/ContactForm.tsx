@@ -38,6 +38,7 @@ export function ContactForm() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [copiedEmail, setCopiedEmail] = useState(false);
 
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -81,9 +82,10 @@ export function ContactForm() {
     return newErrors;
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setTouched({ name: true, email: true, message: true });
+    setSubmitError(null);
 
     const newErrors = validateForm();
 
@@ -101,11 +103,24 @@ export function ContactForm() {
     }
 
     setIsSubmitting(true);
-    // Simulate API dispatch delay
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to submit inquiry. Please try again.");
+      }
       setIsSubmitted(true);
-    }, 700);
+    } catch (err: any) {
+      setSubmitError(
+        err.message || "Failed to send message. Please try again or email us at support@gocoupon.io.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleBlur = (field: "name" | "email" | "message") => {
@@ -425,6 +440,14 @@ export function ContactForm() {
                     </p>
                   )}
                 </div>
+
+                {/* API Submission Error */}
+                {submitError && (
+                  <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-3.5 flex items-start gap-2.5 text-xs text-destructive">
+                    <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                    <span>{submitError}</span>
+                  </div>
+                )}
 
                 {/* Submit Button */}
                 <div className="pt-2">
