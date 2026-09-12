@@ -16,8 +16,8 @@ if (!fs.existsSync(indexHtmlPath)) {
 let rawIndexHtml = fs.readFileSync(indexHtmlPath, "utf-8");
 // Normalize template: strip any pre-rendered content from previous runs
 rawIndexHtml = rawIndexHtml.replace(
-  /<div id="root">[\s\S]*?<\/div>\s*(?:<noscript>[\s\S]*?<\/noscript>)?/i,
-  '<div id="root"></div>'
+  /<div id="root">[\s\S]*?(?=\s*<!-- PWA)/i,
+  '<div id="root"></div>\n'
 );
 rawIndexHtml = rawIndexHtml.replace(
   /<!-- Per-Route Structured Data Start -->[\s\S]*?<!-- Per-Route Structured Data End -->\s*/g,
@@ -926,10 +926,11 @@ ${routeSchemas.map((s) => `    <script type="application/ld+json">\n${s}\n    </
   `;
 
   // Inject into <div id="root"> AND <noscript>
-  // This satisfies both raw HTML headless parsers, AI engine crawlers, and text-only bots!
+  // Keep the sleek branded #site-loader in <div id="root"> so human visitors see a smooth loading spinner
+  // while <noscript> provides the full semantic article and keywords for search engines & AI crawlers!
   const serverMarkup = `
     <div id="root">
-      ${fullSemanticArticleHtml}
+      <div id="site-loader" aria-label="Loading"><div class="gc-loader"></div></div>
     </div>
     <noscript>
       <div style="background-color: #090d16; color: #f1f5f9; padding: 24px;">
