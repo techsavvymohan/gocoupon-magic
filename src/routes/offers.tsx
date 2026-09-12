@@ -80,6 +80,7 @@ function getStoreLogoUrl(deal: Deal): string | null {
   if (lower.includes("soulflower")) return "/Brand logos/soulflower.svg";
   if (lower.includes("rareism")) return "/Brand logos/rareism.svg";
   if (lower.includes("jaypore")) return "/Brand logos/jaypore.svg";
+  if (lower.includes("asaya")) return "/Brand logos/asaya.svg";
   return null;
 }
 
