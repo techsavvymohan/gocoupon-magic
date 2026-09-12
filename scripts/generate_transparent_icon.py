@@ -24,15 +24,16 @@ def generate_icons():
     offset_x = (canvas_size - target_w) // 2
     offset_y = (canvas_size - target_h) // 2
 
-    # High quality PNG buffer of the cropped logo
+    # High quality PNG buffer of the cropped logo scaled to canvas bounds
+    scaled_logo = cropped.resize((target_w, target_h), Image.Resampling.LANCZOS)
     buf = io.BytesIO()
-    cropped.save(buf, format="PNG", optimize=True)
+    scaled_logo.save(buf, format="PNG", optimize=True)
     b64_data = base64.b64encode(buf.getvalue()).decode("utf-8")
 
     # Pure transparent background SVG with square viewBox
-    svg_content = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {canvas_size} {canvas_size}" width="100%" height="100%">
+    svg_content = f"""<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 {canvas_size} {canvas_size}" width="100%" height="100%">
   <!-- GoCoupon Transparent Background Vector Icon -->
-  <image href="data:image/png;base64,{b64_data}" x="{offset_x}" y="{offset_y}" width="{target_w}" height="{target_h}" preserveAspectRatio="xMidYMid meet" />
+  <image href="data:image/png;base64,{b64_data}" xlink:href="data:image/png;base64,{b64_data}" x="{offset_x}" y="{offset_y}" width="{target_w}" height="{target_h}" preserveAspectRatio="xMidYMid meet" />
 </svg>
 """
 

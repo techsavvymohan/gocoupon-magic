@@ -143,7 +143,16 @@ export function ExtensionShowcase() {
                 {/* Popup Header */}
                 <div className="flex items-center justify-between border-b border-border pb-3">
                   <div className="flex items-center gap-2">
-                    <img src="/icons/icon.svg" alt="GoCoupon" className="h-5 w-5 object-contain" width={20} height={20} />
+                    <img
+                      src="/icons/icon.svg"
+                      onError={(e) => {
+                        e.currentTarget.src = "/icons/icon_128.png";
+                      }}
+                      alt="GoCoupon"
+                      className="h-5 w-5 object-contain"
+                      width={20}
+                      height={20}
+                    />
                     <span className="font-display font-bold text-sm tracking-tight">
                       <span className="text-black dark:text-white">Go</span>
                       <span className="text-blue-600 dark:text-blue-400">Coupon</span>

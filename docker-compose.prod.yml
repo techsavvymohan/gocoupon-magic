@@ -26,14 +26,14 @@ services:
       - SUPABASE_URL=${SUPABASE_URL:-}
       - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-}
       - DATABASE_URL=${DATABASE_URL:-}
-      # SMTP Email Configuration
-      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      # SMTP Email Configuration (Spacemail by Spaceship)
+      - SMTP_HOST=${SMTP_HOST:-mail.spacemail.com}
       - SMTP_PORT=${SMTP_PORT:-465}
       - SMTP_SECURE=${SMTP_SECURE:-true}
-      - SMTP_USER=${SMTP_USER:-gocoupon13@gmail.com}
+      - SMTP_USER=${SMTP_USER:-support@gocoupon.io}
       - SMTP_PASS=${SMTP_PASS:-}
-      - SMTP_FROM=${SMTP_FROM:-"GoCoupon" <support@gocoupon.io>}
-      - ADMIN_EMAIL=${ADMIN_EMAIL:-gocoupon13@gmail.com}
+      - SMTP_FROM=${SMTP_FROM:-"GoCoupon Support" <support@gocoupon.io>}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-support@gocoupon.io}
     ports:
       - "3000:3000"
     depends_on:

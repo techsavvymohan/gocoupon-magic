@@ -15,7 +15,14 @@ const SMTP_PORT = parseInt(process.env.SMTP_PORT || "587", 10);
 const SMTP_SECURE = process.env.SMTP_SECURE === "true" || SMTP_PORT === 465;
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
-const SMTP_FROM = process.env.SMTP_FROM || `"GoCoupon" <${SMTP_USER || "noreply@gocoupon.io"}>`;
+export function getFromAddress(): string {
+  const raw = process.env.SMTP_FROM?.trim();
+  if (raw && raw.includes("@")) {
+    return raw;
+  }
+  const user = process.env.SMTP_USER || "support@gocoupon.io";
+  return `"GoCoupon Support" <${user}>`;
+}
 
 let transporter: Transporter | null = null;
 
@@ -102,7 +109,7 @@ export async function sendPriceDropEmail(options: PriceDropEmailOptions): Promis
 
   try {
     await transporter.sendMail({
-      from: SMTP_FROM,
+      from: getFromAddress(),
       to: options.to,
       subject: `🚨 Price Drop Alert: ${options.productTitle} is now ${sym}${options.currentPrice.toLocaleString()}`,
       html,
@@ -144,7 +151,7 @@ export async function sendContactInquiryEmail(options: {
 
   try {
     await transporter.sendMail({
-      from: SMTP_FROM,
+      from: getFromAddress(),
       to: adminEmail,
       replyTo: options.email,
       subject: `[GoCoupon Contact] ${options.subject || "New Message from " + options.name}`,

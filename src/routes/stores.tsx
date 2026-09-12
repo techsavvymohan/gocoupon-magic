@@ -373,7 +373,16 @@ function StoresPage() {
                   to="/chrome-extension"
                   className="inline-flex items-center justify-center gap-2.5 rounded-full bg-primary px-6 py-3.5 min-h-[48px] text-sm font-bold text-primary-foreground shadow-md transition-transform hover:scale-105 active:scale-95 touch-manipulation"
                 >
-                  <img src="/icons/icon.svg" alt="GoCoupon" className="h-5 w-5 object-contain" width={20} height={20} />
+                  <img
+                    src="/icons/icon.svg"
+                    onError={(e) => {
+                      e.currentTarget.src = "/icons/icon_128.png";
+                    }}
+                    alt="GoCoupon"
+                    className="h-5 w-5 object-contain"
+                    width={20}
+                    height={20}
+                  />
                   <span>Install Free Chrome Extension</span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -391,7 +400,16 @@ function StoresPage() {
               <div className="rounded-2xl border border-border/80 bg-background/90 p-4 sm:p-5 shadow-xl backdrop-blur-md md:hover:rotate-1 transition-transform duration-300">
                 <div className="flex items-center justify-between border-b border-border/80 pb-3">
                   <div className="flex items-center gap-2">
-                    <img src="/icons/icon.svg" alt="GoCoupon" className="h-4 w-4 object-contain" width={16} height={16} />
+                    <img
+                      src="/icons/icon.svg"
+                      onError={(e) => {
+                        e.currentTarget.src = "/icons/icon_128.png";
+                      }}
+                      alt="GoCoupon"
+                      className="h-4 w-4 object-contain"
+                      width={16}
+                      height={16}
+                    />
                     <span className="h-2.5 w-2.5 rounded-full bg-rose-500/80" />
                     <span className="h-2.5 w-2.5 rounded-full bg-amber-500/80" />
                     <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/80" />

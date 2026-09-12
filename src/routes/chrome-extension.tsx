@@ -135,7 +135,16 @@ export function ChromeExtensionPage() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2.5 rounded-full bg-primary px-8 py-3.5 text-base font-semibold text-primary-foreground shadow-md transition-all hover:scale-105"
             >
-              <img src="/icons/icon.svg" alt="GoCoupon" className="h-5 w-5 object-contain" width={20} height={20} />
+              <img
+                src="/icons/icon.svg"
+                onError={(e) => {
+                  e.currentTarget.src = "/icons/icon_128.png";
+                }}
+                alt="GoCoupon"
+                className="h-5 w-5 object-contain"
+                width={20}
+                height={20}
+              />
               <span>Add to Chrome — It&apos;s Free</span>
               <ArrowRight className="h-4 w-4" />
             </MagneticButton>

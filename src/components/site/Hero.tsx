@@ -59,7 +59,16 @@ export function Hero() {
             to="/chrome-extension"
             className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs sm:text-sm font-bold text-primary-foreground shadow-md shadow-primary/20 transition-all hover:scale-105 active:scale-95 touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
           >
-            <img src="/icons/icon.svg" alt="GoCoupon" className="h-5 w-5 object-contain" width={20} height={20} />
+            <img
+              src="/icons/icon.svg"
+              onError={(e) => {
+                e.currentTarget.src = "/icons/icon_128.png";
+              }}
+              alt="GoCoupon"
+              className="h-5 w-5 object-contain"
+              width={20}
+              height={20}
+            />
             <span>Add to Chrome — It&apos;s 100% Free</span>
           </Link>
           <a

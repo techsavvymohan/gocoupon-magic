@@ -56,6 +56,9 @@ export function MobileStickyCta() {
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
           <img
             src="/icons/icon.svg"
+            onError={(e) => {
+              e.currentTarget.src = "/icons/icon_128.png";
+            }}
             alt="GoCoupon Extension"
             className="h-8 w-8 shrink-0 object-contain"
             width={32}
