@@ -81,7 +81,7 @@ export const INTERNATIONAL_STORES: InternationalStore[] = [
     category: "general",
     region: "US",
     tier: 1,
-    logo: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=100&auto=format&fit=crop&q=80",
+    logo: "/icons/WMT-Wordmark-Small-TrueBlue-RGB.png",
     cashbackRate: "Up to 4.5%",
     cashbackPct: 0.035,
     buildSearchUrl: (q) =>

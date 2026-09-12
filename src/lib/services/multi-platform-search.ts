@@ -135,6 +135,8 @@ const STORE_LOGOS: Record<string, string> = {
   tatacliq: "/Brand logos/Tata-cliq.webp",
   ajio: "/Brand logos/Ajio.webp",
   nykaa: "/Brand logos/Nykaa.webp",
+  walmart: "/icons/WMT-Wordmark-Small-TrueBlue-RGB.png",
+  "walmart.com": "/icons/WMT-Wordmark-Small-TrueBlue-RGB.png",
 };
 
 export function getStoreLogo(storeName: string): string | undefined {

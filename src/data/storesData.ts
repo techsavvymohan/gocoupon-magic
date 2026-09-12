@@ -49,6 +49,7 @@ export const STORES_DATA: Store[] = [
     name: "Walmart",
     slug: "walmart-coupons",
     category: "General",
+    logo: "/icons/WMT-Wordmark-Small-TrueBlue-RGB.png",
     fallbackIcon: "🛒",
     badge: "Everyday Low Prices",
     rating: 4.8,

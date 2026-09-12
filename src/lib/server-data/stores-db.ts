@@ -75,6 +75,7 @@ export const STORES_DB: StoreRecord[] = [
     name: "Walmart",
     slug: "walmart-coupons",
     category: "General",
+    logo: "/icons/WMT-Wordmark-Small-TrueBlue-RGB.png",
     fallbackIcon: "🛒",
     badge: "Everyday Low Prices",
     rating: 4.8,

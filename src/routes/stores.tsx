@@ -133,7 +133,7 @@ function StoresPage() {
             <div className="flex items-center justify-start md:justify-center gap-3 sm:gap-4 md:gap-6 overflow-x-auto no-scrollbar py-2 px-2 -mx-3.5 sm:mx-0 snap-x snap-mandatory md:animate-storeverse-float">
               {[
                 { name: "Amazon", logo: "/Brand logos/Amazon_logo.svg.webp", deal: "75% OFF" },
-                { name: "Walmart", icon: "🛒", deal: "Rollback $20" },
+                { name: "Walmart", logo: "/icons/WMT-Wordmark-Small-TrueBlue-RGB.png", deal: "Rollback $20" },
                 { name: "Flipkart", logo: "/Brand logos/flipkart.webp", deal: "Flat ₹500" },
                 { name: "Target", icon: "🎯", deal: "Circle 20%" },
                 { name: "Myntra", logo: "/Brand logos/myntra.webp", deal: "Flat ₹500" },

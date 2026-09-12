@@ -294,7 +294,7 @@ export const REGISTERED_STORES: RegisteredStore[] = [
     category: "general",
     region: "US",
     tier: 1,
-    logo: "/Brand logos/Amazon_logo.svg.webp",
+    logo: "/icons/WMT-Wordmark-Small-TrueBlue-RGB.png",
     defaultCoupon: { code: "ROLLBACK20", description: "Save $20 on qualifying orders over $75", discountAmount: 20 },
     cashbackRate: "Up to 6.5%",
     cashbackPct: 0.045,
