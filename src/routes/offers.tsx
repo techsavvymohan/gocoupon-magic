@@ -6,6 +6,8 @@ import { useDeals } from "@/hooks/use-deals";
 import { triggerLiveSync, type DealSortField, type Deal } from "@/lib/api/deals-api";
 import { wrapAffiliateTracking } from "@/lib/services/store-registry";
 import { DealGridSkeleton } from "@/components/ui/DataSkeleton";
+import { StoreLogo } from "@/components/common/StoreLogo";
+import { resolveStoreLogo } from "@/lib/services/store-logo-resolver";
 import {
   Flame,
   Tag,
@@ -65,40 +67,6 @@ const SORT_OPTIONS: { id: DealSortField; label: string; icon: typeof Flame; colo
   { id: "store", label: "Store Name (A-Z)", icon: Store, color: "text-violet-500" },
 ];
 
-function getStoreLogoUrl(deal: Deal): string | null {
-  if (deal.storeLogo && !deal.storeLogo.includes("placeholder")) return deal.storeLogo;
-  const lower = deal.storeName.toLowerCase();
-  if (lower.includes("flipkart")) return "/Brand logos/flipkart.webp";
-  if (lower.includes("amazon")) return "/Brand logos/Amazon_logo.svg.webp";
-  if (lower.includes("myntra")) return "/Brand logos/myntra.webp";
-  if (lower.includes("meesho")) return "/Brand logos/Meesho_logo.webp";
-  if (lower.includes("ajio")) return "/Brand logos/Ajio.webp";
-  if (lower.includes("nykaa")) return "/Brand logos/Nykaa.webp";
-  if (lower.includes("tata cliq") || lower.includes("tatacliq")) return "/Brand logos/Tata-cliq.webp";
-  if (lower.includes("croma")) return "/Brand logos/Croma.webp";
-  if (lower.includes("lenovo")) return "/Brand logos/Lenovo_logo.svg.webp";
-  if (lower.includes("dell")) return "/Brand logos/Dell_logo.svg.webp";
-  if (lower.includes("samsung")) return "/Brand logos/Samsung.webp";
-  if (lower.includes("levi")) return "/Brand logos/Levis.webp";
-  if (lower.includes("firstcry")) return "/Brand logos/firstcry.webp";
-  if (lower.includes("swiggy")) return "/Brand logos/swiggy.webp";
-  if (lower.includes("zomato")) return "/Brand logos/zomato.webp";
-  if (lower.includes("gonoise") || lower.includes("noise")) return "/Brand logos/gonoise.svg";
-  if (lower.includes("soulflower")) return "/Brand logos/soulflower.svg";
-  if (lower.includes("rareism")) return "/Brand logos/rareism.svg";
-  if (lower.includes("jaypore")) return "/Brand logos/jaypore.svg";
-  if (lower.includes("asaya")) return "/Brand logos/asaya.svg";
-  if (lower.includes("bewakoof")) return "/Brand logos/Bewakoof.webp";
-  if (lower.includes("boat")) return "/Brand logos/boat.webp";
-  if (lower.includes("asus")) return "/Brand logos/Asus.webp";
-  if (lower.includes("acer")) return "/Brand logos/Acer.webp";
-
-  const cleanDomain = deal.storeSlug ? deal.storeSlug.replace(/-coupons$/, "") + ".com" : "";
-  if (cleanDomain) {
-    return `https://www.google.com/s2/favicons?domain=${cleanDomain}&sz=128`;
-  }
-  return null;
-}
 
 function OffersHubPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -447,7 +415,6 @@ function OffersHubPage() {
             <div className="space-y-4">
               {visibleOffers.map((deal, idx) => {
                 const affiliateUrl = wrapAffiliateTracking(deal.link, "gocoupon_offers_list");
-                const logoUrl = getStoreLogoUrl(deal);
                 const isCopied = copiedCode === deal.code;
 
                 return (
@@ -462,21 +429,13 @@ function OffersHubPage() {
                     {/* Main Content Info Block */}
                     <div className="flex items-start gap-4 flex-1 min-w-0">
                       {/* Store Avatar */}
-                      <div className="h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-2xl border border-border/80 bg-background/90 p-2 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform overflow-hidden">
-                        {logoUrl ? (
-                          <img
-                            src={logoUrl}
-                            alt={deal.storeName}
-                            className="max-h-full max-w-full object-contain"
-                            loading="lazy"
-                            onError={(e) => {
-                              (e.target as HTMLElement).style.display = "none";
-                            }}
-                          />
-                        ) : (
-                          <Store className="h-6 w-6 text-primary/70" />
-                        )}
-                      </div>
+                      <StoreLogo
+                        storeName={deal.storeName}
+                        storeLogo={deal.storeLogo}
+                        trackingUrl={deal.link}
+                        className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl p-2 group-hover:scale-105 transition-transform"
+                        imageClassName="max-h-full max-w-full object-contain"
+                      />
 
                       {/* Details */}
                       <div className="flex-1 min-w-0">
@@ -587,7 +546,6 @@ function OffersHubPage() {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {visibleOffers.map((deal, idx) => {
                 const affiliateUrl = wrapAffiliateTracking(deal.link, "gocoupon_offers_grid");
-                const logoUrl = getStoreLogoUrl(deal);
                 const isCopied = copiedCode === deal.code;
                 const hasCode = deal.code && deal.code.length > 1;
 
@@ -608,21 +566,13 @@ function OffersHubPage() {
                     {/* ── Store row ── */}
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2.5">
-                        <div className="h-8 w-8 shrink-0 rounded-lg border border-border bg-background flex items-center justify-center overflow-hidden">
-                          {logoUrl ? (
-                            <img
-                              src={logoUrl}
-                              alt={deal.storeName}
-                              className="max-h-full max-w-full object-contain"
-                              loading="lazy"
-                              onError={(e) => {
-                                (e.target as HTMLElement).style.display = "none";
-                              }}
-                            />
-                          ) : (
-                            <Store className="h-4 w-4 text-muted-foreground" />
-                          )}
-                        </div>
+                        <StoreLogo
+                          storeName={deal.storeName}
+                          storeLogo={deal.storeLogo}
+                          trackingUrl={deal.link}
+                          className="h-8 w-8 rounded-lg p-1"
+                          imageClassName="max-h-full max-w-full object-contain"
+                        />
                         <span className="text-[13px] font-semibold text-foreground leading-none">
                           {deal.storeName}
                         </span>

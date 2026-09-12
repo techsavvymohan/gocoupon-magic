@@ -10,44 +10,57 @@ const CUELINKS_V3_BASE_URL = "https://developers.cuelinks.com/pub_api/v3";
 const apiKey = (process.env.CUELINKS_API_KEY || "").trim();
 const pubId = process.env.CUELINKS_PUBLISHER_ID || "148920";
 
-const STORE_LOGOS_MAP = {
+const LOCAL_STORE_LOGOS = {
   amazon: "/Brand logos/Amazon_logo.svg.webp",
   flipkart: "/Brand logos/flipkart.webp",
   myntra: "/Brand logos/myntra.webp",
-  croma: "/Brand logos/Croma.webp",
+  croma: "/Brand logos/croma.svg",
   reliance: "/Brand logos/reliance.svg",
   tatacliq: "/Brand logos/Tata-cliq.webp",
   ajio: "/Brand logos/Ajio.webp",
   nykaa: "/Brand logos/Nykaa.webp",
   meesho: "/Brand logos/Meesho_logo.webp",
-  bewakoof: "/Brand logos/Bewakoof.webp",
-  boat: "/Brand logos/boat.webp",
-  asus: "/Brand logos/Asus.webp",
-  acer: "/Brand logos/Acer.webp",
-  dell: "/Brand logos/Dell_logo.svg.webp",
-  lenovo: "/Brand logos/Lenovo_logo.svg.webp",
-  samsung: "/Brand logos/Samsung.webp",
-  levis: "/Brand logos/Levis.webp",
-  swiggy: "/Brand logos/swiggy.webp",
-  zomato: "/Brand logos/zomato.webp",
-  firstcry: "/Brand logos/firstcry.webp",
-  pepperfry: "/Brand logos/pepperfry.webp",
+  firstcry: "/Brand logos/FirstCry_logo.svg.webp",
   gonoise: "/Brand logos/gonoise.svg",
   noise: "/Brand logos/gonoise.svg",
   soulflower: "/Brand logos/soulflower.svg",
   rareism: "/Brand logos/rareism.svg",
   jaypore: "/Brand logos/jaypore.svg",
   asaya: "/Brand logos/asaya.svg",
+  bestbuy: "/Brand logos/bestbuy.svg",
+  target: "/Brand logos/target.svg",
 };
 
-function getLogoForStore(storeName) {
+function extractMerchantDomain(trackingUrl, storeName, explicitDomain) {
+  if (explicitDomain && explicitDomain.includes(".") && !explicitDomain.includes("cuelinks") && !explicitDomain.includes("linksredirect")) {
+    return explicitDomain.toLowerCase().replace(/^www\./, "").replace(/^m\./, "").replace(/^shop\./, "").trim();
+  }
+  if (trackingUrl) {
+    try {
+      const parsed = new URL(trackingUrl);
+      const targetUrl = parsed.searchParams.get("url");
+      if (targetUrl) {
+        const u = new URL(decodeURIComponent(targetUrl));
+        let host = u.hostname.toLowerCase().replace(/^www\./, "").replace(/^m\./, "").replace(/^shop\./, "");
+        if (host && host.includes(".")) {
+          return host;
+        }
+      }
+    } catch {}
+  }
   const clean = (storeName || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-  for (const [key, logo] of Object.entries(STORE_LOGOS_MAP)) {
-    if (clean.includes(key) || key.includes(clean)) {
+  return clean ? `${clean}.com` : "gocoupon.io";
+}
+
+function resolveStoreLogo(storeName, trackingUrl, explicitDomain) {
+  const clean = (storeName || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  for (const [key, logo] of Object.entries(LOCAL_STORE_LOGOS)) {
+    if (clean === key || clean.startsWith(key) || key.startsWith(clean)) {
       return logo;
     }
   }
-  return undefined;
+  const domain = extractMerchantDomain(trackingUrl, storeName, explicitDomain);
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
 }
 
 function extractDiscount(o) {
@@ -176,7 +189,10 @@ export async function runCuelinksSync(maxPages = 0) {
     const code = hasCoupon ? rawCode.toUpperCase() : "";
     const discount = extractDiscount(o);
     const category = mapCategory(o.categories, o.title);
-    const storeLogo = getLogoForStore(storeName) || (o.image && !o.image.includes("Placeholder") ? o.image : undefined);
+    const trackingUrl =
+      o.tracking_url ||
+      `https://linksredirect.com/?pub_id=${pubId}&subid=gocoupon_live&url=${encodeURIComponent(o.url || "https://gocoupon.io")}`;
+    const storeLogo = resolveStoreLogo(storeName, trackingUrl, o.domain);
 
     let expiresIn = "Limited Time";
     if (o.end_date) {
@@ -205,10 +221,6 @@ export async function runCuelinksSync(maxPages = 0) {
     } else if (discount.includes("%") && parseInt(discount, 10) >= 35) {
       badge = "Exclusive";
     }
-
-    const trackingUrl =
-      o.tracking_url ||
-      `https://linksredirect.com/?pub_id=${pubId}&subid=gocoupon_live&url=${encodeURIComponent(o.url || "https://gocoupon.io")}`;
 
     liveDeals.push({
       id: `cue_${o.id}`,

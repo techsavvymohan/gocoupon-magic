@@ -40,6 +40,63 @@ function parseExpiryDays(expiresIn: string): number {
   return match ? parseInt(match[1], 10) : 30;
 }
 
+const LOCAL_STORE_LOGOS: Record<string, string> = {
+  amazon: "/Brand logos/Amazon_logo.svg.webp",
+  flipkart: "/Brand logos/flipkart.webp",
+  myntra: "/Brand logos/myntra.webp",
+  croma: "/Brand logos/croma.svg",
+  reliance: "/Brand logos/reliance.svg",
+  tatacliq: "/Brand logos/Tata-cliq.webp",
+  ajio: "/Brand logos/Ajio.webp",
+  nykaa: "/Brand logos/Nykaa.webp",
+  meesho: "/Brand logos/Meesho_logo.webp",
+  firstcry: "/Brand logos/FirstCry_logo.svg.webp",
+  gonoise: "/Brand logos/gonoise.svg",
+  noise: "/Brand logos/gonoise.svg",
+  soulflower: "/Brand logos/soulflower.svg",
+  rareism: "/Brand logos/rareism.svg",
+  jaypore: "/Brand logos/jaypore.svg",
+  asaya: "/Brand logos/asaya.svg",
+  bestbuy: "/Brand logos/bestbuy.svg",
+  target: "/Brand logos/target.svg",
+};
+
+function extractMerchantDomain(trackingUrl?: string, storeName?: string): string {
+  if (trackingUrl) {
+    try {
+      const parsed = new URL(trackingUrl);
+      const targetUrl = parsed.searchParams.get("url");
+      if (targetUrl) {
+        const u = new URL(decodeURIComponent(targetUrl));
+        let host = u.hostname.toLowerCase().replace(/^www\./, "").replace(/^m\./, "").replace(/^shop\./, "");
+        if (host && host.includes(".")) {
+          return host;
+        }
+      }
+    } catch {}
+  }
+  const clean = (storeName || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  return clean ? `${clean}.com` : "gocoupon.io";
+}
+
+function resolveStoreLogo(storeName: string, trackingUrl?: string, existingLogo?: string): string {
+  const clean = (storeName || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  for (const [key, logo] of Object.entries(LOCAL_STORE_LOGOS)) {
+    if (clean === key || clean.startsWith(key) || key.startsWith(clean)) {
+      return logo;
+    }
+  }
+  if (
+    existingLogo &&
+    !existingLogo.toLowerCase().includes("placeholder") &&
+    (existingLogo.startsWith("/Brand logos/") || existingLogo.startsWith("https://www.google.com/s2/favicons"))
+  ) {
+    return existingLogo;
+  }
+  const domain = extractMerchantDomain(trackingUrl, storeName);
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+}
+
 export default async function handler(req: any, res: any) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -67,7 +124,10 @@ export default async function handler(req: any, res: any) {
         if (!isNaN(end) && end < now) return false;
       }
       return true;
-    });
+    }).map((d) => ({
+      ...d,
+      storeLogo: resolveStoreLogo(d.storeName, d.link, d.storeLogo),
+    }));
 
     const category = ((req.query.category as string) || "").toLowerCase().trim();
     const q = ((req.query.q as string) || "").toLowerCase().trim();

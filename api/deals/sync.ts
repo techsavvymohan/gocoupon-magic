@@ -32,6 +32,60 @@ function mapCategory(categories: any, title: string) {
   return "General";
 }
 
+const LOCAL_STORE_LOGOS: Record<string, string> = {
+  amazon: "/Brand logos/Amazon_logo.svg.webp",
+  flipkart: "/Brand logos/flipkart.webp",
+  myntra: "/Brand logos/myntra.webp",
+  croma: "/Brand logos/croma.svg",
+  reliance: "/Brand logos/reliance.svg",
+  tatacliq: "/Brand logos/Tata-cliq.webp",
+  ajio: "/Brand logos/Ajio.webp",
+  nykaa: "/Brand logos/Nykaa.webp",
+  meesho: "/Brand logos/Meesho_logo.webp",
+  firstcry: "/Brand logos/FirstCry_logo.svg.webp",
+  gonoise: "/Brand logos/gonoise.svg",
+  noise: "/Brand logos/gonoise.svg",
+  soulflower: "/Brand logos/soulflower.svg",
+  rareism: "/Brand logos/rareism.svg",
+  jaypore: "/Brand logos/jaypore.svg",
+  asaya: "/Brand logos/asaya.svg",
+  bestbuy: "/Brand logos/bestbuy.svg",
+  target: "/Brand logos/target.svg",
+};
+
+function extractMerchantDomain(trackingUrl?: string, storeName?: string, explicitDomain?: string): string {
+  if (explicitDomain && explicitDomain.includes(".") && !explicitDomain.includes("cuelinks") && !explicitDomain.includes("linksredirect")) {
+    return explicitDomain.toLowerCase().replace(/^www\./, "").replace(/^m\./, "").replace(/^shop\./, "").trim();
+  }
+  if (trackingUrl) {
+    try {
+      const parsed = new URL(trackingUrl);
+      const targetUrl = parsed.searchParams.get("url");
+      if (targetUrl) {
+        const u = new URL(decodeURIComponent(targetUrl));
+        let host = u.hostname.toLowerCase().replace(/^www\./, "").replace(/^m\./, "").replace(/^shop\./, "");
+        if (host && host.includes(".")) {
+          return host;
+        }
+      }
+    } catch {}
+  }
+  const clean = (storeName || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  return clean ? `${clean}.com` : "gocoupon.io";
+}
+
+function resolveStoreLogo(storeName: string, trackingUrl?: string, explicitDomain?: string): string {
+  const clean = (storeName || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  for (const [key, logo] of Object.entries(LOCAL_STORE_LOGOS)) {
+    if (clean === key || clean.startsWith(key) || key.startsWith(clean)) {
+      return logo;
+    }
+  }
+  const domain = extractMerchantDomain(trackingUrl, storeName, explicitDomain);
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+}
+
+
 export default async function handler(req: any, res: any) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -101,11 +155,16 @@ export default async function handler(req: any, res: any) {
       if (seen.has(dedup)) continue;
       seen.add(dedup);
 
+      const trackingUrl =
+        o.tracking_url ||
+        `https://linksredirect.com/?pub_id=${pubId}&subid=gocoupon_sync&url=${encodeURIComponent(o.url || "https://gocoupon.io")}`;
+      const storeLogo = resolveStoreLogo(storeName, trackingUrl, o.domain);
+
       liveDeals.push({
         id: `cue_${o.id}`,
         storeName,
         storeSlug,
-        storeLogo: o.image || undefined,
+        storeLogo,
         category: mapCategory(o.categories, o.title),
         title: o.title || `${discount} at ${storeName}`,
         code,
@@ -116,7 +175,7 @@ export default async function handler(req: any, res: any) {
         endDate: o.end_date || undefined,
         minOrder: o.minimum_order ? `₹${Number(o.minimum_order).toLocaleString()}` : undefined,
         terms: (o.description || o.terms || `Valid on ${storeName}.`).trim(),
-        link: o.tracking_url || `https://linksredirect.com/?pub_id=${pubId}&subid=gocoupon_sync&url=${encodeURIComponent(o.url || "https://gocoupon.io")}`,
+        link: trackingUrl,
         usesCount: 1200 + (Math.abs(Number(o.id) || 0) % 4000),
       });
     }

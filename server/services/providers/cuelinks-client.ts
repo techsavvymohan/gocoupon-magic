@@ -19,6 +19,7 @@ import path from "node:path";
 import type { StoreCoupon } from "../../../src/lib/services/canonical-types.js";
 import type { DealRecord, DealCategory, DealBadge } from "../../../src/lib/server-data/deals-db.js";
 import { setLiveDeals } from "../../../src/lib/server-data/deals-db.js";
+import { resolveStoreLogo } from "../../../src/lib/services/store-logo-resolver.js";
 
 const CUELINKS_V3_BASE_URL = "https://developers.cuelinks.com/pub_api/v3";
 
@@ -536,44 +537,12 @@ export function normalizeCuelinksToDealRecord(offer: CuelinksCouponOffer): DealR
     cat = "Recharge";
   }
 
-  const STORE_LOGOS_MAP: Record<string, string> = {
-    amazon: "/Brand logos/Amazon_logo.svg.webp",
-    flipkart: "/Brand logos/flipkart.webp",
-    myntra: "/Brand logos/myntra.webp",
-    croma: "/Brand logos/Croma.webp",
-    reliance: "/Brand logos/reliance.svg",
-    tatacliq: "/Brand logos/Tata-cliq.webp",
-    ajio: "/Brand logos/Ajio.webp",
-    nykaa: "/Brand logos/Nykaa.webp",
-    meesho: "/Brand logos/Meesho_logo.webp",
-    bewakoof: "/Brand logos/Bewakoof.webp",
-    boat: "/Brand logos/boat.webp",
-    asus: "/Brand logos/Asus.webp",
-    acer: "/Brand logos/Acer.webp",
-    dell: "/Brand logos/Dell_logo.svg.webp",
-    lenovo: "/Brand logos/Lenovo_logo.svg.webp",
-    samsung: "/Brand logos/Samsung.webp",
-    levis: "/Brand logos/Levis.webp",
-    swiggy: "/Brand logos/swiggy.webp",
-    zomato: "/Brand logos/zomato.webp",
-    firstcry: "/Brand logos/firstcry.webp",
-    pepperfry: "/Brand logos/pepperfry.webp",
-    gonoise: "/Brand logos/gonoise.svg",
-    noise: "/Brand logos/gonoise.svg",
-    soulflower: "/Brand logos/soulflower.svg",
-    rareism: "/Brand logos/rareism.svg",
-    jaypore: "/Brand logos/jaypore.svg",
-    asaya: "/Brand logos/asaya.svg",
-  };
-
-  const storeKey = offer.storeName.toLowerCase().replace(/[^a-z0-9]/g, "");
-  let storeLogo: string | undefined = offer.imageUrl;
-  for (const [key, logo] of Object.entries(STORE_LOGOS_MAP)) {
-    if (storeKey.includes(key) || key.includes(storeKey)) {
-      storeLogo = logo;
-      break;
-    }
-  }
+  const storeLogo = resolveStoreLogo(
+    offer.storeName,
+    offer.affiliateUrl,
+    offer.storeDomain,
+    offer.imageUrl
+  );
 
   let expiresIn = "Limited Time";
   try {
