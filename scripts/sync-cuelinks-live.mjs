@@ -36,6 +36,7 @@ const STORE_LOGOS_MAP = {
   noise: "/Brand logos/gonoise.svg",
   soulflower: "/Brand logos/soulflower.svg",
   rareism: "/Brand logos/rareism.svg",
+  jaypore: "/Brand logos/jaypore.svg",
 };
 
 function getLogoForStore(storeName) {
