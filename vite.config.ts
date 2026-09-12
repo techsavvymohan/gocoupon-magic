@@ -348,9 +348,6 @@ export default defineConfig({
           if (normalized.includes("/src/routes/compare")) {
             return "page-compare";
           }
-          if (normalized.includes("/src/routes/price-history")) {
-            return "page-price-history";
-          }
           if (normalized.includes("/src/routes/product/")) {
             return "page-product";
           }
