@@ -76,6 +76,8 @@ function getStoreLogoUrl(deal: Deal): string | null {
   if (lower.includes("samsung")) return "/Brand logos/Samsung.webp";
   if (lower.includes("levi")) return "/Brand logos/Levis.webp";
   if (lower.includes("firstcry")) return "/Brand logos/firstcry.webp";
+  if (lower.includes("gonoise") || lower.includes("go noise") || lower.includes("noise")) return "/Brand logos/gonoise.svg";
+  if (lower.includes("soulflower")) return "/Brand logos/soulflower.svg";
   return null;
 }
 

@@ -32,6 +32,9 @@ const STORE_LOGOS_MAP = {
   zomato: "/Brand logos/zomato.webp",
   firstcry: "/Brand logos/firstcry.webp",
   pepperfry: "/Brand logos/pepperfry.webp",
+  gonoise: "/Brand logos/gonoise.svg",
+  noise: "/Brand logos/gonoise.svg",
+  soulflower: "/Brand logos/soulflower.svg",
 };
 
 function getLogoForStore(storeName) {
