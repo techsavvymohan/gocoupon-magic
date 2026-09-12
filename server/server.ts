@@ -32,8 +32,30 @@ const app = express();
 const PORT = parseInt(process.env.PORT || "3000", 10);
 const HOST = process.env.HOST || "0.0.0.0";
 
+// Security: Disable X-Powered-By header
+app.disable("x-powered-by");
+
 // Trust proxy for VPS reverse proxy setups (Nginx, Caddy, Cloudflare)
 app.set("trust proxy", 1);
+
+// HTTP Security & Transport Headers (Clickjacking, MIME-sniffing, XSS, & Downgrade Defense)
+app.use((_req: Request, res: Response, next: NextFunction) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://utt.impactcdn.com https://www.thunderbolt.com https://www.googletagmanager.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.thunderbolt.com; img-src 'self' data: blob: https: http:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https: wss: http://localhost:* http://127.0.0.1:*; frame-src 'self' https://www.thunderbolt.com https://chromewebstore.google.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self' https:; upgrade-insecure-requests;"
+  );
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
+  res.setHeader(
+    "Permissions-Policy",
+    'camera=(), microphone=(self "https://www.thunderbolt.com"), geolocation=(), payment=(self)'
+  );
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("X-Permitted-Cross-Domain-Policies", "none");
+  next();
+});
 
 // Standard Middlewares
 app.use(

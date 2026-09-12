@@ -155,6 +155,18 @@ export default defineConfig({
   server: {
     port: 8080,
     host: true,
+    headers: {
+      "Content-Security-Policy":
+        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://utt.impactcdn.com https://www.thunderbolt.com https://www.googletagmanager.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.thunderbolt.com; img-src 'self' data: blob: https: http:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https: wss: http://localhost:* http://127.0.0.1:*; frame-src 'self' https://www.thunderbolt.com https://chromewebstore.google.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self' https:; upgrade-insecure-requests;",
+      "X-Frame-Options": "DENY",
+      "X-Content-Type-Options": "nosniff",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+      "Permissions-Policy":
+        'camera=(), microphone=(self "https://www.thunderbolt.com"), geolocation=(), payment=(self)',
+      "X-XSS-Protection": "1; mode=block",
+      "X-Permitted-Cross-Domain-Policies": "none",
+    },
     proxy: {
       "/api": {
         target: "http://127.0.0.1:3000",
@@ -163,6 +175,22 @@ export default defineConfig({
     },
     watch: {
       ignored: ["**/docs/**"],
+    },
+  },
+  preview: {
+    port: 8080,
+    host: true,
+    headers: {
+      "Content-Security-Policy":
+        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://utt.impactcdn.com https://www.thunderbolt.com https://www.googletagmanager.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.thunderbolt.com; img-src 'self' data: blob: https: http:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https: wss: http://localhost:* http://127.0.0.1:*; frame-src 'self' https://www.thunderbolt.com https://chromewebstore.google.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self' https:; upgrade-insecure-requests;",
+      "X-Frame-Options": "DENY",
+      "X-Content-Type-Options": "nosniff",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+      "Permissions-Policy":
+        'camera=(), microphone=(self "https://www.thunderbolt.com"), geolocation=(), payment=(self)',
+      "X-XSS-Protection": "1; mode=block",
+      "X-Permitted-Cross-Domain-Policies": "none",
     },
   },
   optimizeDeps: {
