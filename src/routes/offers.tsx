@@ -180,7 +180,7 @@ function OffersHubPage() {
       />
 
       {/* ── Compact Page Header + Controls ── */}
-      <section className="sticky top-0 z-30 border-b border-border/80 bg-background/95 backdrop-blur-lg px-4 sm:px-6 py-3 shadow-sm">
+      <section className="sticky top-0 z-30 border-b border-border bg-background px-4 sm:px-6 py-3 shadow-sm">
         <div className="mx-auto max-w-6xl space-y-2.5">
 
           {/* Row 1: Brand pill + title + trust badges */}
@@ -216,7 +216,7 @@ function OffersHubPage() {
                 placeholder="Search store or code…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-border/80 bg-card/80 pl-9 pr-8 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 transition-all"
+                className="w-full rounded-xl border border-border bg-muted/40 pl-9 pr-8 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 transition-all"
               />
               {searchQuery && (
                 <button
@@ -484,125 +484,100 @@ function OffersHubPage() {
               })}
             </div>
           ) : (
-            /* ========================================================================= */
-            /* BEAUTIFIED ANIMATED GRID VIEW                                             */
-            /* ========================================================================= */
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            /* ── CLEAN MINIMAL GRID VIEW ── */
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {filteredOffers.map((deal, idx) => {
                 const affiliateUrl = wrapAffiliateTracking(deal.link, "gocoupon_offers_grid");
                 const logoUrl = getStoreLogoUrl(deal);
                 const isCopied = copiedCode === deal.code;
+                const hasCode = deal.code && deal.code.length > 1;
+
+                /* Badge accent colour */
+                const accentClass =
+                  deal.badge === "Verified"
+                    ? "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/60"
+                    : deal.badge === "Exclusive"
+                    ? "text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40 border-violet-200 dark:border-violet-800/60"
+                    : "text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/60";
 
                 return (
                   <div
                     key={deal.id}
-                    style={{ animationDelay: `${Math.min(idx * 40, 400)}ms` }}
-                    className="group relative flex flex-col justify-between rounded-3xl border border-border/80 bg-card/80 backdrop-blur-md p-6 transition-all duration-300 hover:border-primary/50 hover:shadow-2xl hover:-translate-y-1 overflow-hidden animate-in fade-in-50 slide-in-from-bottom-2"
+                    style={{ animationDelay: `${Math.min(idx * 30, 300)}ms` }}
+                    className="group flex flex-col rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:border-primary/40 hover:shadow-lg animate-in fade-in-0 slide-in-from-bottom-2"
                   >
-                    <div>
-                      {/* Top Store Badge & Verified Pill */}
-                      <div className="flex items-center justify-between gap-2 mb-4">
-                        <div className="flex items-center gap-2">
-                          <div className="h-9 w-9 shrink-0 rounded-xl border border-border/80 bg-background/90 p-1.5 flex items-center justify-center shadow-2xs overflow-hidden">
-                            {logoUrl ? (
-                              <img
-                                src={logoUrl}
-                                alt={deal.storeName}
-                                className="max-h-full max-w-full object-contain"
-                                loading="lazy"
-                              />
-                            ) : (
-                              <Store className="h-4 w-4 text-primary" />
-                            )}
-                          </div>
-                          <span className="font-mono text-xs font-bold text-foreground">
-                            {deal.storeName}
-                          </span>
+                    {/* ── Store row ── */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2.5">
+                        <div className="h-8 w-8 shrink-0 rounded-lg border border-border bg-background flex items-center justify-center overflow-hidden">
+                          {logoUrl ? (
+                            <img
+                              src={logoUrl}
+                              alt={deal.storeName}
+                              className="max-h-full max-w-full object-contain"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <Store className="h-4 w-4 text-muted-foreground" />
+                          )}
                         </div>
-
-                        <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-                          {deal.badge}
+                        <span className="text-[13px] font-semibold text-foreground leading-none">
+                          {deal.storeName}
                         </span>
                       </div>
-
-                      {/* Discount Callout */}
-                      <div className="mb-2">
-                        <div className="font-mono text-2xl sm:text-3xl font-black text-foreground tracking-tight">
-                          {deal.discount}
-                        </div>
-                        {deal.minOrder && (
-                          <span className="text-[11px] font-mono text-muted-foreground">
-                            Min. order {deal.minOrder}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Title */}
-                      <h3 className="font-display text-base font-bold leading-snug text-foreground group-hover:text-primary transition-colors">
-                        {deal.title}
-                      </h3>
-
-                      {deal.terms && (
-                        <p className="mt-2 text-xs text-muted-foreground line-clamp-2">
-                          {deal.terms}
-                        </p>
-                      )}
+                      <span className={`rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${accentClass}`}>
+                        {deal.badge}
+                      </span>
                     </div>
 
-                    <div className="mt-6">
-                      {/* Coupon Strip */}
-                      <div className="rounded-2xl border border-border/80 bg-muted/30 p-3 mb-4">
-                        {deal.code && deal.code.length > 1 ? (
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2 font-mono text-xs font-bold text-foreground">
-                              <Tag className="h-3.5 w-3.5 text-primary" />
-                              <span>{deal.code}</span>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => handleCopyCode(deal.code)}
-                              className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
-                                isCopied
-                                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
-                                  : "bg-card border border-border text-foreground hover:bg-muted"
-                              }`}
-                            >
-                              {isCopied ? (
-                                <>
-                                  <Check className="h-3 w-3 text-emerald-400" />
-                                  <span>Copied</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Copy className="h-3 w-3 text-muted-foreground" />
-                                  <span>Copy</span>
-                                </>
-                              )}
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-2 font-mono text-xs font-bold text-orange-500">
-                            <span>🔥 STEAL DEAL — No code needed</span>
-                          </div>
-                        )}
+                    {/* ── Discount + Title ── */}
+                    <div className="mb-3">
+                      <div className="text-2xl font-black tracking-tight text-foreground leading-none mb-1.5">
+                        {deal.discount}
                       </div>
+                      <h3 className="text-[13px] font-medium text-foreground leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+                        {deal.title}
+                      </h3>
+                    </div>
 
-                      {/* Footer Info & Action */}
-                      <div className="flex items-center justify-between pt-3 border-t border-border/80">
-                        <span className="inline-flex items-center gap-1 font-mono text-[11px] text-muted-foreground">
-                          <Clock className="h-3 w-3 text-sky-400" />
-                          <span>{deal.expiresIn}</span>
-                        </span>
-                        <a
-                          href={affiliateUrl}
-                          target="_blank"
-                          rel="noopener noreferrer nofollow"
-                          className="inline-flex items-center gap-1.5 font-bold text-xs text-primary hover:underline group/btn"
+                    {/* ── Expiry ── */}
+                    <div className="flex items-center gap-1 mb-4">
+                      <Clock className="h-3 w-3 text-muted-foreground/60 shrink-0" />
+                      <span className="text-[11px] text-muted-foreground">{deal.expiresIn}</span>
+                    </div>
+
+                    {/* ── Coupon + CTA ── */}
+                    <div className="mt-auto flex items-center gap-2">
+                      {hasCode ? (
+                        <button
+                          type="button"
+                          onClick={() => handleCopyCode(deal.code)}
+                          className={`flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-dashed py-2 text-xs font-bold font-mono transition-all cursor-pointer ${
+                            isCopied
+                              ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400"
+                              : "border-border bg-muted/50 text-foreground hover:border-primary hover:bg-primary/5"
+                          }`}
                         >
-                          <span>Open Store</span>
-                          <ExternalLink className="h-3 w-3 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
-                        </a>
-                      </div>
+                          {isCopied ? (
+                            <><Check className="h-3.5 w-3.5 stroke-[3]" /><span>COPIED!</span></>
+                          ) : (
+                            <><Copy className="h-3.5 w-3.5" /><span>{deal.code}</span></>
+                          )}
+                        </button>
+                      ) : (
+                        <span className="flex-1 flex items-center justify-center gap-1 rounded-xl border border-dashed border-orange-300 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/30 py-2 text-xs font-bold text-orange-600 dark:text-orange-400">
+                          🔥 STEAL DEAL
+                        </span>
+                      )}
+                      <a
+                        href={affiliateUrl}
+                        target="_blank"
+                        rel="noopener noreferrer nofollow"
+                        className="shrink-0 inline-flex items-center gap-1 rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-primary-foreground hover:bg-primary/90 transition-colors"
+                      >
+                        Open
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
                     </div>
                   </div>
                 );
