@@ -14,8 +14,11 @@
  * - Curated fallback catalog when API key is missing or network times out
  */
 
+import fs from "node:fs";
+import path from "node:path";
 import type { StoreCoupon } from "../../../src/lib/services/canonical-types.js";
 import type { DealRecord, DealCategory, DealBadge } from "../../../src/lib/server-data/deals-db.js";
+import { setLiveDeals } from "../../../src/lib/server-data/deals-db.js";
 
 const CUELINKS_V3_BASE_URL = "https://developers.cuelinks.com/pub_api/v3";
 
@@ -36,6 +39,7 @@ export interface CuelinksCouponOffer {
   categories?: string[];
   status?: string;
   imageUrl?: string;
+  percentOff?: number;
 }
 
 export interface CuelinksCampaign {
@@ -269,7 +273,31 @@ export async function testCuelinksConnection(): Promise<CuelinksConnectionStatus
 }
 
 /**
+ * Helper to extract discount label from Cuelinks offer payload
+ */
+export function extractDiscountFromOffer(o: any): string {
+  if (o.percent_off && Number(o.percent_off) > 0) {
+    return `${o.percent_off}% OFF`;
+  }
+  if (o.discount_price && o.original_price && Number(o.original_price) > Number(o.discount_price)) {
+    const diff = Number(o.original_price) - Number(o.discount_price);
+    if (diff > 0) return `₹${diff.toLocaleString()} OFF`;
+  }
+  if (o.discount && typeof o.discount === "string" && o.discount.trim()) {
+    return o.discount.trim();
+  }
+  const text = `${o.title || ""} ${o.description || ""}`;
+  const pctMatch = text.match(/([0-9]+)%\s*(?:off|discount)/i);
+  if (pctMatch) return `${pctMatch[1]}% OFF`;
+  const flatMatch = text.match(/(?:flat\s*)?(?:₹|rs\.?)\s*([0-9,]+)\s*(?:off|discount)/i);
+  if (flatMatch) return `₹${flatMatch[1]} OFF`;
+  if (/free shipping/i.test(text)) return "FREE SHIPPING";
+  return "Verified Deal";
+}
+
+/**
  * Fetches verified live coupons & deals from Cuelinks API v3 (/offers).
+ * Automatically purges expired deals based on end_date and status.
  */
 export async function fetchCuelinksCoupons(options: {
   storeNameOrDomain?: string;
@@ -305,30 +333,56 @@ export async function fetchCuelinksCoupons(options: {
       if (res.ok) {
         const json = await res.json();
         const rawOffers = Array.isArray(json.data) ? json.data : [];
+        const now = Date.now();
 
-        const normalized: CuelinksCouponOffer[] = rawOffers.map((o: any) => {
-          const fallbackStore = o.campaign_name || "Partner Store";
-          const trackingUrl = o.tracking_url || buildCuelinksRedirectUrl({ merchantUrl: `https://${o.domain || "flipkart.com"}` });
+        const normalized: CuelinksCouponOffer[] = [];
+        for (const o of rawOffers) {
+          // 1. Strict status check: only live/active
+          if (o.status && o.status !== "live" && o.status !== "active") {
+            continue;
+          }
 
-          return {
+          // 2. Strict expiration pruning: drop expired offers
+          if (o.end_date) {
+            const endMs = new Date(o.end_date).getTime();
+            if (!isNaN(endMs) && endMs < now) {
+              continue;
+            }
+          }
+
+          const fallbackStore = (o.campaign_name || "Partner Store").trim();
+          const trackingUrl =
+            o.tracking_url ||
+            buildCuelinksRedirectUrl({ merchantUrl: `https://${o.domain || "flipkart.com"}` });
+
+          const rawCode = (o.coupon_code || o.code || "").trim();
+          const cleanCode =
+            rawCode && !/^(deal|none|na|null|undefined)$/i.test(rawCode)
+              ? rawCode.replace(/\s+/g, "").toUpperCase()
+              : "DEALACTIVATED";
+
+          const discount = extractDiscountFromOffer(o);
+
+          normalized.push({
             id: `cue_${o.id}`,
             storeName: fallbackStore,
             storeDomain: o.domain || `${fallbackStore.toLowerCase().replace(/\s+/g, "")}.com`,
             campaignId: Number(o.campaign_id) || 0,
-            code: (o.code || "DEALACTIVATED").trim().toUpperCase(),
-            title: o.title || "Exclusive Merchant Offer",
+            code: cleanCode,
+            title: o.title || `${discount} at ${fallbackStore}`,
             description: o.description || o.terms || "",
-            discount: o.discount || o.title || "Verified Deal",
+            discount,
             minOrder: o.minimum_order ? Number(o.minimum_order) : undefined,
             startDate: o.start_date || new Date().toISOString(),
-            endDate: o.end_date || o.valid_till || new Date(Date.now() + 30 * 86400000).toISOString(),
+            endDate: o.end_date || new Date(Date.now() + 30 * 86400000).toISOString(),
             affiliateUrl: trackingUrl,
             offerType: o.offer_type === "deal" ? "deal" : "coupon",
             categories: Array.isArray(o.categories) ? o.categories.map((c: any) => c.name || c) : [],
             status: "active",
             imageUrl: o.image || undefined,
-          };
-        });
+            percentOff: o.percent_off ? Number(o.percent_off) : undefined,
+          });
+        }
 
         setCached(cacheKey, normalized, 15 * 60 * 1000); // 15 mins
         return normalized;
@@ -484,18 +538,30 @@ export function normalizeCuelinksToDealRecord(offer: CuelinksCouponOffer): DealR
     amazon: "/Brand logos/Amazon_logo.svg.webp",
     flipkart: "/Brand logos/flipkart.webp",
     myntra: "/Brand logos/myntra.webp",
-    croma: "/Brand logos/croma.svg",
+    croma: "/Brand logos/Croma.webp",
     reliance: "/Brand logos/reliance.svg",
     tatacliq: "/Brand logos/Tata-cliq.webp",
     ajio: "/Brand logos/Ajio.webp",
     nykaa: "/Brand logos/Nykaa.webp",
     meesho: "/Brand logos/Meesho_logo.webp",
+    bewakoof: "/Brand logos/Bewakoof.webp",
+    boat: "/Brand logos/boat.webp",
+    asus: "/Brand logos/Asus.webp",
+    acer: "/Brand logos/Acer.webp",
+    dell: "/Brand logos/Dell_logo.svg.webp",
+    lenovo: "/Brand logos/Lenovo_logo.svg.webp",
+    samsung: "/Brand logos/Samsung.webp",
+    levis: "/Brand logos/Levis.webp",
+    swiggy: "/Brand logos/swiggy.webp",
+    zomato: "/Brand logos/zomato.webp",
+    firstcry: "/Brand logos/firstcry.webp",
+    pepperfry: "/Brand logos/pepperfry.webp",
   };
 
   const storeKey = offer.storeName.toLowerCase().replace(/[^a-z0-9]/g, "");
   let storeLogo: string | undefined = offer.imageUrl;
   for (const [key, logo] of Object.entries(STORE_LOGOS_MAP)) {
-    if (storeKey.includes(key)) {
+    if (storeKey.includes(key) || key.includes(storeKey)) {
       storeLogo = logo;
       break;
     }
@@ -505,12 +571,24 @@ export function normalizeCuelinksToDealRecord(offer: CuelinksCouponOffer): DealR
   try {
     const end = new Date(offer.endDate).getTime();
     const diffDays = Math.ceil((end - Date.now()) / (1000 * 60 * 60 * 24));
-    if (diffDays > 0 && diffDays < 90) {
+    if (diffDays <= 0) {
+      expiresIn = "Expired";
+    } else if (diffDays === 1) {
+      expiresIn = "1 day left";
+    } else if (diffDays > 1 && diffDays <= 60) {
       expiresIn = `${diffDays} days left`;
+    } else {
+      expiresIn = "Active Offer";
     }
   } catch {}
 
-  const badge: DealBadge = offer.code && offer.code !== "DEALACTIVATED" ? "Verified" : "Trending";
+  const hasCoupon = offer.code && offer.code !== "DEALACTIVATED";
+  let badge: DealBadge = "Trending";
+  if (hasCoupon) {
+    badge = "Verified";
+  } else if (offer.discount.includes("%") && parseInt(offer.discount, 10) >= 35) {
+    badge = "Exclusive";
+  }
 
   return {
     id: offer.id,
@@ -524,6 +602,7 @@ export function normalizeCuelinksToDealRecord(offer: CuelinksCouponOffer): DealR
     badge,
     verifiedDate: "Live Verified",
     expiresIn,
+    endDate: offer.endDate || undefined,
     minOrder: offer.minOrder ? `₹${offer.minOrder.toLocaleString()}` : undefined,
     terms: offer.description || `Valid on ${offer.storeName}. Automatically tracked & monetized via Cuelinks.`,
     link: offer.affiliateUrl,
@@ -531,8 +610,247 @@ export function normalizeCuelinksToDealRecord(offer: CuelinksCouponOffer): DealR
   };
 }
 
+// ─── 24/7 Dynamic Cuelinks Engine & In-Memory Store ──────────────────────────
+
+let liveDealsPool: DealRecord[] = [];
+let lastSyncMetadata = {
+  lastSyncedAt: "",
+  totalFetched: 0,
+  activeCount: 0,
+  expiredCount: 0,
+  nextSyncAt: "",
+};
+
+function getProjectDataPath(relativePath: string): string {
+  return path.resolve(process.cwd(), relativePath);
+}
+
+function loadInitialDealsFromDisk(): DealRecord[] {
+  try {
+    const targetPath = getProjectDataPath("src/data/live-deals.json");
+    if (fs.existsSync(targetPath)) {
+      const raw = fs.readFileSync(targetPath, "utf-8");
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed?.deals) && parsed.deals.length > 0) {
+        lastSyncMetadata = {
+          lastSyncedAt: parsed.updatedAt || new Date().toISOString(),
+          totalFetched: parsed.totalFetched || parsed.deals.length,
+          activeCount: parsed.activeCount || parsed.deals.length,
+          expiredCount: parsed.expiredCount || 0,
+          nextSyncAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+        };
+        return parsed.deals;
+      }
+    }
+  } catch (err: any) {
+    console.warn("[Cuelinks Client] Could not load initial live-deals.json:", err?.message);
+  }
+  return [];
+}
+
+// Pre-load from disk on module import
+liveDealsPool = loadInitialDealsFromDisk();
+
+/**
+ * Returns current active, non-expired deals from the 24/7 Cuelinks live pool.
+ */
+export function getLiveDealsPool(): DealRecord[] {
+  if (liveDealsPool.length === 0) {
+    liveDealsPool = loadInitialDealsFromDisk();
+  }
+  const now = Date.now();
+  return liveDealsPool.filter((d) => {
+    if (d.expiresIn === "Expired") return false;
+    if (d.endDate) {
+      const end = new Date(d.endDate).getTime();
+      if (!isNaN(end) && end < now) return false;
+    }
+    return true;
+  });
+}
+
+/**
+ * Returns live sync health statistics.
+ */
+export function getLiveSyncStats() {
+  return {
+    ...lastSyncMetadata,
+    currentPoolCount: getLiveDealsPool().length,
+  };
+}
+
+/**
+ * Executes a live 24/7 sync cycle against Cuelinks API v3 (/offers).
+ * Automatically purges expired deals and persists the fresh snapshot.
+ */
+export async function syncLiveCuelinksDeals(maxPages: number = 5): Promise<{
+  updatedAt: string;
+  totalFetched: number;
+  activeCount: number;
+  expiredCount: number;
+  deals: DealRecord[];
+}> {
+  console.log(`⏱️ [Cuelinks 24/7 Syncer] Ingesting live offers from Cuelinks API v3 (pages 1-${maxPages})...`);
+  const config = getCuelinksConfig();
+
+  if (!config.isConfigured) {
+    console.warn("⚠️ [Cuelinks 24/7 Syncer] API key not configured, retaining disk snapshot.");
+    return {
+      updatedAt: lastSyncMetadata.lastSyncedAt || new Date().toISOString(),
+      totalFetched: 0,
+      activeCount: liveDealsPool.length,
+      expiredCount: 0,
+      deals: getLiveDealsPool(),
+    };
+  }
+
+  const rawDeals: any[] = [];
+  for (let page = 1; page <= maxPages; page++) {
+    try {
+      const url = new URL(`${CUELINKS_V3_BASE_URL}/offers`);
+      url.searchParams.set("page", String(page));
+      url.searchParams.set("per_page", "50");
+
+      const res = await fetch(url.toString(), {
+        headers: getV3Headers(config.apiKey),
+        signal: AbortSignal.timeout(8000),
+      });
+
+      if (!res.ok) {
+        console.warn(`[Cuelinks 24/7 Syncer] Page ${page} responded HTTP ${res.status}`);
+        break;
+      }
+
+      const json = await res.json();
+      if (Array.isArray(json.data) && json.data.length > 0) {
+        rawDeals.push(...json.data);
+      } else {
+        break;
+      }
+    } catch (err: any) {
+      console.warn(`[Cuelinks 24/7 Syncer] Page ${page} fetch failed:`, err?.message);
+      break;
+    }
+  }
+
+  const now = Date.now();
+  let expiredCount = 0;
+  const newDeals: DealRecord[] = [];
+  const seenKeys = new Set<string>();
+
+  for (const o of rawDeals) {
+    // 1. Strict status check
+    if (o.status && o.status !== "live" && o.status !== "active") {
+      expiredCount++;
+      continue;
+    }
+
+    // 2. Strict expiration pruning
+    if (o.end_date) {
+      const endMs = new Date(o.end_date).getTime();
+      if (!isNaN(endMs) && endMs < now) {
+        expiredCount++;
+        continue;
+      }
+    }
+
+    const storeName = (o.campaign_name || "Partner Store").trim();
+    const storeSlug = storeName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") + "-coupons";
+    const rawCode = (o.coupon_code || o.code || "").trim();
+    const hasCoupon = rawCode.length > 1 && !/^(deal|none|na|null|undefined)$/i.test(rawCode);
+    const cleanCode = hasCoupon ? rawCode.replace(/\s+/g, "").toUpperCase() : "DEALACTIVATED";
+    const discount = extractDiscountFromOffer(o);
+
+    // Dedup check
+    const dedupKey = `${storeName.toLowerCase()}_${cleanCode}_${(o.title || "").toLowerCase().slice(0, 30)}`;
+    if (seenKeys.has(dedupKey)) continue;
+    seenKeys.add(dedupKey);
+
+    const offerObj: CuelinksCouponOffer = {
+      id: `cue_${o.id}`,
+      storeName,
+      storeDomain: o.domain || `${storeName.toLowerCase().replace(/\s+/g, "")}.com`,
+      campaignId: Number(o.campaign_id) || 0,
+      code: cleanCode,
+      title: o.title || `${discount} at ${storeName}`,
+      description: o.description || o.terms || "",
+      discount,
+      minOrder: o.minimum_order ? Number(o.minimum_order) : undefined,
+      startDate: o.start_date || new Date().toISOString(),
+      endDate: o.end_date || new Date(Date.now() + 30 * 86400000).toISOString(),
+      affiliateUrl:
+        o.tracking_url ||
+        buildCuelinksRedirectUrl({ merchantUrl: `https://${o.domain || "gocoupon.io"}` }),
+      offerType: o.offer_type === "deal" ? "deal" : "coupon",
+      categories: Array.isArray(o.categories) ? o.categories.map((c: any) => c.name || c) : [],
+      status: "active",
+      imageUrl: o.image || undefined,
+      percentOff: o.percent_off ? Number(o.percent_off) : undefined,
+    };
+
+    const record = normalizeCuelinksToDealRecord(offerObj);
+    newDeals.push(record);
+  }
+
+  // Prioritize working coupon codes first, then highest usesCount
+  newDeals.sort((a, b) => {
+    const aHasCode = a.code !== "DEALACTIVATED" ? 1 : 0;
+    const bHasCode = b.code !== "DEALACTIVATED" ? 1 : 0;
+    if (aHasCode !== bHasCode) return bHasCode - aHasCode;
+    return (b.usesCount || 0) - (a.usesCount || 0);
+  });
+
+  if (newDeals.length > 0) {
+    liveDealsPool = newDeals;
+    setLiveDeals(newDeals);
+
+    const payload = {
+      updatedAt: new Date().toISOString(),
+      totalFetched: rawDeals.length,
+      activeCount: newDeals.length,
+      expiredCount,
+      deals: newDeals,
+    };
+
+    lastSyncMetadata = {
+      lastSyncedAt: payload.updatedAt,
+      totalFetched: rawDeals.length,
+      activeCount: newDeals.length,
+      expiredCount,
+      nextSyncAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    };
+
+    // Persist to src/data/live-deals.json
+    try {
+      const srcPath = getProjectDataPath("src/data/live-deals.json");
+      fs.writeFileSync(srcPath, JSON.stringify(payload, null, 2), "utf-8");
+      console.log(`✅ [Cuelinks 24/7 Syncer] Persisted ${newDeals.length} live deals to src/data/live-deals.json`);
+
+      const distPath = getProjectDataPath("dist/data/live-deals.json");
+      if (fs.existsSync(path.dirname(distPath))) {
+        fs.writeFileSync(distPath, JSON.stringify(payload, null, 2), "utf-8");
+      }
+    } catch (saveErr: any) {
+      console.warn("[Cuelinks 24/7 Syncer] Could not persist to disk:", saveErr?.message);
+    }
+  }
+
+  console.log(
+    `🔥 [Cuelinks 24/7 Syncer] Sync cycle complete: ${newDeals.length} active live deals, ${expiredCount} expired pruned.`
+  );
+
+  return {
+    updatedAt: lastSyncMetadata.lastSyncedAt,
+    totalFetched: rawDeals.length,
+    activeCount: newDeals.length,
+    expiredCount,
+    deals: newDeals,
+  };
+}
+
 /**
  * Fetches and normalizes live deals from Cuelinks API v3 (/offers).
+ * Reads directly from the 24/7 auto-updated live deals pool.
  */
 export async function fetchCuelinksDeals(options: {
   category?: string;
@@ -540,14 +858,20 @@ export async function fetchCuelinksDeals(options: {
   limit?: number;
   forceRefresh?: boolean;
 } = {}): Promise<DealRecord[]> {
-  const offers = await fetchCuelinksCoupons({
-    storeNameOrDomain: options.store,
-    category: options.category,
-    limit: options.limit || 30,
-    forceRefresh: options.forceRefresh,
-  });
+  if (options.forceRefresh || liveDealsPool.length === 0) {
+    await syncLiveCuelinksDeals(4);
+  }
 
-  return offers.map(normalizeCuelinksToDealRecord);
+  let deals = getLiveDealsPool();
+  if (options.store) {
+    const s = options.store.toLowerCase().replace(/[^a-z0-9]/g, "");
+    deals = deals.filter((d) => d.storeName.toLowerCase().replace(/[^a-z0-9]/g, "").includes(s));
+  }
+  if (options.category && options.category !== "all") {
+    const c = options.category.toLowerCase();
+    deals = deals.filter((d) => d.category.toLowerCase().includes(c) || c.includes(d.category.toLowerCase()));
+  }
+  return deals.slice(0, options.limit || 50);
 }
 
 // ─── Curated Fallback Data ───────────────────────────────────────────────────

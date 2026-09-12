@@ -21,10 +21,20 @@ export interface Deal {
   badge: DealBadge;
   verifiedDate: string;
   expiresIn: string;
+  endDate?: string;
   minOrder?: string;
   terms: string;
   link: string;
   usesCount: number;
+}
+
+export function isDealActive(deal: { endDate?: string; expiresIn?: string }): boolean {
+  if (deal.expiresIn === "Expired") return false;
+  if (deal.endDate) {
+    const end = new Date(deal.endDate).getTime();
+    if (!isNaN(end) && end < Date.now()) return false;
+  }
+  return true;
 }
 
 export interface DealsApiResponse {
@@ -58,7 +68,15 @@ export interface FetchDealsOptions {
 import { DEALS_DATA } from "@/data/dealsData";
 
 function getStaticDeals(options: FetchDealsOptions = {}): DealsApiResponse {
-  let filtered = [...DEALS_DATA];
+  const now = Date.now();
+  let filtered = DEALS_DATA.filter((d) => {
+    if (d.expiresIn === "Expired") return false;
+    if (d.endDate) {
+      const end = new Date(d.endDate).getTime();
+      if (!isNaN(end) && end < now) return false;
+    }
+    return true;
+  });
 
   if (options.category && options.category !== "all") {
     const catLower = options.category.toLowerCase();

@@ -109,7 +109,15 @@ function OffersHubPage() {
   });
 
   const filteredOffers = useMemo(() => {
+    const now = Date.now();
     return allDeals.filter((deal) => {
+      // 1. Dynamic 24/7 Expiry Pruning: Drop expired deals
+      if (deal.expiresIn === "Expired") return false;
+      if (deal.endDate) {
+        const end = new Date(deal.endDate).getTime();
+        if (!isNaN(end) && end < now) return false;
+      }
+
       const dCat = deal.category.toLowerCase();
       let matchesCategory = true;
       if (selectedCategory === "electronics") {
@@ -179,7 +187,7 @@ function OffersHubPage() {
         <div className="relative mx-auto max-w-5xl text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-rose-500/30 bg-rose-500/10 px-3.5 py-1 font-mono text-xs uppercase tracking-[0.2em] text-rose-500 shadow-xs">
             <Flame className="h-3.5 w-3.5 animate-pulse" />
-            <span>TODAY&apos;S VERIFIED OFFERS &amp; BARGAINS</span>
+            <span>24/7 LIVE CUELINKS SYNC • VERIFIED BARGAINS</span>
           </div>
 
           <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground text-balance">
@@ -238,12 +246,12 @@ function OffersHubPage() {
           <div className="mt-8 inline-flex flex-wrap items-center justify-center gap-4 sm:gap-6 py-2 px-4 rounded-full border border-emerald-500/20 bg-emerald-500/5 text-xs text-muted-foreground font-mono">
             <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
               <CheckCircle2 className="h-3.5 w-3.5" />
-              {allDeals.length} Verified Working Offers
+              {filteredOffers.length} Live Verified Offers
             </span>
             <span className="hidden sm:inline text-border">•</span>
             <span className="inline-flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5 text-sky-400" />
-              Verified in Real-Time
+              Auto-Pruned &amp; Updated 24/7
             </span>
             <span className="hidden sm:inline text-border">•</span>
             <span className="inline-flex items-center gap-1.5 text-amber-500 font-semibold">

@@ -55,7 +55,9 @@ export function useDeals(options: FetchDealsOptions = {}): UseDealsResult {
       options.offset ?? 0,
     ],
     queryFn: () => fetchDeals(options),
-    staleTime: 3 * 60 * 1000,
+    staleTime: 60 * 1000,
+    refetchInterval: 60 * 1000,
+    refetchOnWindowFocus: true,
     gcTime: 15 * 60 * 1000,
     retry: 1,
     placeholderData: {

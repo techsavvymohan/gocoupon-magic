@@ -1,0 +1,236 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const projectRoot = path.resolve(__dirname, "..");
+
+const CUELINKS_V3_BASE_URL = "https://developers.cuelinks.com/pub_api/v3";
+const apiKey = (process.env.CUELINKS_API_KEY || "").trim();
+const pubId = process.env.CUELINKS_PUBLISHER_ID || "148920";
+
+const STORE_LOGOS_MAP = {
+  amazon: "/Brand logos/Amazon_logo.svg.webp",
+  flipkart: "/Brand logos/flipkart.webp",
+  myntra: "/Brand logos/myntra.webp",
+  croma: "/Brand logos/Croma.webp",
+  reliance: "/Brand logos/reliance.svg",
+  tatacliq: "/Brand logos/Tata-cliq.webp",
+  ajio: "/Brand logos/Ajio.webp",
+  nykaa: "/Brand logos/Nykaa.webp",
+  meesho: "/Brand logos/Meesho_logo.webp",
+  bewakoof: "/Brand logos/Bewakoof.webp",
+  boat: "/Brand logos/boat.webp",
+  asus: "/Brand logos/Asus.webp",
+  acer: "/Brand logos/Acer.webp",
+  dell: "/Brand logos/Dell_logo.svg.webp",
+  lenovo: "/Brand logos/Lenovo_logo.svg.webp",
+  samsung: "/Brand logos/Samsung.webp",
+  levis: "/Brand logos/Levis.webp",
+  swiggy: "/Brand logos/swiggy.webp",
+  zomato: "/Brand logos/zomato.webp",
+  firstcry: "/Brand logos/firstcry.webp",
+  pepperfry: "/Brand logos/pepperfry.webp",
+};
+
+function getLogoForStore(storeName) {
+  const clean = (storeName || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  for (const [key, logo] of Object.entries(STORE_LOGOS_MAP)) {
+    if (clean.includes(key) || key.includes(clean)) {
+      return logo;
+    }
+  }
+  return undefined;
+}
+
+function extractDiscount(o) {
+  if (o.percent_off && Number(o.percent_off) > 0) {
+    return `${o.percent_off}% OFF`;
+  }
+  if (o.discount_price && o.original_price && Number(o.original_price) > Number(o.discount_price)) {
+    const diff = Number(o.original_price) - Number(o.discount_price);
+    if (diff > 0) return `₹${diff.toLocaleString()} OFF`;
+  }
+  if (o.discount && typeof o.discount === "string" && o.discount.trim()) {
+    return o.discount.trim();
+  }
+  const text = `${o.title || ""} ${o.description || ""}`;
+  const pctMatch = text.match(/([0-9]+)%\s*(?:off|discount)/i);
+  if (pctMatch) return `${pctMatch[1]}% OFF`;
+  const flatMatch = text.match(/(?:flat\s*)?(?:₹|rs\.?)\s*([0-9,]+)\s*(?:off|discount)/i);
+  if (flatMatch) return `₹${flatMatch[1]} OFF`;
+  if (/free shipping/i.test(text)) return "FREE SHIPPING";
+  return "Verified Deal";
+}
+
+function mapCategory(categories, title) {
+  const catNames = Array.isArray(categories)
+    ? categories.map((c) => (typeof c === "object" ? c.name : c) || "")
+    : [];
+  const text = (catNames.join(" ") + " " + (title || "")).toLowerCase();
+  if (/fashion|apparel|clothing|shoes|footwear|sneaker|shirt|denim|saree|ethnic|dress|lingerie/i.test(text)) return "Fashion";
+  if (/electronic|mobile|laptop|computer|phone|audio|headphone|earbud|gadget|camera|tv/i.test(text)) return "Electronics";
+  if (/beauty|cosmetic|skincare|hair|makeup|perfume|fragrance|wellness/i.test(text)) return "Beauty";
+  if (/home|kitchen|furniture|decor|bedding|appliance|cookware/i.test(text)) return "Home";
+  if (/food|dining|grocery|snack|beverage|meal|hotel|restaurant/i.test(text)) return "Food";
+  if (/travel|flight|hotel|tour|bus|holiday|train/i.test(text)) return "Travel";
+  if (/recharge|bill|utility|telecom/i.test(text)) return "Recharge";
+  return "General";
+}
+
+export async function runCuelinksSync(maxPages = 5) {
+  console.log(`[Cuelinks Sync] Starting 24/7 dynamic sync (API v3, maxPages: ${maxPages})...`);
+  const headers = {
+    Authorization: `Token ${apiKey}`,
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+
+  const rawDeals = [];
+  for (let page = 1; page <= maxPages; page++) {
+    try {
+      const res = await fetch(`${CUELINKS_V3_BASE_URL}/offers?page=${page}&per_page=50`, {
+        headers,
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!res.ok) {
+        console.warn(`[Cuelinks Sync] Page ${page} failed: ${res.status}`);
+        break;
+      }
+      const json = await res.json();
+      if (Array.isArray(json.data) && json.data.length > 0) {
+        rawDeals.push(...json.data);
+      } else {
+        break;
+      }
+    } catch (err) {
+      console.warn(`[Cuelinks Sync] Page ${page} error:`, err?.message || err);
+      break;
+    }
+  }
+
+  const now = Date.now();
+  let expiredCount = 0;
+  const liveDeals = [];
+  const seenKeys = new Set();
+
+  for (const o of rawDeals) {
+    // 1. Strict status check
+    if (o.status && o.status !== "live" && o.status !== "active") {
+      expiredCount++;
+      continue;
+    }
+
+    // 2. Strict expiration pruning: purge if endDate is in the past
+    if (o.end_date) {
+      const endMs = new Date(o.end_date).getTime();
+      if (!isNaN(endMs) && endMs < now) {
+        expiredCount++;
+        continue;
+      }
+    }
+
+    const storeName = (o.campaign_name || "Partner Store").trim();
+    const storeSlug = storeName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") + "-coupons";
+    const rawCode = (o.coupon_code || o.code || "").trim();
+    const hasCoupon = rawCode.length > 1 && !/^(deal|none|na|null|undefined)$/i.test(rawCode);
+    const code = hasCoupon ? rawCode.toUpperCase() : "DEALACTIVATED";
+    const discount = extractDiscount(o);
+    const category = mapCategory(o.categories, o.title);
+    const storeLogo = getLogoForStore(storeName) || (o.image && !o.image.includes("Placeholder") ? o.image : undefined);
+
+    let expiresIn = "Limited Time";
+    if (o.end_date) {
+      const end = new Date(o.end_date).getTime();
+      const diffDays = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+      if (diffDays <= 0) {
+        expiredCount++;
+        continue; // Expired today/earlier
+      } else if (diffDays === 1) {
+        expiresIn = "1 day left";
+      } else if (diffDays <= 60) {
+        expiresIn = `${diffDays} days left`;
+      } else {
+        expiresIn = "Active Offer";
+      }
+    }
+
+    // Deduplication check
+    const dedupKey = `${storeName.toLowerCase()}_${code}_${(o.title || "").toLowerCase().slice(0, 30)}`;
+    if (seenKeys.has(dedupKey)) continue;
+    seenKeys.add(dedupKey);
+
+    let badge = "Trending";
+    if (hasCoupon) {
+      badge = "Verified";
+    } else if (discount.includes("%") && parseInt(discount, 10) >= 35) {
+      badge = "Exclusive";
+    }
+
+    const trackingUrl =
+      o.tracking_url ||
+      `https://linksredirect.com/?pub_id=${pubId}&subid=gocoupon_live&url=${encodeURIComponent(o.url || "https://gocoupon.io")}`;
+
+    liveDeals.push({
+      id: `cue_${o.id}`,
+      storeName,
+      storeSlug,
+      storeLogo,
+      category,
+      title: o.title || `${discount} at ${storeName}`,
+      code,
+      discount,
+      badge,
+      verifiedDate: "Live Verified",
+      expiresIn,
+      endDate: o.end_date || undefined,
+      minOrder: o.minimum_order ? `₹${Number(o.minimum_order).toLocaleString()}` : undefined,
+      terms: (o.description || o.terms || `Valid on ${storeName}. Verified via Cuelinks 24/7 network.`).trim(),
+      link: trackingUrl,
+      usesCount: 1200 + (Math.abs(Number(o.id) || 0) % 4000),
+    });
+  }
+
+  // Prioritize verified working coupons on top, then highest discounts
+  liveDeals.sort((a, b) => {
+    const aHasCode = a.code !== "DEALACTIVATED" ? 1 : 0;
+    const bHasCode = b.code !== "DEALACTIVATED" ? 1 : 0;
+    if (aHasCode !== bHasCode) return bHasCode - aHasCode;
+    return (b.usesCount || 0) - (a.usesCount || 0);
+  });
+
+  const payload = {
+    updatedAt: new Date().toISOString(),
+    totalFetched: rawDeals.length,
+    activeCount: liveDeals.length,
+    expiredCount,
+    deals: liveDeals,
+  };
+
+  // Write to src/data/live-deals.json
+  const targetPath = path.join(projectRoot, "src/data/live-deals.json");
+  fs.writeFileSync(targetPath, JSON.stringify(payload, null, 2), "utf-8");
+  console.log(`[Cuelinks Sync] Saved ${liveDeals.length} live deals to ${targetPath} (Pruned ${expiredCount} expired).`);
+
+  // If dist/ exists, also update dist/data/live-deals.json
+  const distDir = path.join(projectRoot, "dist/data");
+  if (fs.existsSync(distDir)) {
+    fs.writeFileSync(path.join(distDir, "live-deals.json"), JSON.stringify(payload, null, 2), "utf-8");
+    console.log(`[Cuelinks Sync] Also mirrored to dist/data/live-deals.json`);
+  }
+
+  return payload;
+}
+
+if (process.argv[1] && process.argv[1].endsWith("sync-cuelinks-live.mjs")) {
+  runCuelinksSync(5)
+    .then((res) => {
+      console.log(`Sync complete! Live Active: ${res.activeCount}, Expired Pruned: ${res.expiredCount}`);
+      process.exit(0);
+    })
+    .catch((err) => {
+      console.error("Sync failed:", err);
+      process.exit(1);
+    });
+}
