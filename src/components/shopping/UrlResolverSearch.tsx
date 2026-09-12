@@ -1,15 +1,16 @@
 /**
  * @file UrlResolverSearch.tsx
- * @description Ultra-clean Shopping Search & Multi-Store URL Resolver with SearXNG API integration.
+ * @description Ultra-clean Shopping Search & Multi-Store URL Resolver with SearXNG API and Cuelinks Instant Open Integration.
  *
  * Features:
+ * - Top-Priority Partner Stores with 1-Click "⚡ Instant Open" Cuelinks affiliate redirection
  * - Direct SearXNG HTTP API integration (GET /search?q=...&format=json)
- * - Live real-time suggestions & autocomplete dropdown powered by SearXNG
+ * - Live real-time suggestions & autocomplete dropdown powered by SearXNG & local index
  * - WAI-ARIA APG compliant combobox with full keyboard navigation (ArrowUp/Down, Enter, Esc)
  * - Dynamic store placeholder rotating between Myntra, Amazon, Flipkart, Ajio & Meesho
  * - Supported store avatar stack (Amazon, Flipkart, Myntra, Meesho)
  * - 1-Click Clipboard Paste detection & clear button
- * - Optional connected trust badges row (8M+ Active Users, ₹10K CR Cash Saved, 100K+ Trusted Stores)
+ * - Optional connected trust badges row (200+ Stores, 90-Day Tracker, 100% Free Extension)
  */
 
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -18,19 +19,21 @@ import {
   unifiedProductSearch,
   type UnifiedProductSuggestion,
 } from "@/lib/services/unified-search-router";
-import type { SearXNGResult } from "@/lib/services/searxng-service";
+import {
+  findMatchingStores,
+  buildStoreAffiliateUrl,
+  type RegisteredStore,
+} from "@/lib/services/store-registry";
 import {
   Search,
-  TrendingUp,
   ArrowRight,
-  Clipboard,
   X,
   ShieldCheck,
-  Globe,
-  Loader2,
   ExternalLink,
   Tag,
   CheckCircle2,
+  Store as StoreIcon,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -70,7 +73,8 @@ export function UrlResolverSearch({
   const [isResolving, setIsResolving] = useState(false);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
 
-  // Real-time suggestions & product hits state
+  // Real-time suggestions, store matches & product hits state
+  const [matchedStores, setMatchedStores] = useState<RegisteredStore[]>([]);
   const [searxngSuggestions, setSearxngSuggestions] = useState<string[]>([]);
   const [productHits, setProductHits] = useState<UnifiedProductSuggestion[]>([]);
   const [isLoadingSearxng, setIsLoadingSearxng] = useState(false);
@@ -104,10 +108,11 @@ export function UrlResolverSearch({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Debounced Live Query & Catalog Fetcher
+  // Live Query, Store Priority Matching & Catalog Fetcher
   useEffect(() => {
     const trimmed = query.trim();
     if (trimmed.length < 2) {
+      setMatchedStores([]);
       setSearxngSuggestions([]);
       setProductHits([]);
       setShowDropdown(false);
@@ -115,10 +120,18 @@ export function UrlResolverSearch({
       return;
     }
 
+    // 1. Instant local store matching (<1ms) — comes ON TOP
+    const storeHits = findMatchingStores(trimmed, 3);
+    setMatchedStores(storeHits);
+    if (storeHits.length > 0) {
+      setShowDropdown(true);
+    }
+
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
     }
 
+    // 2. Debounced product and suggestion search
     setIsLoadingSearxng(true);
     searchTimeoutRef.current = setTimeout(async () => {
       try {
@@ -130,7 +143,7 @@ export function UrlResolverSearch({
         setSearxngSuggestions(suggestions);
         setProductHits(hits);
 
-        if (suggestions.length > 0 || hits.length > 0) {
+        if (storeHits.length > 0 || suggestions.length > 0 || hits.length > 0) {
           setShowDropdown(true);
         }
       } catch {
@@ -165,18 +178,42 @@ export function UrlResolverSearch({
     [navigate, onSearchSubmit],
   );
 
+  const handleInstantOpen = useCallback(
+    (store: RegisteredStore, openWindow = true) => {
+      const affUrl = buildStoreAffiliateUrl(store, "gocoupon_instant_search");
+      toast.success(`Opening ${store.name} with GoCoupon Cuelinks auto-savings!`);
+      setShowDropdown(false);
+      if (openWindow) {
+        window.open(affUrl, "_blank", "noopener,noreferrer");
+      }
+    },
+    [],
+  );
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (showDropdown && selectedIndex >= 0) {
-      if (selectedIndex < productHits.length) {
-        const selectedHit = productHits[selectedIndex];
+      // 1. Selected Store Hit
+      if (selectedIndex < matchedStores.length) {
+        const selectedStore = matchedStores[selectedIndex];
+        if (selectedStore) {
+          handleInstantOpen(selectedStore);
+          return;
+        }
+      }
+      // 2. Selected Product Hit
+      else if (selectedIndex < matchedStores.length + productHits.length) {
+        const hitIdx = selectedIndex - matchedStores.length;
+        const selectedHit = productHits[hitIdx];
         if (selectedHit) {
           setQuery(selectedHit.title);
           handleExecuteSearch(selectedHit.title);
           return;
         }
-      } else {
-        const suggIdx = selectedIndex - productHits.length;
+      }
+      // 3. Selected Autocomplete Suggestion
+      else {
+        const suggIdx = selectedIndex - matchedStores.length - productHits.length;
         const selectedSuggestion = searxngSuggestions[suggIdx];
         if (selectedSuggestion) {
           setQuery(selectedSuggestion);
@@ -197,7 +234,8 @@ export function UrlResolverSearch({
       return;
     }
 
-    const totalItems = productHits.length + searxngSuggestions.length;
+    const totalItems = matchedStores.length + productHits.length + searxngSuggestions.length;
+    if (totalItems === 0) return;
 
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -211,23 +249,9 @@ export function UrlResolverSearch({
     }
   };
 
-  const handlePasteClipboard = async () => {
-    try {
-      if (navigator.clipboard && navigator.clipboard.readText) {
-        const text = await navigator.clipboard.readText();
-        if (text.trim()) {
-          setQuery(text.trim());
-          handleExecuteSearch(text.trim());
-        }
-      }
-    } catch {
-      toast.info("Please paste the link using Ctrl+V or Long-Press");
-      inputRef.current?.focus();
-    }
-  };
-
   const handleClear = () => {
     setQuery("");
+    setMatchedStores([]);
     setShowDropdown(false);
     setSelectedIndex(-1);
     inputRef.current?.focus();
@@ -237,7 +261,7 @@ export function UrlResolverSearch({
 
   return (
     <div ref={containerRef} className={`group/search relative w-full ${className}`}>
-      {/* Ambient Luminous Glow Halo to highlight search bar and make it prominently noticeable */}
+      {/* Ambient Luminous Glow Halo */}
       <div
         className="absolute -inset-1 sm:-inset-1.5 rounded-[22px] sm:rounded-[30px] bg-gradient-to-r from-primary/30 via-amber-500/20 to-primary/30 opacity-75 blur-xl transition-all duration-500 group-hover/search:opacity-100 group-focus-within/search:opacity-100 pointer-events-none"
         aria-hidden="true"
@@ -283,13 +307,12 @@ export function UrlResolverSearch({
           aria-expanded={showDropdown}
           aria-haspopup="listbox"
           aria-autocomplete="list"
-          aria-label="Search or paste store product URL"
+          aria-label="Search store or paste product URL"
           className="w-full flex-1 bg-transparent border-none text-foreground placeholder:text-muted-foreground/70 text-base font-normal focus:outline-none focus:ring-0 focus-visible:outline-none py-1 sm:py-2 pr-2 touch-manipulation min-w-0 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
         />
 
-        {/* Right Section: Supports / Brand Avatars / Voice Search / Actions */}
+        {/* Right Section: Supports / Brand Avatars / Actions */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* If query has text, show clear button */}
           {query ? (
             <>
               <button
@@ -319,14 +342,11 @@ export function UrlResolverSearch({
               </button>
             </>
           ) : (
-            /* When input is empty: show 'supports' + Brand Avatars */
             <>
-              {/* Supports Label */}
               <span className="hidden sm:inline text-xs sm:text-sm font-normal text-muted-foreground/75 select-none mr-1">
                 supports
               </span>
 
-              {/* Overlapping Brand Avatars */}
               <div
                 className="flex items-center -space-x-2 sm:-space-x-2.5 py-0.5"
                 aria-label="Supported stores"
@@ -351,161 +371,289 @@ export function UrlResolverSearch({
         </div>
       </form>
 
-      {/* Live Dropdown Suggestions */}
-      {showDropdown && (productHits.length > 0 || searxngSuggestions.length > 0) && (
-        <div
-          role="listbox"
-          id="search-suggestions-list"
-          className="absolute top-full left-0 right-0 mt-2 z-50 rounded-2xl sm:rounded-3xl border border-border/80 bg-card/98 backdrop-blur-2xl p-2.5 sm:p-3 shadow-2xl text-left animate-in fade-in zoom-in-95 duration-150 divide-y divide-border/40 max-h-[420px] overflow-y-auto"
-        >
-          {/* Exact & Matched Products Section */}
-          {productHits.length > 0 && (
-            <div className="pb-2.5">
-              <div className="flex items-center justify-between px-2 py-0.5 mb-1.5">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-bold flex items-center gap-1.5">
-                  <Tag className="h-3 w-3 text-primary" />
-                  {productHits.some((h) => h.isExactMatch) ? "Exact Product Matches" : "Matched Products"}
-                </span>
-                <span className="text-[9px] font-mono font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full flex items-center gap-1">
-                  <CheckCircle2 className="h-2.5 w-2.5" /> Verified Prices
-                </span>
-              </div>
-              <ul className="space-y-1.5">
-                {productHits.map((hit, idx) => {
-                  const isSelected = selectedIndex === idx;
-                  return (
-                    <li
-                      key={hit.id || hit.title + idx}
-                      role="option"
-                      aria-selected={isSelected}
-                      onClick={() => {
-                        setQuery(hit.title);
-                        handleExecuteSearch(hit.title);
-                      }}
-                      className={`group/hit flex items-center gap-3 rounded-xl sm:rounded-2xl p-2 sm:p-2.5 transition-all cursor-pointer ${
-                        isSelected
-                          ? "bg-primary/15 border border-primary/40 shadow-xs"
-                          : "hover:bg-muted/80 border border-transparent hover:border-border/60"
-                      }`}
-                    >
-                      {/* Product Thumbnail */}
-                      <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-lg sm:rounded-xl bg-white dark:bg-neutral-900 p-1 border border-border/60 overflow-hidden flex items-center justify-center shadow-2xs">
-                        {hit.imageUrl ? (
-                          <img
-                            src={hit.imageUrl}
-                            alt={hit.title}
-                            className="h-full w-full object-contain"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center font-mono font-bold text-xs text-muted-foreground">
-                            {hit.brand?.slice(0, 2) || "GC"}
-                          </div>
-                        )}
-                      </div>
+      {/* Live Dropdown Suggestions — Stores Top-Ranked */}
+      {showDropdown &&
+        (matchedStores.length > 0 || productHits.length > 0 || searxngSuggestions.length > 0) && (
+          <div
+            role="listbox"
+            id="search-suggestions-list"
+            className="absolute top-full left-0 right-0 mt-2 z-50 rounded-2xl sm:rounded-3xl border border-border/80 bg-card/98 backdrop-blur-2xl p-2.5 sm:p-3 shadow-2xl text-left animate-in fade-in zoom-in-95 duration-150 divide-y divide-border/40 max-h-[460px] overflow-y-auto"
+          >
+            {/* ── 1. PARTNER STORES & INSTANT OPEN (SURFACED FIRST ON TOP) ── */}
+            {matchedStores.length > 0 && (
+              <div className="pb-2.5">
+                <div className="flex items-center justify-between px-2 py-0.5 mb-1.5">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-bold flex items-center gap-1.5">
+                    <StoreIcon className="h-3.5 w-3.5 text-primary" />
+                    Stores &amp; Instant Open
+                  </span>
+                  <span className="text-[9px] font-mono font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <Zap className="h-2.5 w-2.5 fill-emerald-500 text-emerald-500" />
+                    Cuelinks Tracking Active
+                  </span>
+                </div>
 
-                      {/* Product Details */}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
-                          {hit.brand && (
-                            <span className="rounded bg-primary/10 text-primary text-[10px] font-bold px-1.5 py-0.2">
-                              {hit.brand}
+                <ul className="space-y-1.5">
+                  {matchedStores.map((store, idx) => {
+                    const isSelected = selectedIndex === idx;
+                    const affiliateUrl = buildStoreAffiliateUrl(store, "gocoupon_instant_search");
+
+                    return (
+                      <li
+                        key={store.id}
+                        role="option"
+                        aria-selected={isSelected}
+                        className={`group/store flex items-center justify-between gap-3 rounded-xl sm:rounded-2xl p-2 sm:p-2.5 transition-all ${
+                          isSelected
+                            ? "bg-primary/15 border border-primary/40 shadow-xs"
+                            : "bg-muted/30 hover:bg-muted/70 border border-border/40 hover:border-primary/40"
+                        }`}
+                      >
+                        {/* Store Info Container */}
+                        <div
+                          className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1 cursor-pointer"
+                          onClick={() => handleInstantOpen(store)}
+                        >
+                          {/* Logo */}
+                          <div className="relative h-10 w-10 sm:h-11 sm:w-11 shrink-0 rounded-xl bg-white dark:bg-neutral-900 p-1.5 border border-border/80 shadow-2xs flex items-center justify-center overflow-hidden">
+                            <img
+                              src={store.logo}
+                              alt={store.name}
+                              className="h-full w-full object-contain"
+                              loading="lazy"
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = "none";
+                              }}
+                            />
+                            <span className="font-mono font-bold text-xs text-muted-foreground">
+                              {store.name.slice(0, 2).toUpperCase()}
                             </span>
+                          </div>
+
+                          {/* Details */}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
+                              <span className="text-xs sm:text-sm font-bold text-foreground group-hover/store:text-primary transition-colors">
+                                {store.name}
+                              </span>
+
+                              {store.isInstantOpen ? (
+                                <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold px-1.5 py-0.2 flex items-center gap-0.5">
+                                  <Zap className="h-2.5 w-2.5 fill-emerald-500 text-emerald-500" />
+                                  Instant Open
+                                </span>
+                              ) : (
+                                <span className="rounded-full bg-sky-500/15 border border-sky-500/30 text-sky-700 dark:text-sky-300 text-[10px] font-bold px-1.5 py-0.2 flex items-center gap-0.5">
+                                  <CheckCircle2 className="h-2.5 w-2.5 text-sky-600" />
+                                  Available
+                                </span>
+                              )}
+
+                              <span className="text-[10px] font-mono text-muted-foreground hidden sm:inline">
+                                • {store.domain}
+                              </span>
+                            </div>
+
+                            <p className="text-[11px] text-muted-foreground truncate">
+                              {store.defaultCoupon ? (
+                                <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                                  <strong className="font-mono">{store.defaultCoupon.code}</strong> —{" "}
+                                  {store.defaultCoupon.description}
+                                </span>
+                              ) : (
+                                <span>{store.cashbackRate} Cashback Available</span>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Actions Right */}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {store.internalRoute && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setShowDropdown(false);
+                                navigate({ to: store.internalRoute! });
+                              }}
+                              className="hidden md:inline-flex items-center rounded-lg border border-border/80 bg-card px-2.5 py-1 text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
+                            >
+                              Coupons
+                            </button>
                           )}
-                          {hit.isExactMatch && (
-                            <span className="rounded bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold px-1.5 py-0.2 flex items-center gap-0.5">
-                              <CheckCircle2 className="h-2.5 w-2.5 text-emerald-600" /> Exact Match
-                            </span>
-                          )}
-                          {hit.storeName && (
-                            <span className="text-[10px] text-muted-foreground">
-                              • Best on {hit.storeName}
-                            </span>
+
+                          <a
+                            href={affiliateUrl}
+                            target="_blank"
+                            rel="noopener noreferrer nofollow"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleInstantOpen(store, false);
+                            }}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold px-3 py-1.5 sm:py-2 shadow-xs transition-all touch-manipulation focus-visible:ring-2 focus-visible:ring-emerald-400"
+                            title={`Instant Open ${store.name} with Cuelinks auto-tracking`}
+                          >
+                            <span>Instant Open</span>
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+
+            {/* ── 2. EXACT & MATCHED PRODUCTS SECTION ── */}
+            {productHits.length > 0 && (
+              <div className="py-2.5">
+                <div className="flex items-center justify-between px-2 py-0.5 mb-1.5">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-bold flex items-center gap-1.5">
+                    <Tag className="h-3 w-3 text-primary" />
+                    {productHits.some((h) => h.isExactMatch) ? "Exact Product Matches" : "Matched Products"}
+                  </span>
+                  <span className="text-[9px] font-mono font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                    <CheckCircle2 className="h-2.5 w-2.5" /> Verified Prices
+                  </span>
+                </div>
+                <ul className="space-y-1.5">
+                  {productHits.map((hit, idx) => {
+                    const isSelected = selectedIndex === matchedStores.length + idx;
+                    return (
+                      <li
+                        key={hit.id || hit.title + idx}
+                        role="option"
+                        aria-selected={isSelected}
+                        onClick={() => {
+                          setQuery(hit.title);
+                          handleExecuteSearch(hit.title);
+                        }}
+                        className={`group/hit flex items-center gap-3 rounded-xl sm:rounded-2xl p-2 sm:p-2.5 transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-primary/15 border border-primary/40 shadow-xs"
+                            : "hover:bg-muted/80 border border-transparent hover:border-border/60"
+                        }`}
+                      >
+                        {/* Product Thumbnail */}
+                        <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-lg sm:rounded-xl bg-white dark:bg-neutral-900 p-1 border border-border/60 overflow-hidden flex items-center justify-center shadow-2xs">
+                          {hit.imageUrl ? (
+                            <img
+                              src={hit.imageUrl}
+                              alt={hit.title}
+                              className="h-full w-full object-contain"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center font-mono font-bold text-xs text-muted-foreground">
+                              {hit.brand?.slice(0, 2) || "GC"}
+                            </div>
                           )}
                         </div>
 
-                        <p className="text-xs sm:text-sm font-semibold text-foreground truncate group-hover/hit:text-primary transition-colors">
-                          {hit.title}
-                        </p>
-
-                        {/* Price Preview */}
-                        {hit.price && hit.price > 0 ? (
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-xs sm:text-sm font-bold text-foreground">
-                              ₹{hit.price.toLocaleString("en-IN")}
-                            </span>
-                            {hit.originalPrice && hit.originalPrice > hit.price && (
-                              <span className="text-[11px] text-muted-foreground line-through">
-                                ₹{hit.originalPrice.toLocaleString("en-IN")}
+                        {/* Product Details */}
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
+                            {hit.brand && (
+                              <span className="rounded bg-primary/10 text-primary text-[10px] font-bold px-1.5 py-0.2">
+                                {hit.brand}
                               </span>
                             )}
-                            {hit.discountPercent && hit.discountPercent > 0 ? (
-                              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-                                {hit.discountPercent}% OFF
+                            {hit.isExactMatch && (
+                              <span className="rounded bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold px-1.5 py-0.2 flex items-center gap-0.5">
+                                <CheckCircle2 className="h-2.5 w-2.5 text-emerald-600" /> Exact Match
                               </span>
-                            ) : null}
+                            )}
+                            {hit.storeName && (
+                              <span className="text-[10px] text-muted-foreground">
+                                • Best on {hit.storeName}
+                              </span>
+                            )}
                           </div>
-                        ) : null}
-                      </div>
 
-                      {/* Compare CTA */}
-                      <div className="shrink-0 flex items-center gap-1 text-xs font-semibold text-primary group-hover/hit:translate-x-0.5 transition-transform">
-                        <span className="hidden sm:inline">Compare</span>
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          )}
+                          <p className="text-xs sm:text-sm font-semibold text-foreground truncate group-hover/hit:text-primary transition-colors">
+                            {hit.title}
+                          </p>
 
-          {/* Autocomplete Suggestions */}
-          {searxngSuggestions.length > 0 && (
-            <div className="pt-2">
-              <div className="flex items-center justify-between px-2 py-0.5 mb-1">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
-                  <Search className="h-2.5 w-2.5 text-primary" /> Suggested Searches
-                </span>
-                <span className="text-[9px] font-mono text-muted-foreground/60">Fast Auto-fill</span>
+                          {/* Price Preview */}
+                          {hit.price && hit.price > 0 ? (
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-xs sm:text-sm font-bold text-foreground">
+                                ₹{hit.price.toLocaleString("en-IN")}
+                              </span>
+                              {hit.originalPrice && hit.originalPrice > hit.price && (
+                                <span className="text-[11px] text-muted-foreground line-through">
+                                  ₹{hit.originalPrice.toLocaleString("en-IN")}
+                                </span>
+                              )}
+                              {hit.discountPercent && hit.discountPercent > 0 ? (
+                                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                                  {hit.discountPercent}% OFF
+                                </span>
+                              ) : null}
+                            </div>
+                          ) : null}
+                        </div>
+
+                        {/* Compare CTA */}
+                        <div className="shrink-0 flex items-center gap-1 text-xs font-semibold text-primary group-hover/hit:translate-x-0.5 transition-transform">
+                          <span className="hidden sm:inline">Compare</span>
+                          <ArrowRight className="h-3.5 w-3.5" />
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
-              <ul className="space-y-0.5">
-                {searxngSuggestions.map((suggestion, idx) => {
-                  const isSelected = selectedIndex === productHits.length + idx;
-                  return (
-                    <li
-                      key={suggestion}
-                      role="option"
-                      aria-selected={isSelected}
-                      onClick={() => {
-                        setQuery(suggestion);
-                        handleExecuteSearch(suggestion);
-                      }}
-                      className={`flex items-center justify-between rounded-xl px-3 py-1.5 text-xs sm:text-sm transition-colors cursor-pointer ${
-                        isSelected
-                          ? "bg-primary text-primary-foreground font-semibold"
-                          : "text-foreground hover:bg-muted/80"
-                      }`}
-                    >
-                      <span className="truncate">{suggestion}</span>
-                      <ArrowRight className="h-3 w-3 opacity-60 ml-2 shrink-0" />
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          )}
+            )}
 
-          {/* Bottom Footer Tip */}
-          <div className="pt-2 px-2 flex items-center justify-between text-[10px] text-muted-foreground font-mono">
-            <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Real-Time Cross-Store Engine Active
-            </span>
-            <span>Press ↵ to compare</span>
+            {/* ── 3. AUTOCOMPLETE SUGGESTIONS ── */}
+            {searxngSuggestions.length > 0 && (
+              <div className="pt-2">
+                <div className="flex items-center justify-between px-2 py-0.5 mb-1">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
+                    <Search className="h-2.5 w-2.5 text-primary" /> Suggested Searches
+                  </span>
+                  <span className="text-[9px] font-mono text-muted-foreground/60">Fast Auto-fill</span>
+                </div>
+                <ul className="space-y-0.5">
+                  {searxngSuggestions.map((suggestion, idx) => {
+                    const isSelected =
+                      selectedIndex === matchedStores.length + productHits.length + idx;
+                    return (
+                      <li
+                        key={suggestion}
+                        role="option"
+                        aria-selected={isSelected}
+                        onClick={() => {
+                          setQuery(suggestion);
+                          handleExecuteSearch(suggestion);
+                        }}
+                        className={`flex items-center justify-between rounded-xl px-3 py-1.5 text-xs sm:text-sm transition-colors cursor-pointer ${
+                          isSelected
+                            ? "bg-primary text-primary-foreground font-semibold"
+                            : "text-foreground hover:bg-muted/80"
+                        }`}
+                      >
+                        <span className="truncate">{suggestion}</span>
+                        <ArrowRight className="h-3 w-3 opacity-60 ml-2 shrink-0" />
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+
+            {/* Bottom Footer Tip */}
+            <div className="pt-2 px-2 flex items-center justify-between text-[10px] text-muted-foreground font-mono">
+              <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Real-Time Cross-Store Engine Active
+              </span>
+              <span>Press ↵ to open or compare</span>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Popular High-Ticket Search Chips */}
       {showPopularChips && (
@@ -535,16 +683,14 @@ export function UrlResolverSearch({
         </div>
       )}
 
-      {/* Trust Badges Connected with Dashed Lines (Optional & Configurable) */}
+      {/* Trust Badges Connected with Dashed Lines */}
       {showTrustBadges && (
         <div className="mt-6 sm:mt-7 flex flex-wrap items-center justify-center sm:justify-between gap-3 sm:gap-4 text-xs select-none">
-          {/* Left dashed divider line */}
           <div
             className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30"
             aria-hidden="true"
           />
 
-          {/* Badge 1: 200+ Stores Worldwide */}
           <div className="inline-flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-400">
             <span className="flex h-5 w-5 items-center justify-center rounded-md bg-emerald-700 text-white shadow-xs">
               <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
@@ -554,13 +700,11 @@ export function UrlResolverSearch({
             </span>
           </div>
 
-          {/* Middle dashed divider line */}
           <div
             className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30"
             aria-hidden="true"
           />
 
-          {/* Badge 2: 90-Day Price Tracker */}
           <div className="inline-flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-400">
             <span className="flex h-5 w-5 items-center justify-center rounded-md bg-emerald-700 text-white shadow-xs">
               <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
@@ -570,13 +714,11 @@ export function UrlResolverSearch({
             </span>
           </div>
 
-          {/* Middle dashed divider line */}
           <div
             className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30"
             aria-hidden="true"
           />
 
-          {/* Badge 3: 100% Free Extension */}
           <div className="inline-flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-400">
             <span className="flex h-5 w-5 items-center justify-center rounded-md bg-emerald-700 text-white shadow-xs">
               <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
@@ -586,15 +728,12 @@ export function UrlResolverSearch({
             </span>
           </div>
 
-          {/* Right dashed divider line */}
           <div
             className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30"
             aria-hidden="true"
           />
         </div>
       )}
-
-
     </div>
   );
 }

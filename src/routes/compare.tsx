@@ -24,6 +24,7 @@ import { BankCardSelectorBar } from "@/components/shopping/BankCardSelectorBar";
 import { BankOfferBadge } from "@/components/shopping/BankOfferBadge";
 import { CardApplicationModal } from "@/components/shopping/CardApplicationModal";
 import { SUPPORTED_BANK_CARDS, type BankCardDefinition } from "@/lib/services/bank-offers";
+import { wrapAffiliateTracking } from "@/lib/services/store-registry";
 import {
   US_CREDIT_CARDS,
   calculateBnplInstallments,
@@ -710,9 +711,9 @@ export function ComparePage() {
 
                             <a
                               id="spotlight-best-deal-cta"
-                              href={lowestOffer.affiliateUrl || exactMatchProduct.directUrl}
+                              href={wrapAffiliateTracking(lowestOffer.affiliateUrl || exactMatchProduct.directUrl, "gocoupon_compare_spotlight")}
                               target="_blank"
-                              rel="noopener noreferrer"
+                              rel="noopener noreferrer nofollow"
                               className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 dark:bg-emerald-500 px-5 py-2.5 min-h-[44px] text-xs font-bold text-white shadow-md hover:bg-emerald-700 dark:hover:bg-emerald-600 transition-all touch-manipulation focus-visible:ring-2 focus-visible:ring-emerald-400"
                             >
                               <span>Buy on {lowestOffer.storeName}</span>
@@ -1060,9 +1061,9 @@ export function ComparePage() {
                         </button>
 
                         <a
-                          href={product.directUrl}
+                          href={wrapAffiliateTracking(product.directUrl, "gocoupon_compare_secondary")}
                           target="_blank"
-                          rel="noopener noreferrer"
+                          rel="noopener noreferrer nofollow"
                           className="inline-flex items-center justify-center gap-1 rounded-xl bg-primary px-3.5 py-2 min-h-[38px] text-xs font-bold text-primary-foreground shadow-xs hover:bg-primary/90 transition-colors touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
                         >
                           <span>Buy</span>

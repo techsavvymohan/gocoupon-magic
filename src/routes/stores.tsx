@@ -4,6 +4,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import { useStores } from "@/hooks/use-stores";
 import type { Store, StoreSortField } from "@/lib/api/stores-api";
+import { wrapAffiliateTracking } from "@/lib/services/store-registry";
 import { StoreGridSkeleton, FetchError } from "@/components/ui/DataSkeleton";
 import { useCurrency } from "@/context/CurrencyContext";
 import {
@@ -615,7 +616,7 @@ function StoreCard({
 
   return (
     <a
-      href={store.link}
+      href={wrapAffiliateTracking(store.link, "gocoupon_stores_directory")}
       target="_blank"
       rel="noopener noreferrer nofollow"
       className="block h-full"
