@@ -135,7 +135,7 @@ export async function runCuelinksSync(maxPages = 5) {
     const storeSlug = storeName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") + "-coupons";
     const rawCode = (o.coupon_code || o.code || "").trim();
     const hasCoupon = rawCode.length > 1 && !/^(deal|none|na|null|undefined)$/i.test(rawCode);
-    const code = hasCoupon ? rawCode.toUpperCase() : "DEALACTIVATED";
+    const code = hasCoupon ? rawCode.toUpperCase() : "";
     const discount = extractDiscount(o);
     const category = mapCategory(o.categories, o.title);
     const storeLogo = getLogoForStore(storeName) || (o.image && !o.image.includes("Placeholder") ? o.image : undefined);
@@ -194,8 +194,8 @@ export async function runCuelinksSync(maxPages = 5) {
 
   // Prioritize verified working coupons on top, then highest discounts
   liveDeals.sort((a, b) => {
-    const aHasCode = a.code !== "DEALACTIVATED" ? 1 : 0;
-    const bHasCode = b.code !== "DEALACTIVATED" ? 1 : 0;
+    const aHasCode = a.code && a.code.length > 1 ? 1 : 0;
+    const bHasCode = b.code && b.code.length > 1 ? 1 : 0;
     if (aHasCode !== bHasCode) return bHasCode - aHasCode;
     return (b.usesCount || 0) - (a.usesCount || 0);
   });

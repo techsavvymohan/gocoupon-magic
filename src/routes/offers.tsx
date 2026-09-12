@@ -164,7 +164,7 @@ function OffersHubPage() {
       "@type": "ListItem",
       position: idx + 1,
       name: deal.title,
-      description: `${deal.discount} at ${deal.storeName} with coupon ${deal.code}`,
+      description: `${deal.discount} at ${deal.storeName}${deal.code && deal.code.length > 1 ? ` — use code ${deal.code}` : ` — no code needed, discount auto-applied`}`,
       url: wrapAffiliateTracking(deal.link, "gocoupon_schema_offers"),
     })),
   };
@@ -487,28 +487,34 @@ function OffersHubPage() {
                       {/* Interactive Actions Group */}
                       <div className="flex items-center gap-2">
                         {/* Coupon Strip Button */}
-                        <button
-                          type="button"
-                          onClick={() => handleCopyCode(deal.code)}
-                          className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 font-mono text-xs font-bold transition-all cursor-pointer ${
-                            isCopied
-                              ? "border-emerald-500/60 bg-emerald-500/20 text-emerald-400 shadow-xs scale-105"
-                              : "border-dashed border-primary/40 bg-primary/5 text-foreground hover:bg-primary/10 hover:border-primary"
-                          }`}
-                          title="Click to copy coupon code"
-                        >
-                          {isCopied ? (
-                            <>
-                              <Check className="h-3.5 w-3.5 text-emerald-400 stroke-[2.5]" />
-                              <span>COPIED!</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="h-3.5 w-3.5 text-primary" />
-                              <span>{deal.code}</span>
-                            </>
-                          )}
-                        </button>
+                        {deal.code && deal.code.length > 1 ? (
+                          <button
+                            type="button"
+                            onClick={() => handleCopyCode(deal.code)}
+                            className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 font-mono text-xs font-bold transition-all cursor-pointer ${
+                              isCopied
+                                ? "border-emerald-500/60 bg-emerald-500/20 text-emerald-400 shadow-xs scale-105"
+                                : "border-dashed border-primary/40 bg-primary/5 text-foreground hover:bg-primary/10 hover:border-primary"
+                            }`}
+                            title="Click to copy coupon code"
+                          >
+                            {isCopied ? (
+                              <>
+                                <Check className="h-3.5 w-3.5 text-emerald-400 stroke-[2.5]" />
+                                <span>COPIED!</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="h-3.5 w-3.5 text-primary" />
+                                <span>{deal.code}</span>
+                              </>
+                            )}
+                          </button>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 rounded-xl border border-dashed border-orange-500/40 bg-orange-500/10 px-3 py-2 font-mono text-xs font-bold text-orange-500">
+                            🔥 STEAL DEAL
+                          </span>
+                        )}
 
                         {/* Instant Open Button */}
                         <a
@@ -595,33 +601,39 @@ function OffersHubPage() {
                     <div className="mt-6">
                       {/* Coupon Strip */}
                       <div className="rounded-2xl border border-border/80 bg-muted/30 p-3 mb-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2 font-mono text-xs font-bold text-foreground">
-                            <Tag className="h-3.5 w-3.5 text-primary" />
-                            <span>{deal.code}</span>
+                        {deal.code && deal.code.length > 1 ? (
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 font-mono text-xs font-bold text-foreground">
+                              <Tag className="h-3.5 w-3.5 text-primary" />
+                              <span>{deal.code}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyCode(deal.code)}
+                              className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
+                                isCopied
+                                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
+                                  : "bg-card border border-border text-foreground hover:bg-muted"
+                              }`}
+                            >
+                              {isCopied ? (
+                                <>
+                                  <Check className="h-3 w-3 text-emerald-400" />
+                                  <span>Copied</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="h-3 w-3 text-muted-foreground" />
+                                  <span>Copy</span>
+                                </>
+                              )}
+                            </button>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => handleCopyCode(deal.code)}
-                            className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
-                              isCopied
-                                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
-                                : "bg-card border border-border text-foreground hover:bg-muted"
-                            }`}
-                          >
-                            {isCopied ? (
-                              <>
-                                <Check className="h-3 w-3 text-emerald-400" />
-                                <span>Copied</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="h-3 w-3 text-muted-foreground" />
-                                <span>Copy</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
+                        ) : (
+                          <div className="flex items-center gap-2 font-mono text-xs font-bold text-orange-500">
+                            <span>🔥 STEAL DEAL — No code needed</span>
+                          </div>
+                        )}
                       </div>
 
                       {/* Footer Info & Action */}

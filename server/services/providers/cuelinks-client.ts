@@ -357,9 +357,9 @@ export async function fetchCuelinksCoupons(options: {
 
           const rawCode = (o.coupon_code || o.code || "").trim();
           const cleanCode =
-            rawCode && !/^(deal|none|na|null|undefined)$/i.test(rawCode)
+            rawCode && !/^(deal|none|na|null|undefined|dealactivated)$/i.test(rawCode)
               ? rawCode.replace(/\s+/g, "").toUpperCase()
-              : "DEALACTIVATED";
+              : "";
 
           const discount = extractDiscountFromOffer(o);
 
@@ -582,7 +582,7 @@ export function normalizeCuelinksToDealRecord(offer: CuelinksCouponOffer): DealR
     }
   } catch {}
 
-  const hasCoupon = offer.code && offer.code !== "DEALACTIVATED";
+  const hasCoupon = offer.code && offer.code.length > 1;
   let badge: DealBadge = "Trending";
   if (hasCoupon) {
     badge = "Verified";
@@ -597,7 +597,7 @@ export function normalizeCuelinksToDealRecord(offer: CuelinksCouponOffer): DealR
     storeLogo,
     category: cat,
     title: offer.title,
-    code: offer.code || "DEALACTIVATED",
+    code: offer.code || "",
     discount: offer.discount,
     badge,
     verifiedDate: "Live Verified",
@@ -757,8 +757,8 @@ export async function syncLiveCuelinksDeals(maxPages: number = 5): Promise<{
     const storeName = (o.campaign_name || "Partner Store").trim();
     const storeSlug = storeName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") + "-coupons";
     const rawCode = (o.coupon_code || o.code || "").trim();
-    const hasCoupon = rawCode.length > 1 && !/^(deal|none|na|null|undefined)$/i.test(rawCode);
-    const cleanCode = hasCoupon ? rawCode.replace(/\s+/g, "").toUpperCase() : "DEALACTIVATED";
+    const hasCoupon = rawCode.length > 1 && !/^(deal|none|na|null|undefined|dealactivated)$/i.test(rawCode);
+    const cleanCode = hasCoupon ? rawCode.replace(/\s+/g, "").toUpperCase() : "";
     const discount = extractDiscountFromOffer(o);
 
     // Dedup check
@@ -794,8 +794,8 @@ export async function syncLiveCuelinksDeals(maxPages: number = 5): Promise<{
 
   // Prioritize working coupon codes first, then highest usesCount
   newDeals.sort((a, b) => {
-    const aHasCode = a.code !== "DEALACTIVATED" ? 1 : 0;
-    const bHasCode = b.code !== "DEALACTIVATED" ? 1 : 0;
+    const aHasCode = a.code && a.code.length > 1 ? 1 : 0;
+    const bHasCode = b.code && b.code.length > 1 ? 1 : 0;
     if (aHasCode !== bHasCode) return bHasCode - aHasCode;
     return (b.usesCount || 0) - (a.usesCount || 0);
   });

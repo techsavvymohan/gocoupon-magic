@@ -254,30 +254,36 @@ function DealsHubPage() {
 
                   {/* Coupon Strip */}
                   <div className="mt-4 rounded-xl border border-border/80 bg-muted/30 p-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Tag className="h-3.5 w-3.5 text-primary" />
-                        <span className="font-mono text-xs font-bold tracking-wide text-foreground">
-                          {deal.code}
-                        </span>
+                    {deal.code && deal.code.length > 1 ? (
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Tag className="h-3.5 w-3.5 text-primary" />
+                          <span className="font-mono text-xs font-bold tracking-wide text-foreground">
+                            {deal.code}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => handleCopyCode(deal.code)}
+                          className="inline-flex items-center gap-1 rounded-md bg-card px-2 py-1 text-[11px] font-medium border border-border hover:bg-muted transition-colors"
+                        >
+                          {copiedCode === deal.code ? (
+                            <>
+                              <Check className="h-3 w-3 text-emerald-500" />
+                              <span className="text-emerald-500">Copied</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-3 w-3" />
+                              <span>Copy</span>
+                            </>
+                          )}
+                        </button>
                       </div>
-                      <button
-                        onClick={() => handleCopyCode(deal.code)}
-                        className="inline-flex items-center gap-1 rounded-md bg-card px-2 py-1 text-[11px] font-medium border border-border hover:bg-muted transition-colors"
-                      >
-                        {copiedCode === deal.code ? (
-                          <>
-                            <Check className="h-3 w-3 text-emerald-500" />
-                            <span className="text-emerald-500">Copied</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="h-3 w-3" />
-                            <span>Copy</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
+                    ) : (
+                      <div className="flex items-center gap-2 font-mono text-xs font-bold text-orange-500">
+                        <span>🔥 STEAL DEAL — No code needed</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
