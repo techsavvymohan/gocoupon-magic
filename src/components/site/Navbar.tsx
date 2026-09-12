@@ -20,7 +20,6 @@ import {
   Bell,
   Home,
   ShoppingBag,
-  Sparkles,
 } from "lucide-react";
 
 type NavLink = {
@@ -30,6 +29,7 @@ type NavLink = {
   isExternal?: boolean;
   badge?: string;
   badgeColor?: string;
+  isAction?: boolean;
 };
 
 const primaryLinks: NavLink[] = [
@@ -40,6 +40,7 @@ const primaryLinks: NavLink[] = [
   { label: "Deals", href: "https://deals.gocoupon.io", isExternal: true, badge: "HOT", badgeColor: "bg-rose-500/15 text-rose-500" },
   { label: "Extension", to: "/chrome-extension" },
   { label: "Blog", to: "/blog" },
+  { label: "Chat Assistant", isAction: true },
 ];
 
 export function Navbar() {
@@ -108,6 +109,27 @@ export function Navbar() {
                 </>
               );
 
+              if (l.isAction) {
+                return (
+                  <li key={l.label}>
+                    <button
+                      type="button"
+                      data-thunderbolt-launcher
+                      onClick={() => {
+                        if (typeof (window as any).openThunderboltChat === "function") {
+                          (window as any).openThunderboltChat();
+                        } else {
+                          (window as any).Thunderbolt?.open();
+                        }
+                      }}
+                      className={baseClass}
+                    >
+                      {animatedContent}
+                    </button>
+                  </li>
+                );
+              }
+
               if (l.isExternal && l.href) {
                 return (
                   <li key={l.label}>
@@ -169,31 +191,71 @@ export function Navbar() {
         {mobileMenuOpen && (
           <div className="border-b border-border bg-background px-6 py-6 md:hidden animate-fade-in max-h-[80vh] overflow-y-auto">
             <ul className="space-y-3">
-              {primaryLinks.map((l) => (
-                <li key={l.label}>
-                  {l.isExternal && l.href ? (
-                    <a
-                      href={l.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-between rounded-xl p-3 min-h-[44px] text-base font-semibold text-foreground hover:bg-muted touch-manipulation"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span>{l.label}</span>
-                        {l.badge && (
-                          <span
-                            className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-bold ${
-                              l.badgeColor || "bg-primary/10 text-primary"
-                            }`}
-                          >
-                            {l.badge}
-                          </span>
-                        )}
-                      </div>
-                      <ExternalLink className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                    </a>
-                  ) : (
+              {primaryLinks.map((l) => {
+                if (l.isAction) {
+                  return (
+                    <li key={l.label}>
+                      <button
+                        type="button"
+                        data-thunderbolt-launcher
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          if (typeof (window as any).openThunderboltChat === "function") {
+                            (window as any).openThunderboltChat();
+                          } else {
+                            (window as any).Thunderbolt?.open();
+                          }
+                        }}
+                        className="flex w-full items-center justify-between rounded-xl p-3 min-h-[44px] text-base font-semibold text-foreground hover:bg-muted touch-manipulation text-left"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span>{l.label}</span>
+                          {l.badge && (
+                            <span
+                              className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-bold ${
+                                l.badgeColor || "bg-primary/10 text-primary"
+                              }`}
+                            >
+                              {l.badge}
+                            </span>
+                          )}
+                        </div>
+                        <ArrowRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                      </button>
+                    </li>
+                  );
+                }
+
+                if (l.isExternal && l.href) {
+                  return (
+                    <li key={l.label}>
+                      <a
+                        href={l.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-center justify-between rounded-xl p-3 min-h-[44px] text-base font-semibold text-foreground hover:bg-muted touch-manipulation"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span>{l.label}</span>
+                          {l.badge && (
+                            <span
+                              className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-bold ${
+                                l.badgeColor || "bg-primary/10 text-primary"
+                              }`}
+                            >
+                              {l.badge}
+                            </span>
+                          )}
+                        </div>
+                        <ExternalLink className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                      </a>
+                    </li>
+                  );
+                }
+
+                return (
+                  <li key={l.label}>
                     <Link
                       to={l.to!}
                       onClick={() => setMobileMenuOpen(false)}
@@ -213,9 +275,9 @@ export function Navbar() {
                       </div>
                       <ArrowRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                     </Link>
-                  )}
-                </li>
-              ))}
+                  </li>
+                );
+              })}
               <li className="pt-2">
                 <a
                   href="https://chromewebstore.google.com"
@@ -226,40 +288,6 @@ export function Navbar() {
                   <span>Add to Chrome — Free</span>
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </a>
-              </li>
-              {/* Mobile AI Voice & Chat Support */}
-              <li className="pt-1">
-                <button
-                  type="button"
-                  data-thunderbolt-launcher
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    if (typeof (window as any).openThunderboltChat === "function") {
-                      (window as any).openThunderboltChat();
-                    } else {
-                      (window as any).Thunderbolt?.open();
-                    }
-                  }}
-                  className="flex w-full items-center justify-between rounded-2xl p-3 min-h-[48px] text-base font-semibold text-foreground bg-gradient-to-r from-primary/15 via-primary/5 to-transparent border border-primary/25 hover:bg-primary/20 active:scale-[0.98] transition-all touch-manipulation text-left"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-                      <Sparkles className="h-4 w-4 animate-pulse" aria-hidden="true" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm">AI Voice &amp; Chat Agent</span>
-                        <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 font-mono text-[9px] font-bold text-emerald-600 dark:text-emerald-400">
-                          LIVE
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-muted-foreground font-normal">
-                        Instant coupon help &amp; voice assistance
-                      </p>
-                    </div>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-primary" aria-hidden="true" />
-                </button>
               </li>
               <li className="flex items-center justify-between pt-3 border-t border-border">
                 <span className="text-xs text-muted-foreground font-mono">Currency Preference:</span>
