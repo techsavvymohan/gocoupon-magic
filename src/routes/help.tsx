@@ -287,7 +287,7 @@ function HelpPage() {
                 Still have a question or need assistance?
               </h2>
               <p className="mt-3 text-sm text-muted-foreground sm:text-base">
-                Our support team in Bengaluru is ready to help with store issues, partnership queries, or extension bug reports.
+                Our global remote support team is ready to help with store issues, partnership queries, or extension bug reports.
               </p>
               <div className="mt-6 flex flex-wrap gap-4">
                 <Link

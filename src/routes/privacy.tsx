@@ -26,7 +26,6 @@ const LAST_UPDATED = "September 9, 2026";
 const PRODUCT_NAME = "GoCoupon – Coupon Finder";
 const EXTENSION_ID = "bbdcjoadldgankjdhdlmncacpkengnid";
 const CONTACT_EMAIL = "support@gocoupon.io";
-const SECONDARY_EMAIL = "gocoupon13@gmail.com";
 
 export const privacyFaqs = [
   {
@@ -552,8 +551,8 @@ function PrivacyPage() {
                 </p>
                 <div className="text-sm text-foreground space-y-1">
                   <div><strong>Operator:</strong> GoCoupon Team</div>
-                  <div><strong>Location:</strong> Bengaluru, Karnataka, India</div>
-                  <div><strong>Secondary Contact:</strong> <a href={`mailto:${SECONDARY_EMAIL}`} className="text-primary hover:underline">{SECONDARY_EMAIL}</a></div>
+                  <div><strong>Operations:</strong> Remote-First Global Team</div>
+                  <div><strong>Official Email:</strong> <a href={`mailto:${CONTACT_EMAIL}`} className="text-primary hover:underline">{CONTACT_EMAIL}</a></div>
                 </div>
               </div>
 

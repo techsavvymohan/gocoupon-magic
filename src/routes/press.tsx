@@ -92,7 +92,7 @@ function PressPage() {
           </h2>
           <dl className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <Fact label="Founded" value="2024" />
-            <Fact label="HQ" value="Bengaluru, India" />
+            <Fact label="Operations" value="Remote-First · Global" />
             <Fact label="Category" value="Browser extension" />
             <Fact label="Platforms" value="Chrome (Manifest V3)" />
             <Fact label="Coverage" value="Amazon, Walmart, Target, Flipkart &amp; 200+ stores" />

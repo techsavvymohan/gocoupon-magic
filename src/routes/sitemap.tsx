@@ -86,7 +86,7 @@ function SitemapPage() {
       title: "Company & Resources",
       icon: BookOpen,
       links: [
-        { label: "About Us", to: "/about", desc: "Our mission, Bengaluru team, and story" },
+        { label: "About Us", to: "/about", desc: "Our mission, remote-first team, and story" },
         { label: "Blog & Savings Guides", to: "/blog", desc: "Shopping tips and festival sale analysis" },
         { label: "Free Resources & Tools", to: "/resources", desc: "Calculators and e-commerce cheat sheets" },
         { label: "Press Kit & Media", to: "/press", desc: "Brand assets, logos, and media contact" },

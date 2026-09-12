@@ -6,7 +6,7 @@ import {
   MessageSquare,
   CheckCircle,
   Send,
-  MapPin,
+  Globe,
   Clock,
   ShieldCheck,
   Copy,
@@ -208,18 +208,20 @@ export function ContactForm() {
 
               <div className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-sm">
                 <div className="mb-3 grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
-                  <MapPin size={18} />
+                  <Globe size={18} />
                 </div>
                 <h4 className="font-display text-sm font-bold text-foreground">
-                  Registered Office
+                  Remote-First Operations
                 </h4>
                 <p className="mt-1 text-xs text-muted-foreground font-medium text-foreground">
-                  GoCoupon Technologies
+                  Global Digital Support
                 </p>
-                <p className="text-xs text-muted-foreground">100 Feet Road, Indiranagar, Stage 1</p>
                 <p className="text-xs text-muted-foreground">
-                  Bengaluru, Karnataka 560038, India 🇮🇳
+                  Operating 100% remotely to support shoppers worldwide
                 </p>
+                <span className="mt-3 inline-block rounded-full bg-primary/10 px-2.5 py-0.5 font-mono text-[10px] font-bold text-primary">
+                  🌐 Worldwide Team
+                </span>
               </div>
             </div>
 

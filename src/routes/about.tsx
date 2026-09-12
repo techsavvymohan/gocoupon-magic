@@ -137,7 +137,7 @@ export function AboutPage() {
                   Distinction From Unrelated Similarly Named Sites
                 </h3>
                 <p className="text-xs sm:text-sm leading-relaxed text-muted-foreground">
-                  GoCoupon (gocoupon.io) is an independent technology platform headquartered in Bengaluru, India. We are <strong className="text-foreground">not affiliated with</strong> third-party regional or foreign websites such as <em>gocoupon.in</em> or <em>GoCoupons.ca</em>.
+                  GoCoupon (gocoupon.io) is an independent technology platform operated by a global remote-first team. We are <strong className="text-foreground">not affiliated with</strong> third-party regional or foreign websites such as <em>gocoupon.in</em> or <em>GoCoupons.ca</em>.
                 </p>
                 <p className="text-xs sm:text-sm leading-relaxed text-muted-foreground">
                   Always ensure that any browser extension, price check, or promo code tool you install carries the official GoCoupon digital signature and links directly to{" "}
