@@ -128,6 +128,10 @@ export function AboutPage() {
                     </a>
                     .
                   </li>
+                  <li>
+                    <strong className="text-foreground">Ad Space Verification:</strong>{" "}
+                    <span className="font-mono text-muted-foreground text-xs">admitad-verification: 0826</span>
+                  </li>
                 </ul>
               </div>
 
@@ -300,9 +304,9 @@ export function AboutPage() {
                 desc: "Real-time Amazon vs. Flipkart vs. Croma checkout comparison.",
               },
               {
-                title: "30-Day Price Tracker",
-                to: "/price-history",
-                desc: "Historical low checker and fake discount detector.",
+                title: "Verified Store Offers",
+                to: "/offers",
+                desc: "Live tested coupons and exclusive merchant deals.",
               },
               {
                 title: "Security & Trust Architecture",
