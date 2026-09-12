@@ -35,6 +35,65 @@
     </script>
 
     <!-- Thunderbolt AI Voice & Chat Support Agent -->
+    <script>
+      (function () {
+        var origAttachShadow = Element.prototype.attachShadow;
+        Element.prototype.attachShadow = function () {
+          var shadow = origAttachShadow.apply(this, arguments);
+          if (this.tagName === "DIV" && !this.id) {
+            this.setAttribute("data-thunderbolt-host", "true");
+          }
+          return shadow;
+        };
+
+        window.setThunderboltOpen = function (isOpen) {
+          var els = document.querySelectorAll("[data-thunderbolt-host]");
+          els.forEach(function (el) {
+            if (isOpen) {
+              el.setAttribute("data-open", "true");
+            } else {
+              el.removeAttribute("data-open");
+            }
+          });
+        };
+
+        window.openThunderboltChat = function () {
+          window.setThunderboltOpen(true);
+          if (window.Thunderbolt && typeof window.Thunderbolt.open === "function") {
+            window.Thunderbolt.open();
+          }
+        };
+
+        window.addEventListener("message", function (e) {
+          if (!e.data || typeof e.data !== "object") return;
+          var type = e.data.type;
+          if (type === "tbolt:close" || (type === "tbolt:resize" && e.data.state === "hidden")) {
+            window.setThunderboltOpen(false);
+          } else if (
+            type === "tbolt:open" ||
+            (type === "tbolt:resize" && (e.data.state === "fullscreen" || e.data.state === "panel"))
+          ) {
+            window.setThunderboltOpen(true);
+          }
+        });
+
+        var checkCount = 0;
+        var checkInterval = setInterval(function () {
+          checkCount++;
+          if (window.Thunderbolt && typeof window.Thunderbolt.on === "function") {
+            clearInterval(checkInterval);
+            window.Thunderbolt.on("open", function () {
+              window.setThunderboltOpen(true);
+            });
+            window.Thunderbolt.on("close", function () {
+              window.setThunderboltOpen(false);
+            });
+          } else if (checkCount > 50) {
+            clearInterval(checkInterval);
+          }
+        }, 200);
+      })();
+    </script>
     <script defer src="https://www.thunderbolt.com/gateway/api/v1/thunderbolt-ui/embed.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

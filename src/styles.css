@@ -524,3 +524,13 @@ html:not(.dark) .bg-card:hover {
     animation: none !important;
   }
 }
+
+/* ── Thunderbolt AI Support - Mobile Isolation ── */
+/* Strictly applied only to mobile screens (<= 768px). Desktop remains 100% untouched. */
+@media (max-width: 768px) {
+  /* Hide the floating launcher bubble on Android/mobile when closed to prevent overlapping bottom nav */
+  div[data-thunderbolt-host="true"]:not([data-open="true"]) {
+    display: none !important;
+  }
+}
+
