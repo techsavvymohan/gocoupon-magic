@@ -9,7 +9,7 @@ import { useState } from "react";
 import { useUserCards } from "@/context/UserCardsContext";
 import { CardApplicationModal } from "./CardApplicationModal";
 import { BankLogoIcon } from "@/components/icons/BankLogos";
-import { CreditCard, Sparkles, Check, ArrowRight, ShieldCheck } from "lucide-react";
+import { CreditCard, Check, ArrowRight, ShieldCheck } from "lucide-react";
 
 export function BankCardSelectorBar() {
   const { selectedCardId, setSelectedCardId, allCards, activeCard, isIndia } = useUserCards();
@@ -48,7 +48,7 @@ export function BankCardSelectorBar() {
             onClick={() => setModalCard(activeCard)}
             className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 border border-amber-500/25 px-3 py-1 text-xs font-bold text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 transition-all touch-manipulation cursor-pointer shrink-0"
           >
-            <Sparkles className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+            <CreditCard className="h-3.5 w-3.5 text-amber-500 shrink-0" />
             <span>
               {isIndia
                 ? `Need ${activeCard.shortName}? Apply & Save ₹1,500+`

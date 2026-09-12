@@ -4,7 +4,7 @@ import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import {
   CheckCircle2,
   ArrowRight,
-  Sparkles,
+  Zap,
   Layers,
   Flame,
   Home,
@@ -94,7 +94,7 @@ function ThankYouPage() {
                 className="group relative rounded-2xl border border-border bg-card p-5 shadow-xs transition-all hover:border-primary/50 hover:shadow-md active:scale-98"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary mb-3.5 group-hover:scale-110 transition-transform">
-                  <Sparkles className="h-5 w-5" />
+                  <Zap className="h-5 w-5" />
                 </div>
                 <h3 className="font-display text-sm font-bold text-foreground group-hover:text-primary transition-colors flex items-center justify-between">
                   Chrome Extension

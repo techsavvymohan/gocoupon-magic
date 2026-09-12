@@ -47,7 +47,6 @@ import {
   X,
   Store,
   Percent,
-  Sparkles,
   Bell,
   ChevronDown,
   ChevronUp,
@@ -534,7 +533,7 @@ export function ComparePage() {
                 <div className="relative flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-4 mb-6">
                   <div className="flex flex-wrap items-center gap-2">
                     <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                      <Sparkles className="h-3.5 w-3.5" />
+                      <CheckCircle2 className="h-3.5 w-3.5" />
                       <span>Verified Exact Match</span>
                     </div>
                     <span className="rounded-full bg-muted/80 px-2.5 py-1 font-mono text-[11px] text-muted-foreground flex items-center gap-1">
@@ -683,7 +682,7 @@ export function ComparePage() {
                                 className="inline-flex items-center gap-1.5 rounded-xl border border-primary/30 bg-primary/10 px-3.5 py-2.5 min-h-[44px] text-xs font-bold text-primary hover:bg-primary/20 transition-colors touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
                                 title={`Apply for ${recommendedCard.cardName}`}
                               >
-                                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                                <CreditCard className="h-3.5 w-3.5 text-primary" />
                                 <span>Need {recommendedCard.shortName}? Apply</span>
                               </button>
                             )}

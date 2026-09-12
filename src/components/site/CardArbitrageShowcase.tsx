@@ -27,7 +27,6 @@ import {
   XCircle,
   Zap,
   ShieldCheck,
-  Sparkles,
   Smartphone,
   Laptop,
   Headphones,
@@ -339,7 +338,7 @@ export function CardArbitrageShowcase() {
                 <div className="mt-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.04] p-4 sm:p-5 space-y-3">
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                      <Sparkles className="h-3.5 w-3.5" />
+                      <CheckCircle2 className="h-3.5 w-3.5" />
                       Buy on {activeMarket === "india" ? currentDeal.inStoreB : currentDeal.usStoreB}
                     </span>
                     <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-xs font-extrabold text-emerald-600 dark:text-emerald-400">

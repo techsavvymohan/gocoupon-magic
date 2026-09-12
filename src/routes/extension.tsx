@@ -389,7 +389,7 @@ function ExtensionPage() {
                         Extra Bonus
                       </span>
                       <h3 className="font-display text-xl font-bold text-foreground mt-1">
-                        ✨ Cash Back Bonus Ready!
+                        Cash Back Bonus Ready!
                       </h3>
                       <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
                         Earn cash back on eligible purchases. Your $50.00 coupon discount stays 100% untouched.

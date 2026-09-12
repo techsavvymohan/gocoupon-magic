@@ -29,7 +29,7 @@ import {
   Globe,
   Loader2,
   ExternalLink,
-  Sparkles,
+  Tag,
   CheckCircle2,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -363,7 +363,7 @@ export function UrlResolverSearch({
             <div className="pb-2.5">
               <div className="flex items-center justify-between px-2 py-0.5 mb-1.5">
                 <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-bold flex items-center gap-1.5">
-                  <Sparkles className="h-3 w-3 text-amber-500" />
+                  <Tag className="h-3 w-3 text-primary" />
                   {productHits.some((h) => h.isExactMatch) ? "Exact Product Matches" : "Matched Products"}
                 </span>
                 <span className="text-[9px] font-mono font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full flex items-center gap-1">

@@ -11,7 +11,6 @@ import { useUserCards } from "@/context/UserCardsContext";
 import {
   X,
   CheckCircle2,
-  Sparkles,
   ExternalLink,
   ShieldCheck,
   Gift,
@@ -63,7 +62,7 @@ export function CardApplicationModal({
             <BankLogoIcon cardId={card.id} className="h-12 w-12 rounded-2xl shrink-0 shadow-sm" />
             <div>
               <div className="inline-flex items-center gap-1 text-[11px] font-mono font-bold uppercase tracking-wider text-primary">
-                <Sparkles className="h-3 w-3" />
+                <ShieldCheck className="h-3 w-3" />
                 <span>Instant Bank Offer Partner</span>
               </div>
               <h3 id="card-modal-title" className="font-display text-lg font-bold text-foreground">

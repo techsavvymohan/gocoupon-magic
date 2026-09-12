@@ -135,7 +135,7 @@ function DisclosurePage() {
                 <div>
                   <strong className="text-foreground text-sm">Instant Confirmation:</strong>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    A confirmation appears stating <em>&ldquo;✨ Cash Back Bonus Activated!&rdquo;</em> so you always know what happened.
+                    A confirmation appears stating <em>&ldquo;Cash Back Bonus Activated!&rdquo;</em> so you always know what happened.
                   </p>
                 </div>
               </div>

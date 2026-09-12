@@ -399,7 +399,7 @@ function HowItWorksPage() {
               {simStep === "initial" && (
                 <div className="text-center py-4 space-y-4">
                   <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 text-xs sm:text-sm text-foreground/90 leading-relaxed">
-                    ✨ GoCoupon found <strong>working discount codes</strong> for this cart!
+                    GoCoupon found <strong>working discount codes</strong> for this cart!
                   </div>
 
                   <button

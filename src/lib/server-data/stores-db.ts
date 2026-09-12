@@ -224,7 +224,7 @@ export const STORES_DB: StoreRecord[] = [
     name: "Ajio",
     slug: "ajio-coupons",
     category: "Fashion",
-    fallbackIcon: "✨",
+    fallbackIcon: "🛍️",
     badge: "Premium Fashion",
     rating: 4.6,
     couponsCount: 31,

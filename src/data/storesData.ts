@@ -259,7 +259,7 @@ export const STORES_DATA: Store[] = [
     slug: "ajio-coupons",
     category: "Fashion",
     logo: "/Brand logos/Ajio.webp",
-    fallbackIcon: "✨",
+    fallbackIcon: "🛍️",
     badge: "Top Brand Deals",
     rating: 4.7,
     couponsCount: 38,

@@ -4,7 +4,7 @@
  */
 
 import { Link } from "@tanstack/react-router";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { Lightbulb, ArrowRight } from "lucide-react";
 import { UrlResolverSearch } from "../shopping/UrlResolverSearch";
 
 export function Hero() {
@@ -46,7 +46,7 @@ export function Hero() {
         {/* Advisory Callout */}
         <div className="mt-7 inline-flex items-center gap-2.5 rounded-full border border-border bg-card/90 px-4 sm:px-5 py-2 text-xs sm:text-sm text-foreground/80 shadow-2xs">
           <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <Sparkles className="h-3 w-3" aria-hidden="true" />
+            <Lightbulb className="h-3 w-3" aria-hidden="true" />
           </span>
           <span>
             <strong className="font-semibold text-foreground">Pro Tip:</strong> Works for everyone! Compare store prices instantly, auto-apply coupons, and optionally select your bank card to unlock extra savings.

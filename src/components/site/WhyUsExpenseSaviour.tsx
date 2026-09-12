@@ -17,7 +17,6 @@ import {
   CreditCard,
   Ticket,
   ArrowRight,
-  Sparkles,
   Wallet,
   Coins,
   ShieldCheck,

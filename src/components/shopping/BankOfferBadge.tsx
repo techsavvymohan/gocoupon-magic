@@ -9,7 +9,6 @@ import { US_CREDIT_CARDS } from "@/lib/services/international-market";
 import { BankLogoIcon } from "@/components/icons/BankLogos";
 import { useUserCards } from "@/context/UserCardsContext";
 import { CardApplicationModal } from "./CardApplicationModal";
-import { Sparkles } from "lucide-react";
 
 interface BankOfferBadgeProps {
   savingsResult: BankCardSavingsResult;
@@ -58,7 +57,6 @@ export function BankOfferBadge({
         <span className="font-semibold tabular-nums">
           -{isIndia ? "₹" : "$"}{savingsResult.totalCardSavings.toLocaleString(isIndia ? "en-IN" : "en-US")}
         </span>
-        <Sparkles className="h-2.5 w-2.5 text-amber-500 shrink-0" />
       </button>
 
       <CardApplicationModal
