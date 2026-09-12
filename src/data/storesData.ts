@@ -133,6 +133,7 @@ export const STORES_DATA: Store[] = [
     name: "Best Buy",
     slug: "bestbuy-coupons",
     category: "Electronics",
+    logo: "/icons/bestbuy.svg",
     fallbackIcon: "💻",
     badge: "Tech Superstore",
     rating: 4.8,

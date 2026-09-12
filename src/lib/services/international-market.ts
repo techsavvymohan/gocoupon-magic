@@ -105,7 +105,7 @@ export const INTERNATIONAL_STORES: InternationalStore[] = [
     category: "electronics",
     region: "US",
     tier: 1,
-    logo: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=100&auto=format&fit=crop&q=80",
+    logo: "/icons/bestbuy.svg",
     cashbackRate: "Up to 3.5%",
     cashbackPct: 0.03,
     buildSearchUrl: (q) =>

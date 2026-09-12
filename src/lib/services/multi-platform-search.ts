@@ -139,6 +139,9 @@ const STORE_LOGOS: Record<string, string> = {
   "walmart.com": "/icons/WMT-Wordmark-Small-TrueBlue-RGB.png",
   target: "/icons/target.svg",
   "target.com": "/icons/target.svg",
+  bestbuy: "/icons/bestbuy.svg",
+  "best buy": "/icons/bestbuy.svg",
+  "bestbuy.com": "/icons/bestbuy.svg",
 };
 
 export function getStoreLogo(storeName: string): string | undefined {

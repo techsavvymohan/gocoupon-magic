@@ -131,14 +131,16 @@ function StoresPage() {
           {/* Floating Brand Orbital Deck — Responsive: Touch Snap Carousel on Mobile, Floating Deck on Desktop */}
           <div className="relative mt-6 sm:mt-10">
             <div className="flex items-center justify-start md:justify-center gap-3 sm:gap-4 md:gap-6 overflow-x-auto no-scrollbar py-2 px-2 -mx-3.5 sm:mx-0 snap-x snap-mandatory md:animate-storeverse-float">
-              {[
-                { name: "Amazon", logo: "/Brand logos/Amazon_logo.svg.webp", deal: "75% OFF" },
-                { name: "Walmart", logo: "/icons/WMT-Wordmark-Small-TrueBlue-RGB.png", deal: "Rollback $20" },
-                { name: "Flipkart", logo: "/Brand logos/flipkart.webp", deal: "Flat ₹500" },
-                { name: "Target", logo: "/icons/target.svg", deal: "Circle 20%" },
-                { name: "Myntra", logo: "/Brand logos/myntra.webp", deal: "Flat ₹500" },
-                { name: "Best Buy", icon: "💻", deal: "Save $50" },
-              ].map((b, idx) => (
+              {(
+                [
+                  { name: "Amazon", logo: "/Brand logos/Amazon_logo.svg.webp", deal: "75% OFF" },
+                  { name: "Walmart", logo: "/icons/WMT-Wordmark-Small-TrueBlue-RGB.png", deal: "Rollback $20" },
+                  { name: "Flipkart", logo: "/Brand logos/flipkart.webp", deal: "Flat ₹500" },
+                  { name: "Target", logo: "/icons/target.svg", deal: "Circle 20%" },
+                  { name: "Myntra", logo: "/Brand logos/myntra.webp", deal: "Flat ₹500" },
+                  { name: "Best Buy", logo: "/icons/bestbuy.svg", deal: "Save $50" },
+                ] as { name: string; logo?: string; icon?: string; deal: string }[]
+              ).map((b, idx) => (
                 <div
                   key={b.name}
                   onClick={() => setSearchQuery(b.name)}

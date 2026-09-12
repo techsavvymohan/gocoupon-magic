@@ -306,7 +306,7 @@ export const REGISTERED_STORES: RegisteredStore[] = [
     category: "electronics",
     region: "US",
     tier: 1,
-    logo: "/Brand logos/croma.svg",
+    logo: "/icons/bestbuy.svg",
     defaultCoupon: { code: "TECHBOOST", description: "Save on smart tech & computing accessories", discountAmount: 30 },
     cashbackRate: "Up to 5.5%",
     cashbackPct: 0.035,
