@@ -59,14 +59,13 @@ function SitemapPage() {
       ],
     },
     {
-      title: "Deals & Discovery",
+      title: "Offers & Discovery",
       icon: Tag,
       links: [
         {
-          label: "goCoupon Deals Hub",
-          href: "https://deals.gocoupon.io",
-          isExternal: true,
-          desc: "Dedicated deals & coupon codes portal on deals.gocoupon.io",
+          label: "Exclusive Offers & Discounts",
+          to: "/offers",
+          desc: "Verified daily shopping offers, coupon codes and price drops",
         },
         { label: "All Stores Directory", to: "/stores", desc: "200+ global & regional shopping brands" },
         { label: "Shopping Categories", to: "/categories", desc: "Electronics, Fashion, Food, Travel & More" },

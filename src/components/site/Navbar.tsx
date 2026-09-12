@@ -37,7 +37,7 @@ const desktopLinks: NavLink[] = [
   { label: "Price Tracker", to: "/price-history" },
   { label: "Ask", to: "/ask" },
   { label: "Stores", to: "/stores" },
-  { label: "Deals", href: "https://deals.gocoupon.io", isExternal: true, badge: "HOT", badgeColor: "bg-rose-500/15 text-rose-500" },
+  { label: "Offers", to: "/offers", badge: "HOT", badgeColor: "bg-rose-500/15 text-rose-500" },
   { label: "Extension", to: "/chrome-extension" },
   { label: "Blog", to: "/blog" },
 ];

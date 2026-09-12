@@ -94,6 +94,13 @@ const routeConfigs = [
     lead: "Hand-tested lightning deals, verified promo codes, and all-time low price alerts updated continuously across major online retailers.",
   },
   {
+    path: "offers",
+    title: "Today's Best Online Offers, Deals & Exclusive Discounts – GoCoupon",
+    description: "Explore hand-verified online shopping offers, discounts, and all-time low price drops across Amazon, Flipkart, Myntra, Tata CLiQ, and Croma with GoCoupon.",
+    h1: "Today's Verified Offers, Price Drops & Online Discounts",
+    lead: "Hand-tested lightning offers, verified promo codes, and all-time low price alerts updated continuously across major online retailers.",
+  },
+  {
     path: "how-it-works",
     title: "How goCoupon Works – Automated Coupon Testing & Price Tracking Guide",
     description: "Learn how the goCoupon Chrome extension tests promo codes in parallel, unlocks cashback, and tracks 30-day price trends at zero cost.",

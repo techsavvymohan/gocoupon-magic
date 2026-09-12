@@ -5,6 +5,7 @@ import { useCurrency } from "@/context/CurrencyContext";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import { useDeals } from "@/hooks/use-deals";
 import type { DealSortField } from "@/lib/api/deals-api";
+import { wrapAffiliateTracking } from "@/lib/services/store-registry";
 import { DealGridSkeleton, FetchError } from "@/components/ui/DataSkeleton";
 import {
   Flame,
@@ -125,27 +126,18 @@ function DealsHubPage() {
             Every deal is benchmarked against 30-day price history graphs and verified with working coupon codes so you never fall for fake sale markups.
           </p>
 
-          {/* Search & External Platform Launch */}
-          <div className="mx-auto mt-8 max-w-2xl flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
+          {/* Search */}
+          <div className="mx-auto mt-8 max-w-xl">
+            <div className="relative w-full">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
                 type="text"
-                placeholder="Search deals, smartphones, laptops, or coupons…"
+                placeholder="Search offers, smartphones, laptops, or coupons…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full rounded-xl border border-border bg-card pl-10 pr-4 py-3 text-base sm:text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary touch-manipulation"
               />
             </div>
-            <a
-              href="https://deals.gocoupon.io"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-md transition-all hover:bg-primary/90 hover:scale-[1.02]"
-            >
-              <span>Launch Live Deals Engine</span>
-              <ExternalLink className="h-4 w-4" />
-            </a>
           </div>
 
           {/* Category Filter Pills */}
@@ -295,9 +287,9 @@ function DealsHubPage() {
                     {deal.expiresIn}
                   </span>
                   <a
-                    href={deal.link}
+                    href={wrapAffiliateTracking(deal.link, "gocoupon_deals_hub")}
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel="noopener noreferrer nofollow"
                     className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
                   >
                     <span>View Deal</span>

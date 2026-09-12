@@ -27,6 +27,7 @@ import { Route as HelpRouteImport } from './routes/help'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as MeeshoCouponsRouteImport } from './routes/meesho-coupons'
 import { Route as MyntraCouponsRouteImport } from './routes/myntra-coupons'
+import { Route as OffersRouteImport } from './routes/offers'
 import { Route as PressRouteImport } from './routes/press'
 import { Route as PriceHistoryRouteImport } from './routes/price-history'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -135,6 +136,11 @@ const MyntraCouponsRoute = MyntraCouponsRouteImport.update({
   path: '/myntra-coupons',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OffersRoute = OffersRouteImport.update({
+  id: '/offers',
+  path: '/offers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PressRoute = PressRouteImport.update({
   id: '/press',
   path: '/press',
@@ -240,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/meesho-coupons': typeof MeeshoCouponsRoute
   '/myntra-coupons': typeof MyntraCouponsRoute
+  '/offers': typeof OffersRoute
   '/press': typeof PressRoute
   '/price-history': typeof PriceHistoryRoute
   '/privacy': typeof PrivacyRoute
@@ -277,6 +284,7 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/meesho-coupons': typeof MeeshoCouponsRoute
   '/myntra-coupons': typeof MyntraCouponsRoute
+  '/offers': typeof OffersRoute
   '/press': typeof PressRoute
   '/price-history': typeof PriceHistoryRoute
   '/privacy': typeof PrivacyRoute
@@ -315,6 +323,7 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/meesho-coupons': typeof MeeshoCouponsRoute
   '/myntra-coupons': typeof MyntraCouponsRoute
+  '/offers': typeof OffersRoute
   '/press': typeof PressRoute
   '/price-history': typeof PriceHistoryRoute
   '/privacy': typeof PrivacyRoute
@@ -354,6 +363,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/meesho-coupons'
     | '/myntra-coupons'
+    | '/offers'
     | '/press'
     | '/price-history'
     | '/privacy'
@@ -391,6 +401,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/meesho-coupons'
     | '/myntra-coupons'
+    | '/offers'
     | '/press'
     | '/price-history'
     | '/privacy'
@@ -428,6 +439,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/meesho-coupons'
     | '/myntra-coupons'
+    | '/offers'
     | '/press'
     | '/price-history'
     | '/privacy'
@@ -466,6 +478,7 @@ export interface RootRouteChildren {
   HowItWorksRoute: typeof HowItWorksRoute
   MeeshoCouponsRoute: typeof MeeshoCouponsRoute
   MyntraCouponsRoute: typeof MyntraCouponsRoute
+  OffersRoute: typeof OffersRoute
   PressRoute: typeof PressRoute
   PriceHistoryRoute: typeof PriceHistoryRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -613,6 +626,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MyntraCouponsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/offers': {
+      id: '/offers'
+      path: '/offers'
+      fullPath: '/offers'
+      preLoaderRoute: typeof OffersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/press': {
       id: '/press'
       path: '/press'
@@ -754,6 +774,7 @@ const rootRouteChildren: RootRouteChildren = {
   HowItWorksRoute: HowItWorksRoute,
   MeeshoCouponsRoute: MeeshoCouponsRoute,
   MyntraCouponsRoute: MyntraCouponsRoute,
+  OffersRoute: OffersRoute,
   PressRoute: PressRoute,
   PriceHistoryRoute: PriceHistoryRoute,
   PrivacyRoute: PrivacyRoute,
