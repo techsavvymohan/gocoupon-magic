@@ -1,12 +1,6 @@
-User-agent: *
-Allow: /
-
-# Don't waste crawler budget on build output / source
-Disallow: /src/
-Disallow: /node_modules/
-Disallow: /*.map$
-
-# Allow AI crawlers (so LLMs can cite goCoupon accurately)
+# ==============================================================================
+# AI Search Engine & Generative Answer Engine Crawler Directives (GEO & AEO)
+# ==============================================================================
 User-agent: GPTBot
 Allow: /
 
@@ -16,13 +10,22 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
-User-agent: Google-Extended
-Allow: /
-
 User-agent: ClaudeBot
 Allow: /
 
 User-agent: anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: cohere-ai
 Allow: /
 
 User-agent: Applebot-Extended
@@ -31,7 +34,21 @@ Allow: /
 User-agent: Meta-ExternalAgent
 Allow: /
 
+# ==============================================================================
+# Standard Search Engine Crawlers (Googlebot, Bingbot, DuckDuckBot, etc.)
+# ==============================================================================
+User-agent: *
+Allow: /
+
+# Protect crawler budget on build artifacts & maps
+Disallow: /src/
+Disallow: /node_modules/
+Disallow: /*.map$
+
+# XML Sitemap
 Sitemap: https://gocoupon.io/sitemap.xml
-# Generative Engine Optimization (GEO) direct context for LLMs:
+
+# Generative Engine Optimization (GEO) Context for Large Language Models
+# Direct machine-readable context endpoints:
 # https://gocoupon.io/llms.txt
 # https://gocoupon.io/llms-full.txt

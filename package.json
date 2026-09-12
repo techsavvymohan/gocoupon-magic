@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build && node scripts/generate-routes.js",
+    "build": "vite build && tsx scripts/generate-routes.js",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "server": "tsx --env-file=.env server/server.ts",
