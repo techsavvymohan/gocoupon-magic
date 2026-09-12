@@ -1,5 +1,5 @@
 import React from "react";
-import { Check, ExternalLink, Flame, Sparkles } from "lucide-react";
+import { Check, Copy, ExternalLink, Flame } from "lucide-react";
 import type { Deal } from "@/lib/api/deals-api";
 
 interface RedeemCouponButtonProps {
@@ -36,7 +36,7 @@ export function RedeemCouponButton({
     return "DISCOUNT";
   }, [deal.discount]);
 
-  // Last 2 characters of code peeking on the right (like the screenshot "0 0")
+  // Last 2 characters of code peeking out on the right (matching screenshot e.g. "0 0")
   const codePeek = React.useMemo(() => {
     if (!hasCode) return "";
     const clean = deal.code.trim().toUpperCase();
@@ -44,6 +44,7 @@ export function RedeemCouponButton({
     return lastTwo.split("").join(" ");
   }, [deal.code, hasCode]);
 
+  // Copied state: reveals full code with checkmark
   if (isCopied) {
     return (
       <a
@@ -65,56 +66,63 @@ export function RedeemCouponButton({
     );
   }
 
+  // Automatic discount (no coupon code required)
   if (!hasCode) {
-    // Steal Deal / Instant applied discount (no code required)
     return (
       <a
         href={affiliateUrl}
         target="_blank"
         rel="noopener noreferrer nofollow"
         onClick={(e) => onRedeem(deal, e)}
-        className={`group/btn inline-flex items-stretch rounded-xl border-2 border-dashed border-orange-500/50 hover:border-orange-500 bg-background shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer select-none ${
+        className={`group/btn relative inline-flex items-center justify-between rounded-xl border-2 border-dashed border-orange-500/50 hover:border-orange-500 bg-background/80 p-0.5 shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden select-none ${
           fullWidth ? "w-full" : ""
         } ${className}`}
         title={`Activate ${deal.discount} at ${deal.storeName}`}
       >
-        <span className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 group-hover/btn:from-orange-600 group-hover/btn:to-amber-600 text-white px-3.5 py-2 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors">
-          <Flame className="h-3.5 w-3.5 fill-white shrink-0" />
-          <span className="truncate">ACTIVATE {discountLabel}</span>
-        </span>
-        <span className="bg-card px-3 py-2 text-xs font-mono font-black text-orange-500 border-l-2 border-dashed border-orange-500/40 flex items-center justify-center shrink-0 min-w-[42px] uppercase">
+        {/* Underlying deal peek */}
+        <div className="absolute inset-0 flex items-center justify-end pr-3 font-mono text-xs font-black text-orange-500 tracking-wider pointer-events-none">
           DEAL
-        </span>
+        </div>
+
+        {/* Solid cover button */}
+        <div className="relative z-10 flex-1 mr-10 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 group-hover/btn:from-orange-600 group-hover/btn:to-amber-600 text-white px-3.5 py-2 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition-transform duration-200 group-hover/btn:-translate-x-0.5">
+          <Flame className="h-3.5 w-3.5 shrink-0 fill-white" />
+          <span className="truncate">ACTIVATE {discountLabel}</span>
+        </div>
+
+        {/* Peek spacer */}
+        <div className="w-10 shrink-0" aria-hidden="true" />
       </a>
     );
   }
 
-  // Authentic two-part Reveal Code button matching user screenshot:
-  // [ REDEEM RS 200 OFF CODE ] [ 0 0 ]
+  // Hidden Code Voucher Box:
+  // An outer dashed ticket container with the code sitting inside.
+  // The solid blue button sits ON TOP as a cover overlay, hiding all but the last 2 digits peeking out!
   return (
     <a
       href={affiliateUrl}
       target="_blank"
       rel="noopener noreferrer nofollow"
       onClick={(e) => onRedeem(deal, e)}
-      className={`group/btn inline-flex items-stretch rounded-xl border-2 border-dashed border-primary/40 hover:border-primary bg-background shadow-xs hover:shadow-md hover:scale-[1.01] transition-all duration-200 overflow-hidden cursor-pointer select-none ${
+      className={`group/btn relative inline-flex items-center justify-between rounded-xl border-2 border-dashed border-primary/50 hover:border-primary bg-card/60 p-0.5 shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden select-none ${
         fullWidth ? "w-full" : ""
       } ${className}`}
       title={`Click to copy code and open ${deal.storeName}`}
     >
-      {/* Solid primary action button */}
-      <span className="flex-1 bg-primary group-hover/btn:bg-primary/90 text-primary-foreground px-3.5 py-2 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors">
-        <Sparkles className="h-3.5 w-3.5 shrink-0 fill-primary-foreground/30" />
-        <span className="truncate">REDEEM {discountLabel} CODE</span>
-      </span>
+      {/* Underlying hidden code layer - peek showing last 2 digits on the right */}
+      <div className="absolute inset-0 flex items-center justify-end pr-3 font-mono text-xs font-black text-foreground/80 tracking-widest pointer-events-none">
+        <span>{codePeek}</span>
+      </div>
 
-      {/* Dashed peek cutout showing last 2 digits of the code */}
-      <span
-        className="bg-card px-3 py-2 text-xs font-mono font-black text-foreground/80 group-hover/btn:text-primary border-l-2 border-dashed border-primary/40 flex items-center justify-center shrink-0 min-w-[44px] transition-colors"
-        title="Last 2 digits of code revealed. Click to copy full code!"
-      >
-        {codePeek}
-      </span>
+      {/* Solid cover button covering and hiding the coupon code from the left */}
+      <div className="relative z-10 flex-1 mr-9 sm:mr-11 rounded-lg bg-primary group-hover/btn:bg-primary/90 text-primary-foreground px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm transition-transform duration-200 group-hover/btn:-translate-x-0.5">
+        <Copy className="h-3.5 w-3.5 shrink-0" />
+        <span className="truncate">REDEEM {discountLabel} CODE</span>
+      </div>
+
+      {/* Spacer matching peek area width */}
+      <div className="w-9 sm:w-11 shrink-0" aria-hidden="true" />
     </a>
   );
 }
