@@ -20,6 +20,7 @@ import {
   Bell,
   Home,
   ShoppingBag,
+  Flame,
 } from "lucide-react";
 
 type NavLink = {
@@ -33,11 +34,10 @@ type NavLink = {
 };
 
 const desktopLinks: NavLink[] = [
-  { label: "Compare", to: "/compare", badge: "NEW", badgeColor: "bg-primary/10 text-primary" },
-  { label: "Price Tracker", to: "/price-history" },
-  { label: "Ask", to: "/ask" },
-  { label: "Stores", to: "/stores" },
   { label: "Offers", to: "/offers", badge: "HOT", badgeColor: "bg-rose-500/15 text-rose-500" },
+  { label: "Compare", to: "/compare", badge: "NEW", badgeColor: "bg-primary/10 text-primary" },
+  { label: "Stores", to: "/stores" },
+  { label: "Ask", to: "/ask" },
   { label: "Extension", to: "/chrome-extension" },
   { label: "Blog", to: "/blog" },
 ];
@@ -329,13 +329,13 @@ export function Navbar() {
           </Link>
 
           <Link
-            to="/price-history"
+            to="/offers"
             className="flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 px-3 py-1 text-muted-foreground hover:text-foreground active:scale-95 touch-manipulation"
             activeProps={{ className: "text-primary font-bold" }}
-            aria-label="Price Tracker"
+            aria-label="Live Offers"
           >
-            <Clock className="h-4 w-4" aria-hidden="true" />
-            <span className="text-[10px] font-medium">Tracker</span>
+            <Flame className="h-4 w-4" aria-hidden="true" />
+            <span className="text-[10px] font-medium">Offers</span>
           </Link>
 
           <Link

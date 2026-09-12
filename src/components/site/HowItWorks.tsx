@@ -34,11 +34,11 @@ const SHOPPING_STEPS = [
   },
   {
     step: "02",
-    tag: "DEAL HONESTY RADAR",
-    title: "Expose Fake Sales with 30-Day Price Baselines",
+    tag: "LIVE VERIFIED OFFERS",
+    title: "Discover 970+ Hand-Verified Live Promo Deals",
     summary:
-      "Ever notice how sellers inflate prices right before a big festival sale just to claim a fake '50% off'? Our 30-day moving baseline analysis separates authentic bargains from artificial marketing markups.",
-    proof: "Real-time baseline graphs show what the product actually sold for.",
+      "Never miss a working discount code or steal deal. GoCoupon synchronizes directly with affiliate networks and store checkout endpoints 24/7 to deliver genuine 30-75% price drops with zero expired codes.",
+    proof: "Live sync every 15 minutes across Amazon, Flipkart, Myntra, and 500+ stores.",
     icon: TrendingDown,
   },
   {

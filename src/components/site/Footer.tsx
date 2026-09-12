@@ -77,7 +77,7 @@ export function Footer() {
                 </Link>
 
                 <p className="mt-5 max-w-sm text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed">
-                  GoCoupon empowers shoppers to find verified coupons, track honest prices, and earn instant cashback across 500+ top Indian stores.
+                  GoCoupon empowers shoppers to find verified coupons, discover live offers, and earn instant cashback across 500+ top stores.
                 </p>
               </div>
 
@@ -154,10 +154,10 @@ export function Footer() {
                   </li>
                   <li>
                     <Link
-                      to="/price-history"
+                      to="/offers"
                       className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
                     >
-                      Changelog
+                      Exclusive Offers
                     </Link>
                   </li>
                 </ul>
