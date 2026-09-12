@@ -556,6 +556,12 @@ export function normalizeCuelinksToDealRecord(offer: CuelinksCouponOffer): DealR
     zomato: "/Brand logos/zomato.webp",
     firstcry: "/Brand logos/firstcry.webp",
     pepperfry: "/Brand logos/pepperfry.webp",
+    gonoise: "/Brand logos/gonoise.svg",
+    noise: "/Brand logos/gonoise.svg",
+    soulflower: "/Brand logos/soulflower.svg",
+    rareism: "/Brand logos/rareism.svg",
+    jaypore: "/Brand logos/jaypore.svg",
+    asaya: "/Brand logos/asaya.svg",
   };
 
   const storeKey = offer.storeName.toLowerCase().replace(/[^a-z0-9]/g, "");
