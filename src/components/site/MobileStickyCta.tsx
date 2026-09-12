@@ -55,9 +55,9 @@ export function MobileStickyCta() {
       <div className="flex items-center justify-between gap-2.5">
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
           <img
-            src="/icons/store_icon_128x128.png"
+            src="/icons/icon.svg"
             alt="GoCoupon Extension"
-            className="h-8 w-8 shrink-0 rounded-xl object-contain shadow-xs border border-border/60"
+            className="h-8 w-8 shrink-0 object-contain"
             width={32}
             height={32}
           />

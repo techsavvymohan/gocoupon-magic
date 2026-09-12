@@ -32,7 +32,7 @@ export function Footer() {
               to="/chrome-extension"
               className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-white px-6 py-2.5 text-sm font-semibold text-neutral-900 shadow-sm transition-all duration-200 hover:bg-neutral-100 hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black cursor-pointer"
             >
-              <img src="/icons/store_icon_128x128.png" alt="GoCoupon" className="h-4 w-4 rounded-xs object-contain" width={16} height={16} />
+              <img src="/icons/icon.svg" alt="GoCoupon" className="h-4 w-4 object-contain" width={16} height={16} />
               <span>Start for free</span>
             </Link>
           </div>
@@ -53,9 +53,9 @@ export function Footer() {
                   aria-label="GoCoupon — Home"
                 >
                   <img
-                    src="/icons/store_icon_128x128.png"
+                    src="/icons/icon.svg"
                     alt="GoCoupon"
-                    className="h-8 w-8 rounded-xl object-contain shadow-xs border border-border/40"
+                    className="h-8 w-8 object-contain"
                     width={32}
                     height={32}
                   />
