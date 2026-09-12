@@ -172,7 +172,7 @@ export function Navbar() {
               rel="noopener noreferrer"
               className="hidden items-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 px-4 sm:px-5 py-2 text-xs font-bold text-white shadow-md transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-rose-500/25 sm:inline-flex group"
             >
-              <img src="/icons/store_icon_128x128.png" alt="GoCoupon" className="h-4 w-4 rounded-xs object-contain" width={16} height={16} />
+              <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
               <span>Add to Chrome</span>
             </MagneticButton>
             {/* Mobile Menu Toggle Button */}
@@ -283,9 +283,8 @@ export function Navbar() {
                   href="https://chromewebstore.google.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-primary py-3.5 min-h-[44px] text-sm font-bold text-primary-foreground shadow-md touch-manipulation"
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 min-h-[44px] text-sm font-bold text-primary-foreground shadow-md touch-manipulation"
                 >
-                  <img src="/icons/store_icon_128x128.png" alt="GoCoupon" className="h-5 w-5 rounded-md object-contain" width={20} height={20} />
                   <span>Add to Chrome — Free</span>
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </a>
