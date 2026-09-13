@@ -2153,7 +2153,7 @@ export const posts: Post[] = [
         items: [
           { label: "Add GoCoupon to Chrome (Free) →", to: "/extension" },
           { label: "Compare Amazon vs Flipkart Live Prices", to: "/compare" },
-          { label: "Explore 90-Day Price Tracker", to: "/price-history" },
+          { label: "Track Product Price Drops & Alerts", to: "/watchlist" },
           { label: "Check Verified Flipkart Coupons Today", to: "/flipkart-coupons" },
         ],
       },
@@ -2341,7 +2341,7 @@ export const posts: Post[] = [
         items: [
           { label: "Switch to GoCoupon Free on Chrome →", to: "/extension" },
           { label: "Compare Live Prices Across 100+ Stores", to: "/compare" },
-          { label: "Check 90-Day Price Drop Tracker", to: "/price-history" },
+          { label: "Track Live Price Drops on Watchlist", to: "/watchlist" },
         ],
       },
     ],
@@ -2434,7 +2434,7 @@ export const posts: Post[] = [
         items: [
           { label: "Compare Live Product Prices Now →", to: "/compare" },
           { label: "Check Today's Verified Deals Hub", to: "/deals" },
-          { label: "Track 90-Day Price History Graphs", to: "/price-history" },
+          { label: "Track Price Drops & Alerts", to: "/watchlist" },
         ],
       },
     ],
@@ -2522,7 +2522,7 @@ export const posts: Post[] = [
         items: [
           { label: "Explore Today's Hand-Verified Deals →", to: "/deals" },
           { label: "Install Free GoCoupon Auto-Applier", to: "/extension" },
-          { label: "Check 90-Day Price Tracker for Fake Deals", to: "/price-history" },
+          { label: "Track Price Drops on Watchlist", to: "/watchlist" },
         ],
       },
     ],
@@ -2607,13 +2607,13 @@ export const posts: Post[] = [
       {
         type: "callout",
         title: "How do I set a price drop alert for an Amazon product?",
-        text: "Paste the product URL into GoCoupon's Price History tool (/price-history) and click 'Set Price Alert'. You will be notified the moment the item drops to your target price.",
+        text: "Paste the product URL into GoCoupon's Price Watchlist (/watchlist) and click 'Set Price Alert'. You will be notified the moment the item drops to your target price.",
         variant: "info",
       },
       {
         type: "link",
         items: [
-          { label: "Inspect 90-Day Price History Graphs →", to: "/price-history" },
+          { label: "Set Target Price Drop Alerts →", to: "/watchlist" },
           { label: "Compare Live Cross-Store Prices", to: "/compare" },
           { label: "Browse Today's Verified Deals", to: "/deals" },
         ],

@@ -230,7 +230,7 @@ export function organizationSchema() {
       "GrabOn and CouponDuniya Alternative for Indian Online Shoppers",
       "Dealspotr and Honey Alternative for Global E-Commerce",
       "Live Multi-Store Price Comparison (Amazon, Flipkart, Walmart, Target)",
-      "30-Day Price History Graphs & Fake Discount Detection",
+      "Fake Discount & Pre-Sale Markup Detection",
       "Instant Bank Card Discounts (HDFC, SBI, ICICI, Axis)",
       "Verified Promo Codes, Voucher Codes & Discount Deals",
     ],

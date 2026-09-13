@@ -123,7 +123,7 @@ function DealsHubPage() {
             Today's Verified Deals, Price Drops &amp; Shopping Discounts in India
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base sm:text-lg text-muted-foreground text-balance">
-            Every deal is benchmarked against 30-day price history graphs and verified with working coupon codes so you never fall for fake sale markups.
+            Every deal is benchmarked against historical store prices and verified with working coupon codes so you never fall for fake sale markups.
           </p>
 
           {/* Search */}
