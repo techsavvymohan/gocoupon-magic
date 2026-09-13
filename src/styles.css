@@ -63,10 +63,41 @@ html.light {
 
   /* Elevation Shadows */
   --shadow-accent: 0 8px 24px -4px rgba(67, 56, 202, 0.16);
+
+  /* Admin portal legacy compatibility */
+  --text: #090d16;
+  --surface: #ffffff;
+  --surface-soft: #f8fafc;
+  --color-primary: #10b981;
+}
+
+/* ── Specific Admin Light / Dark Mode Text Contrast Fixes ── */
+.admin-light-mode {
+  --text: #090d16 !important;
+  --surface: #ffffff !important;
+  --surface-soft: #f8fafc !important;
+  --border: rgba(15, 23, 42, 0.12) !important;
+  --color-primary: #059669 !important;
+  --muted: #475569 !important; /* Crisp slate-600 so [var(--muted)] text is highly visible */
+  color: #090d16;
+}
+
+.admin-dark-mode {
+  --text: #f8fafc !important;
+  --surface: #18181b !important;
+  --surface-soft: #27272a !important;
+  --border: rgba(255, 255, 255, 0.1) !important;
+  --color-primary: #10b981 !important;
+  --muted: #a1a1aa !important;
+  color: #f8fafc;
 }
 
 /* ── DARK MODE — Deep Midnight Slate & Indigo ── */
 html.dark {
+  --text: #f8fafc;
+  --surface: #18181b;
+  --surface-soft: #27272a;
+  --color-primary: #10b981;
   --background: #090d16; /* Midnight Obsidian */
   --foreground: #f8fafc;
   --card: #0f172a; /* Slate 900 */

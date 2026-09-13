@@ -169,7 +169,7 @@ export async function fetchDeals(options: FetchDealsOptions = {}): Promise<Deals
   if (options.badge) params.set("badge", options.badge);
   if (options.sortBy) params.set("sortBy", options.sortBy);
   if (options.order) params.set("order", options.order);
-  const reqLimit = options.limit !== undefined ? (options.limit <= 0 ? 1500 : options.limit) : 1000;
+  const reqLimit = options.limit !== undefined ? options.limit : 0;
   params.set("limit", String(reqLimit));
   if (options.offset) params.set("offset", String(options.offset));
 

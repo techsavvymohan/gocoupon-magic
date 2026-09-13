@@ -1,7 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
-import { posts, type Post } from "@/data/posts";
+import { posts as defaultPosts, type Post } from "@/data/posts";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import {
   Search,
@@ -67,12 +67,50 @@ const STARTER_TRILOGY_SLUGS = [
 ];
 
 function BlogIndex() {
+  const [allPosts, setAllPosts] = useState<Post[]>(defaultPosts);
   const [selectedTag, setSelectedTag] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortOption, setSortOption] = useState<"latest" | "long" | "quick">("latest");
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetch("/api/blogs")
+      .then((res) => res.json())
+      .then((json) => {
+        if (!isMounted || !json.success || !Array.isArray(json.data)) return;
+        const map = new Map<string, Post>();
+        json.data.forEach((b: any) => {
+          if (b.status === "Published" || !b.status) {
+            map.set(b.slug, {
+              slug: b.slug,
+              tag: b.category || b.tag || "General",
+              date: b.date || (b.createdAt ? new Date(b.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Recent"),
+              title: b.title,
+              excerpt: b.shortDescription || b.excerpt || "",
+              read: b.readTime || b.read || "5 min read",
+              author: b.author || "GoCoupon Editorial",
+              cover: b.image || b.cover,
+              body: Array.isArray(b.body) ? b.body : [
+                { type: "p", text: b.content || b.shortDescription || "" }
+              ]
+            });
+          }
+        });
+        defaultPosts.forEach((p) => {
+          if (!map.has(p.slug)) {
+            map.set(p.slug, p);
+          }
+        });
+        setAllPosts(Array.from(map.values()));
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleSharePost = (slug: string, title: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -97,7 +135,7 @@ function BlogIndex() {
   };
 
   const filteredPosts = useMemo(() => {
-    let result = posts.filter((post) => {
+    let result = allPosts.filter((post) => {
       const matchesTag =
         selectedTag === "All" ||
         post.tag.toLowerCase() === selectedTag.toLowerCase() ||
@@ -126,18 +164,18 @@ function BlogIndex() {
     }
 
     return result;
-  }, [selectedTag, searchQuery, sortOption]);
+  }, [allPosts, selectedTag, searchQuery, sortOption]);
 
   const featured =
-    posts.find(
+    allPosts.find(
       (p) => p.slug === "how-to-find-cheaper-products-online-price-comparison-guide"
-    ) || posts[0];
+    ) || allPosts[0];
 
   const starterTrilogy = useMemo(() => {
     return STARTER_TRILOGY_SLUGS.map((slug) =>
-      posts.find((p) => p.slug === slug)
+      allPosts.find((p) => p.slug === slug)
     ).filter((p): p is Post => Boolean(p));
-  }, []);
+  }, [allPosts]);
 
   const breadcrumb = breadcrumbSchema([
     { name: "Home", path: "/" },
@@ -280,9 +318,9 @@ function BlogIndex() {
                 const isSelected = selectedTag === category.id;
                 const count =
                   category.id === "All"
-                    ? posts.length
-                    : posts.filter(
-                        (p) =>
+                    ? allPosts.length
+                    : allPosts.filter(
+                        (p: Post) =>
                           p.tag.toLowerCase().includes(category.id.toLowerCase()) ||
                           category.id.toLowerCase().includes(p.tag.toLowerCase())
                       ).length;

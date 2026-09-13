@@ -8,6 +8,7 @@ import { useState } from "react";
 import { MagneticButton } from "../MagneticButton";
 import { ThemeToggle } from "../ThemeToggle";
 import { CurrencyToggle } from "../CurrencyToggle";
+import { AnnouncementBar } from "./AnnouncementBar";
 import {
   Menu,
   X,
@@ -61,6 +62,7 @@ export function Navbar() {
           WebkitBackdropFilter: "blur(24px) saturate(160%)",
         }}
       >
+        <AnnouncementBar />
         <nav className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
           {/* Logo */}
           <Link
@@ -171,7 +173,7 @@ export function Navbar() {
 
             <MagneticButton
               as="a"
-              href="https://chromewebstore.google.com"
+              href="https://chromewebstore.google.com/detail/gbmfihnboadlmmjbikajlmocjmlpehij"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden items-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 px-4 sm:px-5 py-2 text-xs font-bold text-white shadow-md transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-rose-500/25 sm:inline-flex group"
@@ -284,7 +286,7 @@ export function Navbar() {
               })}
               <li className="pt-2">
                 <a
-                  href="https://chromewebstore.google.com"
+                  href="https://chromewebstore.google.com/detail/gbmfihnboadlmmjbikajlmocjmlpehij"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 min-h-[44px] text-sm font-bold text-primary-foreground shadow-md touch-manipulation"

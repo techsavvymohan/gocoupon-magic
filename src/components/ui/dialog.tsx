@@ -90,6 +90,14 @@ const DialogDescription = React.forwardRef<
 ));
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
+function useDialogA11yIds() {
+  const id = React.useId();
+  return {
+    titleId: `dialog-title-${id}`,
+    descriptionId: `dialog-desc-${id}`,
+  };
+}
+
 export {
   Dialog,
   DialogPortal,
@@ -101,4 +109,6 @@ export {
   DialogFooter,
   DialogTitle,
   DialogDescription,
+  useDialogA11yIds,
 };
+

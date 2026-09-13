@@ -35,6 +35,7 @@ categoriesRouter.get("/", async (_req: Request, res: Response) => {
 
   const payload = {
     categories,
+    data: categories,
     totalCategories: categories.length,
     totals: {
       stores: totalStores,

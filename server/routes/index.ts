@@ -20,8 +20,32 @@ import { extensionRouter } from "./extension-config.js";
 import { contactRouter } from "./contact.js";
 import { cuelinksRouter } from "./cuelinks.js";
 import { internationalDealsRouter } from "./international-deals.js";
+import { adminRouter } from "./admin.js";
+import { blogsRouter } from "./blogs.js";
 
 export const apiRouter = Router();
+
+apiRouter.use("/admin", adminRouter);
+apiRouter.use("/blogs", blogsRouter);
+apiRouter.use("/admin/blogs", blogsRouter);
+apiRouter.use("/offers", dealsRouter);
+apiRouter.use("/homepage", adminRouter);
+apiRouter.use("/events", adminRouter);
+
+apiRouter.get("/public/countries", (_req, res) => {
+  res.json({
+    success: true,
+    data: [
+      { code: "IN", name: "India" },
+      { code: "US", name: "United States" },
+      { code: "GB", name: "United Kingdom" },
+      { code: "AE", name: "United Arab Emirates" },
+      { code: "SG", name: "Singapore" },
+      { code: "CA", name: "Canada" },
+      { code: "AU", name: "Australia" },
+    ],
+  });
+});
 
 apiRouter.use("/stores", storesRouter);
 apiRouter.use("/deals", dealsRouter);

@@ -188,7 +188,15 @@ export function Footer() {
                       to="/blog"
                       className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
                     >
-                      Blog
+                      Blog &amp; Comparisons
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/blog/gocoupon-vs-grabon-vs-coupondunia-comparison"
+                      className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
+                    >
+                      GoCoupon vs GrabOn
                     </Link>
                   </li>
                   <li>
@@ -196,7 +204,7 @@ export function Footer() {
                       to="/faq"
                       className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
                     >
-                      Support
+                      Support &amp; FAQ
                     </Link>
                   </li>
                 </ul>

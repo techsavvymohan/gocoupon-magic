@@ -19,7 +19,7 @@ export function CTA() {
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <MagneticButton
             as="a"
-            href="https://chromewebstore.google.com"
+            href="https://chromewebstore.google.com/detail/gbmfihnboadlmmjbikajlmocjmlpehij"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-xs transition-all hover:scale-105 active:scale-95"

@@ -1,0 +1,53 @@
+[
+  {
+    "id": "sub-1789329506614-3j4m",
+    "storeName": "Nike India",
+    "code": "NIKEAIR25",
+    "discount": "25% OFF",
+    "url": "https://nike.com/in",
+    "terms": "Valid once per user on footwear category.",
+    "category": "Footwear",
+    "email": "runner@example.com",
+    "submittedAt": "2026-09-13T19:58:26.614Z",
+    "status": "pending"
+  },
+  {
+    "id": "sub-101",
+    "storeName": "Myntra",
+    "code": "MYNTRA500",
+    "discount": "Flat ₹500 OFF on orders above ₹1,999",
+    "category": "Fashion",
+    "url": "https://www.myntra.com",
+    "terms": "Valid on clothing, footwear, and accessories. Select brands only.",
+    "expiryDate": "2026-09-27",
+    "email": "priya.sharma@gmail.com",
+    "submittedAt": "2026-09-13T17:57:21.575Z",
+    "status": "pending"
+  },
+  {
+    "id": "sub-102",
+    "storeName": "Croma",
+    "code": "CROMAAUDIO15",
+    "discount": "15% Instant Discount on Premium Audio",
+    "category": "Electronics",
+    "url": "https://www.croma.com",
+    "terms": "Valid on Sony, JBL, and Bose headphones. Max discount ₹2,000.",
+    "expiryDate": "2026-10-03",
+    "email": "rahul.techie@outlook.com",
+    "submittedAt": "2026-09-13T14:57:21.575Z",
+    "status": "pending"
+  },
+  {
+    "id": "sub-103",
+    "storeName": "Swiggy",
+    "code": "SWIGGYTASTY",
+    "discount": "Flat ₹120 OFF on orders above ₹299",
+    "category": "Food",
+    "url": "https://www.swiggy.com",
+    "terms": "Valid on select restaurants. Payment via UPI or Credit Card.",
+    "expiryDate": "2026-09-20",
+    "email": "ananya.foodie@gmail.com",
+    "submittedAt": "2026-09-12T19:57:21.575Z",
+    "status": "approved"
+  }
+]

@@ -158,10 +158,10 @@ export function WhyUsExpenseSaviour() {
           <div className="p-6 sm:p-7 border-b border-border bg-muted/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h3 className="font-display text-xl sm:text-2xl font-bold text-foreground">
-                How GoCoupon Compares
+                How GoCoupon Compares with Competitors
               </h3>
               <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-                Why standard coupon tools and passive trackers fail modern shoppers
+                Why manual coupon aggregators (GrabOn, CouponDuniya, Dealspotr) and passive trackers fail modern shoppers
               </p>
             </div>
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3.5 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 shrink-0">
@@ -176,7 +176,7 @@ export function WhyUsExpenseSaviour() {
               <thead>
                 <tr className="border-b border-border bg-muted/40 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
                   <th className="p-4 sm:p-5 font-bold">Shopping Challenge</th>
-                  <th className="p-4 sm:p-5 font-medium opacity-80">Old Coupon Apps</th>
+                  <th className="p-4 sm:p-5 font-medium opacity-80">Aggregators (GrabOn / CouponDuniya / Dealspotr)</th>
                   <th className="p-4 sm:p-5 font-medium opacity-80">Passive Trackers</th>
                   <th className="p-4 sm:p-5 font-bold text-primary bg-primary/5">GoCoupon Intelligence</th>
                 </tr>
@@ -230,7 +230,7 @@ export function WhyUsExpenseSaviour() {
             <div className="flex items-center gap-3 shrink-0">
               <MagneticButton
                 as="a"
-                href="https://chromewebstore.google.com"
+                href="https://chromewebstore.google.com/detail/gbmfihnboadlmmjbikajlmocjmlpehij"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs sm:text-sm font-bold text-primary-foreground shadow-xs transition-all hover:scale-105 active:scale-95"

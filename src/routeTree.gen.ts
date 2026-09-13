@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AmazonCouponsRouteImport } from './routes/amazon-coupons'
 import { Route as AskRouteImport } from './routes/ask'
 import { Route as CashbackRewardsRouteImport } from './routes/cashback-rewards'
@@ -53,6 +54,11 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AmazonCouponsRoute = AmazonCouponsRouteImport.update({
@@ -224,6 +230,7 @@ const ProductProductIdRoute = ProductProductIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/amazon-coupons': typeof AmazonCouponsRoute
   '/ask': typeof AskRoute
   '/cashback-rewards': typeof CashbackRewardsRoute
@@ -261,6 +268,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/amazon-coupons': typeof AmazonCouponsRoute
   '/ask': typeof AskRoute
   '/cashback-rewards': typeof CashbackRewardsRoute
@@ -299,6 +307,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/amazon-coupons': typeof AmazonCouponsRoute
   '/ask': typeof AskRoute
   '/cashback-rewards': typeof CashbackRewardsRoute
@@ -338,6 +347,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/admin'
     | '/amazon-coupons'
     | '/ask'
     | '/cashback-rewards'
@@ -375,6 +385,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/admin'
     | '/amazon-coupons'
     | '/ask'
     | '/cashback-rewards'
@@ -412,6 +423,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/admin'
     | '/amazon-coupons'
     | '/ask'
     | '/cashback-rewards'
@@ -450,6 +462,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRoute
   AmazonCouponsRoute: typeof AmazonCouponsRoute
   AskRoute: typeof AskRoute
   CashbackRewardsRoute: typeof CashbackRewardsRoute
@@ -499,6 +512,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/amazon-coupons': {
@@ -738,6 +758,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRoute,
   AmazonCouponsRoute: AmazonCouponsRoute,
   AskRoute: AskRoute,
   CashbackRewardsRoute: CashbackRewardsRoute,

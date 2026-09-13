@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import path from "path";
 import react from "@vitejs/plugin-react";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import tailwindcss from "@tailwindcss/vite";
@@ -273,6 +274,11 @@ export default defineConfig({
     tailwindcss(),
     tsconfigPaths({ projects: ["./tsconfig.json"] }),
   ],
+  resolve: {
+    alias: {
+      "@": path.resolve(process.cwd(), "./src"),
+    },
+  },
   server: {
     port: 8080,
     host: true,

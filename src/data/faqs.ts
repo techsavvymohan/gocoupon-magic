@@ -35,6 +35,16 @@ export const couponFaqs = [
       "When you install our free Chrome extension and proceed to checkout on any supported store, GoCoupon tests all verified working discount codes in seconds and automatically applies the single code that saves you the most money.",
   },
   {
+    question: "How does GoCoupon compare to GrabOn, CouponDuniya, and Dealspotr?",
+    answer:
+      "Unlike older aggregators like GrabOn, CouponDuniya, or Dealspotr that often list expired coupons and clickbait codes, GoCoupon features 100% verified, hand-tested deals updated daily via real-time merchant APIs. GoCoupon also provides a 1-click auto-coupon browser extension, 30-day price drop history graphs, and bank card discount stacking (HDFC, SBI, ICICI, Axis) with zero ads and zero spam.",
+  },
+  {
+    question: "Is GoCoupon also known as Go Coupon or GoCoupons?",
+    answer:
+      "Yes! Whether you search for GoCoupon, Go Coupon, or GoCoupons (gocoupon.io), you reach the official platform. GoCoupon is 100% free forever, aggregating over 970+ live verified deals, 240+ partner stores, and exclusive promo codes across India and global markets.",
+  },
+  {
     question: "Is goCoupon safe and private?",
     answer:
       "Absolutely. goCoupon operates with a strict sandboxed privacy policy. We never track your personal web history, read private emails or messages, or store financial details like card numbers or CVVs. We only activate on checkout pages to help you save.",

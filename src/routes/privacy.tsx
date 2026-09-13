@@ -24,7 +24,7 @@ import {
 
 const LAST_UPDATED = "September 9, 2026";
 const PRODUCT_NAME = "GoCoupon – Coupon Finder";
-const EXTENSION_ID = "bbdcjoadldgankjdhdlmncacpkengnid";
+const EXTENSION_ID = "gbmfihnboadlmmjbikajlmocjmlpehij";
 const CONTACT_EMAIL = "support@gocoupon.io";
 
 export const privacyFaqs = [

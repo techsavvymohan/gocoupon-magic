@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en" class="light">
   <head>
     <meta charset="UTF-8" />
 
@@ -110,21 +110,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Primary SEO -->
-    <title>GoCoupon: Coupons, Price Comparison &amp; Cashback Extension</title>
+    <title>GoCoupon (Go Coupon) – Verified Coupons, Deals &amp; Promo Codes | GrabOn &amp; CouponDuniya Alternative</title>
     <meta
       name="description"
-      content="Find your lowest price across 500+ stores in 1 second. GoCoupon auto-applies working promo codes, exposes fake discounts with 30-day price history, and stacks bank card discounts. 100% free."
+      content="Looking for Go Coupon, GrabOn, CouponDuniya or Dealspotr? GoCoupon features 970+ verified live deals, auto-applied promo codes, price tracking, and 10% instant bank discounts across 500+ stores. 100% free."
     />
     <meta
       name="keywords"
-      content="GoCoupon, gocoupon.io, go coupon, gocoupon extension, deals, discounts, coupons, promo codes, price tracking, price tracker, price comparison, compare prices, auto apply coupons, fake discount detector, cashback extension"
+      content="GoCoupon, go coupon, gocoupon, gocoupons, gocoupon.io, grabon, grabon alternative, grabon coupons, couponduniya, coupon duniya, coupondunia, couponduniya alternative, dealspotr, dealspottr, dealspottr coupons, deals, discounts, coupons, promo codes, price tracking, price tracker, price comparison, compare prices, auto apply coupons, fake discount detector, cashback extension"
     />
     <meta
       name="robots"
       content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1"
     />
     <meta name="author" content="GoCoupon" />
-    <meta name="theme-color" content="#080808" />
+    <meta name="theme-color" content="#ffffff" />
     <meta name="format-detection" content="telephone=no" />
 
     <!-- PWA & Mobile Web App Manifest -->
@@ -144,11 +144,11 @@
     <meta property="og:site_name" content="GoCoupon" />
     <meta
       property="og:title"
-      content="GoCoupon: Coupons, Price Comparison &amp; Cashback Extension"
+      content="GoCoupon (Go Coupon) – Verified Coupons, Deals &amp; Promo Codes"
     />
     <meta
       property="og:description"
-      content="Find your lowest price across 500+ stores in 1 second. Auto-apply coupons, expose fake discounts, and stack bank card offers."
+      content="Looking for Go Coupon, GrabOn, CouponDuniya or Dealspotr? GoCoupon gives you 970+ verified live deals, auto-applied promo codes, price tracking, and 10% instant bank discounts across 500+ stores. 100% free."
     />
     <meta property="og:url" content="https://gocoupon.io/" />
     <meta property="og:image" content="https://gocoupon.io/og-image.png" />
@@ -166,11 +166,11 @@
     <meta name="twitter:creator" content="@gocoupon_in" />
     <meta
       name="twitter:title"
-      content="GoCoupon: Coupons, Price Comparison &amp; Cashback Extension"
+      content="GoCoupon (Go Coupon) – Verified Coupons, Deals &amp; Promo Codes"
     />
     <meta
       name="twitter:description"
-      content="Find your lowest price across 500+ stores in 1 second. Auto-apply coupons, expose fake discounts, and stack bank card offers."
+      content="Looking for Go Coupon, GrabOn, CouponDuniya or Dealspotr? GoCoupon gives you 970+ verified live deals, auto-applied promo codes, price tracking, and 10% instant bank discounts across 500+ stores. 100% free."
     />
     <meta name="twitter:image" content="https://gocoupon.io/og-image.png" />
 
@@ -192,16 +192,13 @@
     <script>
       (function () {
         try {
-          var t = localStorage.getItem("theme");
-          if (!t) {
-            t = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
-          }
+          var t = localStorage.getItem("theme") || "light";
           var r = document.documentElement;
           r.classList.remove("light", "dark");
           r.classList.add(t);
           r.style.colorScheme = t;
         } catch (e) {
-          document.documentElement.classList.add("dark");
+          document.documentElement.classList.add("light");
         }
       })();
     </script>
@@ -214,7 +211,18 @@
         "@id": "https://gocoupon.io/#website",
         "url": "https://gocoupon.io/",
         "name": "GoCoupon",
-        "alternateName": ["GoCoupon.io", "goCoupon"],
+        "alternateName": [
+          "Go Coupon",
+          "gocoupon",
+          "gocoupons",
+          "GoCoupons",
+          "GoCoupon.io",
+          "GrabOn Alternative",
+          "CouponDuniya Alternative",
+          "Coupon Dunia",
+          "Dealspotr Alternative",
+          "Dealspottr"
+        ],
         "publisher": { "@id": "https://gocoupon.io/#organization" },
         "potentialAction": {
           "@type": "SearchAction",
@@ -233,8 +241,17 @@
         "name": "GoCoupon",
         "url": "https://gocoupon.io/",
         "logo": "https://gocoupon.io/gc-logo.webp",
-        "description": "GoCoupon provides coupon discovery, price comparison, price history tracking, cashback and a browser extension for online shoppers worldwide.",
+        "description": "GoCoupon is the official shopping intelligence platform and browser extension for online shoppers worldwide, providing verified coupon automation, price comparison, 30-day price tracking, and bank card cashback stacking.",
         "email": "support@gocoupon.io",
+        "knowsAbout": [
+          "Automated Coupon Testing & 1-Click Checkout Extension",
+          "GrabOn and CouponDuniya Alternative for Indian Online Shoppers",
+          "Dealspotr and Honey Alternative for Global E-Commerce",
+          "Live Multi-Store Price Comparison (Amazon, Flipkart, Walmart, Target)",
+          "30-Day Price History Graphs & Fake Discount Detection",
+          "Instant Bank Card Discounts (HDFC, SBI, ICICI, Axis)",
+          "Verified Promo Codes, Voucher Codes & Discount Deals"
+        ],
         "sameAs": [
           "https://facebook.com/gocouponapp",
           "https://twitter.com/gocoupon_in",
@@ -253,7 +270,7 @@
         "applicationCategory": "ShoppingApplication",
         "applicationSubCategory": "Price Comparison, Price Tracking, Coupon Automation",
         "operatingSystem": "Chrome, Edge, Brave, Opera",
-        "url": "https://gocoupon.io/chrome-extension",
+        "url": "https://chromewebstore.google.com/detail/gbmfihnboadlmmjbikajlmocjmlpehij",
         "description": "GoCoupon automatically applies verified working coupon codes at checkout, tracks 90-day price history graphs, and compares live store prices across Amazon, Walmart, Target, Flipkart, and 200+ online stores worldwide.",
         "featureList": [
           "1-Click Automated Coupon Testing at Checkout in 850ms",
@@ -323,6 +340,22 @@
               "@type": "Answer",
               "text": "Yes. GoCoupon identifies both merchant coupon codes and eligible card or payment method discounts, ensuring you combine store coupons with bank payment offers for maximum savings."
             }
+          },
+          {
+            "@type": "Question",
+            "name": "How does GoCoupon compare to GrabOn, CouponDuniya, and Dealspotr?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Unlike older aggregators like GrabOn, CouponDuniya, or Dealspotr that often list expired coupons and dead links, GoCoupon features 100% verified, hand-tested deals updated daily via real-time merchant APIs. GoCoupon also provides a 1-click auto-coupon browser extension, 30-day price drop history graphs, and bank card discount stacking (HDFC, SBI, ICICI, Axis) with zero ads and zero spam."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is GoCoupon also known as Go Coupon or GoCoupons?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes! Whether you search for GoCoupon, Go Coupon, or GoCoupons (gocoupon.io), you reach the official platform. GoCoupon is 100% free forever, aggregating over 970+ live verified deals, 240+ partner stores, and exclusive promo codes across India and global markets."
+            }
           }
         ]
       }
@@ -348,7 +381,8 @@
     </script>
     <style>
       #site-loader{position:fixed;inset:0;display:grid;place-items:center;background:#090d16;z-index:9999}
-      html.light #site-loader{background:#f8fafc}
+      #site-loader{position:fixed;inset:0;display:grid;place-items:center;background:#f8fafc;z-index:9999}
+      html.dark #site-loader{background:#090d16}
       .gc-loader{width:32px;height:32px;border:2.5px solid rgba(99,102,241,.18);border-top-color:#6366f1;border-radius:50%;animation:gc-spin .7s linear infinite}
       html.light .gc-loader{border-color:rgba(67,56,202,.18);border-top-color:#4338ca}
       @keyframes gc-spin{to{transform:rotate(360deg)}}

@@ -5,27 +5,198 @@
  * Connected 24/7 directly to Cuelinks API v3 with automatic expiration pruning.
  *
  * Endpoints:
- *   GET  /api/deals       - Live filtered, searched, sorted & paginated offers
- *   GET  /api/deals/sync  - Trigger immediate on-demand Cuelinks 24/7 sync
- *   POST /api/deals/sync  - Trigger immediate on-demand Cuelinks 24/7 sync
- *   GET  /api/deals/stats - Live sync health & counts
+ *   GET  /api/deals                - Live filtered, searched, sorted & paginated offers
+ *   GET  /api/deals/popular-brands - Top popular brands with dynamic counts & logos
+ *   POST /api/deals/submit         - Submit community verified coupon/offer
+ *   GET  /api/deals/submissions    - View submitted community coupons
+ *   GET  /api/deals/festivals      - Curated festive shopping deals
+ *   GET  /api/deals/sync           - Trigger immediate on-demand Cuelinks 24/7 sync
+ *   POST /api/deals/sync           - Trigger immediate on-demand Cuelinks 24/7 sync
+ *   GET  /api/deals/stats          - Live sync health & counts
  */
 
 import { Router, type Request, type Response } from "express";
-import { queryDeals, type DealBadge, type DealRecord } from "../../src/lib/server-data/deals-db.js";
+import {
+  queryDeals,
+  getPopularBrandsFromPool,
+  getAllStoresFromPool,
+  getAllCategoriesFromPool,
+  recordUserCouponSubmission,
+  getUserCouponSubmissions,
+  type DealBadge,
+  type DealRecord,
+} from "../../src/lib/server-data/deals-db.js";
 import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
 import { globalCache } from "../../src/lib/services/cache-service.js";
 import {
   getLiveDealsPool,
   getLiveSyncStats,
   syncLiveCuelinksDeals,
+  addDealToPool,
+  deleteDealFromPool,
 } from "../services/providers/cuelinks-client.js";
+import { recordNewSubmission } from "./admin.js";
 
 export const dealsRouter = Router();
 
 /**
+ * GET /api/deals/popular-brands
+ * Serves aggregated top popular brands with dynamic coupon and offer counts.
+ */
+dealsRouter.get("/popular-brands", async (_req: Request, res: Response) => {
+  try {
+    const livePool = getLiveDealsPool();
+    const brands = getPopularBrandsFromPool(livePool);
+    res.setHeader("Cache-Control", "public, max-age=300, s-maxage=600");
+    res.json({
+      success: true,
+      total: brands.length,
+      brands,
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * GET /api/deals/categories
+ * Serves real aggregated categories from the live deals pool with live offer and coupon counts.
+ */
+dealsRouter.get("/categories", async (_req: Request, res: Response) => {
+  try {
+    const livePool = getLiveDealsPool();
+    const categories = getAllCategoriesFromPool(livePool);
+    res.setHeader("Cache-Control", "public, max-age=300, s-maxage=600");
+    res.json({
+      success: true,
+      total: categories.length,
+      categories,
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * GET /api/deals/stores
+ * Serves all real stores from the live deals pool with dynamic counts and logo metadata.
+ */
+dealsRouter.get("/stores", async (_req: Request, res: Response) => {
+  try {
+    const livePool = getLiveDealsPool();
+    const stores = getAllStoresFromPool(livePool);
+    res.setHeader("Cache-Control", "public, max-age=300, s-maxage=600");
+    res.json({
+      success: true,
+      total: stores.length,
+      stores,
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * POST /api/deals/submit
+ * Receives user-submitted coupons and deals for verification.
+ * Automatically injects them into the active deals pool as part of "New Deals".
+ */
+dealsRouter.post("/submit", async (req: Request, res: Response) => {
+  const { storeName, code, discount, url, terms, category, email } = req.body || {};
+
+  if (!storeName || !code) {
+    res.status(400).json({
+      success: false,
+      error: "Store name and coupon code are required.",
+    });
+    return;
+  }
+
+  try {
+    const submission = recordUserCouponSubmission({
+      storeName: String(storeName).trim(),
+      code: String(code).trim().toUpperCase(),
+      discount: discount ? String(discount).trim() : undefined,
+      url: url ? String(url).trim() : undefined,
+      terms: terms ? String(terms).trim() : undefined,
+      category: category ? String(category).trim() : undefined,
+      email: email ? String(email).trim() : undefined,
+    });
+
+    // Also persist in the Admin Submissions review queue
+    recordNewSubmission({
+      storeName: String(storeName).trim(),
+      code: String(code).trim().toUpperCase(),
+      discount: discount ? String(discount).trim() : undefined,
+      url: url ? String(url).trim() : undefined,
+      terms: terms ? String(terms).trim() : undefined,
+      category: category ? String(category).trim() : undefined,
+      email: email ? String(email).trim() : undefined,
+    });
+
+    // Ingest into active deals pool (existing deals + live deals + new deals)
+    const newDeal: DealRecord = {
+      id: `cue_user_${submission.id}`,
+      storeName: submission.storeName,
+      storeSlug: submission.storeName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") + "-coupons",
+      storeLogo: `https://www.google.com/s2/favicons?domain=${submission.storeName.toLowerCase().replace(/[^a-z0-9]/g, "")}.com&sz=128`,
+      category: (submission.category as any) || "General",
+      title: submission.discount ? `${submission.discount} at ${submission.storeName}` : `Verified Offer at ${submission.storeName}`,
+      code: submission.code,
+      discount: submission.discount || "Verified Deal",
+      badge: "Verified",
+      verifiedDate: "Live Verified",
+      expiresIn: "30 days left",
+      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      terms: submission.terms || `Community verified offer for ${submission.storeName}.`,
+      link: submission.url || `https://${submission.storeName.toLowerCase().replace(/[^a-z0-9]/g, "")}.com`,
+      usesCount: 50,
+    };
+    addDealToPool(newDeal);
+    await globalCache.deletePrefix("deals:");
+
+    res.status(201).json({
+      success: true,
+      message: "Thank you! Your coupon has been recorded and added to the active live feed.",
+      submission,
+      deal: newDeal,
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * GET /api/deals/submissions
+ * Retrieves community coupon submissions.
+ */
+dealsRouter.get("/submissions", (_req: Request, res: Response) => {
+  const submissions = getUserCouponSubmissions();
+  res.json({
+    total: submissions.length,
+    submissions,
+  });
+});
+
+/**
+ * GET /api/deals/festivals
+ * Serves curated festival & mega sale offers.
+ */
+dealsRouter.get("/festivals", async (req: Request, res: Response) => {
+  const livePool = getLiveDealsPool();
+  const result = queryDeals({ festive: true, limit: 50 }, livePool);
+  res.setHeader("Cache-Control", "public, max-age=180");
+  res.json({
+    festival: "Festive Super Sales & Mega Offers",
+    total: result.total,
+    deals: result.deals,
+  });
+});
+
+/**
  * GET /api/deals
  * Serves live, verified, non-expired offers from the 24/7 Cuelinks engine.
+ * Supports category, q, store, brand, letter, festive, city, badge, sortBy, order, limit, offset.
  */
 dealsRouter.get("/", async (req: Request, res: Response) => {
   const clientIp =
@@ -46,15 +217,19 @@ dealsRouter.get("/", async (req: Request, res: Response) => {
   const category = (req.query.category as string) ?? "";
   const q = (req.query.q as string) ?? "";
   const store = (req.query.store as string) || (req.query.merchant as string) || "";
+  const brand = (req.query.brand as string) ?? "";
+  const letter = (req.query.letter as string)?.trim().toUpperCase() ?? "";
+  const festive = req.query.festive === "true" || req.query.festive === "1";
+  const city = (req.query.city as string) ?? "";
   const badge = (req.query.badge as DealBadge) ?? undefined;
   const sortBy = (req.query.sortBy as any) || "trending";
   const order = (req.query.order as "asc" | "desc") || "desc";
-  const rawLimit = parseInt(req.query.limit as string, 10);
-  const limit = isNaN(rawLimit) ? 100 : rawLimit <= 0 ? 2000 : Math.min(rawLimit, 2000);
+  const rawLimit = req.query.limit !== undefined ? parseInt(req.query.limit as string, 10) : 0;
+  const limit = isNaN(rawLimit) || rawLimit < 0 ? 0 : rawLimit;
   const rawOffset = parseInt(req.query.offset as string, 10);
-  const offset = isNaN(rawOffset) ? 0 : rawOffset;
+  const offset = isNaN(rawOffset) || rawOffset < 0 ? 0 : rawOffset;
 
-  const cacheKey = `deals:${category}:${store}:${badge ?? "all"}:${q.toLowerCase()}:${sortBy}:${order}:${limit}:${offset}`;
+  const cacheKey = `deals:${category}:${store}:${brand}:${letter}:${festive}:${city}:${badge ?? "all"}:${q.toLowerCase()}:${sortBy}:${order}:${limit}:${offset}`;
   const cachedData = await globalCache.get<any>(cacheKey);
 
   if (cachedData) {
@@ -64,21 +239,23 @@ dealsRouter.get("/", async (req: Request, res: Response) => {
   }
 
   try {
-    // 1. Ingest live Cuelinks deals from 24/7 memory pool
+    // 1. Ingest live Cuelinks deals from 24/7 memory pool (existing + live + new deals)
     const livePool = getLiveDealsPool();
 
     // 2. Query, filter, sort and paginate (with automatic expired pruning)
     const result = queryDeals(
-      { category, q, store, badge, sortBy, order, limit, offset },
+      { category, q, store, brand, letter, festive, city, badge, sortBy, order, limit, offset },
       livePool
     );
 
     const stats = getLiveSyncStats();
+    const isUncapped = limit === 0;
     const responsePayload = {
       ...result,
+      data: result.deals,
       count: result.deals.length,
-      page: Math.floor(offset / limit) + 1,
-      hasMore: offset + limit < result.total,
+      page: isUncapped ? 1 : Math.floor(offset / limit) + 1,
+      hasMore: isUncapped ? false : offset + limit < result.total,
       isDynamic: true,
       provider: "Cuelinks API v3 (24/7 Auto-Sync)",
       lastSyncedAt: stats.lastSyncedAt,
@@ -106,6 +283,7 @@ async function handleSync(req: Request, res: Response) {
   try {
     const pages = parseInt(req.query.pages as string, 10) || 0;
     const result = await syncLiveCuelinksDeals(pages);
+    await globalCache.deletePrefix("deals:");
     res.json({
       success: true,
       message: `24/7 sync completed. ${result.activeCount} active deals ingested, ${result.expiredCount} expired pruned.`,
@@ -138,4 +316,167 @@ dealsRouter.get("/stats", (_req: Request, res: Response) => {
     ...stats,
     is24x7Active: true,
   });
+});
+
+/**
+ * POST /api/deals (or /api/offers)
+ * Admin & manual offer creation
+ */
+dealsRouter.post("/", async (req: Request, res: Response) => {
+  try {
+    const b = req.body || {};
+    const storeSlug = b.storeSlug || (b.storeName ? b.storeName.toLowerCase().replace(/[^a-z0-9]/g, "-") : "online-store");
+    const link = b.affiliateLink || b.url || "https://gocoupon.io";
+    const newDeal: DealRecord = {
+      id: b.id || `offer-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      title: b.title || "Special Offer",
+      description: b.description || "",
+      storeName: b.storeName || "Online Store",
+      storeSlug,
+      category: b.category || "General",
+      code: b.code || "",
+      discount: b.discount || (b.code ? "Special Discount" : "Exclusive Deal"),
+      badge: b.badge || "Verified",
+      verifiedDate: "Today",
+      expiresIn: "30 days",
+      terms: b.terms || "Standard merchant terms apply.",
+      link,
+      usesCount: b.usesCount || 1,
+      url: link,
+      merchantUrl: b.merchantUrl || b.url || "",
+      imageUrl: b.imageUrl || "",
+      endDate: b.expiryDate || b.endDate || new Date(Date.now() + 30 * 86400000).toISOString(),
+      verified: true,
+      votesCount: 1,
+      rating: 4.8,
+      source: b.source || "admin",
+      status: b.status || "active",
+      type: b.type || (b.code ? "Coupon" : "Deal"),
+    };
+
+    addDealToPool(newDeal);
+    await globalCache.deletePrefix("deals:");
+    res.json({ success: true, data: newDeal });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * PUT /api/deals (or /api/offers)
+ * Admin offer update
+ */
+dealsRouter.put("/", async (req: Request, res: Response) => {
+  try {
+    const id = (req.query.id as string) || req.body?.id;
+    if (!id) {
+      res.status(400).json({ success: false, error: "Offer ID is required." });
+      return;
+    }
+
+    const b = req.body || {};
+    const storeSlug = b.storeSlug || (b.storeName ? b.storeName.toLowerCase().replace(/[^a-z0-9]/g, "-") : "online-store");
+    const link = b.affiliateLink || b.url || "https://gocoupon.io";
+    const updatedDeal: DealRecord = {
+      id,
+      title: b.title,
+      description: b.description,
+      storeName: b.storeName,
+      storeSlug,
+      category: b.category || "General",
+      code: b.code || "",
+      discount: b.discount || (b.code ? "Special Discount" : "Exclusive Deal"),
+      badge: b.badge || "Verified",
+      verifiedDate: "Today",
+      expiresIn: "30 days",
+      terms: b.terms || "Standard merchant terms apply.",
+      link,
+      usesCount: b.usesCount || 1,
+      url: link,
+      merchantUrl: b.merchantUrl || b.url || "",
+      imageUrl: b.imageUrl || "",
+      endDate: b.expiryDate || b.endDate,
+      verified: true,
+      source: b.source || "admin",
+      status: b.status || "active",
+      type: b.type || (b.code ? "Coupon" : "Deal"),
+    };
+
+    addDealToPool(updatedDeal);
+    await globalCache.deletePrefix("deals:");
+    res.json({ success: true, data: updatedDeal });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * DELETE /api/deals (or /api/offers)
+ * Admin offer delete
+ */
+dealsRouter.delete("/", async (req: Request, res: Response) => {
+  try {
+    const id = (req.query.id as string) || req.body?.id;
+    if (!id) {
+      res.status(400).json({ success: false, error: "Offer ID is required." });
+      return;
+    }
+
+    deleteDealFromPool(id);
+    await globalCache.deletePrefix("deals:");
+    res.json({ success: true, message: `Offer ${id} removed.` });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * POST /api/deals/bulk (or /api/offers/bulk)
+ * Admin bulk import
+ */
+dealsRouter.post("/bulk", async (req: Request, res: Response) => {
+  try {
+    const items = req.body?.items || [];
+    if (!Array.isArray(items) || items.length === 0) {
+      res.status(400).json({ success: false, error: "Items array is required." });
+      return;
+    }
+
+    let addedCount = 0;
+    for (const item of items) {
+      const storeSlug = item.storeSlug || (item.storeName ? item.storeName.toLowerCase().replace(/[^a-z0-9]/g, "-") : "online-store");
+      const link = item.affiliateLink || item.url || "https://gocoupon.io";
+      const deal: DealRecord = {
+        id: item.id || `bulk-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        title: item.title || "Exclusive Offer",
+        description: item.description || "",
+        storeName: item.storeName || item.storeSlug || "Store",
+        storeSlug,
+        category: item.category || "General",
+        code: item.code || "",
+        discount: item.discount || (item.code ? "Promo Discount" : "Deal"),
+        badge: item.badge || "Verified",
+        verifiedDate: "Today",
+        expiresIn: "30 days",
+        terms: item.terms || "Standard merchant terms apply.",
+        link,
+        usesCount: item.usesCount || 1,
+        url: link,
+        merchantUrl: item.merchantUrl || "",
+        imageUrl: item.imageUrl || "",
+        endDate: item.expiryDate || item.endDate || new Date(Date.now() + 30 * 86400000).toISOString(),
+        verified: true,
+        source: "bulk_import",
+        status: "active",
+        type: item.type || (item.code ? "Coupon" : "Deal"),
+      };
+      addDealToPool(deal);
+      addedCount++;
+    }
+
+    await globalCache.deletePrefix("deals:");
+    res.json({ success: true, count: addedCount, message: `Successfully imported ${addedCount} offers.` });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
 });

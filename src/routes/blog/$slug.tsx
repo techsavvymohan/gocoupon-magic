@@ -18,8 +18,44 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/blog/$slug")({
-  loader: ({ params }) => {
-    const post = getPostBySlug(params.slug);
+  loader: async ({ params }) => {
+    let post = getPostBySlug(params.slug);
+    if (!post) {
+      try {
+        const res = await fetch(`/api/blogs/${params.slug}`);
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data) {
+            const b = json.data;
+            const parsedBody: PostSection[] = Array.isArray(b.body) && b.body.length > 0
+              ? b.body
+              : (b.content
+                  ? b.content.split("\n\n").map((chunk: string) => {
+                      const trimmed = chunk.trim();
+                      if (trimmed.startsWith("## ")) return { type: "h2" as const, text: trimmed.replace(/^##\s+/, "") };
+                      if (trimmed.startsWith("### ")) return { type: "h3" as const, text: trimmed.replace(/^###\s+/, "") };
+                      return { type: "p" as const, text: trimmed };
+                    })
+                  : [{ type: "p" as const, text: b.shortDescription || b.excerpt || "" }]
+                );
+
+            post = {
+              slug: b.slug,
+              tag: b.category || b.tag || "General",
+              date: b.date || (b.createdAt ? new Date(b.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Recent"),
+              title: b.title,
+              excerpt: b.shortDescription || b.excerpt || "",
+              read: b.readTime || b.read || "5 min read",
+              author: b.author || "GoCoupon Editorial",
+              cover: b.image || b.cover,
+              body: parsedBody,
+            };
+          }
+        }
+      } catch {
+        // network or server error fallback
+      }
+    }
     if (!post) throw notFound();
     return { post };
   },

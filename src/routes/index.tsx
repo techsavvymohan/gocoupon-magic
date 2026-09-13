@@ -20,12 +20,12 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () =>
     createSeoHead({
-      title: "GoCoupon: Coupons, Price Comparison & Cashback Extension",
+      title: "GoCoupon (Go Coupon) – Verified Coupons, Deals & Promo Codes | GrabOn & CouponDuniya Alternative",
       description:
-        "Find your lowest price across 500+ stores in 1 second. GoCoupon auto-applies working promo codes, exposes fake discounts with 30-day price history, and stacks bank card discounts. 100% free.",
+        "Looking for Go Coupon, GrabOn, CouponDuniya or Dealspotr? GoCoupon features 970+ verified live deals, auto-applied promo codes, price tracking, and 10% instant bank discounts across 500+ stores. 100% free.",
       path: "/",
       keywords:
-        "GoCoupon, gocoupon.io, go coupon, gocoupon extension, deals, discounts, coupons, promo codes, price tracking, price tracker, price comparison, compare prices, auto apply coupons, fake discount detector, cashback extension",
+        "GoCoupon, go coupon, gocoupon, gocoupons, gocoupon.io, grabon, grabon alternative, grabon coupons, couponduniya, coupon duniya, coupondunia, couponduniya alternative, dealspotr, dealspottr, dealspottr coupons, deals, discounts, coupons, promo codes, price tracking, price tracker, price comparison, compare prices, auto apply coupons, fake discount detector, cashback extension",
     }),
 });
 

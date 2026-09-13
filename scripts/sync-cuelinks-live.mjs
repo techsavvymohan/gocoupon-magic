@@ -6,6 +6,24 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, "..");
 
+// Auto-load .env if available
+const envPath = path.join(projectRoot, ".env");
+if (fs.existsSync(envPath)) {
+  const envContent = fs.readFileSync(envPath, "utf-8");
+  for (const line of envContent.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eqIdx = trimmed.indexOf("=");
+    if (eqIdx > 0) {
+      const key = trimmed.slice(0, eqIdx).trim();
+      const val = trimmed.slice(eqIdx + 1).trim().replace(/^["']|["']$/g, "");
+      if (!process.env[key]) {
+        process.env[key] = val;
+      }
+    }
+  }
+}
+
 const CUELINKS_V3_BASE_URL = "https://developers.cuelinks.com/pub_api/v3";
 const apiKey = (process.env.CUELINKS_API_KEY || "").trim();
 const pubId = process.env.CUELINKS_PUBLISHER_ID || "148920";
@@ -242,8 +260,65 @@ export async function runCuelinksSync(maxPages = 0) {
     });
   }
 
-  // Prioritize verified working coupons on top, then highest discounts
-  liveDeals.sort((a, b) => {
+  // 3. Accumulative Validity Pool Engine:
+  // "wo deals tabh tak database mein rehni chahiye jabh tak wo valid hain aur wo existing deals + live deals + new deals"
+  // Deals remain in database as long as they are valid (endDate >= now).
+  const dealMap = new Map();
+  const targetPath = path.join(projectRoot, "src/data/live-deals.json");
+
+  function getDealDedupKey(d) {
+    if (d.id && String(d.id).startsWith("cue_")) return String(d.id);
+    const store = (d.storeName || "").toLowerCase().trim();
+    const code = (d.code || "").toUpperCase().trim();
+    const title = (d.title || "").toLowerCase().slice(0, 30).replace(/[^a-z0-9]/g, "");
+    return `${store}_${code}_${title}`;
+  }
+
+  // A. Retain all existing valid deals from disk
+  if (fs.existsSync(targetPath)) {
+    try {
+      const diskData = JSON.parse(fs.readFileSync(targetPath, "utf-8"));
+      if (Array.isArray(diskData?.deals)) {
+        for (const d of diskData.deals) {
+          if (d.expiresIn === "Expired" || d.status === "expired" || d.status === "inactive") {
+            expiredCount++;
+            continue;
+          }
+          if (d.endDate) {
+            const endMs = new Date(d.endDate).getTime();
+            if (!isNaN(endMs) && endMs < now) {
+              expiredCount++;
+              continue; // Prune expired
+            }
+          }
+          const key = getDealDedupKey(d);
+          dealMap.set(key, d);
+        }
+      }
+    } catch (e) {
+      console.warn("[Cuelinks Sync] Could not parse existing live-deals.json:", e?.message);
+    }
+  }
+
+  // B. Upsert incoming live deals
+  for (const d of liveDeals) {
+    const key = getDealDedupKey(d);
+    const existing = dealMap.get(key);
+    if (existing) {
+      dealMap.set(key, {
+        ...existing,
+        ...d,
+        usesCount: Math.max(existing.usesCount || 0, d.usesCount || 0),
+      });
+    } else {
+      dealMap.set(key, d);
+    }
+  }
+
+  const accumulatedDeals = Array.from(dealMap.values());
+
+  // Prioritize verified working coupons on top, then highest usesCount
+  accumulatedDeals.sort((a, b) => {
     const aHasCode = a.code && a.code.length > 1 ? 1 : 0;
     const bHasCode = b.code && b.code.length > 1 ? 1 : 0;
     if (aHasCode !== bHasCode) return bHasCode - aHasCode;
@@ -253,15 +328,14 @@ export async function runCuelinksSync(maxPages = 0) {
   const payload = {
     updatedAt: new Date().toISOString(),
     totalFetched: rawDeals.length,
-    activeCount: liveDeals.length,
+    activeCount: accumulatedDeals.length,
     expiredCount,
-    deals: liveDeals,
+    deals: accumulatedDeals,
   };
 
   // Write to src/data/live-deals.json
-  const targetPath = path.join(projectRoot, "src/data/live-deals.json");
   fs.writeFileSync(targetPath, JSON.stringify(payload, null, 2), "utf-8");
-  console.log(`[Cuelinks Sync] Saved ${liveDeals.length} live deals to ${targetPath} (Pruned ${expiredCount} expired).`);
+  console.log(`[Cuelinks Sync] Saved ${accumulatedDeals.length} accumulated live deals to ${targetPath} (Pruned ${expiredCount} expired).`);
 
   // If dist/ exists, also update dist/data/live-deals.json
   const distDir = path.join(projectRoot, "dist/data");

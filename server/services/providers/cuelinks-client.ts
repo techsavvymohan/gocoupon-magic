@@ -629,21 +629,106 @@ function loadInitialDealsFromDisk(): DealRecord[] {
 liveDealsPool = loadInitialDealsFromDisk();
 
 /**
+ * Returns whether a deal is currently valid (non-expired).
+ * Deals remain active in the database as long as endDate >= now.
+ */
+export function isDealValid(deal: { endDate?: string; expiresIn?: string; status?: string }): boolean {
+  if (deal.status === "expired" || deal.status === "inactive") return false;
+  if (deal.expiresIn === "Expired") return false;
+  if (deal.endDate) {
+    const endMs = new Date(deal.endDate).getTime();
+    if (!isNaN(endMs) && endMs < Date.now()) return false;
+  }
+  return true;
+}
+
+/**
  * Returns current active, non-expired deals from the 24/7 Cuelinks live pool.
  */
 export function getLiveDealsPool(): DealRecord[] {
   if (liveDealsPool.length === 0) {
     liveDealsPool = loadInitialDealsFromDisk();
   }
-  const now = Date.now();
-  return liveDealsPool.filter((d) => {
-    if (d.expiresIn === "Expired") return false;
-    if (d.endDate) {
-      const end = new Date(d.endDate).getTime();
-      if (!isNaN(end) && end < now) return false;
+  return liveDealsPool.filter((d) => isDealValid(d));
+}
+
+/**
+ * Ingests a new deal (e.g. from community submission or manual addition) into the live accumulated pool,
+ * persisting it to disk so it stays in the database as long as it is valid.
+ */
+export function addDealToPool(deal: DealRecord): void {
+  const pool = getLiveDealsPool();
+  const dedupKey =
+    deal.id && deal.id.startsWith("cue_")
+      ? deal.id
+      : `${(deal.storeName || "").toLowerCase().trim()}_${(deal.code || "").toUpperCase().trim()}_${(deal.title || "").toLowerCase().slice(0, 30).replace(/[^a-z0-9]/g, "")}`;
+
+  const existingIdx = pool.findIndex(
+    (d) =>
+      d.id === deal.id ||
+      `${(d.storeName || "").toLowerCase().trim()}_${(d.code || "").toUpperCase().trim()}_${(d.title || "").toLowerCase().slice(0, 30).replace(/[^a-z0-9]/g, "")}` === dedupKey
+  );
+
+  if (existingIdx >= 0) {
+    pool[existingIdx] = { ...pool[existingIdx], ...deal };
+  } else {
+    pool.unshift(deal);
+  }
+
+  liveDealsPool = pool;
+  setLiveDeals(pool);
+
+  try {
+    const srcPath = getProjectDataPath("src/data/live-deals.json");
+    const payload = {
+      updatedAt: new Date().toISOString(),
+      totalFetched: pool.length,
+      activeCount: pool.length,
+      expiredCount: 0,
+      deals: pool,
+    };
+    fs.writeFileSync(srcPath, JSON.stringify(payload, null, 2), "utf-8");
+
+    const distPath = getProjectDataPath("dist/data/live-deals.json");
+    if (fs.existsSync(path.dirname(distPath))) {
+      fs.writeFileSync(distPath, JSON.stringify(payload, null, 2), "utf-8");
+    }
+  } catch (err: any) {
+    console.warn("[Cuelinks Client] Could not persist added deal to disk:", err?.message);
+  }
+}
+
+/**
+ * Removes a deal permanently from the live pool and syncs to disk.
+ */
+export function deleteDealFromPool(id: string): boolean {
+  if (liveDealsPool.length === 0) {
+    liveDealsPool = loadInitialDealsFromDisk();
+  }
+  const beforeLen = liveDealsPool.length;
+  liveDealsPool = liveDealsPool.filter((d) => d.id !== id);
+  if (liveDealsPool.length !== beforeLen) {
+    setLiveDeals(liveDealsPool);
+    try {
+      const srcPath = getProjectDataPath("src/data/live-deals.json");
+      const payload = {
+        updatedAt: new Date().toISOString(),
+        totalFetched: liveDealsPool.length,
+        activeCount: liveDealsPool.length,
+        expiredCount: 0,
+        deals: liveDealsPool,
+      };
+      fs.writeFileSync(srcPath, JSON.stringify(payload, null, 2), "utf-8");
+      const distPath = getProjectDataPath("dist/data/live-deals.json");
+      if (fs.existsSync(path.dirname(distPath))) {
+        fs.writeFileSync(distPath, JSON.stringify(payload, null, 2), "utf-8");
+      }
+    } catch (err: any) {
+      console.warn("[Cuelinks Client] Could not persist deleted deal to disk:", err?.message);
     }
     return true;
-  });
+  }
+  return false;
 }
 
 /**
@@ -658,7 +743,7 @@ export function getLiveSyncStats() {
 
 /**
  * Executes a live 24/7 sync cycle against Cuelinks API v3 (/offers).
- * Automatically purges expired deals and persists the fresh snapshot.
+ * Automatically purges expired deals and accumulates existing valid deals + live deals + new deals.
  */
 export async function syncLiveCuelinksDeals(maxPages: number = 0): Promise<{
   updatedAt: string;
@@ -802,30 +887,79 @@ export async function syncLiveCuelinksDeals(maxPages: number = 0): Promise<{
     newDeals.push(record);
   }
 
+  // 3. Accumulative Pool Engine:
+  // "wo deals tabh tak database mein rehni chahiye jabh tak wo valid hain aur wo existing deals + live deals + new deals"
+  // Keep deals in database as long as they are valid (endDate >= now).
+  // Deduplicate and upsert: existing valid deals + new live deals + submitted deals
+  const existingPool = liveDealsPool.length > 0 ? liveDealsPool : loadInitialDealsFromDisk();
+  const dealMap = new Map<string, DealRecord>();
+
+  function getDealDedupKey(deal: { id?: string; storeName?: string; code?: string; title?: string }): string {
+    if (deal.id && deal.id.startsWith("cue_")) {
+      return deal.id;
+    }
+    const store = (deal.storeName || "").toLowerCase().trim();
+    const code = (deal.code || "").toUpperCase().trim();
+    const title = (deal.title || "").toLowerCase().slice(0, 30).replace(/[^a-z0-9]/g, "");
+    return `${store}_${code}_${title}`;
+  }
+
+  // A. Retain all existing valid deals (deals stay in database as long as they are valid)
+  for (const d of existingPool) {
+    if (!isDealValid(d)) {
+      expiredCount++;
+      continue;
+    }
+    const key = getDealDedupKey(d);
+    dealMap.set(key, d);
+  }
+
+  // B. Upsert incoming live deals (new deals + updated deals)
+  for (const d of newDeals) {
+    if (!isDealValid(d)) {
+      expiredCount++;
+      continue;
+    }
+    const key = getDealDedupKey(d);
+    const existing = dealMap.get(key);
+    if (existing) {
+      // Merge with latest live data (price, link, discount, usesCount, terms, etc.)
+      dealMap.set(key, {
+        ...existing,
+        ...d,
+        usesCount: Math.max(existing.usesCount || 0, d.usesCount || 0),
+      });
+    } else {
+      dealMap.set(key, d);
+    }
+  }
+
+  const accumulatedDeals = Array.from(dealMap.values());
+
   // Prioritize working coupon codes first, then highest usesCount
-  newDeals.sort((a, b) => {
+  accumulatedDeals.sort((a, b) => {
     const aHasCode = a.code && a.code.length > 1 ? 1 : 0;
     const bHasCode = b.code && b.code.length > 1 ? 1 : 0;
     if (aHasCode !== bHasCode) return bHasCode - aHasCode;
     return (b.usesCount || 0) - (a.usesCount || 0);
   });
 
-  if (newDeals.length > 0) {
-    liveDealsPool = newDeals;
-    setLiveDeals(newDeals);
+  if (accumulatedDeals.length > 0) {
+    liveDealsPool = accumulatedDeals;
+    setLiveDeals(accumulatedDeals);
 
     const payload = {
       updatedAt: new Date().toISOString(),
       totalFetched: rawDeals.length,
-      activeCount: newDeals.length,
+      activeCount: accumulatedDeals.length,
       expiredCount,
-      deals: newDeals,
+      deals: accumulatedDeals,
     };
 
     lastSyncMetadata = {
       lastSyncedAt: payload.updatedAt,
       totalFetched: rawDeals.length,
-      activeCount: newDeals.length,
+      activeCount: accumulatedDeals.length,
       expiredCount,
       nextSyncAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     };
@@ -834,7 +968,7 @@ export async function syncLiveCuelinksDeals(maxPages: number = 0): Promise<{
     try {
       const srcPath = getProjectDataPath("src/data/live-deals.json");
       fs.writeFileSync(srcPath, JSON.stringify(payload, null, 2), "utf-8");
-      console.log(`✅ [Cuelinks 24/7 Syncer] Persisted ${newDeals.length} live deals to src/data/live-deals.json`);
+      console.log(`✅ [Cuelinks 24/7 Syncer] Persisted ${accumulatedDeals.length} accumulated live deals to src/data/live-deals.json`);
 
       const distPath = getProjectDataPath("dist/data/live-deals.json");
       if (fs.existsSync(path.dirname(distPath))) {
@@ -846,15 +980,15 @@ export async function syncLiveCuelinksDeals(maxPages: number = 0): Promise<{
   }
 
   console.log(
-    `🔥 [Cuelinks 24/7 Syncer] Sync cycle complete: ${newDeals.length} active live deals, ${expiredCount} expired pruned.`
+    `🔥 [Cuelinks 24/7 Syncer] Sync complete: ${accumulatedDeals.length} accumulated deals in database, ${expiredCount} expired pruned.`
   );
 
   return {
     updatedAt: lastSyncMetadata.lastSyncedAt,
     totalFetched: rawDeals.length,
-    activeCount: newDeals.length,
+    activeCount: accumulatedDeals.length,
     expiredCount,
-    deals: newDeals,
+    deals: accumulatedDeals,
   };
 }
 
@@ -869,7 +1003,7 @@ export async function fetchCuelinksDeals(options: {
   forceRefresh?: boolean;
 } = {}): Promise<DealRecord[]> {
   if (options.forceRefresh || liveDealsPool.length === 0) {
-    await syncLiveCuelinksDeals(4);
+    await syncLiveCuelinksDeals(0);
   }
 
   let deals = getLiveDealsPool();

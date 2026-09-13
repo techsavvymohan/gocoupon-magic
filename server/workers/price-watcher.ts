@@ -30,7 +30,7 @@ export function startBackgroundWorkers(intervalMs: number = 15 * 60 * 1000) {
       if (config.isConfigured) {
         console.log("🔥 [Worker] Bootstrapping 24/7 Cuelinks live deals sync (API v3)...");
         await Promise.allSettled([
-          syncLiveCuelinksDeals(5),
+          syncLiveCuelinksDeals(0),
           fetchCuelinksCampaigns({ limit: 50 }),
         ]);
         console.log("✅ [Worker] Cuelinks 24/7 live sync initialized successfully.");
@@ -46,7 +46,7 @@ export function startBackgroundWorkers(intervalMs: number = 15 * 60 * 1000) {
       const config = getCuelinksConfig();
       if (config.isConfigured) {
         await Promise.allSettled([
-          syncLiveCuelinksDeals(5),
+          syncLiveCuelinksDeals(0),
           fetchCuelinksCampaigns({ limit: 40 }),
         ]);
       }

@@ -20,6 +20,8 @@
     "resolveJsonModule": true,
     "verbatimModuleSyntax": false,
     "noEmit": true,
+    "allowJs": true,
+    "checkJs": false,
 
     /* Linting */
     "skipLibCheck": true,

@@ -128,6 +128,17 @@ class CacheService {
   }
 
   /**
+   * Deletes all cached keys that start with a prefix.
+   */
+  async deletePrefix(prefix: string): Promise<void> {
+    for (const key of this.memoryCache.keys()) {
+      if (key.startsWith(prefix)) {
+        this.memoryCache.delete(key);
+      }
+    }
+  }
+
+  /**
    * Helper pattern to wrap fetch calls with caching (Cache-Aside pattern).
    */
   async wrap<T>(key: string, fetcher: () => Promise<T>, ttlMs = this.defaultTtlMs): Promise<T> {

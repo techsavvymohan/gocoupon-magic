@@ -43,7 +43,7 @@ export function createSeoHead(input: SeoInput) {
         name: "keywords",
         content:
           keywords ??
-          "deals, discounts, coupons, coupon codes, promo codes, price tracking, price tracker india, price comparison, compare prices, cheaper products, lowest price online, amazon coupon codes, flipkart coupon codes, auto apply coupons, fake discount detector",
+          "GoCoupon, go coupon, gocoupon, gocoupons, gocoupon.io, grabon, grabon alternative, grabon coupons, couponduniya, coupon duniya, couponduniya alternative, dealspotr, dealspottr, dealspottr coupons, deals, discounts, coupons, coupon codes, promo codes, price tracking, price tracker india, price comparison, compare prices, auto apply coupons, fake discount detector, bank card discount",
       },
       { property: "og:type", content: type },
       { property: "og:site_name", content: SITE_NAME },
@@ -151,7 +151,18 @@ export function websiteSchema() {
     "@id": "https://gocoupon.io/#website",
     url: "https://gocoupon.io/",
     name: "GoCoupon",
-    alternateName: ["GoCoupon.io", "goCoupon"],
+    alternateName: [
+      "Go Coupon",
+      "gocoupon",
+      "gocoupons",
+      "GoCoupons",
+      "GoCoupon.io",
+      "GrabOn Alternative",
+      "CouponDuniya Alternative",
+      "Coupon Dunia",
+      "Dealspotr Alternative",
+      "Dealspottr",
+    ],
     publisher: { "@id": "https://gocoupon.io/#organization" },
     potentialAction: {
       "@type": "SearchAction",
@@ -172,8 +183,8 @@ export function softwareAppSchema() {
     applicationSubCategory: "Price Comparison, Price Tracking, Coupon Automation",
     softwareVersion: "1.2.0",
     url: "https://gocoupon.io/chrome-extension",
-    installUrl: "https://chromewebstore.google.com/detail/gocoupon-%E2%80%93-coupon-finder/bbdcjoadldgankjdhdlmncacpkengnid",
-    downloadUrl: "https://chromewebstore.google.com/detail/gocoupon-%E2%80%93-coupon-finder/bbdcjoadldgankjdhdlmncacpkengnid",
+    installUrl: "https://chromewebstore.google.com/detail/gocoupon-%E2%80%93-coupon-finder/gbmfihnboadlmmjbikajlmocjmlpehij",
+    downloadUrl: "https://chromewebstore.google.com/detail/gocoupon-%E2%80%93-coupon-finder/gbmfihnboadlmmjbikajlmocjmlpehij",
     description:
       "GoCoupon automatically tests and applies valid promo codes at checkout, tracks 30-day price drop graphs, and compares real-time prices across Amazon, Walmart, Target, Flipkart, and 200+ stores worldwide.",
     featureList: [
@@ -212,18 +223,19 @@ export function organizationSchema() {
     url: "https://gocoupon.io/",
     logo: absoluteUrl("/gc-logo.webp"),
     description:
-      "GoCoupon is the official shopping intelligence platform and browser extension for online shoppers worldwide, providing coupon automation, price comparison, 30-day price tracking, and cashback stacking.",
+      "GoCoupon is the official shopping intelligence platform and browser extension for online shoppers worldwide, providing verified coupon automation, price comparison, 30-day price tracking, and bank card cashback stacking.",
     email: "support@gocoupon.io",
     knowsAbout: [
-      "Automated Coupon Testing",
-      "Live Price Comparison",
-      "30-Day Price History Graphs",
-      "Manifest V3 Chrome Extension Security",
-      "Landed Cost Stacking",
-      "E-commerce Deals & Discount Vouchers",
+      "Automated Coupon Testing & 1-Click Checkout Extension",
+      "GrabOn and CouponDuniya Alternative for Indian Online Shoppers",
+      "Dealspotr and Honey Alternative for Global E-Commerce",
+      "Live Multi-Store Price Comparison (Amazon, Flipkart, Walmart, Target)",
+      "30-Day Price History Graphs & Fake Discount Detection",
+      "Instant Bank Card Discounts (HDFC, SBI, ICICI, Axis)",
+      "Verified Promo Codes, Voucher Codes & Discount Deals",
     ],
     sameAs: [
-      "https://chromewebstore.google.com/detail/gocoupon-%E2%80%93-coupon-finder/bbdcjoadldgankjdhdlmncacpkengnid",
+      "https://chromewebstore.google.com/detail/gocoupon-%E2%80%93-coupon-finder/gbmfihnboadlmmjbikajlmocjmlpehij",
       "https://github.com/techsavvymohan/gocoupon-magic",
       "https://github.com/techsavvymohan/gocoupon_extension",
       "https://facebook.com/gocouponapp",

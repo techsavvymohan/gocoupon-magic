@@ -83,3 +83,40 @@ couponsRouter.get("/", async (req: Request, res: Response) => {
     coupons: filtered,
   });
 });
+
+/**
+ * POST /api/coupons/submit
+ * Community verified coupon submission endpoint.
+ */
+couponsRouter.post("/submit", async (req: Request, res: Response) => {
+  const { storeName, code, discount, url, terms, category, email } = req.body || {};
+
+  if (!storeName || !code) {
+    res.status(400).json({
+      success: false,
+      error: "Store name and coupon code are required.",
+    });
+    return;
+  }
+
+  try {
+    const { recordUserCouponSubmission } = await import("../../src/lib/server-data/deals-db.js");
+    const submission = recordUserCouponSubmission({
+      storeName: String(storeName).trim(),
+      code: String(code).trim().toUpperCase(),
+      discount: discount ? String(discount).trim() : undefined,
+      url: url ? String(url).trim() : undefined,
+      terms: terms ? String(terms).trim() : undefined,
+      category: category ? String(category).trim() : undefined,
+      email: email ? String(email).trim() : undefined,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Thank you! Your coupon has been recorded and submitted for validation.",
+      submission,
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
