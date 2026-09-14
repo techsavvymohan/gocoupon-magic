@@ -176,8 +176,8 @@ export function Navbar() {
 
           {/* Right Actions */}
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <LanguageToggle />
-            <CurrencyToggle />
+            <LanguageToggle className="hidden md:inline-block" />
+            <CurrencyToggle className="hidden md:inline-block" />
             <ThemeToggle />
 
             <MagneticButton
