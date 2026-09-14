@@ -293,12 +293,14 @@ export function UrlResolverSearch({
   const isLarge = size === "large";
 
   return (
-    <div ref={containerRef} className={`group/search relative w-full ${className}`}>
-      {/* Ambient Luminous Glow Halo */}
-      <div
-        className="absolute -inset-1 sm:-inset-1.5 rounded-[22px] sm:rounded-[30px] bg-gradient-to-r from-primary/30 via-amber-500/20 to-primary/30 opacity-75 blur-xl transition-all duration-500 group-hover/search:opacity-100 group-focus-within/search:opacity-100 pointer-events-none"
-        aria-hidden="true"
-      />
+    <div ref={containerRef} className={`group/search w-full ${className}`}>
+      {/* Search Input Card & Dropdown Anchor Wrapper */}
+      <div className="relative w-full">
+        {/* Ambient Luminous Glow Halo */}
+        <div
+          className="absolute -inset-1 sm:-inset-1.5 rounded-[22px] sm:rounded-[30px] bg-gradient-to-r from-primary/30 via-amber-500/20 to-primary/30 opacity-75 blur-xl transition-all duration-500 group-hover/search:opacity-100 group-focus-within/search:opacity-100 pointer-events-none"
+          aria-hidden="true"
+        />
 
       {/* Main Search Input Form Card */}
       <form
@@ -410,7 +412,7 @@ export function UrlResolverSearch({
           <div
             role="listbox"
             id="search-suggestions-list"
-            className="absolute top-full left-0 right-0 mt-2 z-50 rounded-2xl sm:rounded-3xl border border-border/80 bg-card/98 backdrop-blur-2xl p-2.5 sm:p-3 shadow-2xl text-left animate-in fade-in zoom-in-95 duration-150 divide-y divide-border/40 max-h-[460px] overflow-y-auto"
+            className="absolute top-full left-0 right-0 mt-1.5 sm:mt-2 z-50 rounded-2xl sm:rounded-3xl border border-border/80 bg-card/98 backdrop-blur-2xl p-2.5 sm:p-3 shadow-2xl text-left animate-in fade-in zoom-in-95 duration-150 divide-y divide-border/40 max-h-[70vh] sm:max-h-[480px] overflow-y-auto overscroll-contain"
           >
             {/* ── 0. OPEN FOOD FACTS BARCODE MATCH ── */}
             {foodComparison && (
@@ -745,6 +747,7 @@ export function UrlResolverSearch({
             </div>
           </div>
         )}
+      </div>
 
       {/* Popular High-Ticket Search Chips */}
       {showPopularChips && (
