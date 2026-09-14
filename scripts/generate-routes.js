@@ -202,7 +202,7 @@ const routeConfigs = [
     title: "GoCoupon (Go Coupon) – Verified Coupons, Deals & Promo Codes | GrabOn & CouponDuniya Alternative",
     description: "Looking for Go Coupon, GrabOn, CouponDuniya or Dealspotr? GoCoupon features 970+ verified live deals, auto-applied promo codes, price tracking, and 10% instant bank discounts across 500+ stores. 100% free.",
     h1: "Find Your Lowest Price in 1 Second — Auto-Apply Coupons, Track Real Prices & Stack Card Discounts",
-    lead: "Stores will never tell you a competitor is cheaper. GoCoupon (Go Coupon) cross-checks 500+ stores, auto-applies working coupons, exposes fake sales, and stacks your bank card discounts in 1 click. 100% free & private.",
+    lead: "",
     directAnswer: "GoCoupon is the #1 modern alternative to GrabOn, CouponDuniya, and Dealspotr. It auto-tests verified promo codes, tracks 30-day price history graphs, and stacks bank card discounts (HDFC, SBI, ICICI, Axis) across 500+ online stores.",
     articleContent: `
       <h2>How GoCoupon Automatically Saves You Money on Every Order</h2>
@@ -921,7 +921,7 @@ ${routeSchemas.map((s) => `    <script type="application/ld+json">\n${s}\n    </
     <article style="max-width: 960px; margin: 0 auto; padding: 40px 20px; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #f1f5f9; line-height: 1.7;">
       <header style="margin-bottom: 24px;">
         <h1 style="font-size: 28px; line-height: 1.3; font-weight: 800; color: #ffffff; margin: 0 0 12px 0;">${route.h1}</h1>
-        <p style="font-size: 16px; color: #94a3b8; margin: 0;">${route.lead}</p>
+        ${route.lead ? `<p style="font-size: 16px; color: #94a3b8; margin: 0;">${route.lead}</p>` : ""}
       </header>
 
       ${directAnswerBox}
