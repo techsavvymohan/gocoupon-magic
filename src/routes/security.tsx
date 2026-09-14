@@ -10,6 +10,9 @@ import {
   XCircle,
   ArrowRight,
   HeartHandshake,
+  Bug,
+  Award,
+  FileCode2,
 } from "lucide-react";
 import { MagneticButton } from "@/components/MagneticButton";
 
@@ -205,17 +208,78 @@ function SecurityPage() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <h3 className="font-display text-base font-bold text-foreground">
-              Questions or Security Reports?
-            </h3>
-            <p className="mt-2 text-xs text-muted-foreground">
-              If you have any questions regarding your privacy, please contact us at{" "}
-              <a href="mailto:support@gocoupon.io" className="text-primary font-medium hover:underline">
-                support@gocoupon.io
+          {/* Bug Bounty & Vulnerability Disclosure Program */}
+          <div id="bug-bounty" className="rounded-3xl border border-border bg-card p-8 shadow-sm space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+                  <Bug className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-display text-lg font-bold text-foreground">
+                    Vulnerability Disclosure &amp; Bug Bounty Program
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Committed to responsible disclosure, researcher safe harbor, and prompt patch SLAs.
+                  </p>
+                </div>
+              </div>
+              <a
+                href="/.well-known/security.txt"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary/50 px-3.5 py-1.5 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <FileCode2 className="h-3.5 w-3.5" />
+                <span>RFC 9116 security.txt</span>
               </a>
-              . We respond to all inquiries within 24 hours.
-            </p>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2 text-xs text-muted-foreground leading-relaxed">
+              <div className="rounded-2xl border border-border/60 bg-muted/20 p-4 space-y-2">
+                <div className="font-semibold text-foreground flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                  <span>In-Scope Targets</span>
+                </div>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Web Application: <code className="font-mono text-[11px] text-foreground">https://gocoupon.io/*</code></li>
+                  <li>Core API Endpoints: <code className="font-mono text-[11px] text-foreground">https://gocoupon.io/api/*</code></li>
+                  <li>Chrome Extension (ID: <code className="font-mono text-[11px] text-foreground">bbdcjoadldgankjdhdlmncacpkengnid</code>)</li>
+                  <li>Auth bypass, SSRF, RCE, IDOR, SQLi, and Token tampering</li>
+                </ul>
+              </div>
+
+              <div className="rounded-2xl border border-border/60 bg-muted/20 p-4 space-y-2">
+                <div className="font-semibold text-foreground flex items-center gap-1.5">
+                  <HeartHandshake className="h-4 w-4 text-primary" />
+                  <span>Safe Harbor &amp; Response SLA</span>
+                </div>
+                <p>
+                  Researchers acting in good faith who avoid privacy violations, data destruction, and service interruption are protected under our Safe Harbor commitment.
+                </p>
+                <div className="pt-1 font-mono text-[11px] text-foreground font-medium">
+                  ⚡ 24h Acknowledgment • 72h Triage • 30-Day Resolution
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <Award className="h-5 w-5 text-primary" />
+                <div>
+                  <div className="text-xs font-semibold text-foreground">Submit Security Reports &amp; Hall of Fame</div>
+                  <div className="text-[11px] text-muted-foreground">
+                    Send detailed reproduction steps, PoC, and environment info to our dedicated security team.
+                  </div>
+                </div>
+              </div>
+              <a
+                href="mailto:security@gocoupon.io?subject=Security%20Vulnerability%20Report%20-%20GoCoupon"
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-all shadow-sm"
+              >
+                <span>security@gocoupon.io</span>
+              </a>
+            </div>
           </div>
         </div>
       </section>

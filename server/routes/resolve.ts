@@ -7,7 +7,7 @@
 
 import { Router, type Request, type Response } from "express";
 import { resolveProduct } from "../../src/lib/services/product-resolver.js";
-import { resolveLiveUrlAndCompetitors } from "../../src/lib/services/url-metadata-extractor.js";
+import { resolveLiveUrlAndCompetitors, isSafePublicUrl } from "../../src/lib/services/url-metadata-extractor.js";
 import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
 
 export const resolveRouter = Router();
@@ -32,6 +32,15 @@ resolveRouter.get("/", async (req: Request, res: Response) => {
   if (!query) {
     res.status(400).json({
       error: "Query parameter 'url', 'q', or 'asin' is required",
+    });
+    return;
+  }
+
+  // Security: Guard against SSRF probing via URL inputs
+  if (/^https?:\/\//i.test(query.trim()) && !isSafePublicUrl(query.trim())) {
+    res.status(400).json({
+      found: false,
+      error: "Invalid or prohibited URL target. Access to private, local, or loopback networks is blocked.",
     });
     return;
   }

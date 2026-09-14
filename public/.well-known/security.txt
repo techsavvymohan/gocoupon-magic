@@ -1,0 +1,10 @@
+# GoCoupon Security Policy & Vulnerability Disclosure Program (RFC 9116)
+# https://gocoupon.io/.well-known/security.txt
+
+Contact: mailto:security@gocoupon.io
+Contact: mailto:support@gocoupon.io
+Expires: 2027-12-31T23:59:59.000Z
+Preferred-Languages: en
+Canonical: https://gocoupon.io/.well-known/security.txt
+Policy: https://gocoupon.io/security
+Acknowledgments: https://gocoupon.io/security

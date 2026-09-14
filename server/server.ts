@@ -108,8 +108,26 @@ if (fs.existsSync(distDir)) {
     express.static(distDir, {
       maxAge: "1h",
       index: false, // Handle index routing explicitly below
+      dotfiles: "allow", // Allow RFC 9116 /.well-known/security.txt
     })
   );
+
+  // RFC 9116 security.txt dedicated route
+  app.get("/.well-known/security.txt", (_req: Request, res: Response) => {
+    const candidatePaths = [
+      path.resolve(process.cwd(), "public", ".well-known", "security.txt"),
+      path.resolve(distDir, ".well-known", "security.txt"),
+      path.resolve(__dirname, "../public/.well-known/security.txt"),
+    ];
+    for (const target of candidatePaths) {
+      if (fs.existsSync(target)) {
+        res.setHeader("Content-Type", "text/plain; charset=utf-8");
+        res.setHeader("Cache-Control", "public, max-age=86400");
+        return res.send(fs.readFileSync(target, "utf-8"));
+      }
+    }
+    res.status(404).send("Not found");
+  });
 
   // Pre-rendered SEO HTML routes + SPA fallback
   app.use((req: Request, res: Response, next: NextFunction) => {

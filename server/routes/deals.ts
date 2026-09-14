@@ -35,7 +35,7 @@ import {
   addDealToPool,
   deleteDealFromPool,
 } from "../services/providers/cuelinks-client.js";
-import { recordNewSubmission } from "./admin.js";
+import { recordNewSubmission, requireAdminAuth } from "./admin.js";
 
 export const dealsRouter = Router();
 
@@ -102,6 +102,22 @@ dealsRouter.get("/stores", async (_req: Request, res: Response) => {
  * Automatically injects them into the active deals pool as part of "New Deals".
  */
 dealsRouter.post("/submit", async (req: Request, res: Response) => {
+  const clientIp =
+    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+    req.socket.remoteAddress ||
+    "127.0.0.1";
+
+  const rateCheck = apiRateLimiter.check(`deal-submit:${clientIp}`, 5, 10 * 60 * 1000);
+  if (!rateCheck.allowed) {
+    res.setHeader("Retry-After", String(rateCheck.retryAfterSeconds));
+    res.status(429).json({
+      success: false,
+      error: `Too many submissions. Please try again in ${rateCheck.retryAfterSeconds} seconds.`,
+      retryAfterSeconds: rateCheck.retryAfterSeconds,
+    });
+    return;
+  }
+
   const { storeName, code, discount, url, terms, category, email } = req.body || {};
 
   if (!storeName || !code) {
@@ -322,7 +338,7 @@ dealsRouter.get("/stats", (_req: Request, res: Response) => {
  * POST /api/deals (or /api/offers)
  * Admin & manual offer creation
  */
-dealsRouter.post("/", async (req: Request, res: Response) => {
+dealsRouter.post("/", requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const b = req.body || {};
     const storeSlug = b.storeSlug || (b.storeName ? b.storeName.toLowerCase().replace(/[^a-z0-9]/g, "-") : "online-store");
@@ -366,7 +382,7 @@ dealsRouter.post("/", async (req: Request, res: Response) => {
  * PUT /api/deals (or /api/offers)
  * Admin offer update
  */
-dealsRouter.put("/", async (req: Request, res: Response) => {
+dealsRouter.put("/", requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const id = (req.query.id as string) || req.body?.id;
     if (!id) {
@@ -414,7 +430,7 @@ dealsRouter.put("/", async (req: Request, res: Response) => {
  * DELETE /api/deals (or /api/offers)
  * Admin offer delete
  */
-dealsRouter.delete("/", async (req: Request, res: Response) => {
+dealsRouter.delete("/", requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const id = (req.query.id as string) || req.body?.id;
     if (!id) {
@@ -434,7 +450,7 @@ dealsRouter.delete("/", async (req: Request, res: Response) => {
  * POST /api/deals/bulk (or /api/offers/bulk)
  * Admin bulk import
  */
-dealsRouter.post("/bulk", async (req: Request, res: Response) => {
+dealsRouter.post("/bulk", requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const items = req.body?.items || [];
     if (!Array.isArray(items) || items.length === 0) {

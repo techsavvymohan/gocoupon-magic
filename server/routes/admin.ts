@@ -15,6 +15,7 @@ import {
 } from "../services/providers/cuelinks-client.js";
 import { STORES_DB } from "../../src/lib/server-data/stores-db.js";
 import { globalCache } from "../../src/lib/services/cache-service.js";
+import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
 
 export const adminRouter = Router();
 
@@ -27,7 +28,11 @@ if (!fs.existsSync(DATA_DIR)) {
 // ---------------------------------------------------------------------------
 // Cryptographic Admin Session Token Security
 // ---------------------------------------------------------------------------
-const ADMIN_TOKEN_SECRET = process.env.ADMIN_PASSWORD || "GC_Admin_Secured#2026!";
+const EPHEMERAL_FALLBACK_SECRET = crypto.randomBytes(32).toString("hex");
+if (!process.env.ADMIN_PASSWORD) {
+  console.warn("[SECURITY WARN] ADMIN_PASSWORD not set in environment. Ephemeral admin secret generated.");
+}
+const ADMIN_TOKEN_SECRET = process.env.ADMIN_PASSWORD || EPHEMERAL_FALLBACK_SECRET;
 
 export interface AdminTokenPayload {
   email: string;
@@ -260,22 +265,53 @@ const defaultUsers = [
 // ---------------------------------------------------------------------------
 // 3. Admin Authentication & Verification Endpoints
 // ---------------------------------------------------------------------------
+function safeCompareStrings(a: string, b: string): boolean {
+  try {
+    const bufA = Buffer.from(a);
+    const bufB = Buffer.from(b);
+    if (bufA.length !== bufB.length) {
+      crypto.timingSafeEqual(bufA, bufA);
+      return false;
+    }
+    return crypto.timingSafeEqual(bufA, bufB);
+  } catch {
+    return false;
+  }
+}
+
 adminRouter.post("/login", (req: Request, res: Response) => {
+  const clientIp =
+    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+    req.socket.remoteAddress ||
+    "127.0.0.1";
+
+  // Limit admin login attempts to 5 requests per 5 minutes per IP
+  const rateCheck = apiRateLimiter.check(`admin-login:${clientIp}`, 5, 5 * 60 * 1000);
+  if (!rateCheck.allowed) {
+    res.setHeader("Retry-After", String(rateCheck.retryAfterSeconds));
+    res.status(429).json({
+      success: false,
+      error: `Too many login attempts. Please wait ${rateCheck.retryAfterSeconds} seconds before trying again.`,
+      retryAfterSeconds: rateCheck.retryAfterSeconds,
+    });
+    return;
+  }
+
   const { email, password } = req.body || {};
   const cleanEmail = String(email || "").trim().toLowerCase();
   const cleanPass = String(password || "").trim();
 
   const configuredEmail = (process.env.ADMIN_EMAIL || "support@gocoupon.io").trim().toLowerCase();
-  const configuredPass = (process.env.ADMIN_PASSWORD || "GC_Admin_Secured#2026!").trim();
+  const configuredPass = (process.env.ADMIN_PASSWORD || EPHEMERAL_FALLBACK_SECRET).trim();
 
   const isSuperadminMatch =
     (cleanEmail === configuredEmail || cleanEmail === "admin@gocoupon.io") &&
-    cleanPass === configuredPass;
+    safeCompareStrings(cleanPass, configuredPass);
 
   const users = loadJson(USERS_FILE, defaultUsers);
   const matchedUser = users.find((u) => u.email.toLowerCase() === cleanEmail && u.isActive);
 
-  if (!isSuperadminMatch && (!matchedUser || cleanPass !== configuredPass)) {
+  if (!isSuperadminMatch && (!matchedUser || !safeCompareStrings(cleanPass, configuredPass))) {
     res.status(401).json({ success: false, error: "Invalid admin email or password." });
     return;
   }

@@ -7,6 +7,7 @@ import { Router, Request, Response } from "express";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { requireAdminAuth } from "./admin.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -205,7 +206,7 @@ blogsRouter.get("/:slug", (req: Request, res: Response) => {
  * POST /api/blogs
  * Create new blog article
  */
-blogsRouter.post("/", (req: Request, res: Response) => {
+blogsRouter.post("/", requireAdminAuth, (req: Request, res: Response) => {
   try {
     const {
       title,
@@ -269,7 +270,7 @@ blogsRouter.post("/", (req: Request, res: Response) => {
  * PUT /api/blogs/:slug
  * Update existing article
  */
-blogsRouter.put("/:slug", (req: Request, res: Response) => {
+blogsRouter.put("/:slug", requireAdminAuth, (req: Request, res: Response) => {
   try {
     const slug = String(req.params.slug).toLowerCase();
     const index = inMemoryBlogs.findIndex((b) => b.slug.toLowerCase() === slug);
@@ -318,7 +319,7 @@ blogsRouter.put("/:slug", (req: Request, res: Response) => {
  * DELETE /api/blogs/:slug
  * Delete article
  */
-blogsRouter.delete("/:slug", (req: Request, res: Response) => {
+blogsRouter.delete("/:slug", requireAdminAuth, (req: Request, res: Response) => {
   try {
     const slug = String(req.params.slug).toLowerCase();
     const initialLen = inMemoryBlogs.length;

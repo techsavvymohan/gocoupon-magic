@@ -13,6 +13,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
+    "test:security": "node scripts/test-security.mjs",
     "test:cuelinks": "tsx --env-file=.env scripts/test-cuelinks.ts",
     "audit:cuelinks": "tsx --env-file=.env scripts/audit-cuelinks-applications.ts",
     "test:admitad": "tsx --env-file=.env scripts/test-admitad.ts"

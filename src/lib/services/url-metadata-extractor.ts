@@ -190,6 +190,66 @@ export function extractMetadataFromHtml(html: string, pageUrl: string): Extracte
 /**
  * Resolves a live URL with strict timeout, caching, and fallback protection.
  */
+/**
+ * Security: SSRF Validation Helper
+ * Ensures the target URL is a public, routable web address and blocks private / loopback IPs,
+ * cloud metadata endpoints, and non-standard internal ports.
+ */
+export function isSafePublicUrl(rawUrl: string): boolean {
+  try {
+    const parsed = new URL(rawUrl.trim());
+
+    // 1. Only allow http and https protocols
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return false;
+    }
+
+    // 2. Only allow standard web ports (empty, 80, 443)
+    if (parsed.port && parsed.port !== "80" && parsed.port !== "443") {
+      return false;
+    }
+
+    const hostname = parsed.hostname.toLowerCase();
+
+    // 3. Block localhost, loopback, and local hostnames
+    if (
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "0.0.0.0" ||
+      hostname === "::1" ||
+      hostname.endsWith(".localhost") ||
+      hostname.endsWith(".local") ||
+      hostname.endsWith(".internal") ||
+      hostname.endsWith(".lan")
+    ) {
+      return false;
+    }
+
+    // 4. Block cloud instance metadata services (AWS, GCP, Azure, DigitalOcean)
+    if (hostname === "169.254.169.254" || hostname === "metadata.google.internal") {
+      return false;
+    }
+
+    // 5. Block private IPv4 addresses (RFC 1918 & RFC 6598)
+    const ipv4Match = hostname.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+    if (ipv4Match) {
+      const parts = ipv4Match.slice(1, 5).map(Number);
+      const [o1, o2] = parts;
+      if (o1 === 127) return false; // 127.0.0.0/8 (loopback)
+      if (o1 === 10) return false; // 10.0.0.0/8 (private)
+      if (o1 === 172 && o2 >= 16 && o2 <= 31) return false; // 172.16.0.0/12 (private)
+      if (o1 === 192 && o2 === 168) return false; // 192.168.0.0/16 (private)
+      if (o1 === 169 && o2 === 254) return false; // 169.254.0.0/16 (link-local)
+      if (o1 === 100 && o2 >= 64 && o2 <= 127) return false; // 100.64.0.0/10 (carrier-grade NAT)
+      if (o1 === 0) return false; // 0.0.0.0/8
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function resolveLiveUrlAndCompetitors(urlOrQuery: string): Promise<LiveProductResolution> {
   const normKey = urlOrQuery.toLowerCase().trim();
   const cacheKey = `url_resolve:${normKey}`;
@@ -202,6 +262,27 @@ export async function resolveLiveUrlAndCompetitors(urlOrQuery: string): Promise<
   let metadata: ExtractedProductMetadata | null = null;
 
   if (isUrl) {
+    if (!isSafePublicUrl(urlOrQuery)) {
+      console.warn(`[SSRF Defense] Blocked internal or non-public URL fetch: ${urlOrQuery}`);
+      return {
+        found: false,
+        metadata: {
+          title: "Restricted URL",
+          price: 0,
+          imageUrl: "",
+          brand: "",
+          rating: 0,
+          reviewCount: 0,
+          storeName: "Unknown",
+          pageUrl: urlOrQuery,
+          isExtractedLive: false,
+        },
+        competitors: [],
+        bestDeal: null,
+        maxSavings: 0,
+      };
+    }
+
     try {
       const resp = await fetch(urlOrQuery, {
         headers: {

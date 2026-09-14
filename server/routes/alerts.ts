@@ -74,8 +74,8 @@ alertsRouter.get("/check", async (req: Request, res: Response) => {
   const authHeader = req.headers.authorization;
   const cronSecret = process.env.CRON_SECRET;
 
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    res.status(401).json({ error: "Unauthorized cron execution" });
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+    res.status(401).json({ error: "Unauthorized: A valid Bearer CRON_SECRET token is required." });
     return;
   }
 

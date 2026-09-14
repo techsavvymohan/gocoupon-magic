@@ -41,6 +41,18 @@ if (SMTP_HOST && SMTP_USER && SMTP_PASS) {
   console.log("[SMTP] Credentials not yet configured — emails will be logged to console in dev mode.");
 }
 
+/**
+ * Security: HTML entity escaper to eliminate HTML/script injection in generated emails.
+ */
+function escapeHtml(text: string): string {
+  return String(text || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 export interface PriceDropEmailOptions {
   to: string;
   productTitle: string;
@@ -56,6 +68,9 @@ export interface PriceDropEmailOptions {
  */
 export async function sendPriceDropEmail(options: PriceDropEmailOptions): Promise<boolean> {
   const sym = options.currencySymbol || "₹";
+  const safeTitle = escapeHtml(options.productTitle);
+  const safeStore = escapeHtml(options.storeName);
+  const safeProductUrl = options.productUrl.replace(/"/g, "%22");
 
   const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #090d16; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px;">
@@ -69,10 +84,10 @@ export async function sendPriceDropEmail(options: PriceDropEmailOptions): Promis
           🎉 PRICE DROP DETECTED!
         </div>
         <h2 style="font-size: 18px; font-weight: 700; margin: 0 0 12px 0; color: #0f172a;">
-          ${options.productTitle}
+          ${safeTitle}
         </h2>
         <p style="font-size: 14px; color: #475569; margin: 0 0 20px 0;">
-          Great news! The item you're tracking on <strong>${options.storeName}</strong> has hit your target price.
+          Great news! The item you're tracking on <strong>${safeStore}</strong> has hit your target price.
         </p>
 
         <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
@@ -89,8 +104,8 @@ export async function sendPriceDropEmail(options: PriceDropEmailOptions): Promis
         </div>
 
         <div style="text-align: center;">
-          <a href="${options.productUrl}" style="display: inline-block; background-color: #4338ca; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; padding: 14px 28px; border-radius: 9999px; box-shadow: 0 4px 12px rgba(67, 56, 202, 0.2);">
-            View Deal at ${options.storeName} &rarr;
+          <a href="${safeProductUrl}" style="display: inline-block; background-color: #4338ca; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; padding: 14px 28px; border-radius: 9999px; box-shadow: 0 4px 12px rgba(67, 56, 202, 0.2);">
+            View Deal at ${safeStore} &rarr;
           </a>
         </div>
       </div>
@@ -123,7 +138,7 @@ export async function sendPriceDropEmail(options: PriceDropEmailOptions): Promis
 }
 
 /**
- * Sends contact form submission to the admin.
+ * Sends contact form submission to the admin with strict HTML sanitization.
  */
 export async function sendContactInquiryEmail(options: {
   name: string;
@@ -133,13 +148,18 @@ export async function sendContactInquiryEmail(options: {
 }): Promise<boolean> {
   const adminEmail = process.env.ADMIN_EMAIL || SMTP_USER || "support@gocoupon.io";
 
+  const safeName = escapeHtml(options.name);
+  const safeEmail = escapeHtml(options.email);
+  const safeSubject = escapeHtml(options.subject || "General Inquiry");
+  const safeMessage = escapeHtml(options.message);
+
   const html = `
     <div style="font-family: sans-serif; padding: 20px; color: #333;">
       <h2>New Contact Inquiry from GoCoupon.io</h2>
-      <p><strong>From:</strong> ${options.name} (${options.email})</p>
-      <p><strong>Subject:</strong> ${options.subject || "General Inquiry"}</p>
+      <p><strong>From:</strong> ${safeName} (${safeEmail})</p>
+      <p><strong>Subject:</strong> ${safeSubject}</p>
       <p><strong>Message:</strong></p>
-      <div style="background: #f4f4f5; padding: 15px; border-radius: 6px; white-space: pre-wrap;">${options.message}</div>
+      <div style="background: #f4f4f5; padding: 15px; border-radius: 6px; white-space: pre-wrap;">${safeMessage}</div>
     </div>
   `;
 
