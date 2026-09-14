@@ -1,6 +1,11 @@
 import { Link } from "@tanstack/react-router";
+import { useI18n } from "@/context/I18nContext";
+import { LanguageToggle } from "../LanguageToggle";
+import { CurrencyToggle } from "../CurrencyToggle";
 
 export function Footer() {
+  const { t } = useI18n();
+
   const handleOpenCookiePreferences = () => {
     // Dispatch custom event to trigger cookie consent banner / settings dialog
     window.dispatchEvent(new CustomEvent("open-cookie-preferences"));
@@ -254,21 +259,27 @@ export function Footer() {
           {/* Thin Clean Divider */}
           <hr className="my-10 border-neutral-100 dark:border-neutral-800" />
 
-          {/* Bottom Copyright & Legal Links */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-400 dark:text-neutral-500">
-            <p>© 2026 GoCoupon. All rights reserved.</p>
-            <div className="flex flex-wrap items-center gap-6">
+          {/* Bottom Copyright, Region Controls & Legal Links */}
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6 text-xs text-neutral-400 dark:text-neutral-500">
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+              <p>© 2026 GoCoupon. {t("footer.allRights", "All rights reserved.")}</p>
+              <div className="flex items-center gap-2">
+                <LanguageToggle variant="footer" />
+                <CurrencyToggle variant="footer" />
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-6">
               <Link
                 to="/privacy"
                 className="hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
               >
-                Privacy Policy
+                {t("footer.privacyPolicy", "Privacy Policy")}
               </Link>
               <Link
                 to="/terms"
                 className="hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
               >
-                Terms of Service
+                {t("footer.terms", "Terms of Service")}
               </Link>
               <button
                 type="button"

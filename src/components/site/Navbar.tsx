@@ -8,6 +8,8 @@ import { useState } from "react";
 import { MagneticButton } from "../MagneticButton";
 import { ThemeToggle } from "../ThemeToggle";
 import { CurrencyToggle } from "../CurrencyToggle";
+import { LanguageToggle } from "../LanguageToggle";
+import { useI18n } from "@/context/I18nContext";
 import { AnnouncementBar } from "./AnnouncementBar";
 import {
   Menu,
@@ -32,15 +34,16 @@ type NavLink = {
   badge?: string;
   badgeColor?: string;
   isAction?: boolean;
+  i18nKey?: string;
 };
 
 const desktopLinks: NavLink[] = [
-  { label: "Offers", to: "/offers", badge: "HOT", badgeColor: "bg-rose-500/15 text-rose-500" },
-  { label: "Compare", to: "/compare", badge: "NEW", badgeColor: "bg-primary/10 text-primary" },
-  { label: "Stores", to: "/stores" },
-  { label: "Ask", to: "/ask" },
-  { label: "Extension", to: "/chrome-extension" },
-  { label: "Blog", to: "/blog" },
+  { label: "Offers", to: "/offers", badge: "HOT", badgeColor: "bg-rose-500/15 text-rose-500", i18nKey: "nav.offers" },
+  { label: "Compare", to: "/compare", badge: "NEW", badgeColor: "bg-primary/10 text-primary", i18nKey: "nav.compare" },
+  { label: "Stores", to: "/stores", i18nKey: "nav.stores" },
+  { label: "Ask", to: "/ask", i18nKey: "nav.ask" },
+  { label: "Extension", to: "/chrome-extension", i18nKey: "nav.extension" },
+  { label: "Blog", to: "/blog", i18nKey: "nav.blog" },
 ];
 
 const mobileLinks: NavLink[] = [
@@ -51,6 +54,7 @@ const mobileLinks: NavLink[] = [
 export function Navbar() {
   const { pathname } = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useI18n();
 
   return (
     <>
@@ -99,9 +103,11 @@ export function Navbar() {
               const baseClass =
                 "group relative py-1 text-xs lg:text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-foreground hover:-translate-y-0.5 flex items-center gap-1.5";
 
+              const localizedLabel = l.i18nKey ? t(l.i18nKey, l.label) : l.label;
+
               const animatedContent = (
                 <>
-                  <span>{l.label}</span>
+                  <span>{localizedLabel}</span>
                   {l.badge && (
                     <span
                       className={`rounded-full px-1.5 py-0.2 font-mono text-[9px] font-bold ${
@@ -167,7 +173,8 @@ export function Navbar() {
           </ul>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-2 sm:gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <LanguageToggle />
             <CurrencyToggle />
             <ThemeToggle />
 
@@ -179,7 +186,7 @@ export function Navbar() {
               className="hidden items-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 px-4 sm:px-5 py-2 text-xs font-bold text-white shadow-md transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-rose-500/25 sm:inline-flex group"
             >
               <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
-              <span>Add to Chrome</span>
+              <span>{t("nav.addToChrome", "Add to Chrome")}</span>
             </MagneticButton>
             {/* Mobile Menu Toggle Button */}
             <button
@@ -268,7 +275,7 @@ export function Navbar() {
                       className="flex items-center justify-between rounded-xl p-3 min-h-[44px] text-base font-semibold text-foreground hover:bg-muted touch-manipulation"
                     >
                       <div className="flex items-center gap-2">
-                        <span>{l.label}</span>
+                        <span>{l.i18nKey ? t(l.i18nKey, l.label) : l.label}</span>
                         {l.badge && (
                           <span
                             className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-bold ${
@@ -291,11 +298,15 @@ export function Navbar() {
                   rel="noopener noreferrer"
                   className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 min-h-[44px] text-sm font-bold text-primary-foreground shadow-md touch-manipulation"
                 >
-                  <span>Add to Chrome — Free</span>
+                  <span>{t("nav.addToChrome", "Add to Chrome — Free")}</span>
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </a>
               </li>
               <li className="flex items-center justify-between pt-3 border-t border-border">
+                <span className="text-xs text-muted-foreground font-mono">Language:</span>
+                <LanguageToggle />
+              </li>
+              <li className="flex items-center justify-between pt-2">
                 <span className="text-xs text-muted-foreground font-mono">Currency Preference:</span>
                 <CurrencyToggle />
               </li>
@@ -317,7 +328,7 @@ export function Navbar() {
             aria-label="Home"
           >
             <Home className="h-4 w-4" aria-hidden="true" />
-            <span className="text-[10px] font-medium">Home</span>
+            <span className="text-[10px] font-medium">{t("nav.home", "Home")}</span>
           </Link>
 
           <Link
@@ -327,7 +338,7 @@ export function Navbar() {
             aria-label="Compare prices"
           >
             <Layers className="h-4 w-4" aria-hidden="true" />
-            <span className="text-[10px] font-medium">Compare</span>
+            <span className="text-[10px] font-medium">{t("nav.compare", "Compare")}</span>
           </Link>
 
           <Link
@@ -337,7 +348,7 @@ export function Navbar() {
             aria-label="Live Offers"
           >
             <Flame className="h-4 w-4" aria-hidden="true" />
-            <span className="text-[10px] font-medium">Offers</span>
+            <span className="text-[10px] font-medium">{t("nav.offers", "Offers")}</span>
           </Link>
 
           <Link
@@ -347,7 +358,7 @@ export function Navbar() {
             aria-label="Shopping Assistant"
           >
             <Bot className="h-4 w-4" aria-hidden="true" />
-            <span className="text-[10px] font-medium">Ask</span>
+            <span className="text-[10px] font-medium">{t("nav.ask", "Ask")}</span>
           </Link>
 
           <Link
@@ -357,7 +368,7 @@ export function Navbar() {
             aria-label="Stores Directory"
           >
             <ShoppingBag className="h-4 w-4" aria-hidden="true" />
-            <span className="text-[10px] font-medium">Stores</span>
+            <span className="text-[10px] font-medium">{t("nav.stores", "Stores")}</span>
           </Link>
         </div>
       </nav>

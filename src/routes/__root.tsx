@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { CurrencyProvider } from "@/context/CurrencyContext";
 import { UserCardsProvider } from "@/context/UserCardsContext";
+import { I18nProvider } from "@/context/I18nContext";
 
 function RootComponent() {
   const [queryClient] = useState(
@@ -21,13 +22,15 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <CurrencyProvider>
-        <UserCardsProvider>
-          <HeadContent />
-          <Outlet />
-          <Toaster position="top-right" richColors />
-        </UserCardsProvider>
-      </CurrencyProvider>
+      <I18nProvider>
+        <CurrencyProvider>
+          <UserCardsProvider>
+            <HeadContent />
+            <Outlet />
+            <Toaster position="top-right" richColors />
+          </UserCardsProvider>
+        </CurrencyProvider>
+      </I18nProvider>
     </QueryClientProvider>
   );
 }

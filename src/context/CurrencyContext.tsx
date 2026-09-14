@@ -1,16 +1,37 @@
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
+﻿import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
 
-export type CurrencyCode = "INR" | "USD";
+export type CurrencyCode = "INR" | "USD" | "EUR" | "GBP" | "AED" | "SGD" | "CAD" | "AUD";
+
+export interface CurrencyMeta {
+  code: CurrencyCode;
+  symbol: string;
+  name: string;
+  flag: string;
+  rateToInr: number; // How many INR = 1 unit of this currency
+}
+
+export const SUPPORTED_CURRENCIES: CurrencyMeta[] = [
+  { code: "INR", symbol: "₹", name: "Indian Rupee", flag: "🇮🇳", rateToInr: 1.0 },
+  { code: "USD", symbol: "$", name: "US Dollar", flag: "🇺🇸", rateToInr: 85.0 },
+  { code: "EUR", symbol: "€", name: "Euro", flag: "🇪🇺", rateToInr: 92.5 },
+  { code: "GBP", symbol: "£", name: "British Pound", flag: "🇬🇧", rateToInr: 108.0 },
+  { code: "AED", symbol: "AED ", name: "UAE Dirham", flag: "🇦🇪", rateToInr: 23.1 },
+  { code: "SGD", symbol: "S$", name: "Singapore Dollar", flag: "🇸🇬", rateToInr: 64.2 },
+  { code: "CAD", symbol: "C$", name: "Canadian Dollar", flag: "🇨🇦", rateToInr: 62.5 },
+  { code: "AUD", symbol: "A$", name: "Australian Dollar", flag: "🇦🇺", rateToInr: 56.0 },
+];
 
 export interface CurrencyContextType {
   currency: CurrencyCode;
   symbol: string;
+  currentCurrency: CurrencyMeta;
+  currencies: CurrencyMeta[];
   country: string;
   countryName: string;
   ip?: string;
   isIndia: boolean;
   isLoading: boolean;
-  exchangeRate: number; // INR per 1 USD
+  exchangeRate: number; // INR per 1 USD (for backward compatibility)
   setCurrency: (currency: CurrencyCode) => void;
   formatPrice: (amountInInr: number, options?: { showDecimals?: boolean }) => string;
   formatSaving: (amountInInr: number) => string;
@@ -19,8 +40,6 @@ export interface CurrencyContextType {
   convertUsdToInr: (amountInUsd: number) => number;
 }
 
-const INR_PER_USD = 85;
-
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
 const STORAGE_KEY_CURRENCY = "gocoupon_currency";
@@ -28,24 +47,43 @@ const STORAGE_KEY_COUNTRY = "gocoupon_country";
 const STORAGE_KEY_IP = "gocoupon_ip";
 const STORAGE_KEY_TIMESTAMP = "gocoupon_geo_timestamp";
 
+function getCurrencyForCountry(countryCode: string): CurrencyCode {
+  const code = countryCode.toUpperCase().trim();
+  if (code === "IN") return "INR";
+  if (code === "GB" || code === "UK") return "GBP";
+  if (["DE", "FR", "ES", "IT", "NL", "BE", "AT", "IE", "PT", "FI", "GR"].includes(code)) return "EUR";
+  if (["AE", "SA", "QA", "KW", "OM", "BH"].includes(code)) return "AED";
+  if (["SG", "MY", "ID", "TH", "VN", "PH"].includes(code)) return "SGD";
+  if (code === "CA") return "CAD";
+  if (code === "AU" || code === "NZ") return "AUD";
+  return "USD";
+}
+
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
-  // Initialize with fast heuristic / cached storage
   const [currency, setCurrencyState] = useState<CurrencyCode>(() => {
     if (typeof window !== "undefined") {
-      const cached = localStorage.getItem(STORAGE_KEY_CURRENCY);
-      if (cached === "INR" || cached === "USD") return cached;
+      const cached = localStorage.getItem(STORAGE_KEY_CURRENCY) as CurrencyCode;
+      if (cached && SUPPORTED_CURRENCIES.some((c) => c.code === cached)) return cached;
 
-      // Fast client-side timezone check as initial default before IP resolves
       try {
         const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
         if (tz.toLowerCase().includes("kolkata") || tz.toLowerCase().includes("calcutta") || tz.toLowerCase().includes("india")) {
           return "INR";
         }
-      } catch {
-        // Fallback to USD if timezone resolution fails
-      }
+        if (tz.toLowerCase().includes("london") || tz.toLowerCase().includes("europe/belfast")) {
+          return "GBP";
+        }
+        if (tz.toLowerCase().includes("berlin") || tz.toLowerCase().includes("paris") || tz.toLowerCase().includes("madrid") || tz.toLowerCase().includes("rome")) {
+          return "EUR";
+        }
+        if (tz.toLowerCase().includes("dubai")) {
+          return "AED";
+        }
+        if (tz.toLowerCase().includes("singapore")) {
+          return "SGD";
+        }
+      } catch {}
     }
-    // Default for international is USD until IP confirms otherwise
     return "USD";
   });
 
@@ -65,12 +103,11 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch real IP Geolocation in background
+  // Background IP Geolocation detection
   useEffect(() => {
     let isMounted = true;
 
     async function detectCountryByIp() {
-      // Check if user recently resolved IP in the last 12 hours
       const cachedTs = localStorage.getItem(STORAGE_KEY_TIMESTAMP);
       const cachedCountry = localStorage.getItem(STORAGE_KEY_COUNTRY);
       const cachedCurrency = localStorage.getItem(STORAGE_KEY_CURRENCY);
@@ -78,10 +115,11 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
       if (cachedTs && cachedCountry && cachedCurrency) {
         const age = Date.now() - parseInt(cachedTs, 10);
         if (age < 12 * 60 * 60 * 1000) {
-          // Fresh cache valid
           if (isMounted) {
             setCountry(cachedCountry);
-            setCurrencyState(cachedCurrency as CurrencyCode);
+            if (SUPPORTED_CURRENCIES.some((c) => c.code === cachedCurrency)) {
+              setCurrencyState(cachedCurrency as CurrencyCode);
+            }
             setIsLoading(false);
           }
           return;
@@ -94,7 +132,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
       // 1. Primary: Fast & CORS-friendly api.country.is
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3500);
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
         const res = await fetch("https://api.country.is/", {
           signal: controller.signal,
           headers: { Accept: "application/json" },
@@ -108,15 +146,13 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
             detectedIp = data.ip || "";
           }
         }
-      } catch {
-        // Continue to secondary fallback
-      }
+      } catch {}
 
       // 2. Secondary fallback: ipwho.is
       if (!detectedCountry) {
         try {
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 3500);
+          const timeoutId = setTimeout(() => controller.abort(), 3000);
           const res = await fetch("https://ipwho.is/", {
             signal: controller.signal,
             headers: { Accept: "application/json" },
@@ -130,50 +166,28 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
               detectedIp = data.ip || "";
             }
           }
-        } catch {
-          // Continue to heuristic fallback
-        }
+        } catch {}
       }
 
-      // 3. Heuristic fallback (Timezone & Navigator)
       if (!detectedCountry) {
-        try {
-          const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-          if (
-            tz.toLowerCase().includes("kolkata") ||
-            tz.toLowerCase().includes("calcutta") ||
-            tz.toLowerCase().includes("india")
-          ) {
-            detectedCountry = "IN";
-          } else {
-            detectedCountry = "US";
-          }
-        } catch {
-          detectedCountry = "US";
-        }
+        detectedCountry = "US";
       }
 
       if (!isMounted) return;
 
-      // Decision rule:
-      // If Indian IP -> default currency is INR (₹)
-      // If any other IP -> default currency is USD ($)
-      const targetCurrency: CurrencyCode = detectedCountry === "IN" ? "INR" : "USD";
+      const targetCurrency = getCurrencyForCountry(detectedCountry);
 
       setCountry(detectedCountry);
       if (detectedIp) setIp(detectedIp);
       setCurrencyState(targetCurrency);
       setIsLoading(false);
 
-      // Persist to localStorage
       try {
         localStorage.setItem(STORAGE_KEY_COUNTRY, detectedCountry);
         localStorage.setItem(STORAGE_KEY_CURRENCY, targetCurrency);
         if (detectedIp) localStorage.setItem(STORAGE_KEY_IP, detectedIp);
         localStorage.setItem(STORAGE_KEY_TIMESTAMP, Date.now().toString());
-      } catch {
-        // Ignore localStorage write errors in private mode
-      }
+      } catch {}
     }
 
     detectCountryByIp();
@@ -183,47 +197,47 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  // Manual currency switcher
+  const currentCurrency = useMemo(() => {
+    return SUPPORTED_CURRENCIES.find((c) => c.code === currency) || SUPPORTED_CURRENCIES[0];
+  }, [currency]);
+
+  const symbol = currentCurrency.symbol;
+  const isIndia = currency === "INR";
+
   const setCurrency = useCallback((newCurrency: CurrencyCode) => {
     setCurrencyState(newCurrency);
     try {
       localStorage.setItem(STORAGE_KEY_CURRENCY, newCurrency);
-    } catch {
-      // Ignore localStorage write errors
-    }
+    } catch {}
   }, []);
 
-  // Helpers
   const convertInrToUsd = useCallback((inr: number) => {
-    return inr / INR_PER_USD;
+    return inr / 85.0;
   }, []);
 
   const convertUsdToInr = useCallback((usd: number) => {
-    return Math.round(usd * INR_PER_USD);
+    return Math.round(usd * 85.0);
   }, []);
 
   const formatPrice = useCallback(
     (amountInInr: number, options?: { showDecimals?: boolean }) => {
-      if (isNaN(amountInInr)) return currency === "INR" ? "₹0" : "$0.00";
+      if (isNaN(amountInInr)) return `${symbol}0`;
 
       if (currency === "INR") {
         return `₹${Math.round(amountInInr).toLocaleString("en-IN")}`;
       }
 
-      // USD conversion
-      const usdValue = amountInInr / INR_PER_USD;
-      const showDecimals = options?.showDecimals ?? (usdValue < 50);
+      const rate = currentCurrency.rateToInr;
+      const convertedValue = amountInInr / rate;
+      const showDecimals = options?.showDecimals ?? (convertedValue < 50);
 
-      if (showDecimals) {
-        return `$${usdValue.toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })}`;
-      }
+      const formatted = showDecimals
+        ? convertedValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : Math.round(convertedValue).toLocaleString("en-US");
 
-      return `$${Math.round(usdValue).toLocaleString("en-US")}`;
+      return `${symbol}${formatted}`;
     },
-    [currency]
+    [currency, currentCurrency, symbol]
   );
 
   const formatSaving = useCallback(
@@ -234,57 +248,43 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         return `Save ₹${Math.round(amountInInr).toLocaleString("en-IN")}`;
       }
 
-      const usdValue = amountInInr / INR_PER_USD;
-      if (usdValue < 10) {
-        return `Save $${usdValue.toFixed(2)}`;
+      const rate = currentCurrency.rateToInr;
+      const convertedValue = amountInInr / rate;
+
+      if (convertedValue < 10) {
+        return `Save ${symbol}${convertedValue.toFixed(2)}`;
       }
-      return `Save $${Math.round(usdValue).toLocaleString("en-US")}`;
+      return `Save ${symbol}${Math.round(convertedValue).toLocaleString("en-US")}`;
     },
-    [currency]
+    [currency, currentCurrency, symbol]
   );
 
-  /**
-   * Helper that converts any existing price string like "₹24,990" or "₹500 OFF"
-   * into the appropriate currency format.
-   */
   const formatPriceString = useCallback(
     (priceString: string): string => {
       if (!priceString) return "";
       if (currency === "INR") return priceString;
 
-      // Extract number from string like "₹24,990" or "₹15,000 OFF"
-      const match = priceString.match(/₹\s*([0-9,]+)/);
-      if (!match) return priceString;
-
-      const numStr = match[1].replace(/,/g, "");
-      const numVal = parseFloat(numStr);
-      if (isNaN(numVal)) return priceString;
-
-      const usdVal = numVal / INR_PER_USD;
-      const formattedUsd =
-        usdVal >= 100
-          ? `$${Math.round(usdVal).toLocaleString("en-US")}`
-          : `$${usdVal.toFixed(2)}`;
-
-      return priceString.replace(/₹\s*[0-9,]+/, formattedUsd);
+      return priceString.replace(/₹\s*([\d,]+(\.\d+)?)/g, (_match, p1) => {
+        const numeric = parseFloat(p1.replace(/,/g, ""));
+        if (isNaN(numeric)) return priceString;
+        return formatPrice(numeric);
+      });
     },
-    [currency]
+    [currency, formatPrice]
   );
 
-  const symbol = currency === "INR" ? "₹" : "$";
-  const isIndia = currency === "INR";
-  const countryName = country === "IN" ? "India" : country || "Global";
-
-  const contextValue = useMemo<CurrencyContextType>(
+  const value = useMemo(
     () => ({
       currency,
       symbol,
+      currentCurrency,
+      currencies: SUPPORTED_CURRENCIES,
       country,
-      countryName,
+      countryName: country,
       ip,
       isIndia,
       isLoading,
-      exchangeRate: INR_PER_USD,
+      exchangeRate: 85.0,
       setCurrency,
       formatPrice,
       formatSaving,
@@ -295,8 +295,8 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     [
       currency,
       symbol,
+      currentCurrency,
       country,
-      countryName,
       ip,
       isIndia,
       isLoading,
@@ -309,28 +309,13 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     ]
   );
 
-  return <CurrencyContext.Provider value={contextValue}>{children}</CurrencyContext.Provider>;
+  return <CurrencyContext.Provider value={value}>{children}</CurrencyContext.Provider>;
 }
 
-export function useCurrency(): CurrencyContextType {
+export function useCurrency() {
   const context = useContext(CurrencyContext);
   if (!context) {
-    // Fallback if rendered outside CurrencyProvider (e.g. testing)
-    return {
-      currency: "USD",
-      symbol: "$",
-      country: "",
-      countryName: "Global",
-      isIndia: false,
-      isLoading: false,
-      exchangeRate: INR_PER_USD,
-      setCurrency: () => {},
-      formatPrice: (amt) => `$${(amt / INR_PER_USD).toFixed(2)}`,
-      formatSaving: (amt) => `Save $${(amt / INR_PER_USD).toFixed(2)}`,
-      formatPriceString: (s) => s,
-      convertInrToUsd: (amt) => amt / INR_PER_USD,
-      convertUsdToInr: (amt) => amt * INR_PER_USD,
-    };
+    throw new Error("useCurrency must be used within a CurrencyProvider");
   }
   return context;
 }
