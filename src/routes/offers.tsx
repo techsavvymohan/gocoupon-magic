@@ -100,7 +100,6 @@ const SIDEBAR_TABS: { id: SidebarTab; label: string; icon: any; badge?: string }
   { id: "brands", label: "Brands", icon: Tag, badge: "Popular" },
   { id: "stores", label: "Stores", icon: Store, badge: "240+" },
   { id: "banks", label: "Banks", icon: Landmark, badge: "Extra 10%" },
-  { id: "festivals", label: "Festivals", icon: Gift, badge: "Hot" },
   { id: "product-deals", label: "Product Deals", icon: ShoppingBag },
 ];
 
@@ -417,13 +416,6 @@ function OffersHubPage() {
     return allRealStores.length > 0 ? allRealStores.length : 241;
   }, [allRealStores]);
 
-  // Dynamic current month name for header sales link
-  const currentMonthSalesLabel = useMemo(() => {
-    const now = new Date();
-    const month = now.toLocaleString("en-US", { month: "long" });
-    return `${month} Sales`;
-  }, []);
-
   // Filter deals dynamically based on all user filters
   const filteredOffers = useMemo(() => {
     const now = Date.now();
@@ -461,23 +453,7 @@ function OffersHubPage() {
         }
       }
 
-      // 5. Filter by Festivals
-      if (activeSidebarTab === "festivals") {
-        const text = `${deal.title} ${deal.category} ${deal.terms || ""}`.toLowerCase();
-        const isFestive =
-          text.includes("sale") ||
-          text.includes("festival") ||
-          text.includes("festive") ||
-          text.includes("diwali") ||
-          text.includes("dhamaka") ||
-          text.includes("mega") ||
-          text.includes("super") ||
-          deal.badge === "Exclusive" ||
-          deal.badge === "Trending";
-        if (!isFestive) return false;
-      }
-
-      // 6. Filter by Product Deals (50%+ discount)
+      // 5. Filter by Product Deals (50%+ discount)
       if (activeSidebarTab === "product-deals") {
         const dText = deal.discount.toLowerCase();
         const hasHighDiscount =
@@ -660,17 +636,6 @@ function OffersHubPage() {
 
             <button
               type="button"
-              onClick={() => setActiveSidebarTab("festivals")}
-              className={`inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
-                activeSidebarTab === "festivals" ? "text-primary font-bold" : "text-foreground/80 hover:text-primary"
-              }`}
-            >
-              <Calendar className="h-4 w-4 text-amber-500" />
-              <span>{currentMonthSalesLabel}</span>
-            </button>
-
-            <button
-              type="button"
               onClick={() => setActiveSidebarTab("product-deals")}
               className="hidden md:inline-flex items-center gap-1.5 text-foreground/80 hover:text-primary transition-colors cursor-pointer"
             >
@@ -691,22 +656,9 @@ function OffersHubPage() {
             </button>
           </div>
 
-          {/* Right Action: Submit Coupon + Festive Special Pill Button */}
+          {/* Right Action: Submit Coupon Button */}
           <div className="flex items-center gap-2.5 ml-auto">
             <SubmitCouponButton variant="header" />
-
-            {/* Festive Highlight Pill */}
-            <button
-              type="button"
-              onClick={() => {
-                setActiveSidebarTab("festivals");
-                toast.info("Showing Festive & Seasonal Shopping Offers!");
-              }}
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#1e3a8a] dark:bg-[#2563eb] text-white px-3.5 py-1.5 text-xs font-bold shadow-sm hover:brightness-110 transition-all cursor-pointer"
-            >
-              <Gift className="h-3.5 w-3.5" />
-              <span>Festive Super Offers</span>
-            </button>
           </div>
         </div>
       </div>
@@ -731,8 +683,6 @@ function OffersHubPage() {
                 ? "Stores"
                 : activeSidebarTab === "banks"
                 ? "Bank Offers"
-                : activeSidebarTab === "festivals"
-                ? "Festive Offers"
                 : "Product Deals"}
             </span>
           </div>
@@ -749,8 +699,6 @@ function OffersHubPage() {
                     ? "Brands"
                     : activeSidebarTab === "banks"
                     ? "Bank Offers & Discounts"
-                    : activeSidebarTab === "festivals"
-                    ? "Festive Shopping Offers"
                     : activeSidebarTab === "categories"
                     ? "Shop By Category"
                     : activeSidebarTab === "stores"
