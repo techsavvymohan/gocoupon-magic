@@ -29,12 +29,14 @@ export interface PushAlertRegistration {
   active: boolean;
 }
 
+import { alertsDb } from "../services/db.js";
+
 // Persistent in-memory registry running 24/7 on the VPS
 export const memoryAlertRegistrations = new Map<string, PushAlertRegistration>();
 
 export const alertsRouter = Router();
 
-alertsRouter.post("/register", (req: Request, res: Response) => {
+alertsRouter.post("/register", async (req: Request, res: Response) => {
   const { subscription, productId, productTitle, targetPrice, currentPrice, store, email } =
     req.body || {};
 
@@ -61,6 +63,7 @@ alertsRouter.post("/register", (req: Request, res: Response) => {
   };
 
   memoryAlertRegistrations.set(alertId, record);
+  alertsDb.createAlert(record).catch((err) => console.warn("[Alerts DB Save Warning]:", err.message));
 
   res.json({
     success: true,
@@ -79,7 +82,11 @@ alertsRouter.get("/check", async (req: Request, res: Response) => {
     return;
   }
 
-  const activeAlerts = Array.from(memoryAlertRegistrations.values()).filter((a) => a.active);
+  let activeAlerts = await alertsDb.getActiveAlerts();
+  if (!activeAlerts || activeAlerts.length === 0) {
+    activeAlerts = Array.from(memoryAlertRegistrations.values()).filter((a) => a.active);
+  }
+
   const results = [];
 
   for (const alert of activeAlerts) {

@@ -142,7 +142,7 @@ function saveBlogs(blogs: BlogPost[]): void {
   }
 }
 
-let inMemoryBlogs: BlogPost[] = loadBlogs();
+import { blogsDb } from "../services/db.js";
 
 export const blogsRouter = Router();
 
@@ -150,63 +150,72 @@ export const blogsRouter = Router();
  * GET /api/blogs
  * Public & admin listing of blog articles
  */
-blogsRouter.get("/", (req: Request, res: Response) => {
-  const category = (req.query.category as string) || "";
-  const status = (req.query.status as string) || "";
-  const q = (req.query.q as string || "").toLowerCase().trim();
+blogsRouter.get("/", async (req: Request, res: Response) => {
+  try {
+    const category = (req.query.category as string) || "";
+    const status = (req.query.status as string) || "";
+    const q = (req.query.q as string || "").toLowerCase().trim();
 
-  let results = [...inMemoryBlogs];
+    const includeDrafts = status === "all" || status.toLowerCase() === "draft";
+    let results = await blogsDb.getBlogs(includeDrafts);
 
-  if (status && status !== "all") {
-    results = results.filter((b) => b.status.toLowerCase() === status.toLowerCase());
+    if (status && status !== "all") {
+      results = results.filter((b) => b.status.toLowerCase() === status.toLowerCase());
+    }
+
+    if (category && category !== "all") {
+      results = results.filter((b) => b.category.toLowerCase() === category.toLowerCase());
+    }
+
+    if (q) {
+      results = results.filter(
+        (b) =>
+          b.title.toLowerCase().includes(q) ||
+          b.slug.toLowerCase().includes(q) ||
+          (b.excerpt && b.excerpt.toLowerCase().includes(q)) ||
+          (b.content && b.content.toLowerCase().includes(q))
+      );
+    }
+
+    res.json({
+      success: true,
+      total: results.length,
+      data: results,
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
   }
-
-  if (category && category !== "all") {
-    results = results.filter((b) => b.category.toLowerCase() === category.toLowerCase());
-  }
-
-  if (q) {
-    results = results.filter(
-      (b) =>
-        b.title.toLowerCase().includes(q) ||
-        b.slug.toLowerCase().includes(q) ||
-        (b.excerpt && b.excerpt.toLowerCase().includes(q)) ||
-        (b.content && b.content.toLowerCase().includes(q))
-    );
-  }
-
-  res.json({
-    success: true,
-    total: results.length,
-    data: results,
-  });
 });
 
 /**
  * GET /api/blogs/:slug
  * Fetch single article by slug
  */
-blogsRouter.get("/:slug", (req: Request, res: Response) => {
-  const slug = String(req.params.slug).toLowerCase();
-  const blog = inMemoryBlogs.find((b) => b.slug.toLowerCase() === slug);
+blogsRouter.get("/:slug", async (req: Request, res: Response) => {
+  try {
+    const slug = String(req.params.slug).toLowerCase();
+    const blog = await blogsDb.getBlogBySlug(slug);
 
-  if (!blog) {
-    res.status(404).json({ success: false, error: `Blog post '${slug}' not found.` });
-    return;
+    if (!blog) {
+      res.status(404).json({ success: false, error: `Blog post '${slug}' not found.` });
+      return;
+    }
+
+    // Increment view counter asynchronously
+    blogsDb.incrementViews(slug).catch((e) => console.warn("[Blog View Count Warning]:", e.message));
+    blog.views = (blog.views || 0) + 1;
+
+    res.json({ success: true, data: blog });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
   }
-
-  // Increment view counter
-  blog.views = (blog.views || 0) + 1;
-  saveBlogs(inMemoryBlogs);
-
-  res.json({ success: true, data: blog });
 });
 
 /**
  * POST /api/blogs
  * Create new blog article
  */
-blogsRouter.post("/", requireAdminAuth, (req: Request, res: Response) => {
+blogsRouter.post("/", requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const {
       title,
@@ -232,10 +241,10 @@ blogsRouter.post("/", requireAdminAuth, (req: Request, res: Response) => {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
 
-    // Check slug collision
+    const allBlogs = await blogsDb.getBlogs(true);
     let finalSlug = baseSlug;
     let counter = 1;
-    while (inMemoryBlogs.some((b) => b.slug === finalSlug)) {
+    while (allBlogs.some((b) => b.slug === finalSlug)) {
       finalSlug = `${baseSlug}-${counter++}`;
     }
 
@@ -257,10 +266,8 @@ blogsRouter.post("/", requireAdminAuth, (req: Request, res: Response) => {
       views: 0,
     };
 
-    inMemoryBlogs.unshift(newBlog);
-    saveBlogs(inMemoryBlogs);
-
-    res.status(201).json({ success: true, data: newBlog, message: "Blog post published successfully!" });
+    const savedBlog = await blogsDb.createBlog(newBlog);
+    res.status(201).json({ success: true, data: savedBlog, message: "Blog post published successfully!" });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -270,21 +277,18 @@ blogsRouter.post("/", requireAdminAuth, (req: Request, res: Response) => {
  * PUT /api/blogs/:slug
  * Update existing article
  */
-blogsRouter.put("/:slug", requireAdminAuth, (req: Request, res: Response) => {
+blogsRouter.put("/:slug", requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const slug = String(req.params.slug).toLowerCase();
-    const index = inMemoryBlogs.findIndex((b) => b.slug.toLowerCase() === slug);
+    const existing = await blogsDb.getBlogBySlug(slug);
 
-    if (index === -1) {
+    if (!existing) {
       res.status(404).json({ success: false, error: `Blog post '${slug}' not found.` });
       return;
     }
 
-    const existing = inMemoryBlogs[index];
     const b = req.body || {};
-
-    const updatedBlog: BlogPost = {
-      ...existing,
+    const updatedFields: Partial<BlogPost> = {
       title: b.title !== undefined ? b.title.trim() : existing.title,
       category: b.category !== undefined ? b.category : existing.category,
       author: b.author !== undefined ? b.author : existing.author,
@@ -295,20 +299,13 @@ blogsRouter.put("/:slug", requireAdminAuth, (req: Request, res: Response) => {
       excerpt: b.shortDescription !== undefined ? b.shortDescription : existing.excerpt,
       content: b.content !== undefined ? b.content : existing.content,
       status: b.status !== undefined ? b.status : existing.status,
-      updatedAt: new Date().toISOString(),
     };
 
-    // Handle slug change if provided and different
     if (b.slug && b.slug.trim().toLowerCase() !== existing.slug) {
-      const newSlug = b.slug.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
-      if (!inMemoryBlogs.some((item) => item.slug === newSlug && item.id !== existing.id)) {
-        updatedBlog.slug = newSlug;
-      }
+      updatedFields.slug = b.slug.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
     }
 
-    inMemoryBlogs[index] = updatedBlog;
-    saveBlogs(inMemoryBlogs);
-
+    const updatedBlog = await blogsDb.updateBlog(existing.id, updatedFields);
     res.json({ success: true, data: updatedBlog, message: "Blog post updated successfully!" });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
@@ -319,18 +316,17 @@ blogsRouter.put("/:slug", requireAdminAuth, (req: Request, res: Response) => {
  * DELETE /api/blogs/:slug
  * Delete article
  */
-blogsRouter.delete("/:slug", requireAdminAuth, (req: Request, res: Response) => {
+blogsRouter.delete("/:slug", requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const slug = String(req.params.slug).toLowerCase();
-    const initialLen = inMemoryBlogs.length;
-    inMemoryBlogs = inMemoryBlogs.filter((b) => b.slug.toLowerCase() !== slug);
+    const existing = await blogsDb.getBlogBySlug(slug);
 
-    if (inMemoryBlogs.length === initialLen) {
+    if (!existing) {
       res.status(404).json({ success: false, error: `Blog post '${slug}' not found.` });
       return;
     }
 
-    saveBlogs(inMemoryBlogs);
+    await blogsDb.deleteBlog(existing.id);
     res.json({ success: true, message: `Blog post '${slug}' removed.` });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });

@@ -16,6 +16,7 @@ import {
 import { STORES_DB } from "../../src/lib/server-data/stores-db.js";
 import { globalCache } from "../../src/lib/services/cache-service.js";
 import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
+import { submissionsDb, dealsDb, getDatabaseDiagnostics } from "../services/db.js";
 
 export const adminRouter = Router();
 
@@ -616,7 +617,7 @@ export interface StoredSubmission {
   expiryDate?: string;
   email?: string;
   submittedAt: string;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "approved" | "rejected" | "verified";
   rejectionReason?: string;
   approvedDealId?: string;
 }
@@ -673,6 +674,20 @@ export function recordNewSubmission(sub: Omit<StoredSubmission, "id" | "submitte
   };
   submissions.unshift(newSub);
   saveJson(SUBMISSIONS_FILE, submissions);
+
+  // Asynchronously persist to PostgreSQL cloud database
+  submissionsDb
+    .createSubmission({
+      storeName: sub.storeName,
+      code: sub.code,
+      discount: sub.discount,
+      category: sub.category,
+      url: sub.url,
+      terms: sub.terms,
+      email: sub.email,
+    })
+    .catch((err) => console.warn("[Admin Submissions DB Warning]:", err.message));
+
   return newSub;
 }
 
@@ -680,10 +695,14 @@ export function recordNewSubmission(sub: Omit<StoredSubmission, "id" | "submitte
  * GET /api/admin/submissions
  * Retrieve submitted community coupons with optional status filter
  */
-adminRouter.get("/submissions", (req: Request, res: Response) => {
+adminRouter.get("/submissions", async (req: Request, res: Response) => {
   const status = (req.query.status as string || "").toLowerCase();
   const q = (req.query.q as string || "").toLowerCase().trim();
-  let submissions = loadJson(SUBMISSIONS_FILE, defaultSubmissions);
+
+  let submissions: StoredSubmission[] = (await submissionsDb.getSubmissions()) as any;
+  if (!submissions || submissions.length === 0) {
+    submissions = loadJson(SUBMISSIONS_FILE, defaultSubmissions);
+  }
 
   if (status && status !== "all") {
     submissions = submissions.filter((s) => s.status === status);
@@ -699,12 +718,13 @@ adminRouter.get("/submissions", (req: Request, res: Response) => {
     );
   }
 
-  const all = loadJson(SUBMISSIONS_FILE, defaultSubmissions);
+  const all: StoredSubmission[] = (await submissionsDb.getSubmissions()) as any;
+  const allList = all && all.length > 0 ? all : loadJson(SUBMISSIONS_FILE, defaultSubmissions);
   const counts = {
-    all: all.length,
-    pending: all.filter((s) => s.status === "pending").length,
-    approved: all.filter((s) => s.status === "approved").length,
-    rejected: all.filter((s) => s.status === "rejected").length,
+    all: allList.length,
+    pending: allList.filter((s) => s.status === "pending").length,
+    approved: allList.filter((s) => s.status === "approved").length,
+    rejected: allList.filter((s) => s.status === "rejected").length,
   };
 
   res.json({
@@ -717,10 +737,10 @@ adminRouter.get("/submissions", (req: Request, res: Response) => {
 
 /**
  * POST /api/admin/submissions/:id/approve
- * Approve user submission and automatically inject it into the live deals pool
+ * Approve user submission and automatically inject it into the live deals pool & database
  */
 adminRouter.post("/submissions/:id/approve", requireAdminAuth, async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const id = String(req.params.id);
   const submissions = loadJson(SUBMISSIONS_FILE, defaultSubmissions);
   const idx = submissions.findIndex((s) => s.id === id);
 
@@ -761,11 +781,13 @@ adminRouter.post("/submissions/:id/approve", requireAdminAuth, async (req: Reque
   };
 
   addDealToPool(newDeal as any);
+  await dealsDb.upsertDeals([newDeal as any]);
   await globalCache.deletePrefix("deals:");
 
   sub.status = "approved";
   sub.approvedDealId = dealId;
   saveJson(SUBMISSIONS_FILE, submissions);
+  await submissionsDb.updateStatus(id, "approved");
 
   res.json({
     success: true,
@@ -779,8 +801,8 @@ adminRouter.post("/submissions/:id/approve", requireAdminAuth, async (req: Reque
  * POST /api/admin/submissions/:id/reject
  * Reject user submission with optional reason
  */
-adminRouter.post("/submissions/:id/reject", requireAdminAuth, (req: Request, res: Response) => {
-  const { id } = req.params;
+adminRouter.post("/submissions/:id/reject", requireAdminAuth, async (req: Request, res: Response) => {
+  const id = String(req.params.id);
   const { reason } = req.body || {};
   const submissions = loadJson(SUBMISSIONS_FILE, defaultSubmissions);
   const idx = submissions.findIndex((s) => s.id === id);
@@ -790,9 +812,11 @@ adminRouter.post("/submissions/:id/reject", requireAdminAuth, (req: Request, res
     return;
   }
 
+  const finalReason = reason || "Expired or invalid coupon code format.";
   submissions[idx].status = "rejected";
-  submissions[idx].rejectionReason = reason || "Expired or invalid coupon code format.";
+  submissions[idx].rejectionReason = finalReason;
   saveJson(SUBMISSIONS_FILE, submissions);
+  await submissionsDb.updateStatus(id, "rejected", finalReason);
 
   res.json({
     success: true,
@@ -806,7 +830,7 @@ adminRouter.post("/submissions/:id/reject", requireAdminAuth, (req: Request, res
  * Edit submission fields before approving
  */
 adminRouter.put("/submissions/:id", requireAdminAuth, (req: Request, res: Response) => {
-  const { id } = req.params;
+  const id = String(req.params.id);
   const submissions = loadJson(SUBMISSIONS_FILE, defaultSubmissions);
   const idx = submissions.findIndex((s) => s.id === id);
 
@@ -840,8 +864,8 @@ adminRouter.put("/submissions/:id", requireAdminAuth, (req: Request, res: Respon
  * DELETE /api/admin/submissions/:id
  * Remove submission
  */
-adminRouter.delete("/submissions/:id", requireAdminAuth, (req: Request, res: Response) => {
-  const { id } = req.params;
+adminRouter.delete("/submissions/:id", requireAdminAuth, async (req: Request, res: Response) => {
+  const id = String(req.params.id);
   let submissions = loadJson(SUBMISSIONS_FILE, defaultSubmissions);
   const initialLen = submissions.length;
   submissions = submissions.filter((s) => s.id !== id);
@@ -852,6 +876,24 @@ adminRouter.delete("/submissions/:id", requireAdminAuth, (req: Request, res: Res
   }
 
   saveJson(SUBMISSIONS_FILE, submissions);
+  await submissionsDb.deleteSubmission(id);
   res.json({ success: true, message: `Submission '${id}' deleted.` });
 });
+
+/**
+ * GET /api/admin/database
+ * Live database connection health, engine diagnostics & table metrics.
+ */
+adminRouter.get("/database", requireAdminAuth, async (_req: Request, res: Response) => {
+  try {
+    const diagnostics = await getDatabaseDiagnostics();
+    res.json({
+      success: true,
+      diagnostics,
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 

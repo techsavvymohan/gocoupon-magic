@@ -36,6 +36,7 @@ import {
   deleteDealFromPool,
 } from "../services/providers/cuelinks-client.js";
 import { recordNewSubmission, requireAdminAuth } from "./admin.js";
+import { dealsDb, submissionsDb } from "../services/db.js";
 
 export const dealsRouter = Router();
 
@@ -169,6 +170,7 @@ dealsRouter.post("/submit", async (req: Request, res: Response) => {
       usesCount: 50,
     };
     addDealToPool(newDeal);
+    dealsDb.upsertDeals([newDeal]).catch((e) => console.warn("[Deals DB Upsert Warning]:", e.message));
     await globalCache.deletePrefix("deals:");
 
     res.status(201).json({
@@ -184,14 +186,22 @@ dealsRouter.post("/submit", async (req: Request, res: Response) => {
 
 /**
  * GET /api/deals/submissions
- * Retrieves community coupon submissions.
+ * Retrieves community coupon submissions from PostgreSQL / local cache.
  */
-dealsRouter.get("/submissions", (_req: Request, res: Response) => {
-  const submissions = getUserCouponSubmissions();
-  res.json({
-    total: submissions.length,
-    submissions,
-  });
+dealsRouter.get("/submissions", async (_req: Request, res: Response) => {
+  try {
+    const submissions = await submissionsDb.getSubmissions();
+    res.json({
+      total: submissions.length,
+      submissions,
+    });
+  } catch (err: any) {
+    const fallback = getUserCouponSubmissions();
+    res.json({
+      total: fallback.length,
+      submissions: fallback,
+    });
+  }
 });
 
 /**
@@ -300,6 +310,10 @@ async function handleSync(req: Request, res: Response) {
     const pages = parseInt(req.query.pages as string, 10) || 0;
     const result = await syncLiveCuelinksDeals(pages);
     await globalCache.deletePrefix("deals:");
+    // Sync to PostgreSQL cloud database in background
+    dealsDb
+      .upsertDeals(getLiveDealsPool())
+      .catch((e) => console.warn("[Deals Live Pool Cloud Sync Warning]:", e.message));
     res.json({
       success: true,
       message: `24/7 sync completed. ${result.activeCount} active deals ingested, ${result.expiredCount} expired pruned.`,

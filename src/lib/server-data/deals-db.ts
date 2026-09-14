@@ -106,7 +106,7 @@ export interface UserCouponSubmission {
   category?: string;
   email?: string;
   submittedAt: string;
-  status: "pending" | "verified" | "rejected";
+  status: "pending" | "verified" | "approved" | "rejected";
 }
 
 const userSubmissionsPool: UserCouponSubmission[] = [];
