@@ -78,9 +78,16 @@ export function UrlResolverSearch({
   const [isResolving, setIsResolving] = useState(false);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
 
+  // Focus and submission guard refs
+  const [isFocused, setIsFocused] = useState(false);
+  const isFocusedRef = useRef(false);
+  const justSubmittedRef = useRef(false);
+
   // Sync internal query state if initialQuery changes from external navigation
   useEffect(() => {
     if (initialQuery !== undefined) {
+      justSubmittedRef.current = true;
+      setShowDropdown(false);
       setQuery(initialQuery);
     }
   }, [initialQuery]);
@@ -100,12 +107,12 @@ export function UrlResolverSearch({
 
   // Rotate placeholder text every 3.2s when input is empty and not focused
   useEffect(() => {
-    if (placeholder || query) return;
+    if (placeholder || query || isFocused) return;
     const interval = setInterval(() => {
       setPlaceholderIndex((prev) => (prev + 1) % ROTATING_PLACEHOLDERS.length);
     }, 3200);
     return () => clearInterval(interval);
-  }, [placeholder, query]);
+  }, [placeholder, query, isFocused]);
 
   const activePlaceholder = placeholder || ROTATING_PLACEHOLDERS[placeholderIndex];
 
@@ -114,6 +121,8 @@ export function UrlResolverSearch({
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setShowDropdown(false);
+        setIsFocused(false);
+        isFocusedRef.current = false;
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -122,6 +131,18 @@ export function UrlResolverSearch({
 
   // Live Query, Store Priority Matching & Catalog Fetcher
   useEffect(() => {
+    // If just submitted or not focused by user, do not reopen dropdown
+    if (justSubmittedRef.current) {
+      justSubmittedRef.current = false;
+      setShowDropdown(false);
+      return;
+    }
+
+    if (!isFocusedRef.current) {
+      setShowDropdown(false);
+      return;
+    }
+
     const trimmed = query.trim();
     if (trimmed.length < 2) {
       setMatchedStores([]);
@@ -139,7 +160,7 @@ export function UrlResolverSearch({
       fetch(`/api/open-food-fact/compare/${cleanBarcode}`)
         .then((r) => r.json())
         .then((data) => {
-          if (data.success && data.data) {
+          if (data.success && data.data && isFocusedRef.current && !justSubmittedRef.current) {
             setFoodComparison(data.data);
             setShowDropdown(true);
           } else {
@@ -154,7 +175,7 @@ export function UrlResolverSearch({
     // 1. Instant local store matching (<1ms) — comes ON TOP
     const storeHits = findMatchingStores(trimmed, 3);
     setMatchedStores(storeHits);
-    if (storeHits.length > 0) {
+    if (storeHits.length > 0 && isFocusedRef.current && !justSubmittedRef.current) {
       setShowDropdown(true);
     }
 
@@ -186,7 +207,12 @@ export function UrlResolverSearch({
 
         setSearxngSuggestions(suggestions.slice(0, 6));
 
-        if (storeHits.length > 0 || suggestions.length > 0) {
+        // Only open if user is still actively focused and hasn't submitted
+        if (
+          isFocusedRef.current &&
+          !justSubmittedRef.current &&
+          (storeHits.length > 0 || suggestions.length > 0)
+        ) {
           setShowDropdown(true);
         }
       } catch {
@@ -206,7 +232,15 @@ export function UrlResolverSearch({
       const trimmed = searchQuery.trim();
       if (!trimmed) return;
 
+      justSubmittedRef.current = true;
+      isFocusedRef.current = false;
+      setIsFocused(false);
       setShowDropdown(false);
+      setSelectedIndex(-1);
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+      inputRef.current?.blur();
 
       if (onSearchSubmit) {
         onSearchSubmit(trimmed);
@@ -223,9 +257,17 @@ export function UrlResolverSearch({
 
   const handleInstantOpen = useCallback(
     (store: RegisteredStore, openWindow = true) => {
+      justSubmittedRef.current = true;
+      isFocusedRef.current = false;
+      setIsFocused(false);
+      setShowDropdown(false);
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+      inputRef.current?.blur();
+
       const affUrl = buildStoreAffiliateUrl(store, "gocoupon_instant_search");
       toast.success(`Opening ${store.name} with GoCoupon Cuelinks auto-savings!`);
-      setShowDropdown(false);
       if (openWindow) {
         window.open(affUrl, "_blank", "noopener,noreferrer");
       }
@@ -235,6 +277,15 @@ export function UrlResolverSearch({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    justSubmittedRef.current = true;
+    isFocusedRef.current = false;
+    setIsFocused(false);
+    setShowDropdown(false);
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    inputRef.current?.blur();
+
     if (showDropdown && selectedIndex >= 0) {
       // 1. Selected Store Hit
       if (selectedIndex < matchedStores.length) {
@@ -331,7 +382,22 @@ export function UrlResolverSearch({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => {
-            if (query.trim().length >= 2) setShowDropdown(true);
+            setIsFocused(true);
+            isFocusedRef.current = true;
+            justSubmittedRef.current = false;
+            if (
+              query.trim().length >= 2 &&
+              (matchedStores.length > 0 || searxngSuggestions.length > 0 || foodComparison)
+            ) {
+              setShowDropdown(true);
+            }
+          }}
+          onBlur={() => {
+            setTimeout(() => {
+              setIsFocused(false);
+              isFocusedRef.current = false;
+              setShowDropdown(false);
+            }, 180);
           }}
           onKeyDown={handleKeyDown}
           placeholder={activePlaceholder}
@@ -618,7 +684,24 @@ export function UrlResolverSearch({
                         key={suggestion}
                         role="option"
                         aria-selected={isSelected}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          justSubmittedRef.current = true;
+                          isFocusedRef.current = false;
+                          setIsFocused(false);
+                          setShowDropdown(false);
+                          if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+                          inputRef.current?.blur();
+                          setQuery(suggestion);
+                          handleExecuteSearch(suggestion);
+                        }}
                         onClick={() => {
+                          justSubmittedRef.current = true;
+                          isFocusedRef.current = false;
+                          setIsFocused(false);
+                          setShowDropdown(false);
+                          if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+                          inputRef.current?.blur();
                           setQuery(suggestion);
                           handleExecuteSearch(suggestion);
                         }}
