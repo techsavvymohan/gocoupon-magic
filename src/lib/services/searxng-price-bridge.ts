@@ -12,7 +12,7 @@
  */
 
 import { searchSearXNG, type SearXNGResult, type SearXNGResponse } from "./searxng-service";
-import { matchProductEntities } from "./entity-matcher";
+import { matchProductEntities, isAccessoryTitle, filterPriceOutliers } from "./entity-matcher";
 import {
   normalizeCommerceCategory,
   type ProductOffer,
@@ -208,7 +208,7 @@ export async function bridgeSearXNGPriceOffers(
   let response: SearXNGResponse = await searchSearXNG(trimmed, {
     categories: "shopping",
     language: "en-IN",
-    timeoutMs: 4000,
+    timeoutMs: 10000,
   });
 
   // 2. If 0 shopping results, fallback to targeted merchant query
@@ -217,7 +217,7 @@ export async function bridgeSearXNGPriceOffers(
     response = await searchSearXNG(targetedQuery, {
       categories: "general",
       language: "en-IN",
-      timeoutMs: 3500,
+      timeoutMs: 8000,
     });
   }
 
@@ -228,6 +228,18 @@ export async function bridgeSearXNGPriceOffers(
   for (const item of rawResults) {
     if (!item.url || !item.title) continue;
 
+    // Relevance verification: ensure item title shares tokens with query
+    const cleanQuery = trimmed.toLowerCase().replace(/[^a-z0-9\s]/g, " ").trim();
+    const queryTokens = cleanQuery.split(/\s+/).filter((w) => w.length >= 3);
+    if (queryTokens.length > 0 && !queryTokens.some((t) => item.title.toLowerCase().includes(t))) {
+      continue;
+    }
+
+    // Accuracy: Filter out accessories (case, cover, protector) when not explicitly queried
+    if (isAccessoryTitle(item.title, trimmed)) {
+      continue;
+    }
+
     // Check variant conflict if reference SKU is provided
     if (options.referenceSku) {
       const matchCheck = matchProductEntities(options.referenceSku, item.title);
@@ -236,17 +248,28 @@ export async function bridgeSearXNGPriceOffers(
       }
     }
 
-    // Extract price from SearXNG native price field or title/content text
-    let priceData = parseExtractedPrice(item.price);
-    if (!priceData) {
-      priceData = parseExtractedPrice(item.content) || parseExtractedPrice(item.title);
+    let itemPrice = 0;
+    let currency: "INR" | "USD" | "EUR" = "INR";
+    if (item.price_intelligence?.amount) {
+      itemPrice = item.price_intelligence.amount;
+      if (item.price_intelligence.currency === "USD" || item.price_intelligence.currency === "EUR") {
+        currency = item.price_intelligence.currency;
+      }
+    } else {
+      let priceData = parseExtractedPrice(item.price);
+      if (!priceData) {
+        priceData = parseExtractedPrice(item.content) || parseExtractedPrice(item.title);
+      }
+      if (priceData) {
+        itemPrice = priceData.price;
+        currency = priceData.currency;
+      }
     }
 
-    // If still no price found, construct a realistic estimate anchored on query tier
-    const itemPrice = priceData ? priceData.price : 0;
     if (itemPrice <= 0) continue; // Skip zero-price listings to maintain honest pricing
 
     const storeMeta = resolveStoreIdentity(item.url, item.engine);
+    const storeName = item.merchant || item.price_intelligence?.merchant || storeMeta.storeName;
 
     // Apply GoCoupon Category-Aware Cashback tiering
     let cashbackRatePct = 1.5;
@@ -265,8 +288,8 @@ export async function bridgeSearXNGPriceOffers(
     normalizedOffers.push({
       id: `searx_${Math.random().toString(36).slice(2, 9)}`,
       storeId: storeMeta.storeId,
-      storeName: storeMeta.storeName,
-      storeLogo: storeMeta.storeLogo,
+      storeName,
+      storeLogo: item.thumbnail || storeMeta.storeLogo,
       productTitle: item.title,
       url: storeMeta.affiliateUrl,
       originalPrice,
@@ -287,8 +310,11 @@ export async function bridgeSearXNGPriceOffers(
     if (normalizedOffers.length >= limit) break;
   }
 
+  // Accuracy: Filter extreme price outliers (e.g. ₹212 covers or erroneous 10x prices)
+  const cleanOffers = filterPriceOutliers(normalizedOffers);
+
   // Sort primarily by out-of-pocket guaranteed checkout price (honest pricing)
-  return normalizedOffers.sort((a, b) => a.guaranteedCheckoutPrice - b.guaranteedCheckoutPrice);
+  return cleanOffers.sort((a, b) => a.guaranteedCheckoutPrice - b.guaranteedCheckoutPrice);
 }
 
 /**

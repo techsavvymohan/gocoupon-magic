@@ -6,14 +6,13 @@
  */
 
 import { Router, type Request, type Response } from "express";
-import { resolveProduct } from "../../src/lib/services/product-resolver.js";
 import {
-  compareProductOffers,
   type ComparisonRow,
   type ProductComparisonSummary,
 } from "../../src/lib/services/comparison-engine.js";
 import type { MerchantOffer } from "../../src/lib/services/canonical-types.js";
 import { searchAllStoresConcurrent } from "../../src/lib/services/multi-store-connectors.js";
+import { filterPriceOutliers } from "../../src/lib/services/entity-matcher.js";
 import { resolveLiveUrlAndCompetitors } from "../../src/lib/services/url-metadata-extractor.js";
 import { recordPriceSnapshot } from "../../src/lib/services/price-tracking-storage.js";
 import { globalCache } from "../../src/lib/services/cache-service.js";
@@ -65,62 +64,6 @@ compareRouter.get("/", async (req: Request, res: Response) => {
     const cueOffers = await fetchCuelinksCoupons({ limit: 40 });
     liveCuelinksCoupons = cueOffers.map(normalizeCuelinksToStoreCoupon);
   } catch {}
-
-  // 1. Try resolving locally from canonical seed catalog first
-  let targetProductId = productId;
-  if (!targetProductId && rawQuery && !isUrl) {
-    const resolved = resolveProduct(rawQuery);
-    if (resolved) {
-      targetProductId = resolved.product.id;
-    }
-  }
-
-  if (targetProductId && targetProductId.startsWith("prod_")) {
-    const comparison = compareProductOffers(targetProductId);
-    if (comparison) {
-      const geo = resolveGeoProfile(req.headers);
-      comparison.rows = comparison.rows.map((r) => {
-        const stack = calculateStackedSavings({
-          storeName: r.storeName,
-          stickerPrice: r.itemPrice,
-          currency: geo.currency,
-          region: geo.region,
-          availableCoupons: liveCuelinksCoupons,
-        });
-        const bestCouponCode = stack.coupon.applied ? stack.coupon.code : r.bestCouponCode;
-        const couponSavings = Math.max(r.couponSavings, stack.coupon.discountAmount);
-
-        return {
-          ...r,
-          bestCouponCode: bestCouponCode || undefined,
-          couponSavings,
-          effectiveNetPrice: stack.trueNetLandedCost,
-          condition: "NEW",
-          stack,
-        };
-      });
-      comparison.geo = geo;
-      comparison.dealHonesty = evaluateDealHonesty({
-        currentPrice: comparison.bestDeal?.itemPrice || 25000,
-        claimedOriginalPrice: Math.round((comparison.bestDeal?.itemPrice || 25000) * 1.25),
-      });
-
-      if (comparison.bestDeal) {
-        recordPriceSnapshot(
-          targetProductId,
-          targetProductId,
-          comparison.bestDeal.storeName,
-          comparison.bestDeal.itemPrice,
-          comparison.bestDeal.effectiveNetPrice,
-          comparison.bestDeal.bestCouponCode
-        ).catch(() => {});
-      }
-
-      res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
-      res.json(comparison);
-      return;
-    }
-  }
 
   // 2. Handle Live Pasted Product URL (Cheerio + SERP API)
   if (isUrl) {
@@ -208,18 +151,35 @@ compareRouter.get("/", async (req: Request, res: Response) => {
   }
 
   // 3. Concurrent Multi-Store Live Search
-  const searchQuery = rawQuery || productId || "Sony WH-1000XM5";
+  const searchQuery = (rawQuery || productId || "").trim();
+  if (!searchQuery) {
+    res.json({
+      productId: "empty",
+      rows: [],
+      bestDeal: undefined,
+      maxSavings: 0,
+      storesComparedCount: 0,
+      unavailableStores: [],
+      geo: resolveGeoProfile(req.headers),
+    });
+    return;
+  }
 
   try {
     const { offers, bestDeal, maxSavings, totalStoresFound, unavailableStores } =
       await searchAllStoresConcurrent(searchQuery);
 
     if (totalStoresFound === 0) {
-      const fallbackComp = compareProductOffers("prod_sony_wh1000xm5");
-      if (fallbackComp) {
-        fallbackComp.unavailableStores = unavailableStores;
-      }
-      res.json(fallbackComp);
+      res.json({
+        productId: `empty_${encodeURIComponent(searchQuery).slice(0, 30)}`,
+        productTitle: searchQuery,
+        rows: [],
+        bestDeal: undefined,
+        maxSavings: 0,
+        storesComparedCount: 0,
+        unavailableStores: unavailableStores || [],
+        geo: resolveGeoProfile(req.headers),
+      });
       return;
     }
 
@@ -291,24 +251,29 @@ compareRouter.get("/", async (req: Request, res: Response) => {
 
     // Sort by true net landed cost ascending
     formattedRows.sort((a, b) => a.effectiveNetPrice - b.effectiveNetPrice);
-    if (formattedRows.length > 0) {
-      formattedRows[0].isBestDeal = true;
-      formattedRows[0].offer.isBestPrice = true;
-      const highestPrice = Math.max(...formattedRows.map((r) => r.itemPrice));
-      for (const row of formattedRows) {
+
+    // Accuracy: Statistical outlier removal
+    const cleanRows = filterPriceOutliers(formattedRows);
+    const finalRows = cleanRows.length >= 2 ? cleanRows : formattedRows;
+
+    if (finalRows.length > 0) {
+      finalRows[0].isBestDeal = true;
+      finalRows[0].offer.isBestPrice = true;
+      const highestPrice = Math.max(...finalRows.map((r) => r.itemPrice));
+      for (const row of finalRows) {
         row.savingsVsWorst = Math.max(0, highestPrice - row.effectiveNetPrice);
       }
     }
 
-    const lowestPrice = formattedRows[0]?.itemPrice || 25000;
+    const lowestPrice = finalRows[0]?.itemPrice || (finalRows[0]?.effectiveNetPrice ?? 0);
     const geo = resolveGeoProfile(req.headers);
 
     const responsePayload: ProductComparisonSummary = {
       productId: canonicalId,
-      rows: formattedRows,
-      bestDeal: formattedRows[0],
+      rows: finalRows,
+      bestDeal: finalRows[0],
       maxSavings,
-      storesComparedCount: formattedRows.length,
+      storesComparedCount: finalRows.length,
       unavailableStores: unavailableStores || [],
       dealHonesty: evaluateDealHonesty({
         currentPrice: lowestPrice,
@@ -317,7 +282,7 @@ compareRouter.get("/", async (req: Request, res: Response) => {
       geo,
     };
 
-    if (cacheKey.length > 10) {
+    if (cacheKey.length > 10 && finalRows.length > 0) {
       await globalCache.set(cacheKey, responsePayload, 5 * 60 * 1000);
     }
 
@@ -325,7 +290,15 @@ compareRouter.get("/", async (req: Request, res: Response) => {
     res.json(responsePayload);
   } catch (err) {
     console.error("Multi-store search error in compare.ts:", err);
-    const fallbackComp = compareProductOffers("prod_sony_wh1000xm5");
-    res.json(fallbackComp);
+    res.json({
+      productId: `error_${encodeURIComponent(searchQuery || "search").slice(0, 30)}`,
+      productTitle: searchQuery || "Product",
+      rows: [],
+      bestDeal: undefined,
+      maxSavings: 0,
+      storesComparedCount: 0,
+      unavailableStores: [],
+      geo: resolveGeoProfile(req.headers),
+    });
   }
 });

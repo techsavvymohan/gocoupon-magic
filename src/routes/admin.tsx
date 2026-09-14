@@ -406,18 +406,6 @@ function AdminLoginScreen({ onLoginSuccess }: { onLoginSuccess: () => void }) {
     }
   };
 
-  const handleQuickUnlock = async () => {
-    setEmail("admin@gocoupon.io");
-    setPassword("admin");
-    setLoading(true);
-    const res = await login("admin@gocoupon.io", "admin");
-    setLoading(false);
-    if (res.success) {
-      toast.success("Unlocked GoCoupon Admin as Super Administrator!");
-      onLoginSuccess();
-    }
-  };
-
   return (
     <div className="min-h-screen grid place-items-center bg-zinc-950 p-4 text-white">
       <div className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-900/90 p-8 shadow-2xl backdrop-blur-xl">
@@ -471,16 +459,6 @@ function AdminLoginScreen({ onLoginSuccess }: { onLoginSuccess: () => void }) {
             {loading ? "Authenticating..." : "Sign In to Admin Panel"}
           </Button>
         </form>
-
-        <div className="mt-6 pt-6 border-t border-zinc-800/80 text-center">
-          <button
-            type="button"
-            onClick={handleQuickUnlock}
-            className="text-xs text-blue-400 hover:text-blue-300 font-semibold cursor-pointer underline underline-offset-2"
-          >
-            Quick Unlock (Demo Super-Admin)
-          </button>
-        </div>
       </div>
     </div>
   );

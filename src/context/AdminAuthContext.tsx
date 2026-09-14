@@ -14,37 +14,44 @@ export interface AdminUser {
   permissions: string[];
 }
 
+export function getAdminAuthHeaders(): Record<string, string> {
+  try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("gocoupon_admin_token") : null;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+}
+
 export interface AdminAuthContextType {
   user: AdminUser | null;
   isAuthenticated: boolean;
+  token: string | null;
   login: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
+  getAuthHeaders: () => Record<string, string>;
   session: { data: { user: AdminUser | null } | null; status: "authenticated" | "unauthenticated" | "loading" };
 }
 
-const STORAGE_KEY = "gocoupon_admin_session_v2";
-
-const DEFAULT_SUPERADMIN: AdminUser = {
-  id: "admin-1",
-  name: "GoCoupon Admin",
-  email: "admin@gocoupon.io",
-  role: "admin",
-  permissions: getPermissionsForRole("admin"),
-};
+const STORAGE_KEY = "gocoupon_admin_session_v3";
+const TOKEN_KEY = "gocoupon_admin_token";
 
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
 
 export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AdminUser | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
+      const savedUser = localStorage.getItem(STORAGE_KEY);
+      const savedToken = localStorage.getItem(TOKEN_KEY);
+      if (savedUser && savedToken) {
+        const parsed = JSON.parse(savedUser);
         if (parsed && parsed.email) {
           setUser(parsed);
+          setToken(savedToken);
         }
       }
     } catch {
@@ -52,51 +59,72 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
+
+    // Automatically inject Bearer token into all /api/admin fetch requests made while in Admin suite
+    const originalFetch = window.fetch;
+    window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === "string" ? input : input instanceof URL ? input.href : (input as Request).url;
+      if (typeof url === "string" && url.includes("/api/admin") && !url.includes("/api/admin/login")) {
+        const currentToken = localStorage.getItem(TOKEN_KEY);
+        if (currentToken) {
+          const headers = new Headers(init?.headers || {});
+          if (!headers.has("Authorization")) {
+            headers.set("Authorization", `Bearer ${currentToken}`);
+          }
+          init = { ...init, headers };
+        }
+      }
+      return originalFetch(input, init);
+    };
+
+    return () => {
+      window.fetch = originalFetch;
+    };
   }, []);
 
   const login = async (email: string, pass: string) => {
     const cleanEmail = email.trim().toLowerCase();
     const cleanPass = pass.trim();
 
-    // Verification against local default or server users
-    if (
-      (cleanEmail === "admin@gocoupon.io" || cleanEmail === "admin") &&
-      (cleanPass === "admin" || cleanPass === "admin123" || cleanPass === "gocoupon2026")
-    ) {
-      setUser(DEFAULT_SUPERADMIN);
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_SUPERADMIN));
-      } catch {}
-      return { success: true };
+    if (!cleanEmail || !cleanPass) {
+      return { success: false, error: "Please enter both email and password." };
     }
 
-    // Try server verification if configured
     try {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: cleanEmail, password: cleanPass }),
       });
-      if (res.ok) {
-        const payload = await res.json();
-        if (payload?.user) {
-          setUser(payload.user);
-          try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(payload.user));
-          } catch {}
-          return { success: true };
-        }
+      const data = await res.json();
+      if (res.ok && data.success && data.user) {
+        setUser(data.user);
+        setToken(data.token || null);
+        try {
+          if (data.token) {
+            localStorage.setItem(TOKEN_KEY, data.token);
+          }
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data.user));
+        } catch {}
+        return { success: true };
       }
-    } catch {}
-
-    return { success: false, error: "Invalid admin email or password." };
+      return { success: false, error: data.error || "Invalid admin credentials." };
+    } catch {
+      return { success: false, error: "Unable to connect to authentication server." };
+    }
   };
 
   const logout = () => {
     setUser(null);
+    setToken(null);
     try {
       localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(TOKEN_KEY);
     } catch {}
+  };
+
+  const getAuthHeaders = () => {
+    return token ? { Authorization: `Bearer ${token}` } : getAdminAuthHeaders();
   };
 
   const session = {
@@ -105,7 +133,17 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AdminAuthContext.Provider value={{ user, isAuthenticated: Boolean(user), login, logout, session }}>
+    <AdminAuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: Boolean(user),
+        token,
+        login,
+        logout,
+        getAuthHeaders,
+        session,
+      }}
+    >
       {children}
     </AdminAuthContext.Provider>
   );

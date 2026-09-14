@@ -119,6 +119,60 @@ export function extractAttributes(title: string): ExtractedProductAttributes {
   return attrs;
 }
 
+export const ACCESSORY_KEYWORDS = [
+  "case", "cover", "tempered glass", "screen protector", "skin", "cable",
+  "charger", "adapter", "dock", "pouch", "sleeve", "strap", "band",
+  "bumper", "stylus", "stand", "holder", "ear tips", "cushion"
+];
+
+/**
+ * Detects if a listing is an accessory (case, cover, protector) when the user was looking for a device.
+ */
+export function isAccessoryTitle(title: string, referenceQuery: string): boolean {
+  if (!title) return false;
+  const qLower = (referenceQuery || "").toLowerCase();
+  const tLower = title.toLowerCase();
+
+  // If reference query asked for an accessory, do not treat as accessory mismatch
+  for (const kw of ACCESSORY_KEYWORDS) {
+    if (qLower.includes(kw)) return false;
+  }
+
+  for (const kw of ACCESSORY_KEYWORDS) {
+    const regex = new RegExp(`\\b${kw}\\b`, "i");
+    if (regex.test(tLower)) return true;
+  }
+  return false;
+}
+
+/**
+ * Filters extreme low/high price outliers using median-relative thresholding.
+ * Prevents ₹199 phone covers or ₹15,00,000 mistaken listings from corrupting device comparison.
+ */
+export function filterPriceOutliers<T extends { price?: number; itemPrice?: number; effectiveNetPrice?: number }>(
+  items: T[],
+  minCount = 4
+): T[] {
+  if (!items || items.length < minCount) return items;
+  const prices = items
+    .map((i) => i.effectiveNetPrice || i.itemPrice || i.price || 0)
+    .filter((p) => p > 0)
+    .sort((a, b) => a - b);
+  if (prices.length < minCount) return items;
+  const median = prices[Math.floor(prices.length / 2)];
+
+  if (median >= 500) {
+    const minAllowed = median * 0.25;
+    const maxAllowed = median * 3.5;
+    const filtered = items.filter((i) => {
+      const p = i.effectiveNetPrice || i.itemPrice || i.price || 0;
+      return p >= minAllowed && p <= maxAllowed;
+    });
+    if (filtered.length >= 2) return filtered;
+  }
+  return items;
+}
+
 /**
  * Evaluates whether two multi-store product listings represent the identical SKU.
  */
@@ -126,7 +180,18 @@ export function matchProductEntities(titleA: string, titleB: string): EntityMatc
   const attrsA = extractAttributes(titleA);
   const attrsB = extractAttributes(titleB);
 
-  // Variant Conflict Guard 1: Storage mismatch
+  // Variant Conflict Guard 1: Accessory mismatch (case / cover / screen protector vs device)
+  if (isAccessoryTitle(titleB, titleA) || isAccessoryTitle(titleA, titleB)) {
+    return {
+      isMatch: false,
+      confidenceScore: 0,
+      attributesA: attrsA,
+      attributesB: attrsB,
+      conflictReason: "Accessory / case / cable mismatch with primary device",
+    };
+  }
+
+  // Variant Conflict Guard 2: Storage mismatch
   if (attrsA.storage && attrsB.storage && attrsA.storage !== attrsB.storage) {
     return {
       isMatch: false,
@@ -137,7 +202,7 @@ export function matchProductEntities(titleA: string, titleB: string): EntityMatc
     };
   }
 
-  // Variant Conflict Guard 2: RAM mismatch
+  // Variant Conflict Guard 3: RAM mismatch
   if (attrsA.ram && attrsB.ram && attrsA.ram !== attrsB.ram) {
     return {
       isMatch: false,
@@ -148,7 +213,7 @@ export function matchProductEntities(titleA: string, titleB: string): EntityMatc
     };
   }
 
-  // Variant Conflict Guard 3: Model series mismatch (e.g. XM5 vs XM4)
+  // Variant Conflict Guard 4: Model series mismatch (e.g. XM5 vs XM4, S24 vs S23)
   if (attrsA.modelSeries && attrsB.modelSeries && attrsA.modelSeries !== attrsB.modelSeries) {
     return {
       isMatch: false,

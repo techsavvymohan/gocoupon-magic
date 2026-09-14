@@ -29,6 +29,8 @@ import {
   US_CREDIT_CARDS,
   calculateBnplInstallments,
 } from "@/lib/services/international-market";
+import { GroceryProductCard } from "@/open_food_fact/components/GroceryProductCard.js";
+import type { FoodProductComparison } from "@/open_food_fact/types.js";
 import {
   Search,
   ArrowRight,
@@ -153,6 +155,7 @@ export function ComparePage() {
   const [showSpotlightHistory, setShowSpotlightHistory] = useState(false);
   const [alertTargetProduct, setAlertTargetProduct] = useState<MultiPlatformProductItem | null>(null);
   const [cardModalTarget, setCardModalTarget] = useState<BankCardDefinition | null>(null);
+  const [foodComparison, setFoodComparison] = useState<FoodProductComparison | null>(null);
 
   // Bank Card Intelligence
   const { selectedCardId, activeCard, getSavingsForOffer } = useUserCards();
@@ -172,11 +175,32 @@ export function ComparePage() {
     const trimmed = activeSearchParam.trim();
     if (!trimmed) {
       setSearchResult(null);
+      setFoodComparison(null);
       return;
     }
 
     let isMounted = true;
     setIsSearching(true);
+
+    // Check Open Food Facts if search query is a barcode
+    const isBarcode = /^[0-9]{8,14}$/.test(trimmed.replace(/[-\s]/g, ""));
+    if (isBarcode) {
+      const cleanBarcode = trimmed.replace(/[^0-9]/g, "");
+      fetch(`/api/open-food-fact/compare/${cleanBarcode}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (isMounted && data.success && data.data) {
+            setFoodComparison(data.data);
+          } else if (isMounted) {
+            setFoodComparison(null);
+          }
+        })
+        .catch(() => {
+          if (isMounted) setFoodComparison(null);
+        });
+    } else {
+      setFoodComparison(null);
+    }
 
     searchProductsAcrossPlatforms(trimmed, { shoprs: activeShoprs })
       .then((res) => {
@@ -517,6 +541,13 @@ export function ComparePage() {
                     </button>
                   );
                 })}
+              </div>
+            )}
+
+            {/* Open Food Facts Barcode & Grocery Intelligence Matrix */}
+            {foodComparison && (
+              <div className="mb-8 animate-in fade-in slide-in-from-top-3 duration-300">
+                <GroceryProductCard comparison={foodComparison} />
               </div>
             )}
 

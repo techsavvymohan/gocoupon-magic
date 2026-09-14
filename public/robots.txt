@@ -40,7 +40,9 @@ Allow: /
 User-agent: *
 Allow: /
 
-# Protect crawler budget on build artifacts & maps
+# Protect crawler budget, security, and internal API routes
+Disallow: /admin
+Disallow: /api/
 Disallow: /src/
 Disallow: /node_modules/
 Disallow: /*.map$

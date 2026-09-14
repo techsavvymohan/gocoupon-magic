@@ -3,7 +3,8 @@
  * @description Comprehensive GoCoupon Administration API Router.
  */
 
-import { Router, type Request, type Response } from "express";
+import { Router, type Request, type Response, type NextFunction } from "express";
+import crypto from "node:crypto";
 import fs from "fs";
 import path from "path";
 import {
@@ -21,6 +22,74 @@ export const adminRouter = Router();
 const DATA_DIR = path.resolve(process.cwd(), "server", "data");
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+
+// ---------------------------------------------------------------------------
+// Cryptographic Admin Session Token Security
+// ---------------------------------------------------------------------------
+const ADMIN_TOKEN_SECRET = process.env.ADMIN_PASSWORD || "GC_Admin_Secured#2026!";
+
+export interface AdminTokenPayload {
+  email: string;
+  role: string;
+  exp: number;
+}
+
+export function generateAdminToken(email: string, role = "admin"): string {
+  const exp = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days validity
+  const payload: AdminTokenPayload = { email, role, exp };
+  const encodedPayload = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const signature = crypto
+    .createHmac("sha256", ADMIN_TOKEN_SECRET)
+    .update(encodedPayload)
+    .digest("base64url");
+  return `${encodedPayload}.${signature}`;
+}
+
+export function verifyAdminToken(token: string): AdminTokenPayload | null {
+  if (!token || !token.includes(".")) return null;
+  const parts = token.split(".");
+  if (parts.length !== 2) return null;
+  const [encodedPayload, signature] = parts;
+
+  try {
+    const expectedSignature = crypto
+      .createHmac("sha256", ADMIN_TOKEN_SECRET)
+      .update(encodedPayload)
+      .digest("base64url");
+
+    if (signature.length !== expectedSignature.length) return null;
+    if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
+      return null;
+    }
+
+    const payload: AdminTokenPayload = JSON.parse(
+      Buffer.from(encodedPayload, "base64url").toString("utf-8")
+    );
+    if (Date.now() > payload.exp) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+export function requireAdminAuth(req: Request, res: Response, next: NextFunction) {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7).trim() : null;
+
+  if (!token) {
+    res.status(401).json({ success: false, error: "Unauthorized: Missing admin bearer token." });
+    return;
+  }
+
+  const payload = verifyAdminToken(token);
+  if (!payload) {
+    res.status(401).json({ success: false, error: "Unauthorized: Invalid or expired admin session token." });
+    return;
+  }
+
+  (req as any).adminUser = payload;
+  next();
 }
 
 const SETTINGS_FILE = path.join(DATA_DIR, "admin-settings.json");
@@ -189,35 +258,72 @@ const defaultUsers = [
 ];
 
 // ---------------------------------------------------------------------------
-// 3. Admin Authentication Endpoint
+// 3. Admin Authentication & Verification Endpoints
 // ---------------------------------------------------------------------------
 adminRouter.post("/login", (req: Request, res: Response) => {
   const { email, password } = req.body || {};
   const cleanEmail = String(email || "").trim().toLowerCase();
   const cleanPass = String(password || "").trim();
 
+  const configuredEmail = (process.env.ADMIN_EMAIL || "support@gocoupon.io").trim().toLowerCase();
+  const configuredPass = (process.env.ADMIN_PASSWORD || "GC_Admin_Secured#2026!").trim();
+
+  const isSuperadminMatch =
+    (cleanEmail === configuredEmail || cleanEmail === "admin@gocoupon.io") &&
+    cleanPass === configuredPass;
+
   const users = loadJson(USERS_FILE, defaultUsers);
-  const matched = users.find(
-    (u) => u.email.toLowerCase() === cleanEmail && u.isActive
-  );
+  const matchedUser = users.find((u) => u.email.toLowerCase() === cleanEmail && u.isActive);
 
-  if (
-    (cleanEmail === "admin@gocoupon.io" || cleanEmail === "admin") &&
-    (cleanPass === "admin" || cleanPass === "admin123" || cleanPass === "gocoupon2026")
-  ) {
-    res.json({
-      success: true,
-      user: users[0] || defaultUsers[0],
-    });
+  if (!isSuperadminMatch && (!matchedUser || cleanPass !== configuredPass)) {
+    res.status(401).json({ success: false, error: "Invalid admin email or password." });
     return;
   }
 
-  if (matched && cleanPass === "admin123") {
-    res.json({ success: true, user: matched });
-    return;
-  }
+  const role = matchedUser ? matchedUser.role : "admin";
+  const token = generateAdminToken(cleanEmail, role);
+  const userPayload = matchedUser || {
+    id: "usr-superadmin",
+    name: "GoCoupon SuperAdmin",
+    email: cleanEmail,
+    role: "admin",
+    permissions: defaultUsers[0].permissions,
+    isActive: true,
+  };
 
-  res.status(401).json({ error: "Invalid admin email or password." });
+  res.json({
+    success: true,
+    token,
+    user: userPayload,
+  });
+});
+
+adminRouter.get("/verify", requireAdminAuth, (req: Request, res: Response) => {
+  res.json({
+    success: true,
+    user: (req as any).adminUser,
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 3.1 Cache Management Endpoints
+// ---------------------------------------------------------------------------
+adminRouter.post("/cache/clear", requireAdminAuth, async (_req: Request, res: Response) => {
+  const clearedCount = await globalCache.clearAll();
+  res.json({
+    success: true,
+    message: `Flushed all active cache entries (${clearedCount} in-memory keys purged).`,
+    clearedCount,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+adminRouter.get("/cache/stats", requireAdminAuth, (_req: Request, res: Response) => {
+  res.json({
+    success: true,
+    activeKeys: globalCache.size(),
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -260,12 +366,12 @@ adminRouter.get("/notifications", (req: Request, res: Response) => {
   res.json({ success: true, data: adminNotifications });
 });
 
-adminRouter.post("/notifications", (req: Request, res: Response) => {
+adminRouter.post("/notifications", requireAdminAuth, (req: Request, res: Response) => {
   adminNotifications = adminNotifications.map((n) => ({ ...n, read: true }));
   res.json({ success: true, message: "Marked all as read." });
 });
 
-adminRouter.delete("/notifications", (req: Request, res: Response) => {
+adminRouter.delete("/notifications", requireAdminAuth, (req: Request, res: Response) => {
   adminNotifications = [];
   res.json({ success: true, message: "Cleared all notifications." });
 });
@@ -278,7 +384,7 @@ adminRouter.get("/settings", (req: Request, res: Response) => {
   res.json({ success: true, data: settings });
 });
 
-adminRouter.put("/settings", (req: Request, res: Response) => {
+adminRouter.put("/settings", requireAdminAuth, (req: Request, res: Response) => {
   const newSettings = req.body || {};
   saveJson(SETTINGS_FILE, newSettings);
   res.json({ success: true, message: "Settings saved successfully.", data: newSettings });
@@ -304,7 +410,7 @@ adminRouter.get("/seo-files", (req: Request, res: Response) => {
   }
 });
 
-adminRouter.post("/seo-files", (req: Request, res: Response) => {
+adminRouter.post("/seo-files", requireAdminAuth, (req: Request, res: Response) => {
   const { fileName = "robots.txt", content = "" } = req.body || {};
   const safeName = String(fileName).replace(/[^a-zA-Z0-9._-]/g, "");
   const targetPath = path.resolve(process.cwd(), "public", safeName);
@@ -320,12 +426,12 @@ adminRouter.post("/seo-files", (req: Request, res: Response) => {
 // ---------------------------------------------------------------------------
 // 8. Admin Users Management
 // ---------------------------------------------------------------------------
-adminRouter.get("/users", (req: Request, res: Response) => {
+adminRouter.get("/users", requireAdminAuth, (req: Request, res: Response) => {
   const users = loadJson(USERS_FILE, defaultUsers);
   res.json({ success: true, data: users });
 });
 
-adminRouter.post("/users", (req: Request, res: Response) => {
+adminRouter.post("/users", requireAdminAuth, (req: Request, res: Response) => {
   const { name, email, role, permissions, isActive } = req.body || {};
   if (!email || !name) {
     res.status(400).json({ error: "Name and email are required." });
@@ -348,7 +454,7 @@ adminRouter.post("/users", (req: Request, res: Response) => {
   res.json({ success: true, data: newUser });
 });
 
-adminRouter.put("/users", (req: Request, res: Response) => {
+adminRouter.put("/users", requireAdminAuth, (req: Request, res: Response) => {
   const { id, name, email, role, permissions, isActive } = req.body || {};
   if (!id) {
     res.status(400).json({ error: "User ID is required." });
@@ -375,7 +481,7 @@ adminRouter.put("/users", (req: Request, res: Response) => {
   res.json({ success: true, data: users[idx] });
 });
 
-adminRouter.delete("/users", (req: Request, res: Response) => {
+adminRouter.delete("/users", requireAdminAuth, (req: Request, res: Response) => {
   const id = req.query.id as string;
   if (!id) {
     res.status(400).json({ error: "User ID is required." });
@@ -396,7 +502,7 @@ adminRouter.get("/hero", (req: Request, res: Response) => {
   res.json({ success: true, data: hero });
 });
 
-adminRouter.put("/hero", (req: Request, res: Response) => {
+adminRouter.put("/hero", requireAdminAuth, (req: Request, res: Response) => {
   const hero = req.body || {};
   saveJson(HERO_FILE, hero);
   res.json({ success: true, message: "Hero settings saved.", data: hero });
@@ -414,7 +520,7 @@ adminRouter.get("/sections", (req: Request, res: Response) => {
   res.json({ success: true, data: sections });
 });
 
-adminRouter.put("/sections", (req: Request, res: Response) => {
+adminRouter.put("/sections", requireAdminAuth, (req: Request, res: Response) => {
   const sections = req.body || {};
   saveJson(SECTIONS_FILE, sections);
   res.json({ success: true, message: "Homepage sections saved.", data: sections });
@@ -428,7 +534,7 @@ adminRouter.get("/events", (req: Request, res: Response) => {
   res.json({ success: true, data: events });
 });
 
-adminRouter.post("/events", (req: Request, res: Response) => {
+adminRouter.post("/events", requireAdminAuth, (req: Request, res: Response) => {
   const event = req.body || {};
   const events = loadJson(EVENTS_FILE, defaultEvents);
   const newEvent = { ...event, id: `evt-${Date.now()}` };
@@ -437,7 +543,7 @@ adminRouter.post("/events", (req: Request, res: Response) => {
   res.json({ success: true, data: newEvent });
 });
 
-adminRouter.put("/events", (req: Request, res: Response) => {
+adminRouter.put("/events", requireAdminAuth, (req: Request, res: Response) => {
   const event = req.body || {};
   const events = loadJson(EVENTS_FILE, defaultEvents);
   const idx = events.findIndex((e) => e.id === event.id || e.slug === event.slug);
@@ -452,7 +558,7 @@ adminRouter.put("/events", (req: Request, res: Response) => {
   }
 });
 
-adminRouter.delete("/events", (req: Request, res: Response) => {
+adminRouter.delete("/events", requireAdminAuth, (req: Request, res: Response) => {
   const id = (req.query.id as string) || (req.query.slug as string);
   let events = loadJson(EVENTS_FILE, defaultEvents);
   events = events.filter((e) => e.id !== id && e.slug !== id);
@@ -577,7 +683,7 @@ adminRouter.get("/submissions", (req: Request, res: Response) => {
  * POST /api/admin/submissions/:id/approve
  * Approve user submission and automatically inject it into the live deals pool
  */
-adminRouter.post("/submissions/:id/approve", async (req: Request, res: Response) => {
+adminRouter.post("/submissions/:id/approve", requireAdminAuth, async (req: Request, res: Response) => {
   const { id } = req.params;
   const submissions = loadJson(SUBMISSIONS_FILE, defaultSubmissions);
   const idx = submissions.findIndex((s) => s.id === id);
@@ -637,7 +743,7 @@ adminRouter.post("/submissions/:id/approve", async (req: Request, res: Response)
  * POST /api/admin/submissions/:id/reject
  * Reject user submission with optional reason
  */
-adminRouter.post("/submissions/:id/reject", (req: Request, res: Response) => {
+adminRouter.post("/submissions/:id/reject", requireAdminAuth, (req: Request, res: Response) => {
   const { id } = req.params;
   const { reason } = req.body || {};
   const submissions = loadJson(SUBMISSIONS_FILE, defaultSubmissions);
@@ -663,7 +769,7 @@ adminRouter.post("/submissions/:id/reject", (req: Request, res: Response) => {
  * PUT /api/admin/submissions/:id
  * Edit submission fields before approving
  */
-adminRouter.put("/submissions/:id", (req: Request, res: Response) => {
+adminRouter.put("/submissions/:id", requireAdminAuth, (req: Request, res: Response) => {
   const { id } = req.params;
   const submissions = loadJson(SUBMISSIONS_FILE, defaultSubmissions);
   const idx = submissions.findIndex((s) => s.id === id);
@@ -698,7 +804,7 @@ adminRouter.put("/submissions/:id", (req: Request, res: Response) => {
  * DELETE /api/admin/submissions/:id
  * Remove submission
  */
-adminRouter.delete("/submissions/:id", (req: Request, res: Response) => {
+adminRouter.delete("/submissions/:id", requireAdminAuth, (req: Request, res: Response) => {
   const { id } = req.params;
   let submissions = loadJson(SUBMISSIONS_FILE, defaultSubmissions);
   const initialLen = submissions.length;

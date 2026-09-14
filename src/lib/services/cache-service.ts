@@ -139,6 +139,35 @@ class CacheService {
   }
 
   /**
+   * Flushes all in-memory and distributed cache entries.
+   */
+  async clearAll(): Promise<number> {
+    const count = this.memoryCache.size;
+    this.memoryCache.clear();
+
+    if (this.upstashUrl && this.upstashToken) {
+      try {
+        await fetch(`${this.upstashUrl.replace(/\/+$/, "")}/flushdb`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${this.upstashToken}` },
+          signal: AbortSignal.timeout(1500),
+        });
+      } catch {
+        // Non-blocking
+      }
+    }
+
+    return count;
+  }
+
+  /**
+   * Returns current count of in-memory cached entries.
+   */
+  size(): number {
+    return this.memoryCache.size;
+  }
+
+  /**
    * Helper pattern to wrap fetch calls with caching (Cache-Aside pattern).
    */
   async wrap<T>(key: string, fetcher: () => Promise<T>, ttlMs = this.defaultTtlMs): Promise<T> {

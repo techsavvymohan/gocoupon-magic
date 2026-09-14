@@ -22,6 +22,7 @@ import { cuelinksRouter } from "./cuelinks.js";
 import { internationalDealsRouter } from "./international-deals.js";
 import { adminRouter } from "./admin.js";
 import { blogsRouter } from "./blogs.js";
+import { openFoodFactRouter } from "../../src/open_food_fact/api-route.js";
 
 export const apiRouter = Router();
 
@@ -64,4 +65,5 @@ apiRouter.use("/bank-offers", bankOffersRouter);
 apiRouter.use("/extension", extensionRouter);
 apiRouter.use("/cuelinks", cuelinksRouter);
 apiRouter.use("/international-deals", internationalDealsRouter);
+apiRouter.use("/open-food-fact", openFoodFactRouter);
 

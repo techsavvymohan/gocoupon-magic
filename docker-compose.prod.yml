@@ -34,6 +34,7 @@ services:
       - SMTP_PASS=${SMTP_PASS:-}
       - SMTP_FROM=${SMTP_FROM:-"GoCoupon Support" <support@gocoupon.io>}
       - ADMIN_EMAIL=${ADMIN_EMAIL:-support@gocoupon.io}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-GC_Admin_Secured#2026!}
     ports:
       - "3000:3000"
     depends_on:
@@ -57,7 +58,9 @@ services:
     container_name: gocoupon-searxng
     restart: always
     volumes:
-      - ./services/searxng:/etc/searxng:rw
+      - ./services/searxng/searx:/etc/searxng:rw
+      - ./services/searxng/searx/plugins:/usr/local/searxng/searx/plugins:rw
+      - ./services/searxng/searx/engines:/usr/local/searxng/searx/engines:rw
     environment:
       - SEARXNG_BASE_URL=http://localhost:8080/
       - UWSGI_WORKERS=4

@@ -34,7 +34,10 @@ import {
   CheckCircle2,
   Store as StoreIcon,
   Zap,
+  Barcode,
 } from "lucide-react";
+import type { FoodProductComparison } from "@/open_food_fact/types.js";
+import { NutriScoreBadge } from "@/open_food_fact/components/NutriScoreBadge.js";
 import { toast } from "sonner";
 
 export interface UrlResolverSearchProps {
@@ -78,6 +81,7 @@ export function UrlResolverSearch({
   const [searxngSuggestions, setSearxngSuggestions] = useState<string[]>([]);
   const [productHits, setProductHits] = useState<UnifiedProductSuggestion[]>([]);
   const [isLoadingSearxng, setIsLoadingSearxng] = useState(false);
+  const [foodComparison, setFoodComparison] = useState<FoodProductComparison | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
@@ -115,9 +119,29 @@ export function UrlResolverSearch({
       setMatchedStores([]);
       setSearxngSuggestions([]);
       setProductHits([]);
+      setFoodComparison(null);
       setShowDropdown(false);
       setSelectedIndex(-1);
       return;
+    }
+
+    // 0. Check for numeric barcode input (UPC/EAN: 8 to 14 digits)
+    const isBarcode = /^[0-9]{8,14}$/.test(trimmed.replace(/[-\s]/g, ""));
+    if (isBarcode) {
+      const cleanBarcode = trimmed.replace(/[^0-9]/g, "");
+      fetch(`/api/open-food-fact/compare/${cleanBarcode}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.success && data.data) {
+            setFoodComparison(data.data);
+            setShowDropdown(true);
+          } else {
+            setFoodComparison(null);
+          }
+        })
+        .catch(() => setFoodComparison(null));
+    } else {
+      setFoodComparison(null);
     }
 
     // 1. Instant local store matching (<1ms) — comes ON TOP
@@ -373,12 +397,70 @@ export function UrlResolverSearch({
 
       {/* Live Dropdown Suggestions — Stores Top-Ranked */}
       {showDropdown &&
-        (matchedStores.length > 0 || productHits.length > 0 || searxngSuggestions.length > 0) && (
+        (foodComparison || matchedStores.length > 0 || productHits.length > 0 || searxngSuggestions.length > 0) && (
           <div
             role="listbox"
             id="search-suggestions-list"
             className="absolute top-full left-0 right-0 mt-2 z-50 rounded-2xl sm:rounded-3xl border border-border/80 bg-card/98 backdrop-blur-2xl p-2.5 sm:p-3 shadow-2xl text-left animate-in fade-in zoom-in-95 duration-150 divide-y divide-border/40 max-h-[460px] overflow-y-auto"
           >
+            {/* ── 0. OPEN FOOD FACTS BARCODE MATCH ── */}
+            {foodComparison && (
+              <div className="pb-2.5">
+                <div className="flex items-center justify-between px-2 py-0.5 mb-1.5">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5">
+                    <Barcode className="h-3.5 w-3.5" />
+                    Barcode Matched (Open Food Facts)
+                  </span>
+                  <NutriScoreBadge grade={foodComparison.product.nutriscore_grade} size="sm" showLabel={false} />
+                </div>
+                <div
+                  onClick={() => {
+                    setQuery(foodComparison.product.product_name);
+                    handleExecuteSearch(foodComparison.product.product_name);
+                  }}
+                  className="group/food flex items-center justify-between gap-3 rounded-xl sm:rounded-2xl p-2 sm:p-2.5 transition-all bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/30 cursor-pointer shadow-xs"
+                >
+                  <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                    <div className="relative h-11 w-11 shrink-0 rounded-xl bg-white dark:bg-neutral-900 p-1 border border-border/80 shadow-2xs flex items-center justify-center overflow-hidden">
+                      {foodComparison.product.image_url ? (
+                        <img
+                          src={foodComparison.product.image_url}
+                          alt={foodComparison.product.product_name}
+                          className="h-full w-full object-contain"
+                        />
+                      ) : (
+                        <Barcode className="h-6 w-6 text-emerald-600" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 uppercase">
+                          {foodComparison.product.brands}
+                        </span>
+                        {foodComparison.product.quantity && (
+                          <span className="text-[10px] text-muted-foreground">
+                            • {foodComparison.product.quantity}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs sm:text-sm font-semibold text-foreground truncate group-hover/food:text-emerald-600 dark:group-hover/food:text-emerald-400 transition-colors">
+                        {foodComparison.product.product_name}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+                        <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                          {foodComparison.availableCouponsCount} stores with active coupons
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="shrink-0 flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                    <span className="hidden sm:inline">Compare</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* ── 1. PARTNER STORES & INSTANT OPEN (SURFACED FIRST ON TOP) ── */}
             {matchedStores.length > 0 && (
               <div className="pb-2.5">
@@ -683,55 +765,41 @@ export function UrlResolverSearch({
         </div>
       )}
 
-      {/* Trust Badges Connected with Dashed Lines */}
+      {/* Redesigned Premium Trust Proof Strip */}
       {showTrustBadges && (
-        <div className="mt-6 sm:mt-7 flex flex-wrap items-center justify-center sm:justify-between gap-3 sm:gap-4 text-xs select-none">
-          <div
-            className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30"
-            aria-hidden="true"
-          />
+        <div className="mt-5 flex items-center justify-center select-none">
+          <div className="inline-flex flex-wrap items-center justify-center gap-y-2 gap-x-3 sm:gap-x-4.5 rounded-full border border-border/80 bg-background/80 dark:bg-card/50 px-4 sm:px-5 py-2 text-xs shadow-2xs backdrop-blur-md transition-all hover:border-primary/30">
+            <div className="inline-flex items-center gap-2 font-medium">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <StoreIcon className="h-3 w-3" aria-hidden="true" />
+              </span>
+              <span className="text-xs sm:text-[13px] font-semibold tracking-tight text-foreground/90">
+                200+ Stores Worldwide
+              </span>
+            </div>
 
-          <div className="inline-flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-400">
-            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-emerald-700 text-white shadow-xs">
-              <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-            </span>
-            <span className="font-sans text-xs sm:text-[13px] tracking-tight">
-              200+ Stores Worldwide
-            </span>
+            <span className="hidden sm:inline-block h-3.5 w-px bg-border/80" aria-hidden="true" />
+
+            <div className="inline-flex items-center gap-2 font-medium">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">
+                <Zap className="h-3 w-3 fill-current" aria-hidden="true" />
+              </span>
+              <span className="text-xs sm:text-[13px] font-semibold tracking-tight text-foreground/90">
+                Auto-Apply Working Coupons
+              </span>
+            </div>
+
+            <span className="hidden sm:inline-block h-3.5 w-px bg-border/80" aria-hidden="true" />
+
+            <div className="inline-flex items-center gap-2 font-medium">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+                <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+              </span>
+              <span className="text-xs sm:text-[13px] font-semibold tracking-tight text-foreground/90">
+                100% Free Chrome Extension
+              </span>
+            </div>
           </div>
-
-          <div
-            className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30"
-            aria-hidden="true"
-          />
-
-          <div className="inline-flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-400">
-            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-emerald-700 text-white shadow-xs">
-              <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-            </span>
-            <span className="font-sans text-xs sm:text-[13px] tracking-tight">
-              90-Day Price Tracker
-            </span>
-          </div>
-
-          <div
-            className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30"
-            aria-hidden="true"
-          />
-
-          <div className="inline-flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-400">
-            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-emerald-700 text-white shadow-xs">
-              <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-            </span>
-            <span className="font-sans text-xs sm:text-[13px] tracking-tight">
-              100% Free Chrome Extension
-            </span>
-          </div>
-
-          <div
-            className="hidden sm:block flex-1 border-t border-dashed border-emerald-600/30 dark:border-emerald-500/30"
-            aria-hidden="true"
-          />
         </div>
       )}
     </div>

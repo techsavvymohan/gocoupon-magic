@@ -13,12 +13,13 @@
 import { bridgeSearXNGPriceOffers } from "./searxng-price-bridge";
 import { globalCache } from "./cache-service";
 import { wrapAffiliateTracking } from "./store-registry";
+import { isAccessoryTitle, filterPriceOutliers } from "./entity-matcher";
 
 const SERPAPI_KEY = process.env.SERPAPI_API_KEY || process.env.SERPAPI_KEY || "";
 
 const AMAZON_PARTNER_TAG = process.env.VITE_AMAZON_IN_PARTNER_TAG || "gocoupon0e-21";
 const CUELINKS_PUBLISHER_ID = process.env.VITE_CUELINKS_PUB_ID || "148920";
-const REQUEST_TIMEOUT_MS = 4000;
+const REQUEST_TIMEOUT_MS = 8000;
 const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes persistent TTL
 
 export interface StoreSearchResult {
@@ -41,6 +42,14 @@ export interface StoreSearchResult {
 }
 
 const inFlightRequests = new Map<string, Promise<any>>();
+
+export function isRelevantResult(itemTitle: string, query: string): boolean {
+  const clean = query.toLowerCase().replace(/[^a-z0-9\s]/g, " ").trim();
+  const tokens = clean.split(/\s+/).filter((w) => w.length >= 3);
+  if (tokens.length === 0) return true;
+  const titleLower = (itemTitle || "").toLowerCase();
+  return tokens.some((t) => titleLower.includes(t));
+}
 
 /**
  * Searches Amazon.in live catalog with timeout and affiliate tag.
@@ -76,7 +85,10 @@ export async function searchAmazon(query: string): Promise<StoreSearchResult[]> 
 
     if (!data) return [];
     const items = (data.shopping_results || []).filter(
-      (i: any) => typeof i.extracted_price === "number" && i.extracted_price > 0,
+      (i: any) =>
+        typeof i.extracted_price === "number" &&
+        i.extracted_price > 0 &&
+        isRelevantResult(i.title || "", query),
     );
 
     const results: StoreSearchResult[] = items.map((item: any) => {
@@ -157,7 +169,10 @@ export async function searchFlipkart(query: string): Promise<StoreSearchResult[]
 
     if (!data) return [];
     const items = (data.shopping_results || []).filter(
-      (i: any) => typeof i.extracted_price === "number" && i.extracted_price > 0,
+      (i: any) =>
+        typeof i.extracted_price === "number" &&
+        i.extracted_price > 0 &&
+        isRelevantResult(i.title || "", query),
     );
 
     const results: StoreSearchResult[] = items.map((item: any) => {
@@ -317,8 +332,15 @@ export async function searchAllStoresConcurrent(query: string): Promise<{
   unavailableStores: UnavailableStoreReport[];
 }> {
   const normKey = query.toLowerCase().trim();
+  const cacheKey = `concurrent:${normKey}`;
 
-  // Check if identical query is already in-flight
+  // 1. High-Speed In-Memory / Redis Cache Check (< 5ms)
+  const cached = await globalCache.get<any>(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  // 2. Check if identical query is already in-flight (SingleFlight)
   if (inFlightRequests.has(normKey)) {
     return inFlightRequests.get(normKey)!;
   }
@@ -388,9 +410,16 @@ export async function searchAllStoresConcurrent(query: string): Promise<{
         allOffers.push(...searxOffers);
       }
 
-      // Deduplicate offers keeping the lowest price per store
+      // Accuracy Step 1: Filter out accessories when the query did not ask for accessories
+      const nonAccessories = allOffers.filter((o) => !isAccessoryTitle(o.title, query));
+      const candidateOffers = nonAccessories.length >= 2 ? nonAccessories : allOffers;
+
+      // Accuracy Step 2: Filter extreme low/high price outliers (e.g. ₹199 covers or ₹15,00,000 mistaken listings)
+      const cleanOffers = filterPriceOutliers(candidateOffers);
+
+      // Accuracy Step 3: Deduplicate offers keeping the lowest price per store
       const storeMap = new Map<string, StoreSearchResult>();
-      allOffers.forEach((offer) => {
+      cleanOffers.forEach((offer) => {
         const existing = storeMap.get(offer.storeName);
         if (!existing || offer.effectiveNetPrice < existing.effectiveNetPrice) {
           storeMap.set(offer.storeName, offer);
@@ -409,13 +438,20 @@ export async function searchAllStoresConcurrent(query: string): Promise<{
       const lowestPrice = bestDeal?.effectiveNetPrice || 0;
       const maxSavings = Math.max(0, highestPrice - lowestPrice);
 
-      return {
+      const payload = {
         offers: dedupedOffers,
         bestDeal,
         maxSavings,
         totalStoresFound: dedupedOffers.length,
         unavailableStores,
       };
+
+      // Persist to TTL cache if stores found
+      if (dedupedOffers.length > 0) {
+        await globalCache.set(cacheKey, payload, CACHE_TTL_MS);
+      }
+
+      return payload;
     } finally {
       inFlightRequests.delete(normKey);
     }

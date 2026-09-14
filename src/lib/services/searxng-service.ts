@@ -11,6 +11,30 @@
  * Reference: https://docs.searxng.org/dev/search_api.html
  */
 
+export interface SearXNGPriceIntelligenceOffer {
+  title: string;
+  url: string;
+  merchant: string;
+  amount: number;
+  currency: string;
+  shipping?: string;
+  thumbnail?: string;
+}
+
+export interface SearXNGPriceIntelligenceSummary {
+  query: string;
+  total_offers: number;
+  currency: string;
+  lowest_price: number;
+  highest_price: number;
+  average_price: number;
+  price_spread: number;
+  max_savings_percentage: number;
+  best_deal_merchant: string;
+  best_deal_url: string;
+  offers: SearXNGPriceIntelligenceOffer[];
+}
+
 export interface SearXNGResult {
   url: string;
   title: string;
@@ -27,6 +51,18 @@ export interface SearXNGResult {
   thumbnail?: string;
   img_src?: string;
   price?: string;
+  merchant?: string;
+  shipping?: string;
+  source_country?: string;
+  price_intelligence?: {
+    amount: number;
+    currency: string;
+    raw_price: string;
+    merchant: string;
+    shipping?: string;
+    source_country?: string;
+    in_stock?: boolean;
+  };
 }
 
 export interface SearXNGResponse {
@@ -34,6 +70,7 @@ export interface SearXNGResponse {
   number_of_results: number;
   results: SearXNGResult[];
   suggestions: string[];
+  price_intelligence?: SearXNGPriceIntelligenceSummary;
   infoboxes?: Array<{
     infobox: string;
     id?: string;
@@ -41,7 +78,7 @@ export interface SearXNGResponse {
     img_src?: string;
     urls?: Array<{ title: string; url: string }>;
   }>;
-  answers?: string[];
+  answers?: any[];
 }
 
 export interface SearXNGOptions {
@@ -54,13 +91,14 @@ export interface SearXNGOptions {
   timeoutMs?: number;
 }
 
-// Configurable instances with fallback pool
+// Configurable instances with local SearXNG as primary
 const CUSTOM_INSTANCE =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_SEARXNG_URL) ||
   (typeof process !== "undefined" && process.env?.SEARXNG_URL) ||
   "";
 
 const DEFAULT_INSTANCES = [
+  "http://127.0.0.1:8888",
   "https://search.mectov.my.id",
   "https://etsi.me",
   "https://sx.xo.st",
