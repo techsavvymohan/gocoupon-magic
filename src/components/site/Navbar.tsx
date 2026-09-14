@@ -24,6 +24,7 @@ import {
   Home,
   ShoppingBag,
   Flame,
+  Sparkles,
 } from "lucide-react";
 
 type NavLink = {
@@ -343,12 +344,22 @@ export function Navbar() {
 
           <Link
             to="/offers"
-            className="flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 px-3 py-1 text-muted-foreground hover:text-foreground active:scale-95 touch-manipulation"
-            activeProps={{ className: "text-primary font-bold" }}
-            aria-label="Live Offers"
+            className="group relative flex min-h-[44px] min-w-[56px] flex-col items-center justify-center gap-0.5 px-2 py-0.5 text-rose-600 dark:text-rose-400 active:scale-95 touch-manipulation"
+            activeProps={{ className: "text-rose-600 font-bold" }}
+            aria-label="Click to find available offers and verified coupons"
           >
-            <Flame className="h-4 w-4" aria-hidden="true" />
-            <span className="text-[10px] font-medium">{t("nav.offers", "Offers")}</span>
+            {/* Animated Attention Badge informing users to click for offers */}
+            <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-1.5 py-0.5 text-[8.5px] font-extrabold uppercase tracking-tight bg-gradient-to-r from-amber-500 via-rose-500 to-primary text-white rounded-full shadow-md shadow-rose-500/30 pointer-events-none whitespace-nowrap animate-bounce ring-1 ring-background">
+              <Sparkles className="h-2 w-2" />
+              <span>Tap for Deals</span>
+            </span>
+
+            <div className="relative flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-rose-500/20 via-amber-500/20 to-primary/20 border border-rose-500/35 text-rose-600 dark:text-rose-400 shadow-xs group-hover:scale-110 transition-transform">
+              <Flame className="h-4 w-4 fill-rose-500 text-rose-500 animate-pulse" aria-hidden="true" />
+            </div>
+            <span className="text-[10px] font-bold text-foreground group-hover:text-rose-600 transition-colors">
+              {t("nav.offers", "Offers")}
+            </span>
           </Link>
 
           <Link

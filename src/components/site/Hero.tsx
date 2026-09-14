@@ -33,11 +33,6 @@ export function Hero() {
           </span>
         </h1>
 
-        {/* Sub-Headline / Authoritative Entity Intro */}
-        <p className="mx-auto mt-3.5 max-w-3xl text-sm sm:text-base md:text-lg font-normal text-muted-foreground text-balance">
-          Stores will never tell you a competitor is cheaper. GoCoupon cross-checks 500+ stores, auto-applies working coupons, exposes fake sales, and stacks your bank card discounts in 1 click. 100% free &amp; private.
-        </p>
-
         {/* Centered Search Box — Prioritized directly below heading */}
         <div className="mt-6 sm:mt-8 mx-auto max-w-3xl text-left">
           <UrlResolverSearch size="large" showPopularChips={true} showTrustBadges={true} />
