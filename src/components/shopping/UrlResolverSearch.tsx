@@ -408,7 +408,7 @@ export function UrlResolverSearch({
 
       {/* Live Dropdown Suggestions — Stores Top-Ranked */}
       {showDropdown &&
-        (foodComparison || matchedStores.length > 0 || productHits.length > 0 || searxngSuggestions.length > 0) && (
+        (foodComparison || matchedStores.length > 0 || searxngSuggestions.length > 0) && (
           <div
             role="listbox"
             id="search-suggestions-list"
