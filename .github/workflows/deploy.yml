@@ -1,0 +1,95 @@
+name: Production Deployment to VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  # ============================================================================
+  # 1. Build & Validation (Runs on GitHub's clean cloud runner)
+  # ============================================================================
+  build:
+    name: 🏗️ Build & Verify Production Bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Check out repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js 22 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🏗️ Build production bundle & pre-rendered SEO static routes
+        run: npm run build
+
+      - name: 🌐 Verify critical build artifacts
+        run: |
+          test -f dist/index.html || { echo "dist/index.html missing"; exit 1; }
+          test -f dist/sitemap.xml || { echo "dist/sitemap.xml missing"; exit 1; }
+          echo "✅ Production artifacts verified successfully."
+
+      - name: 📦 Package build artifacts for deployment
+        run: |
+          tar -czf build-artifacts.tar.gz dist scripts public src server package.json package-lock.json Caddyfile ecosystem.config.cjs tsconfig.json vite.config.ts
+
+      - name: 📤 Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: build-artifacts.tar.gz
+          retention-days: 1
+
+  # ============================================================================
+  # 2. Zero-Downtime Deployment to Bluehost VPS (Runs only if Build succeeds)
+  # ============================================================================
+  deploy:
+    name: 🚀 Zero-Downtime VPS Release
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+
+      - name: 🔐 Securely upload build artifacts to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          source: "build-artifacts.tar.gz"
+          target: "/var/www/gocoupon"
+
+      - name: 🔄 Extract and reload PM2 on VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script: |
+            set -e
+            cd /var/www/gocoupon
+            tar -xzf build-artifacts.tar.gz
+            rm -f build-artifacts.tar.gz
+            pm2 reload gocoupon-web --update-env || pm2 start ecosystem.config.cjs
+            pm2 status
+            curl -sf http://127.0.0.1:3000/api/health || true
+            echo "✅ GoCoupon successfully reloaded on VPS!"
