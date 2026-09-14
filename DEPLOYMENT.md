@@ -174,3 +174,32 @@ Expected result: **40 / 40 Passed (100%)** and **8 / 8 Security Tests Passed**.
    ```
 2. **Local Fallback Data**:
    Ensure `server/data/` is included in regular server backups (`live-deals.json`, `blogs.json`, `admin-submissions.json`).
+
+---
+
+## 8. Automated GitHub Actions CI/CD Pipeline
+
+Every push to the `main` branch triggers an automated zero-downtime production deployment:
+
+```
+git push origin main
+       │
+       ▼
+GitHub Actions Runner (Cloud)
+├── npm ci
+├── npm run build (Bundles & generates 147 SEO static routes)
+└── Verifies dist/index.html & sitemap.xml
+       │
+       ▼ (If build passes)
+Secure SCP Transfer to VPS (/var/www/gocoupon)
+       │
+       ▼
+pm2 reload gocoupon-web --update-env (0s Downtime)
+```
+
+### GitHub Repository Secrets
+Configured in **Settings ➔ Secrets and variables ➔ Actions**:
+* `VPS_HOST`: `50.6.37.40`
+* `VPS_USER`: `root`
+* `VPS_SSH_KEY`: Dedicated OpenSSH private key for automated deployments.
+
