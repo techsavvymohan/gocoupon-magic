@@ -176,8 +176,11 @@ export function Navbar() {
 
           {/* Right Actions */}
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <LanguageToggle className="hidden md:inline-block" />
-            <CurrencyToggle className="hidden md:inline-block" />
+            {/* Country flags / Currency hidden on mobile screens to save navbar space */}
+            <div className="hidden md:inline-flex items-center gap-1.5 sm:gap-2">
+              <LanguageToggle />
+              <CurrencyToggle />
+            </div>
             <ThemeToggle />
 
             <MagneticButton

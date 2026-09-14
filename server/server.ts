@@ -158,8 +158,14 @@ if (fs.existsSync(distDir)) {
 
     const cleanPath = req.path.replace(/\/+$/, "") || "/";
 
+    // Set no-cache headers for HTML responses so clients always get fresh content without stale browser cache
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+
     // A. Check root index.html
     if (cleanPath === "/") {
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
       return res.sendFile(path.join(distDir, "index.html"));
     }
 
