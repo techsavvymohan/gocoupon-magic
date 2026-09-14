@@ -8,6 +8,8 @@
  */
 
 import { memoryAlertRegistrations } from "../routes/alerts.js";
+import { alertsDb } from "../services/db.js";
+import { sendPriceDropEmail } from "../services/email.js";
 import {
   syncLiveCuelinksDeals,
   fetchCuelinksCampaigns,
@@ -78,14 +80,33 @@ export function startBackgroundWorkers(intervalMs: number = 15 * 60 * 1000) {
         }
       }
 
-      // 3. Check active price alerts
-      const activeAlerts = Array.from(memoryAlertRegistrations.values()).filter((a) => a.active);
+      // 3. Check active price alerts & dispatch automated notification emails
+      let activeAlerts = await alertsDb.getActiveAlerts().catch(() => []);
+      if (!activeAlerts || activeAlerts.length === 0) {
+        activeAlerts = Array.from(memoryAlertRegistrations.values()).filter((a) => a.active);
+      }
+
       if (activeAlerts.length > 0) {
         console.log(`🔍 [Worker] Checking ${activeAlerts.length} active price alerts...`);
         for (const alert of activeAlerts) {
           const simulatedDrop = Math.round(alert.initialPrice * 0.92);
           if (simulatedDrop <= alert.targetPrice) {
-            console.log(`🔔 [Worker] Alert triggered for product ${alert.productId}: target ₹${alert.targetPrice}, current ₹${simulatedDrop}`);
+            console.log(`🔔 [Worker] Target met for ${alert.productTitle}: current ₹${simulatedDrop} <= target ₹${alert.targetPrice}`);
+
+            if (alert.email) {
+              sendPriceDropEmail({
+                to: alert.email,
+                productTitle: alert.productTitle,
+                storeName: alert.store || "Amazon / Flipkart",
+                currentPrice: simulatedDrop,
+                targetPrice: alert.targetPrice,
+                productUrl: `https://gocoupon.io/compare?q=${encodeURIComponent(alert.productTitle)}`,
+              }).catch((err) => console.error("[Worker Email Dispatch Error]:", err.message));
+            }
+
+            // Flag as alerted in memory
+            alert.active = false;
+            memoryAlertRegistrations.set(alert.id, alert);
           }
         }
       }

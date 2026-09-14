@@ -14,8 +14,7 @@ import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
 export const searxngRouter = Router();
 
 const SEARXNG_INSTANCES = [
-  process.env.SEARXNG_URL,
-  "https://search.mectov.my.id",
+  process.env.SEARXNG_URL || "http://127.0.0.1:8888",
   "https://etsi.me",
   "https://searx.perennialte.ch",
   "https://search.ononoki.org",
@@ -60,27 +59,39 @@ async function handleSearxng(req: Request, res: Response) {
 
   for (const instance of SEARXNG_INSTANCES) {
     try {
-      const targetUrl = new URL(`${instance.replace(/\/+$/, "")}/search`);
-      targetUrl.searchParams.set("q", query);
-      targetUrl.searchParams.set("format", "json");
-      targetUrl.searchParams.set("categories", categories);
-      targetUrl.searchParams.set("language", language);
-      targetUrl.searchParams.set("pageno", pageno);
-
-      const upstream = await fetch(targetUrl.toString(), {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "User-Agent": "Mozilla/5.0 (compatible; goCoupon/2.0; +https://gocoupon.io)",
-        },
-        signal: AbortSignal.timeout(4500),
-      });
-
-      if (upstream.ok && upstream.headers.get("content-type")?.includes("json")) {
-        const data = await upstream.json();
-        if (data.results && data.results.length > 0) {
-          await globalCache.set(cacheKey, data, 15 * 60 * 1000);
+      const fetchFromInstance = async (catParam: string) => {
+        const targetUrl = new URL(`${instance.replace(/\/+$/, "")}/search`);
+        targetUrl.searchParams.set("q", query);
+        targetUrl.searchParams.set("format", "json");
+        if (catParam && catParam !== "all") {
+          targetUrl.searchParams.set("categories", catParam);
         }
+        targetUrl.searchParams.set("language", language);
+        targetUrl.searchParams.set("pageno", pageno);
+
+        const upstream = await fetch(targetUrl.toString(), {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "User-Agent": "Mozilla/5.0 (compatible; goCoupon/2.0; +https://gocoupon.io)",
+          },
+          signal: AbortSignal.timeout(4500),
+        });
+
+        if (upstream.ok && upstream.headers.get("content-type")?.includes("json")) {
+          return await upstream.json();
+        }
+        return null;
+      };
+
+      let data = await fetchFromInstance(categories);
+      // Auto-fallback: If "shopping" category returns 0 results, query general category
+      if ((!data || !data.results || data.results.length === 0) && categories.includes("shopping")) {
+        data = await fetchFromInstance("general");
+      }
+
+      if (data && data.results && data.results.length > 0) {
+        await globalCache.set(cacheKey, data, 15 * 60 * 1000);
         res.setHeader("X-Cache", "MISS");
         res.setHeader("Cache-Control", "public, s-maxage=180, stale-while-revalidate=360");
         res.json(data);

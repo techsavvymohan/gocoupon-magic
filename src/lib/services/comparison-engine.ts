@@ -42,6 +42,8 @@ export interface UnavailableStoreNotice {
 
 export interface ProductComparisonSummary {
   productId: string;
+  productTitle?: string;
+  productImage?: string;
   rows: ComparisonRow[];
   bestDeal: ComparisonRow;
   maxSavings: number; // difference between highest store price and lowest store net price

@@ -294,7 +294,8 @@ export function isValidShoppingProduct(title: string, store: string, url: string
     "clothing, shoes, accessories", "official site", "terms of use", "privacy policy",
     "customer service", "contact us", "about us", "login", "sign in", "sign up", "cart",
     "checkout", "forum", "discussion", "wikipedia", "news", "blog", "press release", "career",
-    "investors", "corporate"
+    "investors", "corporate", "full phone specifications", "full specifications", "specifications & price",
+    "specs, reviews", "specifications", "price in india", "unboxing", "hands-on", "rumors"
   ];
 
   if (nonProductKeywords.some((kw) => t.includes(kw))) {
@@ -302,9 +303,13 @@ export function isValidShoppingProduct(title: string, store: string, url: string
   }
 
   const nonShoppingHosts = [
-    "wikipedia.org", "gsmarena.com", "reddit.com", "quora.com", "resetera.com", "bizhows.com",
-    "medium.com", "github.com", "youtube.com", "theverge.com", "slashgear.com", "ign.com",
-    "ndtv.com", "indianexpress.com", "timesofindia", "pinterest.com", "facebook.com", "twitter.com", "x.com"
+    "wikipedia.org", "gsmarena.com", "91mobiles.com", "smartprix.com", "mysmartprice.com",
+    "beebom.com", "giznext.com", "tech.hindustantimes.com", "inrdeals.com", "pricehistory.app",
+    "gadgetsnow.com", "gadgets360.com", "pricebaba.com", "digit.in", "cashify.in", "aish4aish.in",
+    "olx.in", "quikr.com", "bajajfinserv.in", "myg.in", "reddit.com", "quora.com", "resetera.com",
+    "bizhows.com", "medium.com", "github.com", "youtube.com", "theverge.com", "slashgear.com",
+    "ign.com", "ndtv.com", "indianexpress.com", "timesofindia", "pinterest.com", "facebook.com",
+    "twitter.com", "x.com"
   ];
 
   if (nonShoppingHosts.some((host) => u.includes(host))) {
@@ -357,9 +362,10 @@ function generateStoreOffers(
   basePrice: number,
   title: string,
   directUrl: string,
-  category = "general"
+  category = "general",
+  brand = ""
 ): MultiPlatformStoreOffer[] {
-  const relevantStores = getRelevantStoresForCategory(category);
+  const relevantStores = getRelevantStoresForCategory(category, "IN", brand);
   const normPrimary = (primaryStore || "").toLowerCase();
 
   const offers: MultiPlatformStoreOffer[] = relevantStores.map((store) => {
@@ -368,8 +374,9 @@ function generateStoreOffers(
     const discountAmount =
       store.defaultCoupon?.discountAmount ||
       (store.defaultCoupon?.discountPct ? Math.round(storePrice * store.defaultCoupon.discountPct) : 0);
-    const couponSavings = Math.min(Math.round(storePrice * 0.2), discountAmount);
-    const cashbackAmount = Math.round(storePrice * store.cashbackPct);
+    // Cap coupon savings realistically to 5% and max ₹1,200 to prevent absurd discounts
+    const couponSavings = Math.min(Math.round(storePrice * 0.05), discountAmount, 1200);
+    const cashbackAmount = Math.round(storePrice * Math.min(0.04, store.cashbackPct));
     const effectiveNetPrice = Math.max(99, storePrice - couponSavings - cashbackAmount);
 
     const rawTarget =
@@ -415,7 +422,8 @@ export async function searchProductsAcrossPlatforms(
   const isUrl = /^https?:\/\//i.test(trimmed);
   let discoveredFilters: GoogleShoppingFilterGroup[] = [];
 
-  // 1. Direct URL Input: Extract metadata & compare competitors directly
+  try {
+    // 1. Direct URL Input: Extract metadata & compare competitors directly
   if (isUrl) {
     try {
       const res = await resolveLiveUrlAndCompetitors(trimmed);
@@ -494,21 +502,53 @@ export async function searchProductsAcrossPlatforms(
   const intent = analyzeQueryIntent(trimmed);
   const products: MultiPlatformProductItem[] = [];
 
-  // Concurrent Live Discovery: Google Shopping API & SearXNG Price Intelligence API
-  const [serpRes, searxRes] = await Promise.allSettled([
+  // Determine optimal search query: use concise coreProductQuery if available, otherwise cleanSearchTerm
+  const primarySearchTerm =
+    intent.coreProductQuery && intent.coreProductQuery.length >= 3 && intent.coreProductQuery.length < trimmed.length
+      ? intent.coreProductQuery
+      : intent.cleanSearchTerm;
+
+  // Concurrent Live Discovery: Google Shopping API, Multi-Store Comparison Engine & SearXNG Price Intelligence API
+  const [serpRes, searxRes, compareRes] = await Promise.allSettled([
     (async () => {
-      const shoppingApiUrl = `/api/shopping?q=${encodeURIComponent(intent.cleanSearchTerm)}${
-        options?.shoprs ? `&shoprs=${encodeURIComponent(options.shoprs)}` : ""
-      }${options?.country ? `&gl=${encodeURIComponent(options.country)}` : ""}`;
-      const res = await fetch(shoppingApiUrl, { signal: AbortSignal.timeout(8000) });
-      if (!res.ok) return null;
-      return res.json();
+      const fetchShopping = async (term: string) => {
+        const baseOrigin = typeof window !== "undefined" ? window.location.origin : "http://127.0.0.1:3000";
+        const shoppingApiUrl = `${baseOrigin}/api/shopping?q=${encodeURIComponent(term)}${
+          options?.shoprs ? `&shoprs=${encodeURIComponent(options.shoprs)}` : ""
+        }${options?.country ? `&gl=${encodeURIComponent(options.country)}` : ""}`;
+        const res = await fetch(shoppingApiUrl, { signal: AbortSignal.timeout(8000) });
+        if (!res.ok) return null;
+        return res.json();
+      };
+
+      let data = await fetchShopping(primarySearchTerm);
+      // Auto-Relaxation Fallback: If 0 shopping results and primary differs from coreProductQuery or cleanSearchTerm, retry
+      if (
+        (!data || !Array.isArray(data.shopping_results) || data.shopping_results.length === 0) &&
+        intent.coreProductQuery &&
+        intent.coreProductQuery !== primarySearchTerm &&
+        intent.coreProductQuery.length >= 3
+      ) {
+        data = await fetchShopping(intent.coreProductQuery);
+      }
+      return data;
     })(),
-    searchSearXNG(intent.cleanSearchTerm, {
-      categories: "shopping",
+    searchSearXNG(primarySearchTerm, {
+      categories: "general",
       language: "en-IN",
       timeoutMs: 5000,
     }),
+    (async () => {
+      try {
+        const baseOrigin = typeof window !== "undefined" ? window.location.origin : "http://127.0.0.1:3000";
+        const compareApiUrl = `${baseOrigin}/api/compare?q=${encodeURIComponent(primarySearchTerm)}`;
+        const res = await fetch(compareApiUrl, { signal: AbortSignal.timeout(6000) });
+        if (!res.ok) return null;
+        return await res.json();
+      } catch {
+        return null;
+      }
+    })(),
   ]);
 
   // Process Google Shopping API results
@@ -548,7 +588,7 @@ export async function searchProductsAcrossPlatforms(
       const price = rawPrice;
       const originalPrice = Math.round(price * 1.15);
       const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
-      const offers = generateStoreOffers(storeName, price, cleanTitle, directUrl, category);
+      const offers = generateStoreOffers(storeName, price, cleanTitle, directUrl, category, brand);
 
       products.push({
         id: `prod_${i}_${cleanTitle.slice(0, 15).replace(/[^a-zA-Z0-9]/g, "_")}`,
@@ -572,6 +612,69 @@ export async function searchProductsAcrossPlatforms(
         lowestPriceStore: offers[0]?.storeName || storeName,
         maxSavingsVsOriginal: Math.max(0, originalPrice - (offers[0]?.effectiveNetPrice || price)),
         isExactSkuMatch: i === 0 && intent.isSkuSpecific,
+      });
+    }
+  }
+
+  // Process Multi-Store Comparison Engine results (/api/compare)
+  if (
+    compareRes.status === "fulfilled" &&
+    compareRes.value &&
+    Array.isArray(compareRes.value.rows) &&
+    compareRes.value.rows.length > 0
+  ) {
+    const compData = compareRes.value;
+    const realOffers: MultiPlatformStoreOffer[] = compData.rows.map((row: any, idx: number) => ({
+      storeId: (row.storeName || "").toLowerCase().replace(/[^a-z0-9]/g, "_"),
+      storeName: row.storeName,
+      storeLogo: row.storeLogo || getStoreLogo(row.storeName),
+      price: row.itemPrice,
+      effectiveNetPrice: row.effectiveNetPrice,
+      couponCode: row.bestCouponCode,
+      couponSavings: row.couponSavings || 0,
+      cashbackRate: row.cashbackRate || "Up to 5%",
+      cashbackAmount: row.cashbackAmount || 0,
+      affiliateUrl:
+        row.affiliateUrl ||
+        `https://www.google.com/search?q=${encodeURIComponent(trimmed + " " + row.storeName)}`,
+      deliveryTime: row.deliveryEstimate || "Standard 2-3 Days",
+      isLowest: idx === 0,
+    }));
+
+    if (realOffers.length > 0) {
+      const bestDealRow = compData.bestDeal || compData.rows[0];
+      const compTitle = cleanProductTitle(compData.productTitle || bestDealRow.offer?.productTitle || trimmed);
+      const compBrand = detectProductBrand(compTitle, trimmed);
+      const compCat = detectProductCategory(compTitle, trimmed, compBrand);
+      const compPrice = bestDealRow.itemPrice || bestDealRow.effectiveNetPrice;
+      const compOrig = Math.max(
+        ...compData.rows.map((r: any) => r.itemPrice),
+        Math.round(compPrice * 1.15)
+      );
+
+      // Prepend exact match SKU with live cross-store comparison matrix
+      products.unshift({
+        id: `compare_exact_${Date.now()}`,
+        title: compTitle,
+        brand: compBrand,
+        category: compCat,
+        primaryStore: bestDealRow.storeName,
+        primaryStoreLogo: bestDealRow.storeLogo || getStoreLogo(bestDealRow.storeName),
+        isTrustedStore: true,
+        trustTier: 1,
+        price: compPrice,
+        originalPrice: compOrig,
+        discountPercent: Math.round(((compOrig - bestDealRow.effectiveNetPrice) / compOrig) * 100),
+        imageUrl: getCategoryImageByCategory(compCat, compTitle),
+        rating: 4.6,
+        reviewCount: 380,
+        directUrl: bestDealRow.affiliateUrl,
+        deliveryInfo: bestDealRow.deliveryEstimate || "2-3 Days Delivery",
+        isBestPrice: true,
+        offers: realOffers,
+        lowestPriceStore: bestDealRow.storeName,
+        maxSavingsVsOriginal: compOrig - bestDealRow.effectiveNetPrice,
+        isExactSkuMatch: true,
       });
     }
   }
@@ -613,8 +716,17 @@ export async function searchProductsAcrossPlatforms(
         const titleLower = topOffer.title.toLowerCase();
 
         if (queryTokens.length === 0 || queryTokens.some((t) => titleLower.includes(t))) {
-          const category = detectProductCategory(topOffer.title, trimmed);
           const brand = detectProductBrand(topOffer.title, trimmed);
+          const category = detectProductCategory(topOffer.title, trimmed, brand);
+          const fullOffers = generateStoreOffers(
+            topOffer.merchant,
+            pi.lowest_price,
+            cleanProductTitle(topOffer.title),
+            topOffer.url,
+            category,
+            brand
+          );
+
           products.push({
             id: `searx_pi_${Date.now()}`,
             title: cleanProductTitle(topOffer.title),
@@ -625,33 +737,59 @@ export async function searchProductsAcrossPlatforms(
             isTrustedStore: true,
             trustTier: 1,
             price: pi.lowest_price,
-            originalPrice: pi.highest_price,
-            discountPercent: pi.max_savings_percentage,
+            originalPrice: pi.highest_price || Math.round(pi.lowest_price * 1.15),
+            discountPercent: pi.max_savings_percentage || 15,
             imageUrl: topOffer.thumbnail || getCategoryImageByCategory(category, topOffer.title),
             rating: 4.6,
             reviewCount: 380,
             directUrl: topOffer.url,
             deliveryInfo: topOffer.shipping || "Fast Delivery Available",
             isBestPrice: true,
-            offers: piOffers,
-            lowestPriceStore: pi.best_deal_merchant,
-            maxSavingsVsOriginal: pi.price_spread,
+            offers: fullOffers.length > 0 ? fullOffers : piOffers,
+            lowestPriceStore: pi.best_deal_merchant || topOffer.merchant,
+            maxSavingsVsOriginal: pi.price_spread || Math.round(pi.lowest_price * 0.15),
             isExactSkuMatch: true,
           });
         }
       }
     }
 
-    // B. Also add any individual SearXNG commerce items if products list is small
+    // B. Also add individual SearXNG commerce items (strictly validated to shopping products)
     const cleanQuery = trimmed.toLowerCase().replace(/[^a-z0-9\s]/g, " ").trim();
     const queryTokens = cleanQuery.split(/\s+/).filter((w) => w.length >= 3);
 
     const rawResults = searxData.results || [];
+
+    // Find benchmark price across all results if available
+    let benchmarkPrice = searxData.price_intelligence?.lowest_price || 0;
+    if (!benchmarkPrice) {
+      for (const r of rawResults) {
+        const p =
+          r.price_intelligence?.amount ||
+          (r.price ? (extractInrPrice(r.price) ?? 0) : 0) ||
+          (r.content ? (extractInrPrice(r.content) ?? 0) : 0) ||
+          (r.title ? (extractInrPrice(r.title) ?? 0) : 0);
+        if (p > 0) {
+          benchmarkPrice = p;
+          break;
+        }
+      }
+    }
+
     const validItems = rawResults.filter((r) => {
-      const p = r.price_intelligence?.amount || (r.price ? (extractInrPrice(r.price) ?? 0) : 0);
+      if (!r.url || !r.title) return false;
       const titleLower = (r.title || "").toLowerCase();
       const isRelevant = queryTokens.length === 0 || queryTokens.some((t) => titleLower.includes(t));
-      return typeof p === "number" && p > 0 && isRelevant;
+      if (!isRelevant) return false;
+      if (isAccessoryTitle(r.title, trimmed)) return false;
+      const price =
+        r.price_intelligence?.amount ||
+        (r.price ? (extractInrPrice(r.price) ?? 0) : 0) ||
+        (r.content ? (extractInrPrice(r.content) ?? 0) : 0) ||
+        (r.title ? (extractInrPrice(r.title) ?? 0) : 0) ||
+        benchmarkPrice;
+      const merchant = r.merchant || r.price_intelligence?.merchant || "";
+      return isValidShoppingProduct(r.title, merchant, r.url, price > 0 ? price : 1000);
     });
 
     for (let idx = 0; idx < Math.min(validItems.length, 6); idx++) {
@@ -659,12 +797,19 @@ export async function searchProductsAcrossPlatforms(
       const cleanTitle = cleanProductTitle(res.title);
       const brand = detectProductBrand(cleanTitle, trimmed);
       const category = detectProductCategory(cleanTitle, trimmed, brand);
-      const price = res.price_intelligence?.amount || (extractInrPrice(res.price || "") ?? 0);
-      if (price <= 0) continue;
+      let price =
+        res.price_intelligence?.amount ||
+        (res.price ? (extractInrPrice(res.price) ?? 0) : 0) ||
+        (res.content ? (extractInrPrice(res.content) ?? 0) : 0) ||
+        (res.title ? (extractInrPrice(res.title) ?? 0) : 0);
+
+      if (price <= 0) {
+        price = benchmarkPrice > 0 ? benchmarkPrice : 1499;
+      }
 
       const storeName = res.merchant || res.price_intelligence?.merchant || "Online Merchant";
       const orig = Math.round(price * 1.15);
-      const offers = generateStoreOffers(storeName, price, cleanTitle, res.url, category);
+      const offers = generateStoreOffers(storeName, price, cleanTitle, res.url, category, brand);
 
       products.push({
         id: `searx_${idx}_${cleanTitle.slice(0, 10).replace(/[^a-zA-Z0-9]/g, "_")}`,
@@ -683,16 +828,16 @@ export async function searchProductsAcrossPlatforms(
         reviewCount: 220,
         directUrl: res.url,
         deliveryInfo: res.shipping || "2-3 Days Delivery",
-        isBestPrice: false,
+        isBestPrice: idx === 0 && products.length === 0,
         offers,
         lowestPriceStore: offers[0]?.storeName || storeName,
         maxSavingsVsOriginal: orig - (offers[0]?.effectiveNetPrice || price),
-        isExactSkuMatch: false,
+        isExactSkuMatch: idx === 0 && intent.isSkuSpecific,
       });
     }
   }
 
-  // If no live offers found, return clean empty result (zero mock/demo data)
+  // If no live offers found, return clean empty result
   if (products.length === 0) {
     return {
       query: trimmed,
@@ -756,4 +901,18 @@ export async function searchProductsAcrossPlatforms(
   }
 
   return finalResult;
+  } catch (err) {
+    console.error("searchProductsAcrossPlatforms internal error:", err);
+    return {
+      query: trimmed,
+      products: [],
+      availableStores: [],
+      totalFound: 0,
+      lowestOverallPrice: 0,
+      highestOverallSavings: 0,
+      isDirectUrl: isUrl,
+      filters: discoveredFilters,
+      activeShoprs: options?.shoprs,
+    };
+  }
 }

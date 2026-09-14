@@ -47,6 +47,7 @@ export interface UrlResolverSearchProps {
   showTrustBadges?: boolean;
   showPopularChips?: boolean;
   onSearchSubmit?: (query: string) => void;
+  initialQuery?: string;
 }
 
 const SUPPORTED_STORES = [
@@ -71,10 +72,18 @@ export function UrlResolverSearch({
   showTrustBadges = false,
   showPopularChips = true,
   onSearchSubmit,
+  initialQuery = "",
 }: UrlResolverSearchProps) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
   const [isResolving, setIsResolving] = useState(false);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
+
+  // Sync internal query state if initialQuery changes from external navigation
+  useEffect(() => {
+    if (initialQuery !== undefined) {
+      setQuery(initialQuery);
+    }
+  }, [initialQuery]);
 
   // Real-time suggestions, store matches & product hits state
   const [matchedStores, setMatchedStores] = useState<RegisteredStore[]>([]);

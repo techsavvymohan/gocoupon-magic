@@ -14,13 +14,38 @@ import { bridgeSearXNGPriceOffers } from "./searxng-price-bridge";
 import { globalCache } from "./cache-service";
 import { wrapAffiliateTracking } from "./store-registry";
 import { isAccessoryTitle, filterPriceOutliers } from "./entity-matcher";
+import { extractCoreProductQuery } from "./query-engine.js";
 
 const SERPAPI_KEY = process.env.SERPAPI_API_KEY || process.env.SERPAPI_KEY || "";
 
 const AMAZON_PARTNER_TAG = process.env.VITE_AMAZON_IN_PARTNER_TAG || "gocoupon0e-21";
 const CUELINKS_PUBLISHER_ID = process.env.VITE_CUELINKS_PUB_ID || "148920";
-const REQUEST_TIMEOUT_MS = 4000; // Fail fast → SerpAPI sandbox fallback activates sooner
+const REQUEST_TIMEOUT_MS = 2000; // Fail fast → SerpAPI sandbox fallback activates sooner
 const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes persistent TTL
+
+export const NON_COMMERCE_SOURCES = [
+  "gadgetsnow",
+  "91mobiles",
+  "smartprix",
+  "mysmartprice",
+  "gsmarena",
+  "cainid",
+  "olx",
+  "quikr",
+  "cashify",
+  "pricehistory",
+  "inrdeals",
+  "giznext",
+  "beebom",
+  "ndtv",
+  "indiatimes",
+  "timesofindia",
+  "hindustantimes",
+  "digit.in",
+  "pricebaba",
+  "wikipedia",
+  "youtube",
+];
 
 export interface StoreSearchResult {
   storeId: string;
@@ -238,12 +263,13 @@ export async function searchCuelinks(query: string): Promise<StoreSearchResult[]
     const data = await res.json();
     const items = (data.shopping_results || []).filter((i: any) => {
       const s = (i.source || i.merchant || "").toLowerCase();
-      return (
-        typeof i.extracted_price === "number" &&
-        i.extracted_price > 0 &&
-        !s.includes("amazon") &&
-        !s.includes("flipkart")
-      );
+      const u = (i.link || i.product_link || "").toLowerCase();
+      const t = (i.title || "").toLowerCase();
+      if (typeof i.extracted_price !== "number" || i.extracted_price <= 0) return false;
+      if (s.includes("amazon") || s.includes("flipkart")) return false;
+      if (NON_COMMERCE_SOURCES.some((d) => s.includes(d) || u.includes(d))) return false;
+      if (t.includes("specification") || t.includes("specs, review") || t.includes("price in india")) return false;
+      return true;
     });
 
     const results: StoreSearchResult[] = items.map((item: any) => {
@@ -347,11 +373,12 @@ export async function searchAllStoresConcurrent(query: string): Promise<{
 
   const executionPromise = (async () => {
     try {
+      const targetQuery = extractCoreProductQuery(query) || query;
       const [amazonRes, flipkartRes, cuelinksRes, searxngRes] = await Promise.allSettled([
-        searchAmazon(query),
-        searchFlipkart(query),
-        searchCuelinks(query),
-        bridgeSearXNGPriceOffers(query),
+        searchAmazon(targetQuery),
+        searchFlipkart(targetQuery),
+        searchCuelinks(targetQuery),
+        bridgeSearXNGPriceOffers(targetQuery),
       ]);
 
       const allOffers: StoreSearchResult[] = [];
@@ -410,9 +437,19 @@ export async function searchAllStoresConcurrent(query: string): Promise<{
         allOffers.push(...searxOffers);
       }
 
+      // Accuracy Step 0: Filter out non-commerce / review / scraper domains
+      const commerceOnlyOffers = allOffers.filter((o) => {
+        const s = (o.storeName || "").toLowerCase();
+        const u = (o.affiliateUrl || "").toLowerCase();
+        const t = (o.title || "").toLowerCase();
+        if (NON_COMMERCE_SOURCES.some((d) => s.includes(d) || u.includes(d))) return false;
+        if (t.includes("specification") || t.includes("specs, review") || t.includes("price in india")) return false;
+        return true;
+      });
+
       // Accuracy Step 1: Filter out accessories when the query did not ask for accessories
-      const nonAccessories = allOffers.filter((o) => !isAccessoryTitle(o.title, query));
-      const candidateOffers = nonAccessories.length >= 2 ? nonAccessories : allOffers;
+      const nonAccessories = commerceOnlyOffers.filter((o) => !isAccessoryTitle(o.title, query));
+      const candidateOffers = nonAccessories.length >= 2 ? nonAccessories : commerceOnlyOffers;
 
       // Accuracy Step 2: Filter extreme low/high price outliers (e.g. ₹199 covers or ₹15,00,000 mistaken listings)
       const cleanOffers = filterPriceOutliers(candidateOffers);
@@ -438,12 +475,18 @@ export async function searchAllStoresConcurrent(query: string): Promise<{
       const lowestPrice = bestDeal?.effectiveNetPrice || 0;
       const maxSavings = Math.max(0, highestPrice - lowestPrice);
 
+      // Only report stores as unavailable if they truly have no offer in the result matrix
+      const foundStoreNames = new Set(dedupedOffers.map((o) => o.storeName.toLowerCase()));
+      const filteredUnavailable = unavailableStores.filter(
+        (u) => !foundStoreNames.has(u.storeName.toLowerCase())
+      );
+
       const payload = {
         offers: dedupedOffers,
         bestDeal,
         maxSavings,
         totalStoresFound: dedupedOffers.length,
-        unavailableStores,
+        unavailableStores: filteredUnavailable,
       };
 
       // Persist to TTL cache if stores found

@@ -4,13 +4,13 @@
  * Searches and lists products across Amazon, Flipkart, Myntra, Croma, Meesho, and Tata CLiQ.
  */
 
-import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
+import { createFileRoute, Link, useSearch, useNavigate } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import { UrlResolverSearch } from "@/components/shopping/UrlResolverSearch";
-import { PriceHistoryChart } from "@/components/shopping/PriceHistoryChart";
 import { PriceAlertModal } from "@/components/shopping/PriceAlertModal";
+import { AdSenseSlot } from "@/components/ads/AdSenseSlot";
 import { useLoadingBus } from "@/context/LoadingContext";
 import {
   searchProductsAcrossPlatforms,
@@ -117,7 +117,15 @@ function StoreLogoImg({
   );
 }
 
-function ProductCardImg({ src, alt }: { src: string; alt: string }) {
+function ProductCardImg({
+  src,
+  alt,
+  category,
+}: {
+  src?: string;
+  alt: string;
+  category?: string;
+}) {
   const [imgSrc, setImgSrc] = useState(src);
   const [hasError, setHasError] = useState(false);
 
@@ -126,9 +134,65 @@ function ProductCardImg({ src, alt }: { src: string; alt: string }) {
     setHasError(false);
   }, [src]);
 
+  const altLower = (alt || "").toLowerCase();
+  const catLower = (category || "").toLowerCase();
+  const isPhone =
+    catLower.includes("smartphone") ||
+    catLower.includes("mobile") ||
+    catLower.includes("phone") ||
+    altLower.includes("phone") ||
+    altLower.includes("5g") ||
+    altLower.includes("vivo") ||
+    altLower.includes("iphone") ||
+    altLower.includes("samsung") ||
+    altLower.includes("pixel") ||
+    altLower.includes("redmi") ||
+    altLower.includes("oneplus") ||
+    altLower.includes("realme");
+  const isLaptop =
+    catLower.includes("laptop") ||
+    catLower.includes("computer") ||
+    altLower.includes("laptop") ||
+    altLower.includes("macbook") ||
+    altLower.includes("thinkpad");
+  const isAudio =
+    catLower.includes("audio") ||
+    catLower.includes("headphone") ||
+    altLower.includes("headphone") ||
+    altLower.includes("earphone") ||
+    altLower.includes("airpods") ||
+    altLower.includes("airdopes");
+  const isWatch =
+    catLower.includes("watch") ||
+    altLower.includes("smartwatch") ||
+    altLower.includes("fitbit");
+
+  let fallbackUrl =
+    "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&auto=format&fit=crop&q=80";
+  if (isPhone) {
+    fallbackUrl = altLower.includes("iphone")
+      ? "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=600&auto=format&fit=crop&q=80"
+      : "https://images.unsplash.com/photo-1511707171634-5f897ff02560?w=600&auto=format&fit=crop&q=80";
+  } else if (isLaptop) {
+    fallbackUrl =
+      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&auto=format&fit=crop&q=80";
+  } else if (isAudio) {
+    fallbackUrl =
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80";
+  } else if (isWatch) {
+    fallbackUrl =
+      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80";
+  }
+
+  // Reject broken/missing images and legacy smartwatch image for non-watches
+  const effectiveSrc =
+    !imgSrc || hasError || (imgSrc.includes("photo-1523275335684-37898b6baf30") && !isWatch)
+      ? fallbackUrl
+      : imgSrc;
+
   return (
     <img
-      src={hasError ? "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80" : imgSrc}
+      src={effectiveSrc}
       alt={alt}
       className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
       loading="lazy"
@@ -138,6 +202,7 @@ function ProductCardImg({ src, alt }: { src: string; alt: string }) {
 }
 
 export function ComparePage() {
+  const navigate = useNavigate();
   const { q, url } = useSearch({ from: "/compare" });
   const activeSearchParam = url || q || "";
   const { formatPrice, isIndia, symbol } = useCurrency();
@@ -154,7 +219,6 @@ export function ComparePage() {
   // Comparison & Price History Modal state
   const [selectedProduct, setSelectedProduct] = useState<MultiPlatformProductItem | null>(null);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
-  const [showSpotlightHistory, setShowSpotlightHistory] = useState(false);
   const [alertTargetProduct, setAlertTargetProduct] = useState<MultiPlatformProductItem | null>(null);
   const [cardModalTarget, setCardModalTarget] = useState<BankCardDefinition | null>(null);
   const [foodComparison, setFoodComparison] = useState<FoodProductComparison | null>(null);
@@ -214,9 +278,18 @@ export function ComparePage() {
           setSelectedProduct(res.products[0]);
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("Platform comparison search error:", err);
         if (!isMounted) return;
-        toast.error("Unable to search platforms. Please try again.");
+        setSearchResult({
+          query: trimmed,
+          products: [],
+          availableStores: [],
+          totalFound: 0,
+          lowestOverallPrice: 0,
+          highestOverallSavings: 0,
+          isDirectUrl: false,
+        });
       })
       .finally(() => {
         if (isMounted) setIsSearching(false);
@@ -358,6 +431,7 @@ export function ComparePage() {
               size="large"
               showTrustBadges={true}
               showPopularChips={true}
+              initialQuery={activeSearchParam}
             />
           </div>
         </div>
@@ -593,7 +667,11 @@ export function ComparePage() {
                   {/* Thumbnail Column */}
                   <div className="md:col-span-4 lg:col-span-3 flex justify-center">
                     <div className="relative aspect-square w-full max-w-[240px] rounded-2xl bg-white p-3 border border-border/80 shadow-md flex items-center justify-center group overflow-hidden">
-                      <ProductCardImg src={exactMatchProduct.imageUrl} alt={exactMatchProduct.title} />
+                      <ProductCardImg
+                        src={exactMatchProduct.imageUrl}
+                        alt={exactMatchProduct.title}
+                        category={exactMatchProduct.category}
+                      />
                       {exactMatchProduct.discountPercent > 0 && (
                         <div className="absolute top-2.5 right-2.5 rounded-full bg-emerald-500 px-2.5 py-0.5 font-mono text-[10px] font-black text-white shadow-xs">
                           {exactMatchProduct.discountPercent}% OFF
@@ -734,16 +812,6 @@ export function ComparePage() {
                               <span>Set Price Alert</span>
                             </button>
 
-                            <button
-                              type="button"
-                              id="spotlight-toggle-history-btn"
-                              onClick={() => setShowSpotlightHistory(!showSpotlightHistory)}
-                              className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2.5 min-h-[44px] text-xs font-bold text-foreground hover:bg-muted transition-colors touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
-                            >
-                              <TrendingDown className="h-4 w-4 text-primary" />
-                              <span>{showSpotlightHistory ? "Hide Chart" : "30-Day Trend"}</span>
-                              {showSpotlightHistory ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-                            </button>
 
                             <a
                               id="spotlight-best-deal-cta"
@@ -761,18 +829,6 @@ export function ComparePage() {
                     })()}
                   </div>
                 </div>
-
-                {/* Inline 90-Day Price History Graph (Toggleable) */}
-                {showSpotlightHistory && (
-                  <div className="mb-8 rounded-2xl border border-border/80 bg-background/60 p-4 sm:p-6 backdrop-blur-xs transition-all">
-                    <PriceHistoryChart
-                      productId={exactMatchProduct.id}
-                      productTitle={exactMatchProduct.title}
-                      currentPrice={exactMatchProduct.price}
-                      onSetAlertClick={() => openAlertFor(exactMatchProduct)}
-                    />
-                  </div>
-                )}
 
                 {/* Cross-Merchant Price Comparison Table */}
                 <div className="relative">
@@ -984,7 +1040,11 @@ export function ComparePage() {
                           className="relative aspect-square w-full overflow-hidden rounded-2xl bg-muted/30 p-2 flex items-center justify-center cursor-pointer"
                           title="Click to compare prices across stores"
                         >
-                          <ProductCardImg src={product.imageUrl} alt={product.title} />
+                          <ProductCardImg
+                            src={product.imageUrl}
+                            alt={product.title}
+                            category={product.category}
+                          />
 
                           {/* Origin Store Badge */}
                           <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-full bg-background/95 backdrop-blur-md px-2.5 py-1 text-[10px] font-bold text-foreground border border-border shadow-xs">
@@ -1117,16 +1177,37 @@ export function ComparePage() {
                 <p className="mt-1 text-xs text-muted-foreground">
                   Try adjusting your platform filters or price range to view more results.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedPlatform("All");
-                    setPriceRange("all");
-                  }}
-                  className="mt-4 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground"
-                >
-                  Reset Filters
-                </button>
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedPlatform("All");
+                      setPriceRange("all");
+                    }}
+                    className="rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground"
+                  >
+                    Reset Filters
+                  </button>
+                  {searchResult?.query && searchResult.query.split(/[\(\[\-\|]/)[0].trim() !== searchResult.query && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedPlatform("All");
+                        setPriceRange("all");
+                        const simplified = searchResult.query.split(/[\(\[\-\|]/)[0].trim();
+                        if (simplified) {
+                          navigate({
+                            to: "/compare",
+                            search: { q: simplified } as unknown as Record<string, string>,
+                          });
+                        }
+                      }}
+                      className="rounded-xl border border-border bg-card px-4 py-2 text-xs font-bold text-foreground hover:bg-muted transition-colors"
+                    >
+                      Search &ldquo;{searchResult.query.split(/[\(\[\-\|]/)[0].trim()}&rdquo; instead
+                    </button>
+                  )}
+                </div>
               </div>
             ) : null}
           </div>
@@ -1222,11 +1303,13 @@ export function ComparePage() {
             {/* Modal Header */}
             <div className="flex items-start justify-between gap-4 p-5 sm:p-6 border-b border-border bg-muted/20">
               <div className="flex items-center gap-4 min-w-0">
-                <img
-                  src={selectedProduct.imageUrl}
-                  alt={selectedProduct.title}
-                  className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl object-contain bg-white p-1 border border-border shrink-0"
-                />
+                <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl bg-white p-1 border border-border shrink-0 overflow-hidden flex items-center justify-center">
+                  <ProductCardImg
+                    src={selectedProduct.imageUrl}
+                    alt={selectedProduct.title}
+                    category={selectedProduct.category}
+                  />
+                </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="rounded-md bg-primary/10 text-primary px-2 py-0.5 font-mono text-[10px] font-bold">
@@ -1396,14 +1479,28 @@ export function ComparePage() {
                 </div>
               </div>
 
-              {/* 30-Day Interactive Price History Graph */}
-              <div>
-                <PriceHistoryChart
-                  productId={selectedProduct.id}
-                  productTitle={selectedProduct.title}
-                  currentPrice={selectedProduct.price}
-                  onSetAlertClick={() => setIsAlertModalOpen(true)}
-                />
+              {/* Lightweight Price Drop Alert Callout & Sponsor */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 rounded-2xl border border-border/80 bg-muted/40">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
+                      <Bell className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-foreground">Waiting for a price drop?</p>
+                      <p className="text-[11px] text-muted-foreground">Get notified immediately when prices drop across verified stores.</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsAlertModalOpen(true)}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-primary-foreground shadow-sm hover:bg-primary/90 transition-all"
+                  >
+                    <Bell className="h-3.5 w-3.5" />
+                    <span>Set Alert</span>
+                  </button>
+                </div>
+                <AdSenseSlot format="card-affiliate" className="mt-4" />
               </div>
             </div>
           </div>

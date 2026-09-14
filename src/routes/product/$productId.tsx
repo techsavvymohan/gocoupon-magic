@@ -19,7 +19,6 @@ import { CANONICAL_PRODUCTS, CANONICAL_OFFERS, CANONICAL_EVIDENCE, CANONICAL_COU
 import { CURATED_COLLECTIONS } from "@/data/collectionsData";
 import { compareProductOffers } from "@/lib/services/comparison-engine";
 import { MerchantComparisonTable } from "@/components/shopping/MerchantComparisonTable";
-import { PriceHistoryChart } from "@/components/shopping/PriceHistoryChart";
 import { FlashVerdictBadge } from "@/components/shopping/FlashVerdictBadge";
 import { CouponStackPill } from "@/components/shopping/CouponStackPill";
 import { PriceAlertModal } from "@/components/shopping/PriceAlertModal";
@@ -290,14 +289,6 @@ function ProductDetailsPage() {
             />
           </section>
         )}
-
-        {/* Section 2: 90-Day Interactive Price History Area Chart */}
-        <section className="mt-12">
-          <PriceHistoryChart
-            productId={product.id}
-            productTitle={product.title}
-          />
-        </section>
 
         {/* Section 3: Flash.co-Style AI Evidence & Rubric Breakdown */}
         <section className="mt-12">

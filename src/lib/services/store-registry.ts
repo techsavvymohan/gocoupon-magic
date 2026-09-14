@@ -831,12 +831,40 @@ export function findMatchingStores(query: string, limit = 3): RegisteredStore[] 
   return scored.slice(0, limit).map((s) => s.store);
 }
 
+const SINGLE_BRAND_STORES: Record<string, string> = {
+  boat: "boat",
+  lenovo_in: "lenovo",
+  dell_in: "dell",
+  samsung_in: "samsung",
+  apple_in: "apple",
+  puma_in: "puma",
+  nike_in: "nike",
+  hm_in: "h&m",
+  marks_spencer: "marks & spencer",
+};
+
 /**
- * Returns the relevant stores for a given product category.
+ * Returns the relevant stores for a given product category and brand.
+ * Strictly prevents single-brand specialty stores (e.g. boAt, Lenovo) from appearing for unrelated brands (e.g. Vivo, Apple).
  */
-export function getRelevantStoresForCategory(category: string, region: "IN" | "US" = "IN"): RegisteredStore[] {
+export function getRelevantStoresForCategory(category: string, region: "IN" | "US" = "IN", brand = ""): RegisteredStore[] {
   const normCat = (category || "").toLowerCase();
-  const stores = REGISTERED_STORES.filter((s) => s.region === region || s.region === "GLOBAL");
+  const normBrand = (brand || "").toLowerCase().trim();
+
+  // Multi-brand retailers are universal, single-brand retailers only match their own brand
+  const stores = REGISTERED_STORES.filter((s) => {
+    if (s.region !== region && s.region !== "GLOBAL") return false;
+    const requiredBrand = SINGLE_BRAND_STORES[s.id];
+    if (requiredBrand) {
+      return normBrand ? normBrand.includes(requiredBrand) : false;
+    }
+    return true;
+  });
+
+  if (normCat.includes("mobile") || normCat.includes("smartphone") || normCat.includes("phone")) {
+    const multiBrandPhoneStoreIds = ["amazon_in", "flipkart", "croma", "reliance", "vijaysales", "tatacliq"];
+    return stores.filter((s) => multiBrandPhoneStoreIds.includes(s.id) || (SINGLE_BRAND_STORES[s.id] && normBrand.includes(SINGLE_BRAND_STORES[s.id])));
+  }
 
   if (normCat.includes("fashion") || normCat.includes("shoe") || normCat.includes("apparel") || normCat.includes("footwear") || normCat.includes("denim")) {
     return stores.filter((s) => s.category === "fashion" || s.category === "general");
@@ -864,8 +892,6 @@ export function getRelevantStoresForCategory(category: string, region: "IN" | "U
 
   if (
     normCat.includes("electronic") ||
-    normCat.includes("mobile") ||
-    normCat.includes("smartphone") ||
     normCat.includes("laptop") ||
     normCat.includes("audio") ||
     normCat.includes("headphone") ||

@@ -20,8 +20,10 @@ import {
 import { useCurrency } from "./CurrencyContext";
 
 interface UserCardsContextType {
-  selectedCardId: string; // 'all' or specific bank id e.g. 'hdfc', 'chase'
+  selectedCardId: string; // 'none' (default), 'all', or specific bank id e.g. 'hdfc', 'chase'
   setSelectedCardId: (id: string) => void;
+  isCardDiscountApplied: boolean;
+  setCardDiscountApplied: (enabled: boolean) => void;
   activeCard: BankCardDefinition | null;
   allCards: BankCardDefinition[];
   userOwnedCardIds: string[];
@@ -48,12 +50,13 @@ export function UserCardsProvider({ children }: { children: React.ReactNode }) {
     return isIndia ? SUPPORTED_BANK_CARDS : US_CREDIT_CARDS;
   }, [isIndia]);
 
-  // 1. Active filter/focus card
+  // 1. Active filter/focus card - defaults to "none" so card discounts are NOT applied by default
   const [selectedCardId, setSelectedCardIdState] = useState<string>(() => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem(STORAGE_KEY_SELECTED_CARD) || "all";
+      const stored = localStorage.getItem(STORAGE_KEY_SELECTED_CARD);
+      if (stored && stored !== "all") return stored;
     }
-    return "all";
+    return "none";
   });
 
   // 2. User's actual wallet of owned cards
@@ -77,6 +80,15 @@ export function UserCardsProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const isCardDiscountApplied = useMemo(() => selectedCardId !== "none", [selectedCardId]);
+
+  const setCardDiscountApplied = useCallback(
+    (enabled: boolean) => {
+      setSelectedCardId(enabled ? "all" : "none");
+    },
+    [setSelectedCardId]
+  );
+
   // Toggle card ownership in user's profile
   const toggleUserOwnedCard = useCallback((cardId: string) => {
     setUserOwnedCardIds((prev) => {
@@ -94,15 +106,30 @@ export function UserCardsProvider({ children }: { children: React.ReactNode }) {
   );
 
   const activeCard = useMemo(() => {
-    if (selectedCardId === "all") return null;
+    if (selectedCardId === "all" || selectedCardId === "none") return null;
     return regionalCards.find((c) => c.id === selectedCardId) || null;
   }, [selectedCardId, regionalCards]);
 
   /**
    * Computes bank card savings for any given store offer taking into account the user's active card selection and region.
+   * Returns 0 savings if selectedCardId === 'none' (default unselected state).
    */
   const getSavingsForOffer = useCallback(
     (storeName: string, price: number, category = "general"): BankCardSavingsResult => {
+      if (selectedCardId === "none" || !selectedCardId) {
+        return {
+          cardId: "none",
+          bankName: "None",
+          cardName: "No Card Selected",
+          instantDiscount: 0,
+          cashbackAmount: 0,
+          totalCardSavings: 0,
+          effectiveNetPrice: price,
+          appliedRuleDescription: "Standard price without card offers",
+          isBestOffer: false,
+          affiliateApplyUrl: "",
+        };
+      }
       if (isIndia) {
         if (selectedCardId !== "all") {
           return calculateBankCardSavings(selectedCardId, storeName, price, category);
@@ -122,6 +149,8 @@ export function UserCardsProvider({ children }: { children: React.ReactNode }) {
     () => ({
       selectedCardId,
       setSelectedCardId,
+      isCardDiscountApplied,
+      setCardDiscountApplied,
       activeCard,
       allCards: regionalCards,
       userOwnedCardIds,
@@ -133,6 +162,8 @@ export function UserCardsProvider({ children }: { children: React.ReactNode }) {
     [
       selectedCardId,
       setSelectedCardId,
+      isCardDiscountApplied,
+      setCardDiscountApplied,
       activeCard,
       regionalCards,
       userOwnedCardIds,

@@ -593,14 +593,142 @@
   }
 
   // ─────────────────────────────────────────────
+  // Sequential Auto-Coupon Applier for Cart Pages
+  // ─────────────────────────────────────────────
+  function initSequentialAutoApplier() {
+    const isCartOrCheckout =
+      window.location.href.includes("cart") ||
+      window.location.href.includes("checkout") ||
+      window.location.href.includes("buy") ||
+      window.location.href.includes("order") ||
+      document.querySelector("input[name='claimCode'], #spc-gcpromoinput, input[placeholder*='coupon' i], input[placeholder*='promo' i]");
+
+    if (!isCartOrCheckout) return;
+
+    // Fetch coupons for this domain
+    if (chrome?.runtime?.sendMessage) {
+      chrome.runtime.sendMessage({ type: "GET_COUPONS", hostname }, (res) => {
+        const coupons = (res?.coupons || []).filter((c) => c.code && c.code.length > 1);
+        if (coupons.length > 0 && !document.getElementById("gc-runner-bar")) {
+          renderRunnerBar(coupons);
+        }
+      });
+    }
+  }
+
+  function renderRunnerBar(coupons) {
+    injectStyles();
+    const runnerBar = document.createElement("div");
+    runnerBar.id = "gc-runner-bar";
+    runnerBar.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:18px;">⚡</span>
+        <div>
+          <strong style="color:#10b981;font-size:12px;display:block;">GoCoupon Autopilot</strong>
+          <small style="color:#cbd5e1;font-size:11px;">Found ${coupons.length} coupon codes for this store</small>
+        </div>
+      </div>
+      <button class="gc-runner-btn" id="gc-start-runner">
+        🚀 Auto-Test All (${coupons.length})
+      </button>
+      <button id="gc-close-runner" style="background:transparent;border:none;color:#6b7280;font-size:14px;cursor:pointer;">✕</button>
+    `;
+
+    document.body.appendChild(runnerBar);
+    runnerBar.querySelector("#gc-close-runner").addEventListener("click", () => runnerBar.remove());
+
+    const startBtn = runnerBar.querySelector("#gc-start-runner");
+    startBtn.addEventListener("click", () => {
+      runSequentialCouponTest(coupons, runnerBar);
+    });
+  }
+
+  async function runSequentialCouponTest(coupons, runnerBar) {
+    const startBtn = runnerBar.querySelector("#gc-start-runner");
+    startBtn.disabled = true;
+
+    // Find input & apply button
+    const inputSelectors = [
+      "input[name='claimCode']", "#spc-gcpromoinput", "#claimCode",
+      "input[placeholder*='coupon' i]", "input[placeholder*='promo' i]",
+      "input[placeholder*='code' i]", "input#promo-code-input"
+    ];
+    const applySelectors = [
+      "input[name='applycode']", "#spc-gcpromoinput-button",
+      "button#apply-promo-button", "button:contains('Apply')"
+    ];
+
+    let input = null;
+    for (const sel of inputSelectors) {
+      input = document.querySelector(sel);
+      if (input) break;
+    }
+
+    if (!input) {
+      alert(`Could not find the coupon input on this page. Copy code directly from GoCoupon!`);
+      startBtn.disabled = false;
+      return;
+    }
+
+    let bestCode = coupons[0].code;
+    let index = 0;
+
+    for (const c of coupons) {
+      index++;
+      startBtn.textContent = `Testing ${index}/${coupons.length}: ${c.code}…`;
+
+      // Fill input
+      input.focus();
+      input.value = c.code;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+
+      // Find apply button
+      let applyBtn = null;
+      for (const sel of applySelectors) {
+        applyBtn = document.querySelector(sel);
+        if (applyBtn) break;
+      }
+
+      if (applyBtn) applyBtn.click();
+      else input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", keyCode: 13, bubbles: true }));
+
+      // Wait 750ms for store reaction
+      await new Promise((r) => setTimeout(r, 750));
+    }
+
+    // Apply winning code
+    input.focus();
+    input.value = bestCode;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+
+    runnerBar.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:24px;">🎉</span>
+        <div>
+          <strong style="color:#34d399;font-size:13px;display:block;">Best Code Applied: ${bestCode}!</strong>
+          <small style="color:#cbd5e1;font-size:11px;">You got the maximum savings available.</small>
+        </div>
+      </div>
+      <button id="gc-done-runner" style="background:#10b981;color:#fff;border:none;padding:6px 12px;border-radius:8px;font-weight:700;cursor:pointer;">Awesome</button>
+    `;
+    runnerBar.querySelector("#gc-done-runner")?.addEventListener("click", () => runnerBar.remove());
+    setTimeout(() => runnerBar.remove(), 6000);
+  }
+
+  // ─────────────────────────────────────────────
   // Main Init
   // ─────────────────────────────────────────────
   function init() {
-    // Always show coupon panel on shopping pages
+    // 1. Coupon panel
     loadAndRenderCoupons();
 
-    // Savings HUD only on product pages with price
-    setTimeout(initSavingsHud, 1500);
+    // 2. Savings HUD beside Buy Now
+    setTimeout(initSavingsHud, 1200);
+
+    // 3. Cart Autopilot Sequential Runner (cart/checkout only)
+    setTimeout(initSequentialAutoApplier, 1800);
   }
 
   // ─────────────────────────────────────────────
@@ -609,7 +737,6 @@
   if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.onMessage) {
     chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       if (message.type === "OPEN_COUPON_PANEL") {
-        // Remove any existing panel first to force a fresh fetch
         const existing = document.getElementById("gc-panel");
         if (existing) existing.remove();
         loadAndRenderCoupons();

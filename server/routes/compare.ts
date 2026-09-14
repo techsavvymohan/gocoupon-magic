@@ -95,6 +95,7 @@ compareRouter.get("/", async (req: Request, res: Response) => {
           };
 
           const stack = calculateStackedSavings({
+            productTitle: urlResolution.metadata.title,
             storeName: c.storeName,
             stickerPrice: c.price,
             currency: "INR",
@@ -198,12 +199,18 @@ compareRouter.get("/", async (req: Request, res: Response) => {
       ).catch(() => {});
     }
 
+    const applyBank = req.query.applyBank === "true" || (Boolean(req.query.card) && req.query.card !== "none");
+    const preferredCard = req.query.card && req.query.card !== "none" ? String(req.query.card) : undefined;
+
     const formattedRows: ComparisonRow[] = offers.map((offer, idx) => {
       const stack = calculateStackedSavings({
+        productTitle: offer.title || productTitle,
         storeName: offer.storeName,
         stickerPrice: offer.itemPrice,
         currency: "INR",
         availableCoupons: liveCuelinksCoupons,
+        applyBankDiscount: applyBank,
+        preferredBankCard: preferredCard,
       });
       const rawCouponCode = stack.coupon.applied ? stack.coupon.code : offer.couponCode;
       const bestCouponCode = rawCouponCode ? String(rawCouponCode) : undefined;
@@ -271,6 +278,7 @@ compareRouter.get("/", async (req: Request, res: Response) => {
 
     const responsePayload: ProductComparisonSummary = {
       productId: canonicalId,
+      productTitle,
       rows: finalRows,
       bestDeal: finalRows[0],
       maxSavings,

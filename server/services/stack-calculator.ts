@@ -25,6 +25,7 @@ export interface StackRequest {
   preferredBankCard?: string;
   userCashbackRate?: number; // e.g. 0.05 for 5%
   availableCoupons?: any[];  // Live Cuelinks or store-specific coupons
+  applyBankDiscount?: boolean; // false by default; true only if explicitly requested
   isCrossBorderImport?: boolean;
   internationalShippingFee?: number;
   customsDutyPercent?: number;
@@ -87,9 +88,27 @@ export function calculateStackedSavings(req: StackRequest): StackSavingsBreakdow
   // ── Tier 1: Auto-Coupon Matching ──────────────────────────────────────────
   let matchedCoupon: any = null;
   const pool = [...CANONICAL_COUPONS, ...(req.availableCoupons || [])];
+  const prodTitleLower = (req.productTitle || "").toLowerCase();
   const storeCoupons = pool.filter((c) => {
     const cStore = (c.storeName || c.storeId || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-    return normalizedStore.includes(cStore) || cStore.includes(normalizedStore);
+    const matchesStore = normalizedStore.includes(cStore) || cStore.includes(normalizedStore);
+    if (!matchesStore) return false;
+
+    // Category affinity check when productTitle is available
+    if (prodTitleLower) {
+      const cText = `${c.title || ""} ${c.description || ""} ${c.code || ""}`.toLowerCase();
+      // Audio coupon on a smartphone
+      const isAudioCoupon = cText.includes("audio") || cText.includes("headphone") || cText.includes("soundbar") || cText.includes("speaker");
+      const isPhoneProduct = prodTitleLower.includes("phone") || prodTitleLower.includes("5g") || prodTitleLower.includes("vivo") || prodTitleLower.includes("iphone") || prodTitleLower.includes("samsung") || prodTitleLower.includes("pixel") || prodTitleLower.includes("redmi") || prodTitleLower.includes("oneplus") || prodTitleLower.includes("realme");
+      if (isAudioCoupon && isPhoneProduct) return false;
+
+      // Fashion coupon on tech product
+      const isFashionCoupon = cText.includes("fashion") || cText.includes("apparel") || cText.includes("clothing") || cText.includes("footwear") || cText.includes("shirt") || cText.includes("jeans");
+      const isTechProduct = isPhoneProduct || prodTitleLower.includes("laptop") || prodTitleLower.includes("tablet") || prodTitleLower.includes("tv");
+      if (isFashionCoupon && isTechProduct) return false;
+    }
+
+    return true;
   });
 
   if (storeCoupons.length > 0) {
@@ -126,7 +145,10 @@ export function calculateStackedSavings(req: StackRequest): StackSavingsBreakdow
     preferredBank: req.preferredBankCard,
   });
 
-  const bankDiscount = bestBankEval ? bestBankEval.discountAmount : 0;
+  const shouldApplyBank =
+    req.applyBankDiscount === true ||
+    (Boolean(req.preferredBankCard) && req.preferredBankCard !== "none" && req.preferredBankCard !== "standard");
+  const bankDiscount = (shouldApplyBank && bestBankEval) ? bestBankEval.discountAmount : 0;
   const priceAfterBank = Math.max(0, priceAfterCoupon - bankDiscount);
 
   // ── Tier 3: Instant Cashback Kickback (Cuelinks Commission Tiers) ─────────
@@ -259,7 +281,7 @@ export function calculateStackedSavings(req: StackRequest): StackSavingsBreakdow
       isInstantDiscount: bestBankEval?.offer.isInstantDiscount ?? true,
       description: bestBankEval?.offer.description || null,
       instruction: bestBankEval
-        ? `Select ${bestBankEval.offer.bankName} on payment screen to save ${currency === "INR" ? "₹" : "$"}${bankDiscount}.`
+        ? `Select ${bestBankEval.offer.bankName} on payment screen to save ${currency === "INR" ? "₹" : "$"}${bestBankEval.discountAmount}.`
         : null,
     },
     cashback: {

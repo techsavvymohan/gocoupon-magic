@@ -157,6 +157,16 @@ export function Footer() {
                       Integrations
                     </Link>
                   </li>
+
+                  <li>
+                    <Link
+                      to="/pricing-intelligence"
+                      className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs flex items-center gap-1.5"
+                    >
+                      <span>B2B Pricing Intelligence</span>
+                      <span className="rounded-full bg-blue-500/15 px-1.5 py-0.5 text-[9px] font-bold text-blue-400">API</span>
+                    </Link>
+                  </li>
                   <li>
                     <Link
                       to="/offers"

@@ -133,30 +133,32 @@ export async function searchSearXNG(
 
   const timeoutMs = options.timeoutMs || 4500;
 
-  // 1. Try local backend proxy first (/api/searxng) to prevent any client-side CORS issues
-  try {
-    const proxyUrl = new URL("/api/searxng", window.location.origin);
-    proxyUrl.searchParams.set("q", trimmed);
-    proxyUrl.searchParams.set("format", "json");
-    if (options.categories) proxyUrl.searchParams.set("categories", options.categories);
-    if (options.language) proxyUrl.searchParams.set("language", options.language);
-    if (options.pageno) proxyUrl.searchParams.set("pageno", String(options.pageno));
+  // 1. In browser, try local backend proxy (/api/searxng) to prevent client-side CORS issues
+  if (typeof window !== "undefined") {
+    try {
+      const proxyUrl = new URL("/api/searxng", window.location.origin);
+      proxyUrl.searchParams.set("q", trimmed);
+      proxyUrl.searchParams.set("format", "json");
+      if (options.categories) proxyUrl.searchParams.set("categories", options.categories);
+      if (options.language) proxyUrl.searchParams.set("language", options.language);
+      if (options.pageno) proxyUrl.searchParams.set("pageno", String(options.pageno));
 
-    const proxyRes = await fetch(proxyUrl.toString(), {
-      method: "GET",
-      headers: { Accept: "application/json" },
-      signal: AbortSignal.timeout(timeoutMs),
-    });
+      const proxyRes = await fetch(proxyUrl.toString(), {
+        method: "GET",
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(timeoutMs),
+      });
 
-    if (proxyRes.ok) {
-      const data: SearXNGResponse = await proxyRes.json();
-      if (data && Array.isArray(data.results)) {
-        searxngCache.set(cacheKey, { data, timestamp: Date.now() });
-        return data;
+      if (proxyRes.ok) {
+        const data: SearXNGResponse = await proxyRes.json();
+        if (data && Array.isArray(data.results)) {
+          searxngCache.set(cacheKey, { data, timestamp: Date.now() });
+          return data;
+        }
       }
+    } catch {
+      // Fall back to direct instance pool below
     }
-  } catch {
-    // Fall back to direct instance pool below
   }
 
   // 2. Direct Query to SearXNG instance pool (with failover)

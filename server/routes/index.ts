@@ -23,6 +23,8 @@ import { internationalDealsRouter } from "./international-deals.js";
 import { adminRouter } from "./admin.js";
 import { blogsRouter } from "./blogs.js";
 import { openFoodFactRouter } from "../../src/open_food_fact/api-route.js";
+import { priceHistoryRouter } from "./price-history.js";
+import { intelligenceRouter } from "./intelligence.js";
 import {
   getAdmitadConfig,
   getAdmitadAccessToken,
@@ -100,4 +102,7 @@ apiRouter.use("/cuelinks", cuelinksRouter);
 apiRouter.use("/international-deals", internationalDealsRouter);
 apiRouter.use("/admitad", admitadRouter);
 apiRouter.use("/open-food-fact", openFoodFactRouter);
+apiRouter.use("/price-history", priceHistoryRouter);
+apiRouter.use("/v1/intelligence", intelligenceRouter);
+apiRouter.use("/intelligence", intelligenceRouter);
 

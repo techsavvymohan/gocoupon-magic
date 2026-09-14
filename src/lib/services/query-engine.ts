@@ -12,11 +12,11 @@
  * 7. Effective Net Savings & Best Offer Computation.
  * 8. Resilient Fallback with Semantic Integrity.
  */
-
 export interface QueryIntent {
   rawQuery: string;
   normalizedQuery: string;
   cleanSearchTerm: string;
+  coreProductQuery: string;
   brand: string | null;
   allowedBrands: string[];
   category: string;
@@ -77,7 +77,7 @@ export const PRODUCT_FORMS: Record<string, ProductFormDefinition> = {
     incompatibleWith: /\b(facewash|face\s+wash|face\s+cleanser|cleanser|lipstick|laptop|phone|tv|shoe|sneaker)\b/i,
   },
   phone: {
-    regex: /\b(phone|phones|mobile|mobiles|smartphone|smartphones|handset|iphone|galaxy\s*s|redmi)\b/i,
+    regex: /\b(phone|phones|mobile|mobiles|smartphone|smartphones|handset|iphone|galaxy\s*s|galaxy\s*z|pixel|oneplus|realme|redmi|xiaomi|poco|vivo|oppo|iqoo|motorola|moto|honor|nothing)\b/i,
     category: "Smartphones & Mobiles",
     incompatibleWith: /\b(laptop|macbook|notebook|shampoo|facewash|cleanser|tv|refrigerator|washing\s+machine|shoe)\b/i,
   },
@@ -119,6 +119,65 @@ const NOISE_WORDS = new RegExp(
 );
 
 /**
+ * Strips e-commerce title noise, parenthetical specs, marketing feature clauses,
+ * and dangerous search operators (- used as negation) to extract the core product name.
+ *
+ * Examples:
+ * "Vivo X100 Pro 5G (Asteroid Black, 512 GB, 16 GB RAM) - ZEISS 1-inch Camera"
+ * => "Vivo X100 Pro 5G"
+ *
+ * "Sony WH-1000XM5 Wireless Industry Leading Noise Canceling Headphones - Black"
+ * => "Sony WH-1000XM5 Wireless Headphones"
+ */
+export function extractCoreProductQuery(rawQuery: string): string {
+  if (!rawQuery) return "";
+  let text = rawQuery.trim();
+
+  // 1. Remove store suffixes & pipes
+  text = text.replace(/\s*\|.*$/i, "");
+
+  // 2. Remove common marketing clauses after hyphens / dashes / colons
+  text = text.replace(
+    /\s+[-–—]\s+(zeiss|with\s+|auto\s+|industry|ai\s+|camera|lens|processor|battery|display|official|buy\s+|fast\s+|original|black|white|blue|green|red|gold|silver|titanium|grey|gray|teal|midnight).*$/i,
+    ""
+  );
+
+  // If there is still a trailing " - Anything", if preceding text already has brand/model, strip it
+  if (/\s+[-–—]\s+/.test(text)) {
+    const parts = text.split(/\s+[-–—]\s+/);
+    if (parts[0] && parts[0].trim().split(/\s+/).length >= 2) {
+      text = parts[0].trim();
+    }
+  }
+
+  // 3. Remove parenthetical specs / color variants: (Asteroid Black, 512 GB, 16 GB RAM), [16GB/512GB]
+  text = text.replace(
+    /\s*\([^)]*(?:gb|ram|storage|rom|black|white|blue|green|red|gold|silver|titanium|gray|grey|teal|midnight|mah|watt|inch|cm|refurbished|renewed)[^)]*\)/gi,
+    ""
+  );
+  text = text.replace(
+    /\s*\[[^\]]*(?:gb|ram|storage|rom|black|white|blue|green|red|gold|silver|titanium|gray|grey|teal|midnight|mah|watt|inch|cm|refurbished|renewed)[^\]]*\]/gi,
+    ""
+  );
+
+  // 4. Remove standalone marketing phrases inside the main title
+  text = text.replace(/\b(ai smartphone|flagship smartphone|5g smartphone)\b/gi, "");
+  text = text.replace(/\b(zeiss\s+[0-9a-z\s-]+camera)\b/gi, "");
+  text = text.replace(/\b(industry leading noise canceling)\b/gi, "");
+
+  // 5. Replace any remaining hyphens/underscores with spaces (NEVER send '-' to Google Shopping as it negates words)
+  text = text.replace(/[-–—_]/g, " ");
+
+  // 6. Remove quotes, commas, brackets, colons, slashes
+  text = text.replace(/[\(\)\[\]\{\}\"\'\`,:;\/\\]/g, " ");
+
+  // 7. Normalize spaces
+  text = text.replace(/\s+/g, " ").trim();
+
+  return text;
+}
+
+/**
  * Universal Query Intent Analyzer.
  * Decomposes any input query into semantic vectors and dynamically determines specificity.
  */
@@ -137,8 +196,13 @@ export function analyzeQueryIntent(rawQuery: string): QueryIntent {
     .replace(/\blaptops\b/g, "laptop")
     .replace(/\bsneakers\b/g, "shoes");
 
-  // 2. Clean Search Term (Strip search operator noise)
+  // Extract clean core product query
+  const coreProductQuery = extractCoreProductQuery(rawQuery);
+
+  // 2. Clean Search Term (Strip search operator noise, brackets, hyphens, noise words)
   const cleanSearchTerm = normalizedQuery
+    .replace(/[-–—_]/g, " ")
+    .replace(/[\(\)\[\]\{\}\"\'\`,:;\/\\]/g, " ")
     .replace(NOISE_WORDS, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -186,7 +250,7 @@ export function analyzeQueryIntent(rawQuery: string): QueryIntent {
 
   // Infer device form from well-known device lines if not explicitly written
   if (!detectedForm) {
-    if (/\b(iphone|redmi|galaxy\s*s|pixel|oneplus|realme|iqoo)\b/i.test(lower)) {
+    if (/\b(iphone|redmi|galaxy\s*s|galaxy\s*z|pixel|oneplus|realme|iqoo|vivo|oppo|motorola|moto|poco|xiaomi|honor|nothing\s*phone)\b/i.test(lower)) {
       detectedForm = "phone";
       detectedCategory = "Smartphones & Mobiles";
     } else if (/\b(macbook|thinkpad|zenbook|ideapad|vivobook|legion|omen|victus)\b/i.test(lower)) {
@@ -300,6 +364,7 @@ export function analyzeQueryIntent(rawQuery: string): QueryIntent {
     rawQuery,
     normalizedQuery,
     cleanSearchTerm: cleanSearchTerm || normalizedQuery,
+    coreProductQuery: coreProductQuery || cleanSearchTerm || normalizedQuery,
     brand: detectedBrand,
     allowedBrands,
     category: detectedCategory,

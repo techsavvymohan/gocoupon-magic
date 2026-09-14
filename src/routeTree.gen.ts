@@ -30,6 +30,7 @@ import { Route as MeeshoCouponsRouteImport } from './routes/meesho-coupons'
 import { Route as MyntraCouponsRouteImport } from './routes/myntra-coupons'
 import { Route as OffersRouteImport } from './routes/offers'
 import { Route as PressRouteImport } from './routes/press'
+import { Route as PricingIntelligenceRouteImport } from './routes/pricing-intelligence'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as SecurityRouteImport } from './routes/security'
@@ -152,6 +153,11 @@ const PressRoute = PressRouteImport.update({
   path: '/press',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PricingIntelligenceRoute = PricingIntelligenceRouteImport.update({
+  id: '/pricing-intelligence',
+  path: '/pricing-intelligence',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -255,6 +261,7 @@ export interface FileRoutesByFullPath {
   '/myntra-coupons': typeof MyntraCouponsRoute
   '/offers': typeof OffersRoute
   '/press': typeof PressRoute
+  '/pricing-intelligence': typeof PricingIntelligenceRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
   '/security': typeof SecurityRoute
@@ -294,6 +301,7 @@ export interface FileRoutesByTo {
   '/myntra-coupons': typeof MyntraCouponsRoute
   '/offers': typeof OffersRoute
   '/press': typeof PressRoute
+  '/pricing-intelligence': typeof PricingIntelligenceRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
   '/security': typeof SecurityRoute
@@ -334,6 +342,7 @@ export interface FileRoutesById {
   '/myntra-coupons': typeof MyntraCouponsRoute
   '/offers': typeof OffersRoute
   '/press': typeof PressRoute
+  '/pricing-intelligence': typeof PricingIntelligenceRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
   '/security': typeof SecurityRoute
@@ -375,6 +384,7 @@ export interface FileRouteTypes {
     | '/myntra-coupons'
     | '/offers'
     | '/press'
+    | '/pricing-intelligence'
     | '/privacy'
     | '/resources'
     | '/security'
@@ -414,6 +424,7 @@ export interface FileRouteTypes {
     | '/myntra-coupons'
     | '/offers'
     | '/press'
+    | '/pricing-intelligence'
     | '/privacy'
     | '/resources'
     | '/security'
@@ -453,6 +464,7 @@ export interface FileRouteTypes {
     | '/myntra-coupons'
     | '/offers'
     | '/press'
+    | '/pricing-intelligence'
     | '/privacy'
     | '/resources'
     | '/security'
@@ -493,6 +505,7 @@ export interface RootRouteChildren {
   MyntraCouponsRoute: typeof MyntraCouponsRoute
   OffersRoute: typeof OffersRoute
   PressRoute: typeof PressRoute
+  PricingIntelligenceRoute: typeof PricingIntelligenceRoute
   PrivacyRoute: typeof PrivacyRoute
   ResourcesRoute: typeof ResourcesRoute
   SecurityRoute: typeof SecurityRoute
@@ -660,6 +673,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pricing-intelligence': {
+      id: '/pricing-intelligence'
+      path: '/pricing-intelligence'
+      fullPath: '/pricing-intelligence'
+      preLoaderRoute: typeof PricingIntelligenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -797,6 +817,7 @@ const rootRouteChildren: RootRouteChildren = {
   MyntraCouponsRoute: MyntraCouponsRoute,
   OffersRoute: OffersRoute,
   PressRoute: PressRoute,
+  PricingIntelligenceRoute: PricingIntelligenceRoute,
   PrivacyRoute: PrivacyRoute,
   ResourcesRoute: ResourcesRoute,
   SecurityRoute: SecurityRoute,
