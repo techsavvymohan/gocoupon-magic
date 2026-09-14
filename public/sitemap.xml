@@ -187,6 +187,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://gocoupon.io/submit-coupon</loc>
+    <lastmod>2026-09-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://gocoupon.io/uninstall</loc>
     <lastmod>2026-09-14</lastmod>
     <changefreq>weekly</changefreq>

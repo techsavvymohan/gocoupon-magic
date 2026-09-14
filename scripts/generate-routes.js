@@ -644,6 +644,18 @@ const routeConfigs = [
     `,
   },
   {
+    path: "submit-coupon",
+    title: "Submit a Coupon – Share Verified Deals | GoCoupon",
+    description: "Submit working coupon codes, promo links, and store discounts to the GoCoupon community. Help thousands of shoppers worldwide save money.",
+    h1: "Share a Verified Coupon or Store Discount Code",
+    lead: "Found a working promo code or hidden discount? Share it with our global community. Our verification engine tests submissions in parallel.",
+    directAnswer: "Submit working coupons and promo codes on GoCoupon. Our autonomous verification engine tests submissions in under 850ms before publishing to our live deals feed.",
+    articleContent: `
+      <h2>Community-Driven Deal Verification</h2>
+      <p>GoCoupon empowers shoppers worldwide to share working promo codes and exclusive discounts. Every submission is scanned against store checkout forms in parallel to guarantee high accuracy.</p>
+    `,
+  },
+  {
     path: "uninstall",
     title: "Extension Feedback & Uninstall Help | GoCoupon",
     description: "We are sorry to see you uninstall GoCoupon. Share your feedback so we can continue improving our coupon automation and price comparison capabilities.",

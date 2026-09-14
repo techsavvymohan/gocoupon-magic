@@ -88,6 +88,24 @@ export function PriceAlertModal({
       store: "Amazon / Flipkart",
     });
 
+    // Register with backend email alert service if email provided
+    if (email.trim()) {
+      try {
+        fetch("/api/alerts/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: email.trim(),
+            productId,
+            productTitle,
+            targetPrice,
+            currentPrice,
+            store: "Amazon / Flipkart",
+          }),
+        }).catch(() => {});
+      } catch {}
+    }
+
     // If push is supported and not denied, prompt user to receive notifications
     if (pushStatus === "default") {
       await requestNotificationPermission();

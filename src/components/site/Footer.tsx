@@ -165,6 +165,15 @@ export function Footer() {
                       Exclusive Offers
                     </Link>
                   </li>
+                  <li>
+                    <Link
+                      to="/submit-coupon"
+                      className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs flex items-center gap-1.5"
+                    >
+                      <span>Submit a Coupon</span>
+                      <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold text-primary">NEW</span>
+                    </Link>
+                  </li>
                 </ul>
               </div>
 

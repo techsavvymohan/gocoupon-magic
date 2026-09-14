@@ -35,6 +35,7 @@ import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as SecurityRouteImport } from './routes/security'
 import { Route as SitemapRouteImport } from './routes/sitemap'
 import { Route as StoresRouteImport } from './routes/stores'
+import { Route as SubmitCouponRouteImport } from './routes/submit-coupon'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ThankYouRouteImport } from './routes/thank-you'
 import { Route as UninstallRouteImport } from './routes/uninstall'
@@ -176,6 +177,11 @@ const StoresRoute = StoresRouteImport.update({
   path: '/stores',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SubmitCouponRoute = SubmitCouponRouteImport.update({
+  id: '/submit-coupon',
+  path: '/submit-coupon',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -254,6 +260,7 @@ export interface FileRoutesByFullPath {
   '/security': typeof SecurityRoute
   '/sitemap': typeof SitemapRoute
   '/stores': typeof StoresRoute
+  '/submit-coupon': typeof SubmitCouponRoute
   '/terms': typeof TermsRoute
   '/thank-you': typeof ThankYouRoute
   '/uninstall': typeof UninstallRoute
@@ -292,6 +299,7 @@ export interface FileRoutesByTo {
   '/security': typeof SecurityRoute
   '/sitemap': typeof SitemapRoute
   '/stores': typeof StoresRoute
+  '/submit-coupon': typeof SubmitCouponRoute
   '/terms': typeof TermsRoute
   '/thank-you': typeof ThankYouRoute
   '/uninstall': typeof UninstallRoute
@@ -331,6 +339,7 @@ export interface FileRoutesById {
   '/security': typeof SecurityRoute
   '/sitemap': typeof SitemapRoute
   '/stores': typeof StoresRoute
+  '/submit-coupon': typeof SubmitCouponRoute
   '/terms': typeof TermsRoute
   '/thank-you': typeof ThankYouRoute
   '/uninstall': typeof UninstallRoute
@@ -371,6 +380,7 @@ export interface FileRouteTypes {
     | '/security'
     | '/sitemap'
     | '/stores'
+    | '/submit-coupon'
     | '/terms'
     | '/thank-you'
     | '/uninstall'
@@ -409,6 +419,7 @@ export interface FileRouteTypes {
     | '/security'
     | '/sitemap'
     | '/stores'
+    | '/submit-coupon'
     | '/terms'
     | '/thank-you'
     | '/uninstall'
@@ -447,6 +458,7 @@ export interface FileRouteTypes {
     | '/security'
     | '/sitemap'
     | '/stores'
+    | '/submit-coupon'
     | '/terms'
     | '/thank-you'
     | '/uninstall'
@@ -486,6 +498,7 @@ export interface RootRouteChildren {
   SecurityRoute: typeof SecurityRoute
   SitemapRoute: typeof SitemapRoute
   StoresRoute: typeof StoresRoute
+  SubmitCouponRoute: typeof SubmitCouponRoute
   TermsRoute: typeof TermsRoute
   ThankYouRoute: typeof ThankYouRoute
   UninstallRoute: typeof UninstallRoute
@@ -682,6 +695,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StoresRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/submit-coupon': {
+      id: '/submit-coupon'
+      path: '/submit-coupon'
+      fullPath: '/submit-coupon'
+      preLoaderRoute: typeof SubmitCouponRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -782,6 +802,7 @@ const rootRouteChildren: RootRouteChildren = {
   SecurityRoute: SecurityRoute,
   SitemapRoute: SitemapRoute,
   StoresRoute: StoresRoute,
+  SubmitCouponRoute: SubmitCouponRoute,
   TermsRoute: TermsRoute,
   ThankYouRoute: ThankYouRoute,
   UninstallRoute: UninstallRoute,

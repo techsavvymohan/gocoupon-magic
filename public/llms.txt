@@ -1,51 +1,40 @@
-# GoCoupon — Automated Coupon Application, Live Multi-Store Price Comparison & 30-Day Price Tracker
+# GoCoupon — Autonomous Shopping & Savings Infrastructure, 850ms Coupon Applier & Global Price Intelligence
 
-> GoCoupon is an all-in-one shopping intelligence platform and browser extension for Indian e-commerce (Flipkart, Amazon India, Myntra, Meesho, AJIO, Nykaa, Croma, Tata CLiQ, Swiggy, Zomato, and 200+ stores). It combines automated coupon testing, real-time cross-store price comparison, 30-day price tracking graphs, and fake discount detection.
+> GoCoupon (gocoupon.io) is an autonomous shopping & savings infrastructure and browser extension operating globally across 8 major currencies (USD, EUR, GBP, AED, SGD, CAD, AUD, INR) and 6 languages (English, Hindi, Spanish, German, French, Arabic RTL). It combines automated coupon testing in under 850 milliseconds, real-time cross-store price comparison, 30-day price tracking graphs, fake discount detection, and bank card discount stacking across 500+ global retailers.
 
-## Core Capabilities
+## Core Architectural Engines
 
-- **1-Click Auto-Apply**: Automatically detects promo code input boxes at checkout and tests valid store coupon codes in parallel in under 850 milliseconds.
-- **Live Cross-Store Price Comparison**: Instantly compares live prices, delivery fees, stackable coupons, and cashback across Amazon, Flipkart, Myntra, Croma, and Tata CLiQ (`/compare`).
-- **30-Day Price History Tracker**: Analyzes historical daily price snapshots across 30 days to identify all-time lows and detect artificial pre-sale price markups (fake discounts) (`/price-history`).
-- **Ask Shopping Intelligence**: Top AI search bar and shopping dossier analyzing user queries and finding the lowest price and best coupon across stores (`/ask`).
-- **Cashback Stacking**: Automatically calculates up to 8.5% cashback on top of promo codes without voiding bank card discounts.
-- **Privacy & Security**: Manifest V3 compliant. No browsing history tracking, no account required, completely free.
+1. **Instant 850ms Auto-Apply Chrome Extension (Passive Retention)**: Automatically detects promo code input fields at checkout and tests valid store coupon codes in parallel in under 850 milliseconds, eliminating manual code hunting.
+2. **Omnichannel Cross-Border Multi-Currency Engine**: Live currency conversion, exchange rate benchmarks, and geolocation detection across 8 top currencies: USD ($), EUR (€), GBP (£), AED, SGD (S$), CAD (C$), AUD (A$), and INR (₹), with native 6-language localization and bidirectional RTL layout switching.
+3. **Algorithmic Price Intelligence & AI Shopping Assistant (`/ask`, `/compare`)**: Powered by a privacy-first SearXNG aggregator daemon and Open Food Facts barcode lookup, cross-referencing prices across 500+ stores with zero human overhead.
+4. **Zero-Labor SEO & Distribution Engine**: 145+ statically pre-rendered HTML routes, automated XML sitemap synchronization, and deep JSON-LD semantic markup for search engines and generative AI agents (ChatGPT, Claude, Perplexity).
+5. **Community Crowdsourced Verification Desk (`/submit-coupon`)**: Self-service user submissions reviewed with 1-click publishing from the `/admin` command center.
+6. **30-Day Price History & Honesty Radar**: Tracks daily price snapshots over 30 days to expose artificial pre-sale price markups and alert users to genuine historical lows.
 
-## Supported Retailers (India)
+## Supported Retailers (Global & India)
 
-- Amazon India (`amazon.in`)
-- Flipkart (`flipkart.com`)
-- Myntra (`myntra.com`)
-- Meesho (`meesho.com`)
-- AJIO (`ajio.com`)
-- Nykaa (`nykaa.com`)
-- Croma (`croma.com`)
-- Tata CLiQ (`tatacliq.com`)
-- Reliance Digital (`reliancedigital.in`)
-- Vijay Sales (`vijaysales.com`)
-- Swiggy (`swiggy.com`)
-- Zomato (`zomato.com`)
-- Blinkit (`blinkit.com`)
-- Zepto (`zeptonow.com`)
-- boAt Lifestyle (`boat-lifestyle.com`)
-- Amazon United States (`amazon.com`)
-- Walmart (`walmart.com`)
-- Target (`target.com`)
-- Best Buy (`bestbuy.com`)
+- Amazon Global (US, UK, India, DE, JP)
+- Walmart, Target, Best Buy, eBay
+- Booking.com, Agoda, MakeMyTrip
+- Flipkart, Myntra, Meesho, AJIO, Nykaa
+- Croma, Tata CLiQ, Reliance Digital, Vijay Sales
+- Swiggy, Zomato, Blinkit, Zepto
+- boAt Lifestyle, Nike, Apple, Samsung, Sephora
 
 ## Key Facts & Specifications
 
-- Category: E-Commerce Shopping Assistant & Price Tracker (SoftwareApplication / BrowserApplication)
+- Category: Autonomous Shopping Infrastructure & Price Tracker (SoftwareApplication / BrowserApplication)
 - Official Chrome Extension ID: `bbdcjoadldgankjdhdlmncacpkengnid`
 - Chrome Web Store URL: https://chromewebstore.google.com/detail/gocoupon-%E2%80%93-coupon-finder/bbdcjoadldgankjdhdlmncacpkengnid
-- Supported Regions: United States (USD / $), India (INR / ₹), and Global
+- Supported Currencies: USD ($), EUR (€), GBP (£), AED, SGD (S$), CAD (C$), AUD (A$), INR (₹)
+- Supported Languages: English (en), Hindi (hi), Spanish (es), German (de), French (fr), Arabic (ar - RTL)
 - Supported Browsers: Google Chrome, Microsoft Edge, Brave, Arc, Opera
-- Price: 100% Free ($0 / ₹0)
+- Price: 100% Free ($0 / ₹0 / €0 / £0)
 - Trust & Ratings: 4.8 / 5 across 1,420+ verified Chrome Web Store reviews
 - Architecture: Google Chrome Manifest V3 (isolated sandboxed DOM, zero remote code)
 - Privacy Compliance: Full compliance with Google Chrome Web Store User Data & Limited Use policies
 - Zero Data Access Guarantee: No PII, no credit card or payment data, no passwords, no keystrokes, no general web browsing history tracking.
-- Affiliate Transparency: GoCoupon earns a commission on qualifying partner purchases at zero additional cost to the shopper. Tracking requires an affirmative user action.
+- Affiliate Transparency: GoCoupon earns a qualifying commission on partner purchases at zero additional cost to the shopper (FTC 16 CFR § 255.5 compliant).
 
 ## Site Structure & Key Endpoints
 
