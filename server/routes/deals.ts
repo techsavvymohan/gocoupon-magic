@@ -168,6 +168,10 @@ dealsRouter.post("/submit", async (req: Request, res: Response) => {
       terms: submission.terms || `Community verified offer for ${submission.storeName}.`,
       link: submission.url || `https://${submission.storeName.toLowerCase().replace(/[^a-z0-9]/g, "")}.com`,
       usesCount: 50,
+      source: "community",
+      verified: false,
+      status: "pending",
+      type: "coupon",
     };
     addDealToPool(newDeal);
     dealsDb.upsertDeals([newDeal]).catch((e) => console.warn("[Deals DB Upsert Warning]:", e.message));

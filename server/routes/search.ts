@@ -39,7 +39,12 @@ searchRouter.get("/", async (req: Request, res: Response) => {
     return;
   }
 
-  const q = ((req.query.q as string) || "").trim();
+  // Sanitize q: strip HTML tags and limit length to prevent XSS reflection
+  const rawQ = ((req.query.q as string) || "").trim();
+  const q = rawQ.replace(/<[^>]*>/g, "").replace(/[&<>"'`]/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#x27;", "`": "&#x60;",
+  }[c] || c)).slice(0, 200);
+
   if (!q) {
     res.status(400).json({ error: "Search query 'q' parameter is required." });
     return;

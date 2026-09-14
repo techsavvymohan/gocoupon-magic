@@ -11,6 +11,7 @@ import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import { UrlResolverSearch } from "@/components/shopping/UrlResolverSearch";
 import { PriceHistoryChart } from "@/components/shopping/PriceHistoryChart";
 import { PriceAlertModal } from "@/components/shopping/PriceAlertModal";
+import { useLoadingBus } from "@/context/LoadingContext";
 import {
   searchProductsAcrossPlatforms,
   getPlatformTrustRank,
@@ -140,6 +141,7 @@ export function ComparePage() {
   const { q, url } = useSearch({ from: "/compare" });
   const activeSearchParam = url || q || "";
   const { formatPrice, isIndia, symbol } = useCurrency();
+  const { startLoading } = useLoadingBus();
 
   const [searchResult, setSearchResult] = useState<MultiPlatformSearchResult | null>(null);
   const [isSearching, setIsSearching] = useState(false);
@@ -181,6 +183,7 @@ export function ComparePage() {
 
     let isMounted = true;
     setIsSearching(true);
+    const stopLoading = startLoading("compare-search");
 
     // Check Open Food Facts if search query is a barcode
     const isBarcode = /^[0-9]{8,14}$/.test(trimmed.replace(/[-\s]/g, ""));
@@ -217,12 +220,14 @@ export function ComparePage() {
       })
       .finally(() => {
         if (isMounted) setIsSearching(false);
+        stopLoading();
       });
 
     return () => {
       isMounted = false;
+      stopLoading();
     };
-  }, [activeSearchParam, activeShoprs]);
+  }, [activeSearchParam, activeShoprs, startLoading]);
 
   const handleCopy = (code: string) => {
     navigator.clipboard.writeText(code).catch(() => {});

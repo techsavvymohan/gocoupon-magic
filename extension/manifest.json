@@ -1,12 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "GoCoupon – Coupon Finder",
-  "version": "1.0.0",
-  "description": "Never overpay. Instant Landed Cost stacking with verified coupons, bank card maximizer, and 2-second checkout auto-apply.",
+  "name": "GoCoupon – Coupon Finder & Auto-Apply",
+  "version": "1.1.0",
+  "description": "Never overpay. Live coupons from GoCoupon database (Cuelinks + Admitad + Community). Auto-apply best coupon at checkout in 2 seconds.",
   "permissions": [
     "storage",
     "activeTab",
-    "alarms"
+    "alarms",
+    "tabs",
+    "scripting",
+    "clipboardWrite"
   ],
   "host_permissions": [
     "*://*.amazon.in/*",
@@ -15,6 +18,10 @@
     "*://*.walmart.com/*",
     "*://*.bestbuy.com/*",
     "*://*.croma.com/*",
+    "*://*.myntra.com/*",
+    "*://*.meesho.com/*",
+    "*://*.nykaa.com/*",
+    "*://*.ajio.com/*",
     "https://*.supabase.co/*",
     "https://gocoupon.io/*"
   ],
@@ -29,7 +36,11 @@
         "*://*.flipkart.com/*",
         "*://*.walmart.com/*",
         "*://*.bestbuy.com/*",
-        "*://*.croma.com/*"
+        "*://*.croma.com/*",
+        "*://*.myntra.com/*",
+        "*://*.meesho.com/*",
+        "*://*.nykaa.com/*",
+        "*://*.ajio.com/*"
       ],
       "js": ["content.js"],
       "run_at": "document_idle"
@@ -37,6 +48,7 @@
   ],
   "action": {
     "default_title": "GoCoupon Savings Wingman",
+    "default_popup": "popup.html",
     "default_icon": {
       "16": "icon_16.png",
       "32": "icon_32.png",

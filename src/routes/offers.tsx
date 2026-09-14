@@ -10,6 +10,18 @@ import { DealGridSkeleton } from "@/components/ui/DataSkeleton";
 import { StoreLogo } from "@/components/common/StoreLogo";
 import { RedeemCouponButton } from "@/components/common/RedeemCouponButton";
 import { SubmitCouponButton } from "@/components/submit_coupon";
+import { useLoadingBus } from "@/context/LoadingContext";
+import {
+  DealCard,
+  BankOfferCard,
+  CategoryCard,
+  StoreDirectoryCard,
+  PopularBrandCard,
+  OffersAlphabetBar,
+  type SidebarTab,
+  type PopularBrand,
+  type BankOffer,
+} from "@/components/offers";
 import {
   Flame,
   Tag,
@@ -83,8 +95,6 @@ const SORT_OPTIONS: { id: DealSortField; label: string; icon: any; color: string
 ];
 
 // Sidebar Discovery Tabs
-type SidebarTab = "brands" | "categories" | "stores" | "banks" | "festivals" | "product-deals";
-
 const SIDEBAR_TABS: { id: SidebarTab; label: string; icon: any; badge?: string }[] = [
   { id: "categories", label: "Categories", icon: Grid, badge: "8" },
   { id: "brands", label: "Brands", icon: Tag, badge: "Popular" },
@@ -98,17 +108,6 @@ const SIDEBAR_TABS: { id: SidebarTab; label: string; icon: any; badge?: string }
 const ALPHABET = ["All", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")];
 
 // Top Curated Popular Brands (matching the screenshot reference)
-interface PopularBrand {
-  name: string;
-  query: string;
-  logo: string;
-  tagline: string;
-  couponsCount: number;
-  offersCount: number;
-  bgClass?: string;
-  textColorClass?: string;
-}
-
 const DEFAULT_POPULAR_BRANDS: PopularBrand[] = [
   {
     name: "Samsung",
@@ -145,17 +144,6 @@ const DEFAULT_POPULAR_BRANDS: PopularBrand[] = [
     textColorClass: "text-white",
   },
 ];
-
-interface BankOffer {
-  bankName: string;
-  logo: string;
-  cardType: string;
-  discount: string;
-  code: string;
-  applicableStores: string[];
-  minOrder: string;
-  maxSavings: string;
-}
 
 // Curated Bank Offers for the "Banks" Discovery Tab
 const BANK_OFFERS_DATA: BankOffer[] = [
@@ -222,6 +210,8 @@ const BANK_OFFERS_DATA: BankOffer[] = [
 ];
 
 function OffersHubPage() {
+  const { startLoading } = useLoadingBus();
+
   // Navigation & Filtering State
   const [activeSidebarTab, setActiveSidebarTab] = useState<SidebarTab>("categories");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -566,6 +556,7 @@ function OffersHubPage() {
 
   const handleLiveSync = async () => {
     setIsSyncing(true);
+    const stopLoading = startLoading("offers-sync");
     toast.info("Connecting to Cuelinks & Admitad APIs... Ingesting fresh live deals.");
     try {
       const res = await triggerLiveSync();
@@ -579,6 +570,7 @@ function OffersHubPage() {
       toast.error("Could not sync right now, using active live deals pool.");
     } finally {
       setIsSyncing(false);
+      stopLoading();
     }
   };
 
@@ -926,81 +918,8 @@ function OffersHubPage() {
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
-                  {BANK_OFFERS_DATA.map((bank, i) => (
-                    <div
-                      key={i}
-                      className="rounded-2xl border border-border bg-card p-5 shadow-xs hover:border-primary/40 hover:shadow-md transition-all flex flex-col justify-between"
-                    >
-                      <div>
-                        {/* Top: Official Bank Logo + Bank Name & Type + Discount Badge */}
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className="h-11 w-11 rounded-xl bg-white dark:bg-card border border-border/80 p-1.5 shrink-0 flex items-center justify-center shadow-xs">
-                              <img
-                                src={bank.logo}
-                                alt={`${bank.bankName} logo`}
-                                className="max-h-full max-w-full object-contain"
-                                loading="lazy"
-                              />
-                            </div>
-                            <div className="min-w-0">
-                              <h3 className="font-display font-bold text-base text-foreground truncate">
-                                {bank.bankName}
-                              </h3>
-                              <div className="text-xs text-muted-foreground mt-0.5 font-medium truncate">
-                                {bank.cardType}
-                              </div>
-                            </div>
-                          </div>
-
-                          <span className="rounded-full bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 shrink-0 font-mono">
-                            {bank.discount}
-                          </span>
-                        </div>
-
-                        {/* Order & Savings Specs */}
-                        <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between text-xs">
-                          <div>
-                            <span className="text-muted-foreground">Min Order: </span>
-                            <strong className="text-foreground font-mono">{bank.minOrder}</strong>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Max Savings: </span>
-                            <strong className="text-foreground font-mono">{bank.maxSavings}</strong>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-4 pt-2">
-                        {/* Coupon Code Block */}
-                        <div className="flex items-center justify-between gap-3 bg-muted/40 rounded-xl p-2.5 border border-border/60">
-                          <div className="font-mono text-xs font-bold text-foreground">
-                            Code: <span className="text-primary font-black tracking-wider text-sm">{bank.code}</span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              navigator.clipboard.writeText(bank.code);
-                              toast.success(`Bank code "${bank.code}" copied to clipboard!`);
-                            }}
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 hover:bg-primary hover:text-primary-foreground text-primary px-3 py-1.5 text-xs font-bold transition-all cursor-pointer"
-                          >
-                            <Copy className="h-3.5 w-3.5" />
-                            <span>Copy Code</span>
-                          </button>
-                        </div>
-
-                        {/* Applicable Stores */}
-                        <div className="mt-3 text-[11px] text-muted-foreground flex flex-wrap items-center gap-1.5">
-                          <span className="font-medium text-muted-foreground/80">Valid on:</span>
-                          {bank.applicableStores.map((st) => (
-                            <span key={st} className="rounded-md bg-muted/70 px-1.5 py-0.5 text-[10px] font-medium text-foreground">
-                              {st}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+                  {BANK_OFFERS_DATA.map((bank) => (
+                    <BankOfferCard key={bank.code} bank={bank} />
                   ))}
                 </div>
               </div>
@@ -1042,59 +961,18 @@ function OffersHubPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {allRealCategories.map((cat) => {
                     const meta = ALL_CATEGORY_META[cat.name] || { label: cat.name, icon: Tag };
-                    const CatIcon = meta.icon;
                     const isSelected = selectedCategory.toLowerCase() === cat.name.toLowerCase();
-
                     return (
-                      <div
+                      <CategoryCard
                         key={cat.name}
-                        onClick={() => {
-                          setSelectedCategory(isSelected ? "all" : cat.name);
+                        category={cat}
+                        metaIcon={meta.icon}
+                        isSelected={isSelected}
+                        onSelect={(name) => {
+                          setSelectedCategory(isSelected ? "all" : name);
                           dealsGridRef.current?.scrollIntoView({ behavior: "smooth" });
                         }}
-                        className={`group flex flex-col justify-between rounded-2xl border p-4 transition-all duration-200 cursor-pointer hover:shadow-md hover:-translate-y-0.5 ${
-                          isSelected
-                            ? "border-primary bg-primary/5 ring-2 ring-primary/20 shadow-sm"
-                            : "border-border bg-card hover:border-primary/40"
-                        }`}
-                      >
-                        <div>
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                              <CatIcon className="h-5 w-5" />
-                            </div>
-                            <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                              {cat.maxDiscount || "Verified Deals"}
-                            </span>
-                          </div>
-
-                          <h3 className="font-display font-bold text-base text-foreground group-hover:text-primary transition-colors">
-                            {cat.name}
-                          </h3>
-                          <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
-                            {cat.description || `Hand-verified ${cat.name} discount coupons & deals.`}
-                          </p>
-
-                          {cat.topStores.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-3">
-                              {cat.topStores.map((st) => (
-                                <span key={st} className="rounded-md bg-muted/60 px-1.5 py-0.5 text-[10px] text-muted-foreground font-medium">
-                                  {st}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between text-xs">
-                          <span className="font-mono font-bold text-foreground">
-                            {cat.offersCount} Deals
-                          </span>
-                          <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
-                            {cat.couponsCount} Codes
-                          </span>
-                        </div>
-                      </div>
+                      />
                     );
                   })}
                 </div>
@@ -1155,25 +1033,11 @@ function OffersHubPage() {
                   </div>
 
                   {/* Alphabet Pills */}
-                  <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
-                    {ALPHABET.map((letter) => {
-                      const isSelected = storeAlphabetFilter === letter;
-                      return (
-                        <button
-                          key={letter}
-                          type="button"
-                          onClick={() => setStoreAlphabetFilter(letter)}
-                          className={`inline-flex items-center justify-center shrink-0 min-w-[28px] h-7 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                            isSelected
-                              ? "bg-primary text-primary-foreground shadow-xs font-extrabold"
-                              : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                          }`}
-                        >
-                          {letter}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <OffersAlphabetBar
+                    selectedLetter={storeAlphabetFilter}
+                    onSelectLetter={setStoreAlphabetFilter}
+                    ariaLabel="Store directory alphabet filter"
+                  />
                 </div>
 
                 {/* Store Cards Grid */}
@@ -1181,48 +1045,15 @@ function OffersHubPage() {
                   {filteredStoresList.map((store) => {
                     const isSelected = selectedBrandFilter?.toLowerCase() === store.name.toLowerCase();
                     return (
-                      <div
+                      <StoreDirectoryCard
                         key={store.name}
-                        onClick={() => {
-                          setSelectedBrandFilter(isSelected ? null : store.name);
+                        store={store}
+                        isSelected={isSelected}
+                        onSelect={(name) => {
+                          setSelectedBrandFilter(isSelected ? null : name);
                           dealsGridRef.current?.scrollIntoView({ behavior: "smooth" });
                         }}
-                        className={`group relative flex flex-col justify-between rounded-2xl border p-3.5 transition-all duration-200 cursor-pointer hover:shadow-md hover:-translate-y-0.5 ${
-                          isSelected
-                            ? "border-primary bg-primary/5 ring-2 ring-primary/20 shadow-sm"
-                            : "border-border bg-card hover:border-primary/40"
-                        }`}
-                      >
-                        {isSelected && (
-                          <div className="absolute top-2 right-2 h-4 w-4 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                            <Check className="h-2.5 w-2.5 stroke-[3]" />
-                          </div>
-                        )}
-
-                        <div className="flex flex-col items-center text-center">
-                          <StoreLogo
-                            storeName={store.name}
-                            storeLogo={store.logo}
-                            className="h-12 w-12 rounded-xl p-1.5 mb-2 shadow-xs"
-                            imageClassName="max-h-full max-w-full object-contain"
-                          />
-                          <h4 className="font-display font-bold text-xs sm:text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                            {store.name}
-                          </h4>
-                          <span className="text-[10px] text-muted-foreground mt-0.5 font-medium">
-                            {store.category}
-                          </span>
-                        </div>
-
-                        <div className="mt-3 pt-2 border-t border-border/60 flex items-center justify-between text-[10px] font-mono">
-                          <span className="text-foreground font-bold">{store.offersCount} Deals</span>
-                          {store.couponsCount > 0 ? (
-                            <span className="text-emerald-600 dark:text-emerald-400 font-bold">{store.couponsCount} Codes</span>
-                          ) : (
-                            <span className="text-muted-foreground">Active</span>
-                          )}
-                        </div>
-                      </div>
+                      />
                     );
                   })}
                 </div>
@@ -1252,51 +1083,14 @@ function OffersHubPage() {
 
                 {/* 4-Column Grid of Popular Brands */}
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                  {popularBrands.map((brand) => {
-                    const isSelected = selectedBrandFilter === brand.query;
-                    return (
-                      <div
-                        key={brand.name}
-                        onClick={() => handlePopularBrandClick(brand.query)}
-                        className={`group relative flex flex-col justify-between rounded-2xl border bg-card p-4 transition-all duration-200 cursor-pointer hover:shadow-md hover:-translate-y-0.5 ${
-                          isSelected
-                            ? "border-primary ring-2 ring-primary/20 shadow-md bg-primary/5"
-                            : "border-border/80 hover:border-primary/50"
-                        }`}
-                      >
-                        {/* Selected Indicator */}
-                        {isSelected && (
-                          <div className="absolute top-2.5 right-2.5 h-5 w-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                            <Check className="h-3 w-3 stroke-[3]" />
-                          </div>
-                        )}
-
-                        {/* Centered Brand Logo Box */}
-                        <div
-                          className={`h-24 sm:h-28 w-full rounded-xl flex items-center justify-center p-3 mb-3 transition-colors ${
-                            brand.bgClass || "bg-muted/20 group-hover:bg-muted/40"
-                          }`}
-                        >
-                          <img
-                            src={brand.logo}
-                            alt={brand.name}
-                            className="max-h-12 max-w-[120px] object-contain drop-shadow-xs group-hover:scale-105 transition-transform"
-                            loading="lazy"
-                          />
-                        </div>
-
-                        {/* Brand Name & Counts */}
-                        <div>
-                          <h3 className="font-display font-bold text-sm sm:text-base text-foreground leading-snug">
-                            {brand.name}
-                          </h3>
-                          <div className="text-xs text-muted-foreground mt-0.5 font-medium">
-                            {brand.couponsCount} Coupons &bull; {brand.offersCount} Offers
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                  {popularBrands.map((brand) => (
+                    <PopularBrandCard
+                      key={brand.name}
+                      brand={brand}
+                      isSelected={selectedBrandFilter === brand.query}
+                      onSelect={handlePopularBrandClick}
+                    />
+                  ))}
                 </div>
               </section>
             )}
@@ -1383,28 +1177,14 @@ function OffersHubPage() {
               {/* Alphabet Navigation & Search Bar */}
               <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3.5 bg-card/80 border border-border/80 rounded-2xl p-3 shadow-xs">
                 {/* Alphabet Pills Bar */}
-                <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
-                  {ALPHABET.map((letter) => {
-                    const isSelected = selectedAlphabet === letter;
-                    return (
-                      <button
-                        key={letter}
-                        type="button"
-                        onClick={() => {
-                          setSelectedAlphabet(letter);
-                          setSelectedBrandFilter(null);
-                        }}
-                        className={`inline-flex items-center justify-center shrink-0 min-w-[28px] h-7 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                          isSelected
-                            ? "bg-primary text-primary-foreground shadow-xs font-extrabold"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                        }`}
-                      >
-                        {letter}
-                      </button>
-                    );
-                  })}
-                </div>
+                <OffersAlphabetBar
+                  selectedLetter={selectedAlphabet}
+                  onSelectLetter={(letter) => {
+                    setSelectedAlphabet(letter);
+                    setSelectedBrandFilter(null);
+                  }}
+                  ariaLabel="Brand alphabet filter"
+                />
 
                 {/* Search Bar */}
                 <div className="relative shrink-0 w-full md:w-72">
@@ -1575,95 +1355,18 @@ function OffersHubPage() {
               ) : viewDensity === "list" ? (
                 /* ── LIST VIEW ── */
                 <div className="space-y-3.5">
-                  {visibleOffers.map((deal) => {
-                    const affiliateUrl = wrapAffiliateTracking(deal.link, "gocoupon_offers_list");
-                    const isCopied = Boolean(copiedCode && (copiedCode === deal.code || copiedCode === deal.id));
-                    const isExpanded = expandedDealIds.has(deal.id);
-
-                    return (
-                      <div
-                        key={deal.id}
-                        onClick={(e) => handleCardBoxClick(deal, e)}
-                        className="group relative flex flex-col md:flex-row md:items-center justify-between gap-5 rounded-2xl border border-border/80 bg-card p-5 sm:p-6 transition-all duration-200 hover:border-primary/50 hover:shadow-md cursor-pointer"
-                      >
-                        <div className="flex items-start gap-4 flex-1 min-w-0">
-                          <StoreLogo
-                            storeName={deal.storeName}
-                            storeLogo={deal.storeLogo}
-                            trackingUrl={deal.link}
-                            className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl p-2 shrink-0 group-hover:scale-105 transition-transform"
-                            imageClassName="max-h-full max-w-full object-contain"
-                          />
-
-                          <div className="flex-1 min-w-0">
-                            <div className="flex flex-wrap items-center gap-2 mb-1">
-                              <span className="font-bold text-xs text-foreground">{deal.storeName}</span>
-                              <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.2 font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-                                {deal.badge || "Verified"}
-                              </span>
-                              <span className="text-[11px] text-muted-foreground font-mono">
-                                &bull; {deal.category}
-                              </span>
-                            </div>
-
-                            <h3 className="font-display text-sm sm:text-base font-bold text-foreground group-hover:text-primary transition-colors leading-snug">
-                              {deal.title}
-                            </h3>
-
-                            {deal.terms && (
-                              <div className="mt-1">
-                                <p className={`text-xs text-muted-foreground ${isExpanded ? "" : "line-clamp-1"} leading-relaxed`}>
-                                  {deal.terms}
-                                </p>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    toggleExpand(deal.id);
-                                  }}
-                                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline cursor-pointer pt-0.5"
-                                >
-                                  <span>{isExpanded ? "Read less" : "Read more"}</span>
-                                  <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
-                                </button>
-                              </div>
-                            )}
-
-                            <div className="mt-2.5 flex flex-wrap items-center gap-3 text-[11px] font-mono text-muted-foreground">
-                              <span className="inline-flex items-center gap-1">
-                                <Clock className="h-3 w-3 text-sky-400" />
-                                <span>{deal.expiresIn}</span>
-                              </span>
-                              <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-                                <Users className="h-3 w-3" />
-                                <span>{(deal.usesCount || 1200).toLocaleString()} shoppers saved</span>
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Right Action */}
-                        <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-3 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-border/60">
-                          <div className="text-left md:text-right">
-                            <div className="font-mono text-xl sm:text-2xl font-black text-foreground">
-                              {deal.discount}
-                            </div>
-                            <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider block">
-                              Instant Discount
-                            </span>
-                          </div>
-
-                          <RedeemCouponButton
-                            deal={deal}
-                            affiliateUrl={affiliateUrl}
-                            isCopied={isCopied}
-                            onRedeem={handleRedeemDeal}
-                            className="min-w-[200px]"
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
+                  {visibleOffers.map((deal) => (
+                    <DealCard
+                      key={deal.id}
+                      deal={deal}
+                      viewDensity="list"
+                      isCopied={Boolean(copiedCode && (copiedCode === deal.code || copiedCode === deal.id))}
+                      isExpanded={expandedDealIds.has(deal.id)}
+                      onToggleExpand={toggleExpand}
+                      onCardClick={handleCardBoxClick}
+                      onRedeem={handleRedeemDeal}
+                    />
+                  ))}
                 </div>
               ) : (
                 /* ── GRID VIEWS (4 cols, 3 cols, or 2 cols) ── */
@@ -1676,95 +1379,18 @@ function OffersHubPage() {
                       : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
                   }`}
                 >
-                  {visibleOffers.map((deal) => {
-                    const affiliateUrl = wrapAffiliateTracking(deal.link, "gocoupon_offers_grid");
-                    const isCopied = Boolean(copiedCode && (copiedCode === deal.code || copiedCode === deal.id));
-                    const isExpanded = expandedDealIds.has(deal.id);
-
-                    const accentClass =
-                      deal.badge === "Verified"
-                        ? "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/60"
-                        : deal.badge === "Exclusive"
-                        ? "text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40 border-violet-200 dark:border-violet-800/60"
-                        : "text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/60";
-
-                    return (
-                      <div
-                        key={deal.id}
-                        onClick={(e) => handleCardBoxClick(deal, e)}
-                        className="group flex flex-col justify-between rounded-2xl border border-border bg-card p-4 transition-all duration-200 hover:border-primary/40 hover:shadow-md cursor-pointer overflow-hidden"
-                      >
-                        {/* Top: Store logo + Badge */}
-                        <div>
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-2 min-w-0">
-                              <StoreLogo
-                                storeName={deal.storeName}
-                                storeLogo={deal.storeLogo}
-                                trackingUrl={deal.link}
-                                className="h-7 w-7 rounded-lg p-1 shrink-0"
-                                imageClassName="max-h-full max-w-full object-contain"
-                              />
-                              <span className="text-xs font-bold text-foreground truncate leading-none">
-                                {deal.storeName}
-                              </span>
-                            </div>
-                            <span className={`rounded-md border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide shrink-0 ${accentClass}`}>
-                              {deal.badge || "Verified"}
-                            </span>
-                          </div>
-
-                          {/* Discount + Title */}
-                          <div className="mb-2.5">
-                            <div className="text-xl font-black tracking-tight text-foreground leading-none mb-1 truncate">
-                              {deal.discount}
-                            </div>
-                            <h3 className="text-xs font-medium text-foreground leading-snug line-clamp-2 group-hover:text-primary transition-colors">
-                              {deal.title}
-                            </h3>
-                          </div>
-
-                          {/* Terms & Conditions toggle */}
-                          {deal.terms && (
-                            <div className="mb-2.5">
-                              <p className={`text-[11px] text-muted-foreground ${isExpanded ? "" : "line-clamp-1"} leading-snug`}>
-                                {deal.terms}
-                              </p>
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  toggleExpand(deal.id);
-                                }}
-                                className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-primary hover:underline cursor-pointer pt-0.5"
-                              >
-                                <span>{isExpanded ? "Less" : "Terms"}</span>
-                                <ChevronDown className={`h-2.5 w-2.5 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
-                              </button>
-                            </div>
-                          )}
-
-                          {/* Expiry line */}
-                          <div className="flex items-center gap-1 text-[10px] text-muted-foreground mb-3 font-mono">
-                            <Clock className="h-3 w-3 text-muted-foreground/60 shrink-0" />
-                            <span>{deal.expiresIn}</span>
-                            <span className="ml-auto opacity-70">{deal.category}</span>
-                          </div>
-                        </div>
-
-                        {/* Bottom CTA Button */}
-                        <div className="pt-2 border-t border-border/50">
-                          <RedeemCouponButton
-                            deal={deal}
-                            affiliateUrl={affiliateUrl}
-                            isCopied={isCopied}
-                            onRedeem={handleRedeemDeal}
-                            fullWidth
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
+                  {visibleOffers.map((deal) => (
+                    <DealCard
+                      key={deal.id}
+                      deal={deal}
+                      viewDensity={viewDensity}
+                      isCopied={Boolean(copiedCode && (copiedCode === deal.code || copiedCode === deal.id))}
+                      isExpanded={expandedDealIds.has(deal.id)}
+                      onToggleExpand={toggleExpand}
+                      onCardClick={handleCardBoxClick}
+                      onRedeem={handleRedeemDeal}
+                    />
+                  ))}
                 </div>
               )}
 

@@ -127,6 +127,23 @@ const AMAZON_IN_PRODUCTS: AffiliateProductResponse[] = [
   },
 ];
 
+/**
+ * GET /api/affiliates
+ * Root handler — returns default Amazon IN product highlights.
+ */
+affiliatesRouter.get("/", async (_req: Request, res: Response) => {
+  const AMAZON_IN_PARTNER_TAG_VAR = process.env.VITE_AMAZON_IN_PARTNER_TAG || "gocoupon0e-21";
+  res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
+  res.json({
+    provider: "amazon",
+    country: "IN",
+    note: "Use /api/affiliates/products?provider=amazon for filtered results",
+    products: AMAZON_IN_PRODUCTS.slice(0, 4),
+    total: AMAZON_IN_PRODUCTS.length,
+    cached: false,
+  });
+});
+
 affiliatesRouter.get("/products", async (req: Request, res: Response) => {
   const clientIp =
     (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||

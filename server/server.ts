@@ -68,6 +68,20 @@ app.use(
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 
+// ─── Global Path Traversal Guard ──────────────────────────────────────────────
+// Block any request whose raw URL contains directory traversal sequences.
+// This runs before routing so ../ cannot reach static files or API routes.
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const rawUrl = req.originalUrl || req.url || "";
+  // Decode twice to catch double-encoded sequences (%252e%252e)
+  const decoded = decodeURIComponent(decodeURIComponent(rawUrl).replace(/%/g, "%"));
+  if (/(?:\.\.|%2e%2e|%252e|\\\.\\\.)/i.test(decoded)) {
+    res.status(400).json({ error: "Bad Request: Path traversal not allowed." });
+    return;
+  }
+  next();
+});
+
 // Request logger for API calls
 app.use("/api", (req: Request, _res: Response, next: NextFunction) => {
   if (process.env.NODE_ENV !== "test") {
@@ -75,6 +89,7 @@ app.use("/api", (req: Request, _res: Response, next: NextFunction) => {
   }
   next();
 });
+
 
 // 1. Health Check Endpoint
 app.get("/api/health", (_req: Request, res: Response) => {

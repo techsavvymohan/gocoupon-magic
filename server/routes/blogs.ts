@@ -193,7 +193,15 @@ blogsRouter.get("/", async (req: Request, res: Response) => {
  */
 blogsRouter.get("/:slug", async (req: Request, res: Response) => {
   try {
-    const slug = String(req.params.slug).toLowerCase();
+    const rawSlug = String(req.params.slug).toLowerCase();
+
+    // Strict slug validation — only allow alphanumeric + hyphens (no traversal, no special chars)
+    if (!/^[a-z0-9][a-z0-9-]{0,199}$/.test(rawSlug)) {
+      res.status(400).json({ success: false, error: "Invalid slug format." });
+      return;
+    }
+
+    const slug = rawSlug;
     const blog = await blogsDb.getBlogBySlug(slug);
 
     if (!blog) {

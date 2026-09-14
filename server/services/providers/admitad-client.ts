@@ -324,3 +324,72 @@ export async function fetchLiveInternationalDeals(): Promise<Deal[]> {
 
   return deals;
 }
+
+// ─── 24/7 Admitad Background Sync ─────────────────────────────────────────────
+
+import type { DealRecord } from "../../../src/lib/server-data/deals-db.js";
+import { addDealToPool } from "./cuelinks-client.js";
+
+let lastAdmitadSync = 0;
+let lastAdmitadSyncCount = 0;
+
+/**
+ * 24/7 Admitad background sync — mirrors syncLiveCuelinksDeals() in cuelinks-client.ts.
+ * Fetches live international coupons and merges them into the shared liveDealsPool,
+ * making them available via /api/deals and the Chrome extension.
+ *
+ * Designed to be called every 3600s (hourly) from the server.ts background worker.
+ */
+export async function syncAdmitadDeals(): Promise<{ synced: number; source: string; skipped: number }> {
+  const deals = await fetchLiveInternationalDeals();
+  let synced = 0;
+  let skipped = 0;
+
+  for (const deal of deals) {
+    try {
+      const record: DealRecord = {
+        id: deal.id.startsWith("admitad") ? deal.id : `admitad-${deal.id}`,
+        storeName: deal.storeName,
+        storeSlug: deal.storeSlug,
+        storeLogo: (deal as any).storeLogo || undefined,
+        category: deal.category as any,
+        title: deal.title,
+        code: deal.code,
+        discount: deal.discount,
+        badge: deal.badge as any,
+        verifiedDate: deal.verifiedDate,
+        expiresIn: deal.expiresIn,
+        endDate: (deal as any).endDate || undefined,
+        minOrder: (deal as any).minOrder || undefined,
+        terms: deal.terms,
+        link: deal.link,
+        usesCount: deal.usesCount,
+        source: "admitad",
+        verified: true,
+        status: "active",
+        type: deal.code && deal.code.length > 2 ? "coupon" : "deal",
+      };
+      addDealToPool(record);
+      synced++;
+    } catch {
+      skipped++;
+    }
+  }
+
+  lastAdmitadSync = Date.now();
+  lastAdmitadSyncCount = synced;
+
+  console.log(`✅ [Admitad Sync] Merged ${synced} international deals into live pool (skipped: ${skipped})`);
+  return { synced, source: "admitad", skipped };
+}
+
+/**
+ * Returns last sync metadata for /api/admitad/status.
+ */
+export function getAdmitadSyncStatus() {
+  return {
+    lastSyncedAt: lastAdmitadSync ? new Date(lastAdmitadSync).toISOString() : null,
+    lastSyncCount: lastAdmitadSyncCount,
+    nextSyncAt: lastAdmitadSync ? new Date(lastAdmitadSync + 60 * 60 * 1000).toISOString() : null,
+  };
+}

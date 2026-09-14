@@ -584,8 +584,12 @@ export function normalizeCuelinksToDealRecord(offer: CuelinksCouponOffer): DealR
     terms: offer.description || `Valid on ${offer.storeName}. Automatically tracked & monetized via Cuelinks.`,
     link: offer.affiliateUrl,
     usesCount: 1200 + (Math.abs(offer.campaignId) % 3500),
+    source: "cuelinks",
+    verified: true,
+    status: "active",
   };
 }
+
 
 // ─── 24/7 Dynamic Cuelinks Engine & In-Memory Store ──────────────────────────
 

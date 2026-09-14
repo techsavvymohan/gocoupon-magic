@@ -407,26 +407,6 @@ html:not(.dark) .bg-card:hover {
   border-radius: 4px;
 }
 
-::selection {
-  background: var(--primary);
-  color: var(--primary-foreground);
-}
-
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--muted-foreground);
-}
-
 /* ── 3D & SPATIAL INTERACTION UTILITIES ── */
 .perspective-1000 {
   perspective: 1000px;

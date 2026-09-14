@@ -7,6 +7,7 @@
  */
 
 import { Router, type Request, type Response } from "express";
+import { dealsDb } from "../services/db.js";
 
 export const extensionRouter = Router();
 
@@ -114,6 +115,86 @@ const SELECTORS_CONFIG: Record<string, MerchantSelectorConfig> = {
       crossStoreArbitrage: true,
     },
   },
+  "myntra.com": {
+    domain: "myntra.com",
+    name: "Myntra",
+    cartCouponBox: {
+      inputSelector: "input.coupon-input, input[placeholder*='coupon' i]",
+      applyButtonSelector: "button.apply-coupon, button:contains('Apply')",
+      successMessageSelector: ".coupon-success",
+      errorMessageSelector: ".coupon-error",
+    },
+    productPageHud: {
+      buyNowButtonSelector: "button.btn-add-to-bag, a[data-position='BUY_NOW']",
+      priceContainerSelector: ".pdp-price",
+      injectionAnchor: "before",
+    },
+    supportedFeatures: {
+      autoApply: true,
+      savingsHud: true,
+      crossStoreArbitrage: true,
+    },
+  },
+  "meesho.com": {
+    domain: "meesho.com",
+    name: "Meesho",
+    cartCouponBox: {
+      inputSelector: "input[placeholder*='coupon' i]",
+      applyButtonSelector: "button:contains('Apply'), button:contains('APPLY')",
+      successMessageSelector: "[class*='success']",
+      errorMessageSelector: "[class*='error']",
+    },
+    productPageHud: {
+      buyNowButtonSelector: "button[class*='buy-now'], button:contains('Buy Now')",
+      priceContainerSelector: "[class*='price']",
+      injectionAnchor: "before",
+    },
+    supportedFeatures: {
+      autoApply: false,
+      savingsHud: true,
+      crossStoreArbitrage: true,
+    },
+  },
+  "nykaa.com": {
+    domain: "nykaa.com",
+    name: "Nykaa",
+    cartCouponBox: {
+      inputSelector: "input[placeholder*='coupon' i], input.coupon-code",
+      applyButtonSelector: "button.apply-btn, button:contains('Apply')",
+      successMessageSelector: ".coupon-applied",
+      errorMessageSelector: ".coupon-invalid",
+    },
+    productPageHud: {
+      buyNowButtonSelector: "button[data-action='addToCart']",
+      priceContainerSelector: ".css-1jczs19",
+      injectionAnchor: "before",
+    },
+    supportedFeatures: {
+      autoApply: false,
+      savingsHud: true,
+      crossStoreArbitrage: false,
+    },
+  },
+  "ajio.com": {
+    domain: "ajio.com",
+    name: "AJIO",
+    cartCouponBox: {
+      inputSelector: "input[placeholder*='coupon' i]",
+      applyButtonSelector: "button:contains('Apply')",
+      successMessageSelector: "[class*='couponApplied']",
+      errorMessageSelector: "[class*='error']",
+    },
+    productPageHud: {
+      buyNowButtonSelector: "button[class*='buynow']",
+      priceContainerSelector: "[class*='price-container']",
+      injectionAnchor: "before",
+    },
+    supportedFeatures: {
+      autoApply: false,
+      savingsHud: true,
+      crossStoreArbitrage: false,
+    },
+  },
 };
 
 /**
@@ -123,8 +204,8 @@ const SELECTORS_CONFIG: Record<string, MerchantSelectorConfig> = {
 extensionRouter.get("/selectors.json", (_req: Request, res: Response) => {
   res.setHeader("Cache-Control", "public, max-age=300"); // 5 minutes cache
   res.json({
-    version: "2026.1.0",
-    lastUpdated: "2026-09-08T00:00:00Z",
+    version: "2026.2.0",
+    lastUpdated: new Date().toISOString(),
     merchants: SELECTORS_CONFIG,
   });
 });
@@ -141,4 +222,65 @@ extensionRouter.get("/ping", (req: Request, res: Response) => {
     clientVersion: version,
     recommendedMinVersion: "1.0.0",
   });
+});
+
+/**
+ * GET /api/extension/coupons
+ * Returns all active coupons from PostgreSQL database for a given merchant domain or name.
+ * Real-time unified feed connecting:
+ * 1. Community submitted coupons (approved or live)
+ * 2. Cuelinks 24/7 synchronized offers
+ * 3. Admitad global affiliate coupons
+ */
+extensionRouter.get("/coupons", async (req: Request, res: Response) => {
+  try {
+    const rawDomain = (req.query.domain as string || "").toLowerCase().trim();
+    const rawStore = (req.query.store as string || "").toLowerCase().trim();
+
+    // Extract core merchant brand keyword (e.g., 'amazon.in' -> 'amazon', 'myntra.com' -> 'myntra')
+    let brandKeyword = rawStore;
+    if (!brandKeyword && rawDomain) {
+      brandKeyword = rawDomain
+        .replace(/^https?:\/\//, "")
+        .replace(/^www\./, "")
+        .split(".")[0];
+    }
+
+    if (!brandKeyword) {
+      res.status(400).json({ success: false, error: "domain or store query parameter is required" });
+      return;
+    }
+
+    const allDeals = await dealsDb.getDeals({
+      search: brandKeyword,
+      limit: 50,
+    });
+
+    const coupons = allDeals.map((d) => ({
+      id: d.id,
+      code: d.code || "",
+      title: d.title,
+      discount: d.discount,
+      category: d.category,
+      badge: d.badge || "Verified",
+      verified: d.verified ?? true,
+      usesCount: d.usesCount || 1,
+      terms: d.terms || "Standard merchant terms apply.",
+      source: d.source || "community-verified",
+      link: d.link,
+      isAutoApplyEligible: Boolean(d.code && d.code.length > 1),
+    }));
+
+    res.setHeader("Cache-Control", "public, max-age=60"); // 1 min fast edge cache
+    res.json({
+      success: true,
+      store: brandKeyword,
+      domain: rawDomain,
+      total: coupons.length,
+      autoApplyCount: coupons.filter((c) => c.isAutoApplyEligible).length,
+      coupons,
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
 });

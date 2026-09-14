@@ -19,7 +19,7 @@ const SERPAPI_KEY = process.env.SERPAPI_API_KEY || process.env.SERPAPI_KEY || ""
 
 const AMAZON_PARTNER_TAG = process.env.VITE_AMAZON_IN_PARTNER_TAG || "gocoupon0e-21";
 const CUELINKS_PUBLISHER_ID = process.env.VITE_CUELINKS_PUB_ID || "148920";
-const REQUEST_TIMEOUT_MS = 8000;
+const REQUEST_TIMEOUT_MS = 4000; // Fail fast → SerpAPI sandbox fallback activates sooner
 const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes persistent TTL
 
 export interface StoreSearchResult {

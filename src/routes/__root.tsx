@@ -6,6 +6,8 @@ import { useState } from "react";
 import { CurrencyProvider } from "@/context/CurrencyContext";
 import { UserCardsProvider } from "@/context/UserCardsContext";
 import { I18nProvider } from "@/context/I18nContext";
+import { LoadingProvider } from "@/context/LoadingContext";
+import { GlobalLoadingBar } from "@/components/common/GlobalLoadingBar";
 
 function RootComponent() {
   const [queryClient] = useState(
@@ -22,15 +24,18 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <I18nProvider>
-        <CurrencyProvider>
-          <UserCardsProvider>
-            <HeadContent />
-            <Outlet />
-            <Toaster position="top-right" richColors />
-          </UserCardsProvider>
-        </CurrencyProvider>
-      </I18nProvider>
+      <LoadingProvider>
+        <I18nProvider>
+          <CurrencyProvider>
+            <UserCardsProvider>
+              <GlobalLoadingBar />
+              <HeadContent />
+              <Outlet />
+              <Toaster position="top-right" richColors />
+            </UserCardsProvider>
+          </CurrencyProvider>
+        </I18nProvider>
+      </LoadingProvider>
     </QueryClientProvider>
   );
 }

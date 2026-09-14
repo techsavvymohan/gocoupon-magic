@@ -348,6 +348,15 @@ export default defineConfig({
           }
 
           // 2. Heavy feature page route modules
+          if (normalized.includes("/src/routes/offers") || normalized.includes("/src/components/offers/")) {
+            return "page-offers";
+          }
+          if (normalized.includes("/src/routes/admin") || normalized.includes("/src/admin/")) {
+            return "page-admin";
+          }
+          if (normalized.includes("/src/routes/stores")) {
+            return "page-stores";
+          }
           if (normalized.includes("/src/routes/blog/")) {
             return "page-blog";
           }

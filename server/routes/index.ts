@@ -23,6 +23,39 @@ import { internationalDealsRouter } from "./international-deals.js";
 import { adminRouter } from "./admin.js";
 import { blogsRouter } from "./blogs.js";
 import { openFoodFactRouter } from "../../src/open_food_fact/api-route.js";
+import {
+  getAdmitadConfig,
+  getAdmitadAccessToken,
+  getAdmitadSyncStatus,
+  syncAdmitadDeals,
+} from "../services/providers/admitad-client.js";
+import { Router as ExpressRouter } from "express";
+
+// ── Lightweight Admitad Status Router ─────────────────────────────────────────
+const admitadRouter = ExpressRouter();
+
+admitadRouter.get("/status", async (_req, res) => {
+  const config = getAdmitadConfig();
+  const token = config.isConfigured ? await getAdmitadAccessToken() : null;
+  const syncStatus = getAdmitadSyncStatus();
+  res.json({
+    provider: "admitad",
+    configured: config.isConfigured,
+    connected: Boolean(token),
+    ...syncStatus,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+admitadRouter.post("/sync", async (_req, res) => {
+  try {
+    const result = await syncAdmitadDeals();
+    res.json({ success: true, ...result, timestamp: new Date().toISOString() });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+// ──────────────────────────────────────────────────────────────────────────────
 
 export const apiRouter = Router();
 
@@ -65,5 +98,6 @@ apiRouter.use("/bank-offers", bankOffersRouter);
 apiRouter.use("/extension", extensionRouter);
 apiRouter.use("/cuelinks", cuelinksRouter);
 apiRouter.use("/international-deals", internationalDealsRouter);
+apiRouter.use("/admitad", admitadRouter);
 apiRouter.use("/open-food-fact", openFoodFactRouter);
 

@@ -18,6 +18,7 @@ import {
   buildCuelinksRedirectUrl,
   convertCuelinksLinkApi,
   getCuelinksConfig,
+  getLiveDealsPool,
 } from "../services/providers/cuelinks-client.js";
 import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
 
@@ -29,10 +30,13 @@ export const cuelinksRouter = Router();
  */
 cuelinksRouter.get("/status", async (_req: Request, res: Response) => {
   const status = await testCuelinksConnection();
+  const livePool = getLiveDealsPool();
   res.setHeader("Cache-Control", "no-store");
   res.json({
     status: status.connected ? "connected" : status.configured ? "error" : "fallback_mode",
     ...status,
+    dealsCount: livePool.length,
+    autoApplyCount: livePool.filter((d) => d.code && d.code.length > 1).length,
     timestamp: new Date().toISOString(),
   });
 });
