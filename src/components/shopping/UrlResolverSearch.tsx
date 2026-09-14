@@ -85,10 +85,9 @@ export function UrlResolverSearch({
     }
   }, [initialQuery]);
 
-  // Real-time suggestions, store matches & product hits state
+  // Real-time suggestions & store matches state
   const [matchedStores, setMatchedStores] = useState<RegisteredStore[]>([]);
   const [searxngSuggestions, setSearxngSuggestions] = useState<string[]>([]);
-  const [productHits, setProductHits] = useState<UnifiedProductSuggestion[]>([]);
   const [isLoadingSearxng, setIsLoadingSearxng] = useState(false);
   const [foodComparison, setFoodComparison] = useState<FoodProductComparison | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -127,7 +126,6 @@ export function UrlResolverSearch({
     if (trimmed.length < 2) {
       setMatchedStores([]);
       setSearxngSuggestions([]);
-      setProductHits([]);
       setFoodComparison(null);
       setShowDropdown(false);
       setSelectedIndex(-1);
@@ -164,19 +162,31 @@ export function UrlResolverSearch({
       clearTimeout(searchTimeoutRef.current);
     }
 
-    // 2. Debounced product and suggestion search
+    // 2. Debounced shopping product suggestions & query autocomplete (<50ms response)
     setIsLoadingSearxng(true);
     searchTimeoutRef.current = setTimeout(async () => {
       try {
-        const response = await unifiedProductSearch(trimmed, { limit: 5 });
+        let suggestions: string[] = [];
+        try {
+          const res = await fetch(`/api/search/suggestions?q=${encodeURIComponent(trimmed)}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.suggestions)) {
+              suggestions = data.suggestions;
+            }
+          }
+        } catch {
+          // Fallback to local search router below
+        }
 
-        const suggestions = (response.suggestions || []).slice(0, 4);
-        const hits = (response.results || []).slice(0, 4);
+        if (suggestions.length === 0) {
+          const fallback = await unifiedProductSearch(trimmed, { limit: 6 });
+          suggestions = fallback.suggestions || [];
+        }
 
-        setSearxngSuggestions(suggestions);
-        setProductHits(hits);
+        setSearxngSuggestions(suggestions.slice(0, 6));
 
-        if (storeHits.length > 0 || suggestions.length > 0 || hits.length > 0) {
+        if (storeHits.length > 0 || suggestions.length > 0) {
           setShowDropdown(true);
         }
       } catch {
@@ -184,7 +194,7 @@ export function UrlResolverSearch({
       } finally {
         setIsLoadingSearxng(false);
       }
-    }, 120);
+    }, 80);
 
     return () => {
       if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
@@ -234,19 +244,9 @@ export function UrlResolverSearch({
           return;
         }
       }
-      // 2. Selected Product Hit
-      else if (selectedIndex < matchedStores.length + productHits.length) {
-        const hitIdx = selectedIndex - matchedStores.length;
-        const selectedHit = productHits[hitIdx];
-        if (selectedHit) {
-          setQuery(selectedHit.title);
-          handleExecuteSearch(selectedHit.title);
-          return;
-        }
-      }
-      // 3. Selected Autocomplete Suggestion
+      // 2. Selected Autocomplete Suggestion
       else {
-        const suggIdx = selectedIndex - matchedStores.length - productHits.length;
+        const suggIdx = selectedIndex - matchedStores.length;
         const selectedSuggestion = searxngSuggestions[suggIdx];
         if (selectedSuggestion) {
           setQuery(selectedSuggestion);
@@ -267,7 +267,7 @@ export function UrlResolverSearch({
       return;
     }
 
-    const totalItems = matchedStores.length + productHits.length + searxngSuggestions.length;
+    const totalItems = matchedStores.length + searxngSuggestions.length;
     if (totalItems === 0) return;
 
     if (e.key === "ArrowDown") {
@@ -598,121 +598,21 @@ export function UrlResolverSearch({
               </div>
             )}
 
-            {/* ── 2. EXACT & MATCHED PRODUCTS SECTION ── */}
-            {productHits.length > 0 && (
-              <div className="py-2.5">
+            {/* ── 2. PRODUCT AUTOCOMPLETE RECOMMENDATIONS ── */}
+            {searxngSuggestions.length > 0 && (
+              <div className="py-2">
                 <div className="flex items-center justify-between px-2 py-0.5 mb-1.5">
                   <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-bold flex items-center gap-1.5">
-                    <Tag className="h-3 w-3 text-primary" />
-                    {productHits.some((h) => h.isExactMatch) ? "Exact Product Matches" : "Matched Products"}
+                    <Search className="h-3 w-3 text-primary" />
+                    Product Recommendations
                   </span>
-                  <span className="text-[9px] font-mono font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full flex items-center gap-1">
-                    <CheckCircle2 className="h-2.5 w-2.5" /> Verified Prices
+                  <span className="text-[9px] font-mono font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    Multi-Store Compare
                   </span>
                 </div>
-                <ul className="space-y-1.5">
-                  {productHits.map((hit, idx) => {
-                    const isSelected = selectedIndex === matchedStores.length + idx;
-                    return (
-                      <li
-                        key={hit.id || hit.title + idx}
-                        role="option"
-                        aria-selected={isSelected}
-                        onClick={() => {
-                          setQuery(hit.title);
-                          handleExecuteSearch(hit.title);
-                        }}
-                        className={`group/hit flex items-center gap-3 rounded-xl sm:rounded-2xl p-2 sm:p-2.5 transition-all cursor-pointer ${
-                          isSelected
-                            ? "bg-primary/15 border border-primary/40 shadow-xs"
-                            : "hover:bg-muted/80 border border-transparent hover:border-border/60"
-                        }`}
-                      >
-                        {/* Product Thumbnail */}
-                        <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-lg sm:rounded-xl bg-white dark:bg-neutral-900 p-1 border border-border/60 overflow-hidden flex items-center justify-center shadow-2xs">
-                          {hit.imageUrl ? (
-                            <img
-                              src={hit.imageUrl}
-                              alt={hit.title}
-                              className="h-full w-full object-contain"
-                              loading="lazy"
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center font-mono font-bold text-xs text-muted-foreground">
-                              {hit.brand?.slice(0, 2) || "GC"}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Product Details */}
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
-                            {hit.brand && (
-                              <span className="rounded bg-primary/10 text-primary text-[10px] font-bold px-1.5 py-0.2">
-                                {hit.brand}
-                              </span>
-                            )}
-                            {hit.isExactMatch && (
-                              <span className="rounded bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold px-1.5 py-0.2 flex items-center gap-0.5">
-                                <CheckCircle2 className="h-2.5 w-2.5 text-emerald-600" /> Exact Match
-                              </span>
-                            )}
-                            {hit.storeName && (
-                              <span className="text-[10px] text-muted-foreground">
-                                • Best on {hit.storeName}
-                              </span>
-                            )}
-                          </div>
-
-                          <p className="text-xs sm:text-sm font-semibold text-foreground truncate group-hover/hit:text-primary transition-colors">
-                            {hit.title}
-                          </p>
-
-                          {/* Price Preview */}
-                          {hit.price && hit.price > 0 ? (
-                            <div className="flex items-center gap-2 mt-0.5">
-                              <span className="text-xs sm:text-sm font-bold text-foreground">
-                                ₹{hit.price.toLocaleString("en-IN")}
-                              </span>
-                              {hit.originalPrice && hit.originalPrice > hit.price && (
-                                <span className="text-[11px] text-muted-foreground line-through">
-                                  ₹{hit.originalPrice.toLocaleString("en-IN")}
-                                </span>
-                              )}
-                              {hit.discountPercent && hit.discountPercent > 0 ? (
-                                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-                                  {hit.discountPercent}% OFF
-                                </span>
-                              ) : null}
-                            </div>
-                          ) : null}
-                        </div>
-
-                        {/* Compare CTA */}
-                        <div className="shrink-0 flex items-center gap-1 text-xs font-semibold text-primary group-hover/hit:translate-x-0.5 transition-transform">
-                          <span className="hidden sm:inline">Compare</span>
-                          <ArrowRight className="h-3.5 w-3.5" />
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            )}
-
-            {/* ── 3. AUTOCOMPLETE SUGGESTIONS ── */}
-            {searxngSuggestions.length > 0 && (
-              <div className="pt-2">
-                <div className="flex items-center justify-between px-2 py-0.5 mb-1">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
-                    <Search className="h-2.5 w-2.5 text-primary" /> Suggested Searches
-                  </span>
-                  <span className="text-[9px] font-mono text-muted-foreground/60">Fast Auto-fill</span>
-                </div>
-                <ul className="space-y-0.5">
+                <ul className="space-y-1">
                   {searxngSuggestions.map((suggestion, idx) => {
-                    const isSelected =
-                      selectedIndex === matchedStores.length + productHits.length + idx;
+                    const isSelected = selectedIndex === matchedStores.length + idx;
                     return (
                       <li
                         key={suggestion}
@@ -722,14 +622,31 @@ export function UrlResolverSearch({
                           setQuery(suggestion);
                           handleExecuteSearch(suggestion);
                         }}
-                        className={`flex items-center justify-between rounded-xl px-3 py-1.5 text-xs sm:text-sm transition-colors cursor-pointer ${
+                        className={`group/sugg flex items-center justify-between rounded-xl px-3 py-2 text-xs sm:text-sm transition-all cursor-pointer ${
                           isSelected
-                            ? "bg-primary text-primary-foreground font-semibold"
-                            : "text-foreground hover:bg-muted/80"
+                            ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                            : "text-foreground hover:bg-muted/80 hover:text-primary"
                         }`}
                       >
-                        <span className="truncate">{suggestion}</span>
-                        <ArrowRight className="h-3 w-3 opacity-60 ml-2 shrink-0" />
+                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                          <Search
+                            className={`h-3.5 w-3.5 shrink-0 ${
+                              isSelected ? "text-primary-foreground" : "text-primary/70 group-hover/sugg:text-primary"
+                            }`}
+                          />
+                          <span className="truncate font-medium">{suggestion}</span>
+                        </div>
+
+                        <div className="shrink-0 flex items-center gap-1.5 text-[11px] font-mono opacity-80 group-hover/sugg:opacity-100">
+                          <span className={`hidden sm:inline text-[10px] font-semibold ${isSelected ? "text-primary-foreground/90" : "text-muted-foreground"}`}>
+                            Compare Stores
+                          </span>
+                          <ArrowRight
+                            className={`h-3.5 w-3.5 transition-transform group-hover/sugg:translate-x-0.5 ${
+                              isSelected ? "text-primary-foreground" : "text-primary"
+                            }`}
+                          />
+                        </div>
                       </li>
                     );
                   })}

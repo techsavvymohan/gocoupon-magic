@@ -279,8 +279,8 @@ export function analyzeQueryIntent(rawQuery: string): QueryIntent {
   const modelTokens: string[] = [];
   const modelRegexes = [
     /\b(wh-1000xm[45]|wh1000xm[45]|wf-1000xm[45])\b/gi,
-    /\b(iphone\s*(?:1[1-6]|se|x|xs|xr))\b/gi,
-    /\b(galaxy\s*s2[0-4]|galaxy\s*z\s*(?:fold|flip)[0-9]?)\b/gi,
+    /\b(iphone\s*(?:[1-2][0-9]|se|x|xs|xr))\b/gi,
+    /\b(galaxy\s*s2[0-9]|galaxy\s*z\s*(?:fold|flip)[0-9]?)\b/gi,
     /\b(note\s*(?:1[0-4]|pro|plus)?)\b/gi,
     /\b(pixel\s*[6-9][a-z]?)\b/gi,
     /\b(macbook\s*(?:air|pro))\b/gi,
