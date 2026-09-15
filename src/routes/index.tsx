@@ -7,7 +7,6 @@ import { ExtensionShowcase } from "@/components/site/ExtensionShowcase";
 import { HowItWorks } from "@/components/site/HowItWorks";
 import { Features } from "@/components/site/Features";
 import { AnimatedDealsCarousel } from "@/components/site/AnimatedDealsCarousel";
-import { CardArbitrageShowcase } from "@/components/site/CardArbitrageShowcase";
 import { WhyUsExpenseSaviour } from "@/components/site/WhyUsExpenseSaviour";
 import { FAQ } from "@/components/site/FAQ";
 import { Blog } from "@/components/site/Blog";
@@ -19,12 +18,12 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () =>
     createSeoHead({
-      title: "GoCoupon (Go Coupon) – Verified Coupons, Deals & Promo Codes | GrabOn & CouponDuniya Alternative",
+      title: "GoCoupon – Verified Coupons, Promo Codes & Deals (2026) | 1-Click Auto-Apply Extension",
       description:
-        "Looking for Go Coupon, GrabOn, CouponDuniya or Dealspotr? GoCoupon features 970+ verified live deals, auto-applied promo codes, price tracking, and 10% instant bank discounts across 500+ stores. 100% free.",
+        "Find verified working coupon codes, promo vouchers, and live merchant deals across 240+ online stores. Install the free GoCoupon Chrome extension to auto-apply tested discount codes at checkout.",
       path: "/",
       keywords:
-        "GoCoupon, go coupon, gocoupon, gocoupons, gocoupon.io, grabon, grabon alternative, grabon coupons, couponduniya, coupon duniya, coupondunia, couponduniya alternative, dealspotr, dealspottr, dealspottr coupons, deals, discounts, coupons, promo codes, price tracking, price tracker, price comparison, compare prices, auto apply coupons, fake discount detector, cashback extension",
+        "coupons, promo codes, discount codes, verified coupons, working coupons today, chrome extension auto apply coupons, coupon code extension, amazon promo codes, myntra discount coupons, swiggy coupons, booking.com hotel discount, online shopping deals india 2026, gocoupon",
     }),
 });
 
@@ -59,12 +58,11 @@ function Index() {
       />
       <Hero />
       <LogoMarquee />
-      <CardArbitrageShowcase />
       <Stats />
       <AnimatedDealsCarousel />
-      <WhyUsExpenseSaviour />
       <ExtensionShowcase />
       <HowItWorks />
+      <WhyUsExpenseSaviour />
       <Features />
       <FAQ />
       <Blog />

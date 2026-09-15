@@ -19,7 +19,6 @@ import {
   ChevronUp,
   Loader2,
   Building2,
-  Sparkles,
   Layers,
 } from "lucide-react";
 import { useSubmitCoupon } from "./useSubmitCoupon";

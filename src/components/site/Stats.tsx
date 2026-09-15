@@ -6,8 +6,8 @@ export function Stats() {
 
   const stats = [
     { label: "Avg. Annual Household Savings", to: isIndia ? 48500 : 650, prefix: symbol, suffix: "+" },
-    { label: "Instant Price Drop At Checkout", to: 18, suffix: ".4%" },
-    { label: "Verified Stores & Brands Monitored", to: 500, suffix: "+" },
+    { label: "Average Checkout Promo Savings", to: 18, suffix: ".4%" },
+    { label: "Verified Partner Stores Monitored", to: 240, suffix: "+" },
     { label: "Cost to You, Forever", to: 0, prefix: symbol, suffix: " Free" },
   ];
   return (

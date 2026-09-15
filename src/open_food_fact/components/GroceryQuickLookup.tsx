@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from "react";
-import { Search, Barcode, Loader2, Sparkles, AlertCircle } from "lucide-react";
+import { Search, Barcode, Loader2, Tag, AlertCircle } from "lucide-react";
 import type { FoodProductComparison, FoodProduct } from "../types.js";
 import { GroceryProductCard } from "./GroceryProductCard.js";
 
@@ -136,7 +136,7 @@ export const GroceryQuickLookup: React.FC<{ className?: string }> = ({ className
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4" />
+                <Tag className="w-4 h-4" />
                 <span>Find Deals</span>
               </>
             )}

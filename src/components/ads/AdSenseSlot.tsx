@@ -9,7 +9,7 @@
  */
 
 import { useEffect, useRef } from "react";
-import { CreditCard, ExternalLink, Sparkles } from "lucide-react";
+import { CreditCard, ExternalLink } from "lucide-react";
 
 interface AdSenseSlotProps {
   slotId?: string;

@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from "react";
-import { Check, Copy, ExternalLink, ShoppingBag, Sparkles, Tag, Truck } from "lucide-react";
+import { Check, Copy, ExternalLink, ShoppingBag, Tag, Truck } from "lucide-react";
 import type { FoodProductComparison, GroceryStoreOffer } from "../types.js";
 import { NutriScoreBadge, NovaBadge } from "./NutriScoreBadge.js";
 
@@ -40,7 +40,7 @@ export const GroceryProductCard: React.FC<GroceryProductCardProps> = ({ comparis
         </div>
         {availableCouponsCount > 0 && (
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-semibold border border-emerald-500/20">
-            <Sparkles className="w-3 h-3" />
+            <Tag className="w-3 h-3" />
             <span>{availableCouponsCount} Active Store Coupons</span>
           </div>
         )}

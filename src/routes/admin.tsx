@@ -32,7 +32,6 @@ import {
   ExternalLink,
   ShieldCheck,
   TrendingUp,
-  Sparkles,
   Lock,
   ArrowRight,
   PlusCircle,

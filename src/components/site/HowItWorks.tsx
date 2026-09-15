@@ -25,63 +25,63 @@ import {
 const SHOPPING_STEPS = [
   {
     step: "01",
-    tag: "STORE COMPARISON",
-    title: "Find the Lowest Price Across 500+ Stores",
+    tag: "SMART SEARCH BAR",
+    title: "Instant Store & Deal Finder",
     summary:
-      "Never overpay because you didn't check another tab. When you browse or search any product, GoCoupon compares Amazon, Flipkart, Walmart, Best Buy, Target, Croma, and direct brand stores so you always buy from the verified lowest merchant.",
-    proof: "Benchmarks 500+ verified stores in 1 second with zero sponsored bias.",
-    icon: Layers,
+      "Search any brand or category in 1 second. Type Booking.com, Myntra, or Swiggy, or search deals like Shoes, Hotels, or Flights to instantly see verified promo codes and active discounts with 1-click auto-copy.",
+    proof: "Instant autocomplete across 240+ partner stores and 980+ live API deals.",
+    icon: Search,
   },
   {
     step: "02",
-    tag: "LIVE VERIFIED OFFERS",
-    title: "Discover 970+ Hand-Verified Live Promo Deals",
+    tag: "CHROME EXTENSION",
+    title: "1-Click Auto-Apply at Checkout",
     summary:
-      "Never miss a working discount code or steal deal. GoCoupon synchronizes directly with affiliate networks and store checkout endpoints 24/7 to deliver genuine 30-75% price drops with zero expired codes.",
-    proof: "Live sync every 15 minutes across Amazon, Flipkart, Myntra, and 500+ stores.",
-    icon: TrendingDown,
+      "Never search for coupon codes manually again. When you reach checkout on Amazon, Flipkart, Myntra, or 240+ stores, GoCoupon's free browser extension tests all active codes in parallel and applies the highest savings automatically.",
+    proof: "Applies working promo codes in under 2 seconds with zero popup spam.",
+    icon: Zap,
   },
   {
     step: "03",
-    tag: "BANK ARBITRAGE",
-    title: "Unlock Instant Bank & Card Discounts",
+    tag: "LIVE VERIFIED DEALS",
+    title: "980+ Promo Codes Synced 24/7",
     summary:
-      "Stores offer exclusive bank promotions that most shoppers miss. An iPhone might be ₹5,000 cheaper on Flipkart with HDFC, or a laptop $120 cheaper at Best Buy with Chase. GoCoupon identifies the highest-saving card in your wallet automatically.",
-    proof: "Instant savings with HDFC, SBI, ICICI, Axis, Chase, or Amex. (No card? Still lowest store price).",
-    icon: CreditCard,
+      "Stop wasting time on expired coupon sites. GoCoupon connects directly to official merchant affiliate networks and checkout endpoints around the clock, testing and verifying every discount code so dead vouchers are purged immediately.",
+    proof: "Live sync every 15 minutes across 240+ stores with zero broken links.",
+    icon: TrendingDown,
   },
   {
     step: "04",
-    tag: "INSTANT PRICE DROP",
-    title: "4-Tier Stacked Savings at Checkout",
+    tag: "BANK CARD STACKING",
+    title: "Extra 10% Instant Card Savings",
     summary:
-      "Why wait weeks for a price alert? GoCoupon triggers an Instant Price Drop (IPD) by stacking your store discount, auto-applied promo codes, instant bank rebates, and cashback rewards simultaneously.",
-    proof: "Calculates True Landed Cost in 1 click with zero dead codes or popup spam.",
-    icon: CheckCircle2,
+      "Maximize every purchase by pairing store discount codes with instant bank partner promotions. GoCoupon highlights whether HDFC, ICICI, SBI, Axis, or Amex unlocks an additional 5% to 15% off at final payment.",
+    proof: "Calculates stacked savings before you pay without ever asking for card details.",
+    icon: CreditCard,
   },
 ];
 
 const SEARCH_INTENT_GUIDES = [
   {
-    badge: "Price Comparison",
-    title: "How to Find the Cheapest Price for Any Product Across Stores",
-    slug: "how-to-find-cheaper-products-online-price-comparison-guide",
-    searchQuery: "compare prices across amazon walmart flipkart best buy",
+    badge: "Auto-Apply Coupons",
+    title: "How to Automatically Apply Working Promo Codes at Checkout",
+    slug: "chrome-extension-to-automatically-apply-coupons-india",
+    searchQuery: "free chrome extension to auto apply coupons and promo codes",
   },
   {
     badge: "Card Discounts",
     title: "How to Stack Bank Card Offers & Coupons for Maximum Savings",
     slug: "credit-card-bank-offers-coupon-stacking-guide",
-    searchQuery: "hdfc sbi icici chase credit card shopping discount guide",
+    searchQuery: "hdfc sbi icici credit card shopping discount guide",
   },
   {
-    badge: "Price History",
-    title: "How to Spot Fake Discounts & Check Price History Before Buying",
-    slug: "best-price-tracking-tools-india-price-history-guide",
-    searchQuery: "check if sale discount is real or fake price drop tracker",
+    badge: "Store Promo Codes",
+    title: "Myntra & Ajio Coupon Codes That Actually Work in 2026",
+    slug: "myntra-coupon-codes-that-actually-work",
+    searchQuery: "myntra working discount coupons end of season sale",
   },
   {
-    badge: "Coupon Codes",
+    badge: "Coupon Truth",
     title: "Why Online Coupons Fail at Checkout & How to Find Working Codes",
     slug: "why-coupons-silently-fail-checkout",
     searchQuery: "how to find working discount codes without expired coupons",
@@ -89,12 +89,12 @@ const SEARCH_INTENT_GUIDES = [
 ];
 
 const POPULAR_SEARCH_TOPICS = [
-  "Cheapest store for iPhone 16",
-  "MacBook Air M3 lowest price today",
-  "Sony WH-1000XM5 price drop history",
-  "Amazon vs Flipkart price comparison",
-  "Best credit card shopping discounts",
-  "How to avoid fake online sale prices",
+  "Working Myntra coupon codes today",
+  "Amazon India promo codes & bank offers",
+  "Booking.com hotel discount coupons",
+  "Swiggy food promo codes & vouchers",
+  "Free Chrome extension to auto-apply coupons",
+  "How to stack bank credit card discounts",
 ];
 
 export function HowItWorks() {

@@ -3,39 +3,39 @@ import {
   Ticket,
   ShieldCheck,
   Lock,
-  Layers,
+  Search,
   TrendingDown,
 } from "lucide-react";
 
 const features = [
   {
-    title: "Instant Price Drop (IPD) Engine",
-    body: "Don't wait weeks for a passive price drop alert. GoCoupon calculates instant savings right when you buy by combining live merchant discounts, hidden promo codes, and card offers immediately.",
+    title: "Smart Store & Deal Search Engine",
+    body: "Search across 240+ partner stores (Booking.com, Myntra, Swiggy, Amazon) or find deals by keyword (Shoes, Hotels, Flights) with instant 1-click coupon auto-copy.",
+    icon: Search,
+  },
+  {
+    title: "1-Click Auto-Apply Chrome Extension",
+    body: "Never type coupon codes manually. When you reach checkout on 240+ stores, GoCoupon tests all working codes in parallel and applies the highest savings in under 2 seconds.",
     icon: Zap,
   },
   {
-    title: "4-Tier True Landed Cost Calculation",
-    body: "Sticker Price minus Auto-Coupon minus Bank Instant Rebate minus Cashback reward. We calculate the exact out-of-pocket payment before you complete checkout.",
-    icon: Layers,
-  },
-  {
-    title: "30-Day Deal Honesty Radar",
-    body: "Exposes fake sales and pre-festival price hikes using our 30-day baseline analysis. Instantly flags whether a product is a Real Bargain or an artificial marketing markup.",
+    title: "24/7 Live Verified Deals Sync",
+    body: "Connected directly to merchant affiliate APIs around the clock. Every deal is tested and timestamped live, automatically purging dead or expired vouchers.",
     icon: TrendingDown,
   },
   {
-    title: "Bank Card & Payment Arbitrage",
-    body: "Dynamically checks which card in your wallet (HDFC, SBI, ICICI, Axis, Amex, Chase, Citi) unlocks the highest instant checkout rebate, without ever asking for card numbers.",
+    title: "Bank & Credit Card Discount Stacking",
+    body: "Pair merchant coupon codes with exclusive bank partner offers (HDFC, SBI, ICICI, Axis, Amex) to unlock an extra 5% to 15% instant checkout savings.",
     icon: Ticket,
   },
   {
-    title: "Universal Multi-Store Intelligence",
-    body: "Real-time pricing across Amazon, Flipkart, Walmart, Best Buy, Target, Croma, and 500+ direct brand stores worldwide. 100% unbiased—finding you the lowest price is our only objective.",
+    title: "Zero 503 Outbound Redirection",
+    body: "Smart failover router guarantees you are never blocked by broken affiliate links or proxy downtime, ensuring seamless 1-click checkout hand-offs every time.",
     icon: ShieldCheck,
   },
   {
-    title: "Bank-Grade Privacy & 1-Click Savings",
-    body: "Tests every working code in under 2 seconds. Operates in a local sandboxed browser environment with zero keystroke logging, zero personal data harvesting, and zero cost.",
+    title: "Bank-Grade Privacy & 100% Free Forever",
+    body: "Operates in a local sandboxed browser environment with zero keystroke logging, zero personal data collection, and no annoying spam popups.",
     icon: Lock,
   },
 ];
@@ -46,11 +46,11 @@ export function Features() {
       <div className="mx-auto max-w-7xl">
         <div className="reveal mb-14 max-w-2xl">
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">
-            Instant savings when you buy.
-            <span className="text-primary block mt-1">Not weeks later.</span>
+            Real Working Coupons.
+            <span className="text-primary block mt-1">Verified Every 15 Minutes.</span>
           </h2>
           <p className="mt-4 text-sm sm:text-base text-muted-foreground leading-relaxed">
-            From our Instant Price Drop engine and 4-tier stacked savings calculator to 30-day Deal Honesty verification — engineered to guarantee you never overpay online.
+            From our 1-click Chrome Extension and 24/7 Live Deal Sync to our Smart Store Search and Bank Stacking Engine — built so you never overpay online again.
           </p>
         </div>
 

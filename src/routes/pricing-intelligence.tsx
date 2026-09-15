@@ -26,7 +26,6 @@ import {
   Server,
   Database,
   ArrowRight,
-  Sparkles,
   BarChart3,
   Sliders,
   BellRing,

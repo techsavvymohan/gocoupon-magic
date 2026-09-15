@@ -28,77 +28,77 @@ export function WhyUsExpenseSaviour() {
 
   const comparisons = [
     {
-      capability: "Cross-Store Price Arbitrage",
-      honey: "Locked to current store tab only",
-      trackers: "Shows price graph, no competitor cart link",
-      gocoupon: "Instantly routes you to the cheaper store (saves ₹1,500 – ₹6,000)",
+      capability: "Live Verified Promo Codes",
+      honey: "Crowdsourced codes (often 0% saved)",
+      trackers: "Shows price graph only, zero coupons",
+      gocoupon: "Direct merchant API sync 24/7 with zero dead codes",
       highlight: true,
     },
     {
-      capability: "Savings Delivery Time",
-      honey: "Tests codes at checkout (often 0% saved)",
-      trackers: "Wait 2 to 4 weeks for a price drop alert",
-      gocoupon: "Instant Price Drop (IPD) right at checkout today",
+      capability: "Checkout Auto-Apply Speed",
+      honey: "Slow 20–30s checkout delay",
+      trackers: "No checkout extension applier",
+      gocoupon: "Parallel code testing in under 2 seconds",
       highlight: true,
     },
     {
       capability: "Bank & Credit Card Rebates",
       honey: "Zero bank card intelligence",
       trackers: "Zero payment method recommendations",
-      gocoupon: "Calculates max instant discount for HDFC, SBI, ICICI, Chase, Amex",
+      gocoupon: "Calculates max instant discount for HDFC, SBI, ICICI, Axis, Amex",
       highlight: true,
     },
     {
-      capability: "Fake Sale & Markup Shield",
-      honey: "Blind to pre-sale artificial price hikes",
-      trackers: "Basic history without honesty grading",
-      gocoupon: "30-Day Deal Honesty Radar flags artificial price hikes before you pay",
+      capability: "Smart Store & Deal Search",
+      honey: "No instant web search bar",
+      trackers: "Search restricted to historical graphs",
+      gocoupon: "Instant autocomplete across 240+ stores & 980+ live API deals",
       highlight: true,
     },
     {
-      capability: "Amazon & Hidden Voucher Clipping",
-      honey: "Frequently misses on-page checkboxes",
-      trackers: "Does not clip on-page discount boxes",
-      gocoupon: "Auto-detects and 1-click clips secret on-page vouchers",
+      capability: "Outbound Redirection Reliability",
+      honey: "Frequent broken redirect links",
+      trackers: "Basic outbound links without failover",
+      gocoupon: "Zero 503 errors with smart merchant destination failover",
       highlight: false,
     },
     {
-      capability: "Typical Annual Household Relief",
+      capability: "Typical Annual Household Savings",
       honey: isIndia ? "₹800 – ₹1,500 / year" : "$20 – $40 / year",
       trackers: isIndia ? "₹1,200 – ₹2,500 / year" : "$30 – $60 / year",
-      gocoupon: isIndia ? "₹35,000 – ₹65,000+ / year" : "$500 – $900+ / year",
+      gocoupon: isIndia ? "₹15,000 – ₹35,000+ / year" : "$300 – $600+ / year",
       highlight: true,
     },
   ];
 
   const expenseLeaks = [
     {
-      icon: Layers,
-      title: "1. The Single-Store Trap",
-      leak: isIndia ? "Losing ₹2,000 – ₹5,000 per gadget" : "Losing $40 – $100 per purchase",
+      icon: Ticket,
+      title: "1. The Dead Coupon Trap",
+      leak: "Wasting 15 mins on expired codes",
       solution:
-        "Amazon won't tell you Flipkart has the same phone for ₹4,000 less; Walmart won't tell you Best Buy is cheaper. GoCoupon checks 500+ stores in 1 second.",
-    },
-    {
-      icon: TrendingDown,
-      title: "2. The Fake Pre-Sale Markup",
-      leak: isIndia ? "Overpaying 25% on 'Sale' days" : "Falling for fake 40% OFF banners",
-      solution:
-        "Sellers quietly hike prices 5 days before festival sales. Our 30-day baseline detector flags whether a deal is an authentic bargain or an artificial trick.",
+        "Generic coupon directories leave broken codes active for months. GoCoupon tests and purges expired vouchers every 15 minutes through direct API sync.",
     },
     {
       icon: CreditCard,
-      title: "3. Unclaimed Bank Discounts",
+      title: "2. Unclaimed Bank Discounts",
       leak: isIndia ? "Leaving ₹2,500+ card offers unclaimed" : "Missing $50+ card partner rebates",
       solution:
-        "You already hold the cards in your wallet. GoCoupon tells you exactly which card unlocks maximum instant discount without ever asking for card numbers.",
+        "You already hold the cards in your wallet. GoCoupon highlights whether HDFC, ICICI, SBI, Axis, or Amex unlocks an extra 5% to 15% instant checkout discount.",
     },
     {
-      icon: Ticket,
-      title: "4. Dead Coupon Despair",
-      leak: "Wasting 15 mins on expired codes",
+      icon: Zap,
+      title: "3. Manual Checkout Friction",
+      leak: "Missing secret checkout vouchers",
       solution:
-        "We test verified working codes in parallel in under 2 seconds and auto-clip hidden on-page coupons so you never pay sticker price.",
+        "Our free Chrome Extension pops up automatically at checkout on 240+ stores, testing all working promo codes and applying the highest net savings in 2 seconds.",
+    },
+    {
+      icon: ShieldCheck,
+      title: "4. Broken Affiliate Dead-Ends",
+      leak: "Annoying 503 errors on other sites",
+      solution:
+        "GoCoupon's smart redirection engine guarantees zero 503 errors by automatically resolving clean destination URLs while auto-copying your promo code.",
     },
   ];
 

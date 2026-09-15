@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
-import { Flame, ArrowRight, X, Sparkles } from "lucide-react";
+import { Flame, ArrowRight, X } from "lucide-react";
 
 const STORAGE_KEY = "gocoupon_offers_announcement_v1";
 

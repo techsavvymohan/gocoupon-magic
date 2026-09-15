@@ -24,7 +24,7 @@ import {
   Home,
   ShoppingBag,
   Flame,
-  Sparkles,
+  Zap,
 } from "lucide-react";
 
 type NavLink = {
@@ -355,7 +355,7 @@ export function Navbar() {
             {/* Animated Attention Badge informing users to click for offers — hidden when already on /offers */}
             {!isOffersPage && (
               <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-1.5 py-0.5 text-[8.5px] font-extrabold uppercase tracking-tight bg-gradient-to-r from-amber-500 via-rose-500 to-primary text-white rounded-full shadow-md shadow-rose-500/30 pointer-events-none whitespace-nowrap animate-bounce ring-1 ring-background">
-                <Sparkles className="h-2 w-2" />
+                <Zap className="h-2 w-2 fill-current" />
                 <span>Tap for Deals</span>
               </span>
             )}

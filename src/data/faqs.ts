@@ -1,52 +1,43 @@
 export const couponFaqs = [
   {
-    question: "Is goCoupon really free to use?",
+    question: "Is GoCoupon really 100% free to use?",
     answer:
-      "Yes, 100% free forever. There are no subscriptions, no paid Pro plans, and no accounts or credit cards required. You get unlimited access to multi-store price comparisons, 90-day price history charts, automated coupon code application, and card savings.",
+      "Yes, 100% free forever. There are no paid subscriptions, no hidden charges, and no account or credit card required. You get unlimited access to verified promo codes across 240+ partner stores, 1-click auto-apply with our Chrome extension, and bank card discount stacking.",
   },
   {
-    question: "What is GoCoupon's Instant Price Drop (IPD) Engine?",
+    question: "How does GoCoupon's Smart Store & Deal Search Bar work?",
     answer:
-      "Unlike traditional price trackers that make you wait weeks for a potential price drop notification, GoCoupon's Instant Price Drop engine engineers an immediate discount right when you checkout. It stacks the merchant's lowest price, auto-applied discount codes, and partner bank card rebates simultaneously.",
+      "GoCoupon's Smart Search Bar lets you find working coupon codes and deals in one second. Simply type a store name like 'Booking.com', 'Myntra', or 'Swiggy' to immediately see top active promo codes, or search for keywords like 'Shoes', 'Hotels', or 'Electronics' to explore live verified merchant deals with 1-click coupon auto-copy.",
   },
   {
-    question: "How does the 4-Tier True Landed Cost calculation work?",
+    question: "How does the 1-click coupon auto-apply Chrome extension work?",
     answer:
-      "Many sites show misleading sticker prices that hide shipping fees or omit payment discounts. GoCoupon calculates your True Landed Cost: (Sticker Price) − (Auto-Applied Store Coupon) − (Payment Card Instant Rebate) − (Cashback Reward) + (Estimated Shipping). You see your exact net out-of-pocket cost before paying.",
+      "When you install the free GoCoupon Chrome extension, it sits quietly in your browser. Whenever you visit the cart or checkout page of Amazon, Flipkart, Myntra, or 240+ supported stores, GoCoupon pops up, tests all verified working promo codes in parallel in under 2 seconds, and automatically applies the single code that saves you the most money.",
   },
   {
-    question: "How does the 30-Day Deal Honesty Radar detect fake discounts?",
+    question: "How are deals and promo codes verified on GoCoupon?",
     answer:
-      "Retailers often inflate list prices right before major festival sales (Prime Day, Big Billion Days, Black Friday) to make standard prices look like massive '50% off' bargains. GoCoupon's Deal Honesty engine tracks a 30-day moving price baseline and labels deals as Real Bargain, Fair Deal, Cyclical Normal, or Fake Discount Alert.",
+      "Unlike traditional coupon websites filled with expired clickbait codes, GoCoupon connects directly to official merchant affiliate APIs 24/7. Working deals are synced live every 15 minutes, and any invalid or expired voucher codes are automatically purged from our directory.",
   },
   {
     question: "Can I stack bank credit card offers with promo codes?",
     answer:
-      "Yes! GoCoupon matches your eligible bank cards (HDFC, SBI, ICICI, Axis, Chase, Amex, Capital One) with active merchant promotions. We show you exactly which card to use at checkout to unlock up to an extra ₹5,000 or $120 instant discount on high-ticket tech and fashion.",
+      "Yes! GoCoupon matches your eligible credit and debit cards (such as HDFC, SBI, ICICI, Axis, and Amex) with active merchant promotions. We show you which card unlocks an additional 5% to 15% instant checkout discount stacked on top of store promo codes.",
   },
   {
-    question: "Can I compare prices by pasting a product link from Amazon or other stores?",
+    question: "How does GoCoupon compare to GrabOn, CouponDuniya, and Honey?",
     answer:
-      "Yes! Simply paste any product URL from Amazon, Walmart, Target, Flipkart, or Myntra into the search bar. GoCoupon instantly resolves the product specifications and scans 500+ verified retailers to find competing offers and stackable coupons.",
+      "Unlike older aggregators that list expired coupons and make you manually try dozens of broken codes, GoCoupon features 100% live verified deals synced via real-time merchant APIs. GoCoupon also provides a fast 1-click auto-coupon browser extension, smart store autocomplete, zero 503 outbound link failover, and bank card discount stacking with zero spam.",
   },
   {
-    question: "How does 1-click coupon auto-apply work at checkout?",
+    question: "Is GoCoupon safe and private?",
     answer:
-      "When you install our free Chrome extension and proceed to checkout on any supported store, GoCoupon tests all verified working discount codes in seconds and automatically applies the single code that saves you the most money.",
-  },
-  {
-    question: "How does GoCoupon compare to GrabOn, CouponDuniya, and Dealspotr?",
-    answer:
-      "Unlike older aggregators like GrabOn, CouponDuniya, or Dealspotr that often list expired coupons and clickbait codes, GoCoupon features 100% verified, hand-tested deals updated daily via real-time merchant APIs. GoCoupon also provides a 1-click auto-coupon browser extension, 30-day price drop history graphs, and bank card discount stacking (HDFC, SBI, ICICI, Axis) with zero ads and zero spam.",
+      "Absolutely. GoCoupon operates with a strict, sandboxed privacy-first architecture. We never track your personal search history, read private emails, or store sensitive financial details like credit card numbers or CVVs. The extension only activates on checkout pages to test working discount codes.",
   },
   {
     question: "Is GoCoupon also known as Go Coupon or GoCoupons?",
     answer:
-      "Yes! Whether you search for GoCoupon, Go Coupon, or GoCoupons (gocoupon.io), you reach the official platform. GoCoupon is 100% free forever, aggregating over 970+ live verified deals, 240+ partner stores, and exclusive promo codes across India and global markets.",
-  },
-  {
-    question: "Is goCoupon safe and private?",
-    answer:
-      "Absolutely. goCoupon operates with a strict sandboxed privacy policy. We never track your personal web history, read private emails or messages, or store financial details like card numbers or CVVs. We only activate on checkout pages to help you save.",
+      "Yes! Whether you search for GoCoupon, Go Coupon, or GoCoupons (gocoupon.io), you reach the official platform. GoCoupon is 100% free forever, aggregating over 980+ live verified deals, 240+ partner stores, and exclusive promo codes updated daily.",
   },
 ] as const;
+

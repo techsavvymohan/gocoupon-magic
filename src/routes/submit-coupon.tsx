@@ -10,7 +10,6 @@ import {
   Plus,
   Loader2,
   Building2,
-  Sparkles,
   Layers,
   ArrowRight,
   ShieldCheck,
@@ -76,7 +75,7 @@ function SubmitCouponPage() {
         {/* Header */}
         <div className="text-center">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary mb-4">
-            <Sparkles className="h-3.5 w-3.5" />
+            <Tag className="h-3.5 w-3.5" />
             <span>Community Savings Engine</span>
           </div>
           <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground text-balance">
