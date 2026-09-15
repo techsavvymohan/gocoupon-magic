@@ -161,10 +161,61 @@ function ProductCardImg({
     catLower.includes("watch") ||
     altLower.includes("smartwatch") ||
     altLower.includes("fitbit");
+  const isJeans =
+    altLower.includes("jean") ||
+    altLower.includes("denim") ||
+    catLower.includes("jean") ||
+    catLower.includes("denim");
+  const isFootwear =
+    catLower.includes("footwear") ||
+    catLower.includes("shoe") ||
+    altLower.includes("shoe") ||
+    altLower.includes("sneaker") ||
+    altLower.includes("sandal") ||
+    altLower.includes("boot");
+  const isFashion =
+    catLower.includes("fashion") ||
+    catLower.includes("apparel") ||
+    catLower.includes("clothing") ||
+    altLower.includes("shirt") ||
+    altLower.includes("t-shirt") ||
+    altLower.includes("tshirt") ||
+    altLower.includes("hoodie") ||
+    altLower.includes("jacket") ||
+    altLower.includes("pant") ||
+    altLower.includes("trouser") ||
+    altLower.includes("dress") ||
+    altLower.includes("kurta");
+  const isBeauty =
+    catLower.includes("beauty") ||
+    catLower.includes("personal care") ||
+    altLower.includes("serum") ||
+    altLower.includes("cream") ||
+    altLower.includes("lotion") ||
+    altLower.includes("sunscreen") ||
+    altLower.includes("shampoo") ||
+    altLower.includes("facewash");
+  const isCamera =
+    catLower.includes("camera") ||
+    altLower.includes("camera") ||
+    altLower.includes("polaroid") ||
+    altLower.includes("dslr");
 
   let fallbackUrl =
-    "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&auto=format&fit=crop&q=80";
-  if (isPhone) {
+    "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=600&auto=format&fit=crop&q=80";
+  if (isJeans) {
+    fallbackUrl =
+      "https://images.unsplash.com/photo-1542272604-780c96856592?w=600&auto=format&fit=crop&q=80";
+  } else if (isFootwear) {
+    fallbackUrl =
+      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&auto=format&fit=crop&q=80";
+  } else if (isFashion) {
+    fallbackUrl =
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80";
+  } else if (isBeauty) {
+    fallbackUrl =
+      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&auto=format&fit=crop&q=80";
+  } else if (isPhone) {
     fallbackUrl = altLower.includes("iphone")
       ? "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=600&auto=format&fit=crop&q=80"
       : "https://images.unsplash.com/photo-1511707171634-5f897ff02560?w=600&auto=format&fit=crop&q=80";
@@ -179,8 +230,14 @@ function ProductCardImg({
       "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80";
   }
 
+  // Reject old stale camera fallback if not a camera
+  const isStaleCameraFallback =
+    imgSrc && imgSrc.includes("photo-1526170375885-4d8ecf77b99f") && !isCamera;
+  const isStaleWatchFallback =
+    imgSrc && imgSrc.includes("photo-1523275335684-37898b6baf30") && !isWatch;
+
   const effectiveSrc =
-    !imgSrc || hasError || (imgSrc.includes("photo-1523275335684-37898b6baf30") && !isWatch)
+    !imgSrc || hasError || isStaleCameraFallback || isStaleWatchFallback
       ? fallbackUrl
       : imgSrc;
 
@@ -188,6 +245,7 @@ function ProductCardImg({
     <img
       src={effectiveSrc}
       alt={alt}
+      referrerPolicy="no-referrer"
       className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
       loading="lazy"
       onError={() => setHasError(true)}

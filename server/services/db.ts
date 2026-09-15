@@ -58,9 +58,29 @@ if (DATABASE_URL) {
     // Test initial connection asynchronously
     pgPool
       .query("SELECT 1")
-      .then(() => {
+      .then(async () => {
         isPgConnected = true;
         console.log("⚡ [Database] Connected to PostgreSQL (Supabase) successfully.");
+        // Ensure gocoupon_clicks table and indexes exist
+        await pgPool?.query(`
+          CREATE TABLE IF NOT EXISTS gocoupon_clicks (
+            id TEXT PRIMARY KEY,
+            deal_id TEXT NOT NULL,
+            deal_title TEXT NOT NULL,
+            store_name TEXT NOT NULL,
+            store_slug TEXT,
+            coupon_code TEXT,
+            destination_url TEXT NOT NULL,
+            source TEXT DEFAULT 'offers',
+            device TEXT,
+            ip TEXT,
+            user_agent TEXT,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+          );
+          CREATE INDEX IF NOT EXISTS idx_clicks_deal_id ON gocoupon_clicks(deal_id);
+          CREATE INDEX IF NOT EXISTS idx_clicks_store_name ON gocoupon_clicks(store_name);
+          CREATE INDEX IF NOT EXISTS idx_clicks_created_at ON gocoupon_clicks(created_at DESC);
+        `).catch((e) => console.warn("[Database] Could not verify gocoupon_clicks table:", e.message));
       })
       .catch((err) => {
         console.warn("⚠️ [Database] Initial PostgreSQL connection check failed, using fallback engine:", err.message);
@@ -678,7 +698,275 @@ export const storesDb = {
 };
 
 // =============================================================================
-// 6. OVERALL DATABASE HEALTH & METRICS
+// 6. DEAL CLICKS & CONVERSION TRACKING SERVICE
+// =============================================================================
+export interface DealClickRecord {
+  id: string;
+  dealId: string;
+  dealTitle: string;
+  storeName: string;
+  storeSlug?: string;
+  couponCode?: string;
+  destinationUrl: string;
+  source?: string;
+  device?: string;
+  ip?: string;
+  userAgent?: string;
+  createdAt: string;
+}
+
+export const clicksDb = {
+  /**
+   * Records a user click on an offer/coupon and updates deal uses count.
+   */
+  async recordClick(click: Omit<DealClickRecord, "id" | "createdAt"> & { id?: string; createdAt?: string }): Promise<DealClickRecord> {
+    const record: DealClickRecord = {
+      id: click.id || `clk_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      dealId: click.dealId || "unknown",
+      dealTitle: click.dealTitle || "Exclusive Offer",
+      storeName: click.storeName || "Partner Store",
+      storeSlug: click.storeSlug || "",
+      couponCode: click.couponCode || "",
+      destinationUrl: click.destinationUrl,
+      source: click.source || "offers",
+      device: click.device || "desktop",
+      ip: click.ip || "",
+      userAgent: click.userAgent || "",
+      createdAt: click.createdAt || new Date().toISOString(),
+    };
+
+    // 1. Try PostgreSQL insertion
+    await queryPg(`
+      INSERT INTO gocoupon_clicks (
+        id, deal_id, deal_title, store_name, store_slug,
+        coupon_code, destination_url, source, device, ip, user_agent, created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+    `, [
+      record.id, record.dealId, record.dealTitle, record.storeName, record.storeSlug,
+      record.couponCode, record.destinationUrl, record.source, record.device,
+      record.ip, record.userAgent, record.createdAt
+    ]);
+
+    // Increment uses_count in gocoupon_deals if deal exists
+    if (record.dealId && record.dealId !== "unknown") {
+      await queryPg(
+        "UPDATE gocoupon_deals SET uses_count = COALESCE(uses_count, 0) + 1 WHERE id = $1",
+        [record.dealId]
+      ).catch(() => {});
+    }
+
+    // 2. Resilient local disk sync
+    try {
+      const clicks = readJsonFallback<DealClickRecord[]>("admin-clicks.json", []);
+      clicks.unshift(record);
+      if (clicks.length > 5000) clicks.length = 5000;
+      writeJsonFallback("admin-clicks.json", clicks);
+    } catch (e: any) {
+      console.warn("[clicksDb] Disk write error:", e?.message);
+    }
+
+    return record;
+  },
+
+  /**
+   * Retrieves aggregated click analytics, top deals, and recent click events.
+   */
+  async getClickAnalytics(): Promise<{
+    totalClicksToday: number;
+    totalClicks7d: number;
+    totalClicks30d: number;
+    totalClicksAllTime: number;
+    topDeals: Array<{
+      dealId: string;
+      dealTitle: string;
+      storeName: string;
+      couponCode: string;
+      clickCount: number;
+      lastClickedAt: string;
+    }>;
+    topStores: Array<{
+      storeName: string;
+      clickCount: number;
+    }>;
+    recentClicks: DealClickRecord[];
+    clicksByDay: Array<{ date: string; clicks: number }>;
+  }> {
+    // 1. Try PostgreSQL aggregation first
+    const pgRes = await queryPg(`
+      SELECT 
+        COUNT(*) AS total_all_time,
+        COUNT(*) FILTER (WHERE created_at >= CURRENT_DATE) AS total_today,
+        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '7 days') AS total_7d,
+        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '30 days') AS total_30d
+      FROM gocoupon_clicks
+    `);
+
+    if (pgRes && pgRes.rows.length > 0) {
+      const topDealsRes = await queryPg(`
+        SELECT 
+          deal_id AS "dealId",
+          deal_title AS "dealTitle",
+          store_name AS "storeName",
+          coupon_code AS "couponCode",
+          COUNT(*) AS "clickCount",
+          MAX(created_at) AS "lastClickedAt"
+        FROM gocoupon_clicks
+        GROUP BY deal_id, deal_title, store_name, coupon_code
+        ORDER BY "clickCount" DESC
+        LIMIT 25
+      `);
+
+      const topStoresRes = await queryPg(`
+        SELECT store_name AS "storeName", COUNT(*) AS "clickCount"
+        FROM gocoupon_clicks
+        GROUP BY store_name
+        ORDER BY "clickCount" DESC
+        LIMIT 10
+      `);
+
+      const recentRes = await queryPg(`
+        SELECT 
+          id, deal_id AS "dealId", deal_title AS "dealTitle",
+          store_name AS "storeName", store_slug AS "storeSlug",
+          coupon_code AS "couponCode", destination_url AS "destinationUrl",
+          source, device, ip, user_agent AS "userAgent", created_at AS "createdAt"
+        FROM gocoupon_clicks
+        ORDER BY created_at DESC
+        LIMIT 50
+      `);
+
+      const dailyRes = await queryPg(`
+        SELECT 
+          TO_CHAR(created_at, 'YYYY-MM-DD') AS date,
+          COUNT(*) AS clicks
+        FROM gocoupon_clicks
+        WHERE created_at >= NOW() - INTERVAL '14 days'
+        GROUP BY TO_CHAR(created_at, 'YYYY-MM-DD')
+        ORDER BY date ASC
+      `);
+
+      const r = pgRes.rows[0];
+      return {
+        totalClicksToday: Number(r.total_today) || 0,
+        totalClicks7d: Number(r.total_7d) || 0,
+        totalClicks30d: Number(r.total_30d) || 0,
+        totalClicksAllTime: Number(r.total_all_time) || 0,
+        topDeals: (topDealsRes?.rows || []).map((d) => ({
+          ...d,
+          clickCount: Number(d.clickCount),
+        })),
+        topStores: (topStoresRes?.rows || []).map((s) => ({
+          ...s,
+          clickCount: Number(s.clickCount),
+        })),
+        recentClicks: recentRes?.rows || [],
+        clicksByDay: (dailyRes?.rows || []).map((d) => ({
+          date: d.date,
+          clicks: Number(d.clicks),
+        })),
+      };
+    }
+
+    // 2. Fallback to local JSON disk data
+    const clicks = readJsonFallback<DealClickRecord[]>("admin-clicks.json", []);
+    const now = Date.now();
+    const oneDayAgo = now - 24 * 60 * 60 * 1000;
+    const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+    const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;
+
+    let today = 0;
+    let past7d = 0;
+    let past30d = 0;
+
+    const dealMap: Record<string, { dealId: string; dealTitle: string; storeName: string; couponCode: string; clickCount: number; lastClickedAt: string }> = {};
+    const storeMap: Record<string, number> = {};
+    const dayMap: Record<string, number> = {};
+
+    for (const c of clicks) {
+      const time = new Date(c.createdAt).getTime();
+      if (time >= oneDayAgo) today++;
+      if (time >= sevenDaysAgo) past7d++;
+      if (time >= thirtyDaysAgo) past30d++;
+
+      const dKey = c.dealId || c.dealTitle;
+      if (!dealMap[dKey]) {
+        dealMap[dKey] = {
+          dealId: c.dealId,
+          dealTitle: c.dealTitle,
+          storeName: c.storeName,
+          couponCode: c.couponCode || "",
+          clickCount: 0,
+          lastClickedAt: c.createdAt,
+        };
+      }
+      dealMap[dKey].clickCount++;
+
+      const sKey = c.storeName || "Unknown";
+      storeMap[sKey] = (storeMap[sKey] || 0) + 1;
+
+      const dayStr = c.createdAt ? c.createdAt.slice(0, 10) : new Date().toISOString().slice(0, 10);
+      dayMap[dayStr] = (dayMap[dayStr] || 0) + 1;
+    }
+
+    const topDeals = Object.values(dealMap).sort((a, b) => b.clickCount - a.clickCount).slice(0, 25);
+    const topStores = Object.entries(storeMap)
+      .map(([storeName, clickCount]) => ({ storeName, clickCount }))
+      .sort((a, b) => b.clickCount - a.clickCount)
+      .slice(0, 10);
+
+    const clicksByDay = Object.entries(dayMap)
+      .map(([date, clicks]) => ({ date, clicks }))
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(-14);
+
+    return {
+      totalClicksToday: today,
+      totalClicks7d: past7d,
+      totalClicks30d: past30d,
+      totalClicksAllTime: clicks.length,
+      topDeals,
+      topStores,
+      recentClicks: clicks.slice(0, 50),
+      clicksByDay,
+    };
+  },
+
+  /**
+   * Retrieves click count for a specific deal ID.
+   */
+  async getClicksForDeal(dealId: string): Promise<number> {
+    const res = await queryPg("SELECT COUNT(*) FROM gocoupon_clicks WHERE deal_id = $1", [dealId]);
+    if (res && res.rows.length > 0) {
+      return parseInt(res.rows[0].count, 10);
+    }
+    const clicks = readJsonFallback<DealClickRecord[]>("admin-clicks.json", []);
+    return clicks.filter((c) => c.dealId === dealId).length;
+  },
+
+  /**
+   * Returns a dictionary of dealId -> clickCount for fast bulk lookup.
+   */
+  async getAllDealClickCounts(): Promise<Record<string, number>> {
+    const res = await queryPg("SELECT deal_id, COUNT(*) as count FROM gocoupon_clicks GROUP BY deal_id");
+    const counts: Record<string, number> = {};
+    if (res && res.rows.length > 0) {
+      for (const r of res.rows) {
+        counts[r.deal_id] = parseInt(r.count, 10);
+      }
+      return counts;
+    }
+    const clicks = readJsonFallback<DealClickRecord[]>("admin-clicks.json", []);
+    for (const c of clicks) {
+      if (c.dealId) {
+        counts[c.dealId] = (counts[c.dealId] || 0) + 1;
+      }
+    }
+    return counts;
+  },
+};
+
+// =============================================================================
+// 7. OVERALL DATABASE HEALTH & METRICS
 // =============================================================================
 export async function getDatabaseDiagnostics(): Promise<{
   status: "connected" | "degraded" | "offline";
@@ -694,6 +982,7 @@ export async function getDatabaseDiagnostics(): Promise<{
     blogs: 0,
     alerts: 0,
     price_snapshots: 0,
+    clicks: 0,
   };
 
   const dealsC = await queryPg("SELECT COUNT(*) FROM gocoupon_deals");
@@ -703,6 +992,7 @@ export async function getDatabaseDiagnostics(): Promise<{
     const blogsC = await queryPg("SELECT COUNT(*) FROM gocoupon_blogs");
     const alertsC = await queryPg("SELECT COUNT(*) FROM gocoupon_alerts");
     const snapsC = await queryPg("SELECT COUNT(*) FROM gocoupon_price_snapshots");
+    const clicksC = await queryPg("SELECT COUNT(*) FROM gocoupon_clicks");
 
     counts.deals = parseInt(dealsC.rows[0].count, 10);
     counts.stores = storesC ? parseInt(storesC.rows[0].count, 10) : 0;
@@ -710,6 +1000,7 @@ export async function getDatabaseDiagnostics(): Promise<{
     counts.blogs = blogsC ? parseInt(blogsC.rows[0].count, 10) : 0;
     counts.alerts = alertsC ? parseInt(alertsC.rows[0].count, 10) : 0;
     counts.price_snapshots = snapsC ? parseInt(snapsC.rows[0].count, 10) : 0;
+    counts.clicks = clicksC ? parseInt(clicksC.rows[0].count, 10) : 0;
 
     return {
       status: "connected",
@@ -723,10 +1014,12 @@ export async function getDatabaseDiagnostics(): Promise<{
   const fallbackBlogs = readJsonFallback<any[]>("blogs.json", []);
   const fallbackSubs = readJsonFallback<any[]>("admin-submissions.json", []);
   const fallbackDeals = getLiveDeals();
+  const fallbackClicks = readJsonFallback<any[]>("admin-clicks.json", []);
 
   counts.deals = fallbackDeals.length;
   counts.blogs = fallbackBlogs.length;
   counts.submissions = fallbackSubs.length;
+  counts.clicks = fallbackClicks.length;
 
   return {
     status: isPgConnected ? "degraded" : "offline",

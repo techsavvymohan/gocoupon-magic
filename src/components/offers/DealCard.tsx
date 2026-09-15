@@ -2,7 +2,7 @@ import React from "react";
 import { Clock, Users, ChevronDown } from "lucide-react";
 import { StoreLogo } from "@/components/common/StoreLogo";
 import { RedeemCouponButton } from "@/components/common/RedeemCouponButton";
-import { wrapAffiliateTracking } from "@/lib/services/store-registry";
+import { buildDealRedirectUrl, wrapAffiliateTracking } from "@/lib/services/store-registry";
 import type { Deal } from "@/lib/api/deals-api";
 
 export interface DealCardProps {
@@ -25,10 +25,15 @@ export const DealCard = React.memo(function DealCard({
   onRedeem,
 }: DealCardProps) {
   const isListView = viewDensity === "list";
-  const affiliateUrl = wrapAffiliateTracking(
-    deal.link,
-    isListView ? "gocoupon_offers_list" : "gocoupon_offers_grid"
-  );
+  const affiliateUrl = buildDealRedirectUrl({
+    url: deal.link,
+    dealId: deal.id,
+    storeName: deal.storeName,
+    storeSlug: deal.storeSlug,
+    title: deal.title,
+    code: deal.code,
+    source: isListView ? "gocoupon_offers_list" : "gocoupon_offers_grid",
+  });
 
   const accentClass =
     deal.badge === "Verified"

@@ -1,0 +1,46 @@
+[
+  {
+    "id": "usr-surya",
+    "name": "Surya",
+    "email": "surya@gocoupon.io",
+    "passwordHash": "b8ea855a7e7dde790609366079cdc175:a54f59ac44f2a95cf87ac319eea58b479e921f622c699ed266def7964ab35a350daf10cc7aeb8af55a16f5bf092c319aa8f7ccc082cfddd66aecc3c57bdec9c8",
+    "role": "admin",
+    "permissions": [
+      "dashboard",
+      "offers",
+      "submissions",
+      "stores",
+      "categories",
+      "blogs",
+      "events",
+      "hero",
+      "sections",
+      "users",
+      "settings"
+    ],
+    "isActive": true,
+    "createdAt": "2026-09-14T19:38:00.000Z"
+  },
+  {
+    "id": "usr-mohan",
+    "name": "Mohan",
+    "email": "mohan@gocoupon.io",
+    "passwordHash": "775abcc661a77c8a794bf554d2c0eb81:ea5c6d70a9b7617e75ebe7d1f5ebd2d50d6e3ce8b10f5cb1ab165829bb67a664685edc9a3e4fed29f5f121c0527ceaea6d30eae03a86e924b0bf0207fb28ff5c",
+    "role": "admin",
+    "permissions": [
+      "dashboard",
+      "offers",
+      "submissions",
+      "stores",
+      "categories",
+      "blogs",
+      "events",
+      "hero",
+      "sections",
+      "users",
+      "settings"
+    ],
+    "isActive": true,
+    "createdAt": "2026-09-14T19:38:00.000Z"
+  }
+]

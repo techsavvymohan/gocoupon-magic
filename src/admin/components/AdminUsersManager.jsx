@@ -48,10 +48,13 @@ export default function AdminUsersManager() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/users", { cache: "no-store" });
+      const response = await fetch("/api/admin/users", { cache: "no-store" });
       const payload = await response.json();
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("Session expired or invalid. Please sign out and sign in again.");
+        }
         throw new Error(payload.error || "Unable to load users.");
       }
 
@@ -126,7 +129,7 @@ export default function AdminUsersManager() {
         throw new Error("Password is required for new users.");
       }
 
-      const response = await fetch(isEditing ? `/api/users/${form.id}` : "/api/users", {
+      const response = await fetch(isEditing ? `/api/admin/users/${form.id}` : "/api/admin/users", {
         method: isEditing ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -159,7 +162,7 @@ export default function AdminUsersManager() {
 
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/users/${deleteTarget.id}`, { method: "DELETE" });
+      const response = await fetch(`/api/admin/users/${deleteTarget.id}`, { method: "DELETE" });
       const result = await response.json();
 
       if (!response.ok) {

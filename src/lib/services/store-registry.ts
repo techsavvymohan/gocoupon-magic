@@ -47,38 +47,71 @@ const CUELINKS_PUB_ID =
  * Wraps any target merchant link with Cuelinks or Amazon affiliate attribution.
  * Safe against double-wrapping and handles direct domain tagging.
  */
+/**
+ * Builds a smart, trackable redirect URL with deal metadata.
+ * Routes through /api/redirect/deal with 100% 503-failover protection.
+ */
+export function buildDealRedirectUrl(options: {
+  url: string;
+  dealId?: string;
+  storeName?: string;
+  storeSlug?: string;
+  title?: string;
+  code?: string;
+  source?: string;
+}): string {
+  if (!options.url || options.url.startsWith("#") || options.url.startsWith("javascript:")) {
+    return "#";
+  }
+
+  // If already routed through our redirect
+  if (options.url.startsWith("/api/redirect/deal") || options.url.startsWith("/out")) {
+    return options.url;
+  }
+
+  const params = new URLSearchParams();
+  params.set("url", options.url);
+  if (options.dealId) params.set("dealId", options.dealId);
+  if (options.storeName) params.set("store", options.storeName);
+  if (options.storeSlug) params.set("slug", options.storeSlug);
+  if (options.title) params.set("title", options.title);
+  if (options.code) params.set("code", options.code);
+  if (options.source) params.set("source", options.source);
+
+  return `/api/redirect/deal?${params.toString()}`;
+}
+
+/**
+ * Wraps any target merchant link with GoCoupon smart redirect tracking.
+ * Safe against double-wrapping, eliminates affiliate 503 errors, and tracks clicks.
+ */
 export function wrapAffiliateTracking(targetUrl: string, subId = "gocoupon_web"): string {
   if (!targetUrl || targetUrl.startsWith("#") || targetUrl.startsWith("javascript:")) return "";
 
-  // Already an active affiliate redirect
-  if (targetUrl.includes("linksredirect.com") || targetUrl.includes("clnk.in")) {
+  // Already an internal redirect
+  if (targetUrl.startsWith("/api/redirect/deal") || targetUrl.startsWith("/out")) {
     return targetUrl;
   }
+
+  let finalUrl = targetUrl;
 
   // Amazon India tagging
-  if (targetUrl.includes("amazon.in")) {
-    if (!targetUrl.includes("tag=")) {
-      const sep = targetUrl.includes("?") ? "&" : "?";
-      return `${targetUrl}${sep}tag=${AMAZON_IN_PARTNER_TAG}`;
+  if (finalUrl.includes("amazon.in")) {
+    if (!finalUrl.includes("tag=")) {
+      const sep = finalUrl.includes("?") ? "&" : "?";
+      finalUrl = `${finalUrl}${sep}tag=${AMAZON_IN_PARTNER_TAG}`;
     }
-    return targetUrl;
   }
-
   // Amazon US tagging
-  if (targetUrl.includes("amazon.com")) {
-    if (AMAZON_US_PARTNER_TAG && !targetUrl.includes("tag=")) {
-      const sep = targetUrl.includes("?") ? "&" : "?";
-      return `${targetUrl}${sep}tag=${AMAZON_US_PARTNER_TAG}`;
+  else if (finalUrl.includes("amazon.com")) {
+    if (AMAZON_US_PARTNER_TAG && !finalUrl.includes("tag=")) {
+      const sep = finalUrl.includes("?") ? "&" : "?";
+      finalUrl = `${finalUrl}${sep}tag=${AMAZON_US_PARTNER_TAG}`;
     }
-    return targetUrl;
   }
 
-  // Cuelinks redirect wrapping with publisher ID and subid
-  if (CUELINKS_PUB_ID && /^https?:\/\//i.test(targetUrl)) {
-    return `https://linksredirect.com/?pub_id=${CUELINKS_PUB_ID}&subid=${encodeURIComponent(subId)}&url=${encodeURIComponent(targetUrl)}`;
-  }
-
-  return targetUrl;
+  // Route through GoCoupon's Smart Outbound Redirect & Click Tracker
+  return `/api/redirect/deal?url=${encodeURIComponent(finalUrl)}&source=${encodeURIComponent(subId)}`;
 }
 
 /**
@@ -866,7 +899,17 @@ export function getRelevantStoresForCategory(category: string, region: "IN" | "U
     return stores.filter((s) => multiBrandPhoneStoreIds.includes(s.id) || (SINGLE_BRAND_STORES[s.id] && normBrand.includes(SINGLE_BRAND_STORES[s.id])));
   }
 
-  if (normCat.includes("fashion") || normCat.includes("shoe") || normCat.includes("apparel") || normCat.includes("footwear") || normCat.includes("denim")) {
+  if (
+    normCat.includes("fashion") ||
+    normCat.includes("shoe") ||
+    normCat.includes("apparel") ||
+    normCat.includes("footwear") ||
+    normCat.includes("denim") ||
+    normCat.includes("jean") ||
+    normCat.includes("pant") ||
+    normCat.includes("trouser") ||
+    normCat.includes("shirt")
+  ) {
     return stores.filter((s) => s.category === "fashion" || s.category === "general");
   }
 

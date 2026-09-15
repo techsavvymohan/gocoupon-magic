@@ -60,7 +60,12 @@ export function useSession() {
 
 export function signOut(options?: { callbackUrl?: string }) {
   if (typeof window !== "undefined") {
+    localStorage.removeItem("gocoupon_admin_session_v3");
     localStorage.removeItem("gocoupon_admin_session_v2");
+    localStorage.removeItem("gocoupon_admin_token");
+    try {
+      sessionStorage.clear();
+    } catch {}
     window.location.href = options?.callbackUrl || "/admin";
   }
 }

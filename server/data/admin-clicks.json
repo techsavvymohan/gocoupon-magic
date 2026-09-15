@@ -1,0 +1,30 @@
+[
+  {
+    "id": "clk_1789444336920_up2tl3",
+    "dealId": "cue_booking_101",
+    "dealTitle": "Flat 50% Off Hotels",
+    "storeName": "Booking.com",
+    "storeSlug": "booking",
+    "couponCode": "HOTEL50",
+    "destinationUrl": "https://www.booking.com",
+    "source": "redeem_button",
+    "device": "desktop",
+    "ip": "127.0.0.1",
+    "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.9444",
+    "createdAt": "2026-09-15T03:52:16.920Z"
+  },
+  {
+    "id": "clk_1789444199551_nf0qne",
+    "dealId": "cue_booking_101",
+    "dealTitle": "Flat 50 Off Hotels",
+    "storeName": "Booking.com",
+    "storeSlug": "",
+    "couponCode": "BOOKING50",
+    "destinationUrl": "https://www.booking.com",
+    "source": "offers",
+    "device": "desktop",
+    "ip": "127.0.0.1",
+    "userAgent": "curl/8.21.0",
+    "createdAt": "2026-09-15T03:49:59.551Z"
+  }
+]

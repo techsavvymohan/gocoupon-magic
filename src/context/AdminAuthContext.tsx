@@ -64,7 +64,11 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     const originalFetch = window.fetch;
     window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = typeof input === "string" ? input : input instanceof URL ? input.href : (input as Request).url;
-      if (typeof url === "string" && url.includes("/api/admin") && !url.includes("/api/admin/login")) {
+      if (
+        typeof url === "string" &&
+        (url.startsWith("/api/") || url.includes("/api/")) &&
+        !url.includes("/api/admin/login")
+      ) {
         const currentToken = localStorage.getItem(TOKEN_KEY);
         if (currentToken) {
           const headers = new Headers(init?.headers || {});

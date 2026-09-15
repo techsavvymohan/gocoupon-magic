@@ -6,6 +6,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { MousePointerClick, TrendingUp } from "lucide-react";
+import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 import BulkCouponImportDialog from "./BulkCouponImportDialog";
 
 const initialForm = {
@@ -38,6 +40,8 @@ export default function AdminOffersManager() {
 
   const [offers, setOffers] = useState([]);
   const [stores, setStores] = useState([]);
+  const [clickCounts, setClickCounts] = useState({});
+  const [sortByClicks, setSortByClicks] = useState(false);
   const [open, setOpen] = useState(false);
   const [bulkImportOpen, setBulkImportOpen] = useState(false);
   const [editingOffer, setEditingOffer] = useState(null);
@@ -50,12 +54,19 @@ export default function AdminOffersManager() {
   const affiliateEditedRef = useRef(false);
 
   async function loadData() {
-    const [offersResponse, storesResponse] = await Promise.all([
+    const [offersResponse, storesResponse, clicksResponse] = await Promise.all([
       fetch("/api/offers?includeExpired=true", { cache: "no-store" }),
       fetch("/api/stores", { cache: "no-store" }),
+      fetch("/api/admin/clicks/counts", { headers: getAdminAuthHeaders(), cache: "no-store" }).catch(() => null),
     ]);
 
     const [offersPayload, storesPayload] = await Promise.all([offersResponse.json(), storesResponse.json()]);
+    if (clicksResponse && clicksResponse.ok) {
+      try {
+        const clicksPayload = await clicksResponse.json();
+        setClickCounts(clicksPayload.counts || {});
+      } catch {}
+    }
     setOffers(offersPayload.data || []);
     setStores(storesPayload.data || []);
     setSelectedOfferIds((current) => current.filter((id) => (offersPayload.data || []).some((offer) => offer.id === id)));
@@ -65,14 +76,21 @@ export default function AdminOffersManager() {
     let active = true;
 
     async function hydrateData() {
-      const [offersResponse, storesResponse] = await Promise.all([
+      const [offersResponse, storesResponse, clicksResponse] = await Promise.all([
         fetch("/api/offers?includeExpired=true", { cache: "no-store" }),
         fetch("/api/stores", { cache: "no-store" }),
+        fetch("/api/admin/clicks/counts", { headers: getAdminAuthHeaders(), cache: "no-store" }).catch(() => null),
       ]);
 
       const [offersPayload, storesPayload] = await Promise.all([offersResponse.json(), storesResponse.json()]);
 
       if (active) {
+        if (clicksResponse && clicksResponse.ok) {
+          try {
+            const clicksPayload = await clicksResponse.json();
+            setClickCounts(clicksPayload.counts || {});
+          } catch {}
+        }
         setOffers(offersPayload.data || []);
         setStores(storesPayload.data || []);
         setSelectedOfferIds([]);
@@ -234,6 +252,16 @@ export default function AdminOffersManager() {
     ? processedOffers.filter((o) => !o.isExpired)
     : processedOffers;
 
+  // Sorted offers (by clicks if sortByClicks is active)
+  const sortedOffers = useMemo(() => {
+    if (!sortByClicks) return filteredOffers;
+    return [...filteredOffers].sort((a, b) => {
+      const aClicks = clickCounts[a.id] || a.usesCount || 0;
+      const bClicks = clickCounts[b.id] || b.usesCount || 0;
+      return bClicks - aClicks;
+    });
+  }, [filteredOffers, sortByClicks, clickCounts]);
+
   const expiredCount = processedOffers.filter((o) => o.isExpired).length;
 
   return (
@@ -242,31 +270,44 @@ export default function AdminOffersManager() {
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <CardTitle>Coupons & Deals Management</CardTitle>
-            <CardDescription>Manage verified promo codes, discount deals, and store offer coverage.</CardDescription>
+            <CardDescription>Manage verified promo codes, discount deals, and real-time user redemption clicks.</CardDescription>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             {/* Filter Tabs */}
             <div className="flex items-center rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1 text-xs font-semibold border border-zinc-200 dark:border-zinc-700">
               <button
                 type="button"
-                onClick={() => setFilterTab("all")}
-                className={`px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer ${filterTab === "all" ? "bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs" : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"}`}
+                onClick={() => { setFilterTab("all"); setSortByClicks(false); }}
+                className={`px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer ${filterTab === "all" && !sortByClicks ? "bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs" : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"}`}
               >
                 All ({offers.length})
               </button>
               <button
                 type="button"
-                onClick={() => setFilterTab("active")}
-                className={`px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer ${filterTab === "active" ? "bg-emerald-600 text-white shadow-2xs" : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"}`}
+                onClick={() => { setFilterTab("active"); setSortByClicks(false); }}
+                className={`px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer ${filterTab === "active" && !sortByClicks ? "bg-emerald-600 text-white shadow-2xs" : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"}`}
               >
                 Active ({offers.length - expiredCount})
               </button>
               <button
                 type="button"
-                onClick={() => setFilterTab("expired")}
-                className={`px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer ${filterTab === "expired" ? "bg-rose-600 text-white shadow-2xs" : "text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40"}`}
+                onClick={() => { setFilterTab("expired"); setSortByClicks(false); }}
+                className={`px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer ${filterTab === "expired" && !sortByClicks ? "bg-rose-600 text-white shadow-2xs" : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"}`}
               >
                 Expired ({expiredCount})
+              </button>
+              <button
+                type="button"
+                onClick={() => setSortByClicks((prev) => !prev)}
+                className={`px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer flex items-center gap-1.5 ${
+                  sortByClicks
+                    ? "bg-emerald-600 text-white shadow-2xs"
+                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
+                }`}
+                title="Sort offers by user clicks and popularity"
+              >
+                <TrendingUp className="h-3.5 w-3.5" />
+                <span>Most Clicked</span>
               </button>
             </div>
 
@@ -299,7 +340,7 @@ export default function AdminOffersManager() {
                     <input
                       type="checkbox"
                       className="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 accent-emerald-600 cursor-pointer"
-                      checked={filteredOffers.length > 0 && selectedOfferIds.length === filteredOffers.length}
+                      checked={sortedOffers.length > 0 && selectedOfferIds.length === sortedOffers.length}
                       onChange={toggleSelectAll}
                       aria-label="Select all offers"
                     />
@@ -311,11 +352,12 @@ export default function AdminOffersManager() {
                 <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Store</TableHead>
                 <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Expiry Date</TableHead>
                 <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Status</TableHead>
+                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Clicks</TableHead>
                 <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredOffers.map((offer) => {
+              {sortedOffers.map((offer) => {
                 const storeLogo = storeLogoMap[offer.storeSlug];
                 const displayStatus = offer.displayStatus;
 
@@ -386,6 +428,12 @@ export default function AdminOffersManager() {
                         {displayStatus}
                       </span>
                     </TableCell>
+                    <TableCell>
+                      <span className="inline-flex items-center gap-1 font-mono text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-1 rounded-md border border-emerald-200 dark:border-emerald-800">
+                        <MousePointerClick className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                        <span>{(clickCounts[offer.id] || offer.usesCount || 0).toLocaleString()}</span>
+                      </span>
+                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1.5">
                         <Button
@@ -414,7 +462,7 @@ export default function AdminOffersManager() {
             </TableBody>
           </Table>
 
-          {!filteredOffers.length ? (
+          {!sortedOffers.length ? (
             <div className="mt-6 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 px-5 py-6 text-xs text-center text-zinc-500 dark:text-zinc-400">
               {filterTab === "expired" ? "No expired offers found." : "No offers added yet. Use the button above to add coupons and deals."}
             </div>

@@ -114,7 +114,7 @@ export default function AdminSidebar({ activeTab, onSelectTab }) {
 
             <button
               type="button"
-              onClick={() => signOut({ callbackUrl: typeof window !== "undefined" ? `${window.location.origin}/login` : "/login" })}
+              onClick={() => signOut({ callbackUrl: "/admin" })}
               className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 dark:bg-zinc-700 hover:bg-rose-600 dark:hover:bg-rose-600 py-2.5 px-3 text-xs font-semibold text-white shadow-xs transition-colors duration-150 cursor-pointer"
             >
               <LogOutIcon />

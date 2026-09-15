@@ -21,17 +21,27 @@ import { extensionRouter } from "./extension-config.js";
 import { contactRouter } from "./contact.js";
 import { cuelinksRouter } from "./cuelinks.js";
 import { internationalDealsRouter } from "./international-deals.js";
-import { adminRouter } from "./admin.js";
+import {
+  adminRouter,
+  handleGetSettings,
+  handlePutSettings,
+  handleGetEvents,
+  handleCreateEvent,
+  handleUpdateEvent,
+  handleDeleteEvent,
+  requireAdminAuth,
+} from "./admin.js";
 import { blogsRouter } from "./blogs.js";
 import { openFoodFactRouter } from "../../src/open_food_fact/api-route.js";
 import { priceHistoryRouter } from "./price-history.js";
-import { intelligenceRouter } from "./intelligence.js";
 import {
   getAdmitadConfig,
   getAdmitadAccessToken,
   getAdmitadSyncStatus,
   syncAdmitadDeals,
 } from "../services/providers/admitad-client.js";
+import { intelligenceRouter } from "./intelligence.js";
+import { redirectRouter } from "./redirect.js";
 import { Router as ExpressRouter } from "express";
 
 // ── Lightweight Admitad Status Router ─────────────────────────────────────────
@@ -60,14 +70,29 @@ admitadRouter.post("/sync", async (_req, res) => {
 });
 // ──────────────────────────────────────────────────────────────────────────────
 
+// Dedicated Settings & SEO Router (serves /api/settings)
+const settingsRouter = ExpressRouter();
+settingsRouter.get("/", handleGetSettings);
+settingsRouter.put("/", requireAdminAuth, handlePutSettings);
+
+// Dedicated Events & Festivals Router (serves /api/events)
+const eventsRouter = ExpressRouter();
+eventsRouter.get("/", handleGetEvents);
+eventsRouter.post("/", requireAdminAuth, handleCreateEvent);
+eventsRouter.put("/", requireAdminAuth, handleUpdateEvent);
+eventsRouter.delete("/", requireAdminAuth, handleDeleteEvent);
+eventsRouter.delete("/:id", requireAdminAuth, handleDeleteEvent);
+
 export const apiRouter = Router();
 
 apiRouter.use("/admin", adminRouter);
+apiRouter.use("/settings", settingsRouter);
+apiRouter.use("/events", eventsRouter);
+apiRouter.use("/users", adminRouter);
 apiRouter.use("/blogs", blogsRouter);
 apiRouter.use("/admin/blogs", blogsRouter);
 apiRouter.use("/offers", dealsRouter);
 apiRouter.use("/homepage", adminRouter);
-apiRouter.use("/events", adminRouter);
 
 apiRouter.get("/public/countries", (_req, res) => {
   res.json({
@@ -108,4 +133,7 @@ apiRouter.use("/open-food-fact", openFoodFactRouter);
 apiRouter.use("/price-history", priceHistoryRouter);
 apiRouter.use("/v1/intelligence", intelligenceRouter);
 apiRouter.use("/intelligence", intelligenceRouter);
+apiRouter.use("/redirect", redirectRouter);
+apiRouter.use(redirectRouter);
+
 

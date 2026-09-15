@@ -344,11 +344,23 @@ export function getCategoryImageByCategory(category: string, title = ""): string
     case "Television & Displays":
       return "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=600&auto=format&fit=crop&q=80";
     case "Fashion & Apparel":
-      return "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80";
+      if (t.includes("jean") || t.includes("denim")) {
+        return "https://images.unsplash.com/photo-1542272604-780c96856592?w=600&auto=format&fit=crop&q=80";
+      }
+      if (t.includes("shoe") || t.includes("sneaker") || t.includes("boot")) {
+        return "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&auto=format&fit=crop&q=80";
+      }
+      if (t.includes("shirt") || t.includes("t-shirt") || t.includes("tshirt")) {
+        return "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80";
+      }
+      return "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=600&auto=format&fit=crop&q=80";
     case "Beauty & Personal Care":
       return "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&auto=format&fit=crop&q=80";
     default:
-      return "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&auto=format&fit=crop&q=80";
+      if (t.includes("jean") || t.includes("denim")) {
+        return "https://images.unsplash.com/photo-1542272604-780c96856592?w=600&auto=format&fit=crop&q=80";
+      }
+      return "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=600&auto=format&fit=crop&q=80";
   }
 }
 
@@ -484,6 +496,30 @@ export function generateUniversalComparisonProducts(query: string): MultiPlatfor
       { title: "Sony WH-1000XM4 Wireless Noise Cancelling Headphones", basePrice: 19990, rating: 4.7, reviews: 8900 },
       { title: "Sony WF-1000XM5 Truly Wireless Noise Canceling Earbuds", basePrice: 21990, rating: 4.6, reviews: 1800 },
     );
+  } else if (
+    category === "Fashion & Apparel" ||
+    lower.includes("jean") ||
+    lower.includes("denim") ||
+    lower.includes("pant") ||
+    lower.includes("trouser")
+  ) {
+    if (lower.includes("jean") || lower.includes("denim")) {
+      blueprints.push(
+        { title: "Levi's Men 511 Slim Fit Mid Rise Blue Jeans", basePrice: 2499, rating: 4.6, reviews: 3420 },
+        { title: "Wrangler Men Regular Fit Stonewash Denim Jeans", basePrice: 1999, rating: 4.5, reviews: 2150 },
+        { title: "Spykar Super Skinny Fit Washed Stretch Jeans", basePrice: 2299, rating: 4.4, reviews: 1480 },
+        { title: "Pepe Jeans Men Relaxed Tapered Fit Jeans", basePrice: 2699, rating: 4.6, reviews: 980 },
+        { title: "Flying Machine Jackson Slim Fit Dark Wash Jeans", basePrice: 1799, rating: 4.3, reviews: 820 },
+        { title: "Peter England Casuals Tapered Stretch Denim Jeans", basePrice: 1499, rating: 4.3, reviews: 640 }
+      );
+    } else {
+      const formatted = baseTitle.split(" ").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+      blueprints.push(
+        { title: `${formatted} - Regular Fit Classic`, basePrice: 1499, rating: 4.5, reviews: 1240 },
+        { title: `${formatted} - Premium Cotton Blend Edition`, basePrice: 1999, rating: 4.6, reviews: 780 },
+        { title: `${formatted} - Casual Slim Fit Collection`, basePrice: 1299, rating: 4.4, reviews: 450 }
+      );
+    }
   } else {
     // Universal dynamic generator for ANY other product
     let basePrice = 3499;
@@ -506,18 +542,30 @@ export function generateUniversalComparisonProducts(query: string): MultiPlatfor
   }
 
   return blueprints.map((bp, idx) => {
+    const isFashionItem =
+      category === "Fashion & Apparel" ||
+      lower.includes("jean") ||
+      lower.includes("denim") ||
+      lower.includes("pant");
+    const primaryStore = isFashionItem
+      ? idx % 2 === 0
+        ? "Myntra"
+        : "Ajio"
+      : "Amazon India";
     const origPrice = Math.round(bp.basePrice * 1.18);
-    const directUrl = `https://www.amazon.in/s?k=${encodeURIComponent(bp.title)}&tag=gocoupon0e-21`;
-    const offers = generateStoreOffers("Amazon.in", bp.basePrice, bp.title, directUrl, category, brand);
-    const bestOffer = offers[0] || { storeName: "Amazon India", effectiveNetPrice: bp.basePrice };
+    const directUrl = isFashionItem
+      ? `https://www.myntra.com/${encodeURIComponent(bp.title)}`
+      : `https://www.amazon.in/s?k=${encodeURIComponent(bp.title)}&tag=gocoupon0e-21`;
+    const offers = generateStoreOffers(primaryStore, bp.basePrice, bp.title, directUrl, category, brand);
+    const bestOffer = offers[0] || { storeName: primaryStore, effectiveNetPrice: bp.basePrice };
 
     return {
       id: `univ_${idx}_${bp.title.slice(0, 15).replace(/[^a-zA-Z0-9]/g, "_")}`,
       title: bp.title,
       brand,
       category,
-      primaryStore: "Amazon India",
-      primaryStoreLogo: getStoreLogo("amazon"),
+      primaryStore,
+      primaryStoreLogo: getStoreLogo(primaryStore),
       isTrustedStore: true,
       trustTier: 1,
       price: bp.basePrice,

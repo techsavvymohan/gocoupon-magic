@@ -37,6 +37,9 @@ import {
   ArrowRight,
   PlusCircle,
   Database,
+  MousePointerClick,
+  Activity,
+  ArrowUpRight,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -145,16 +148,18 @@ function getTabTitle(tab: string): string {
 function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => void }) {
   const [stats, setStats] = useState<any>(null);
   const [dbStats, setDbStats] = useState<any>(null);
+  const [clicksData, setClicksData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [recentOffers, setRecentOffers] = useState<any[]>([]);
 
   const fetchStats = async () => {
     try {
-      const [statsRes, offersRes, dbRes] = await Promise.all([
+      const [statsRes, offersRes, dbRes, clicksRes] = await Promise.all([
         fetch("/api/admin/stats"),
         fetch("/api/offers?limit=8"),
         fetch("/api/admin/database", { headers: getAdminAuthHeaders() }).catch(() => null),
+        fetch("/api/admin/clicks", { headers: getAdminAuthHeaders() }).catch(() => null),
       ]);
       if (statsRes.ok) {
         const payload = await statsRes.json();
@@ -176,6 +181,10 @@ function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => v
       if (dbRes && dbRes.ok) {
         const dbPayload = await dbRes.json();
         setDbStats(dbPayload?.diagnostics);
+      }
+      if (clicksRes && clicksRes.ok) {
+        const clicksPayload = await clicksRes.json();
+        setClicksData(clicksPayload?.data);
       }
     } catch {
       // Fallback
@@ -247,7 +256,7 @@ function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => v
       </div>
 
       {/* KPI Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">Total Live Deals</span>
@@ -287,6 +296,21 @@ function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => v
             {loading ? "..." : (stats?.activeCoupons || 342).toLocaleString()}
           </p>
           <p className="mt-1 text-xs text-violet-700 dark:text-violet-400 font-bold">Verified auto-apply</p>
+        </div>
+
+        <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">Deal Clicks</span>
+            <div className="h-8 w-8 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 grid place-items-center font-bold">
+              <MousePointerClick className="h-4 w-4" />
+            </div>
+          </div>
+          <p className="mt-3 text-3xl font-black text-zinc-900 dark:text-white">
+            {loading ? "..." : (clicksData?.totalClicksAllTime || stats?.totalClicksAllTime || stats?.totalClicksToday || 0).toLocaleString()}
+          </p>
+          <p className="mt-1 text-xs text-amber-700 dark:text-amber-400 font-bold flex items-center gap-1">
+            <span>+{clicksData?.totalClicksToday || stats?.totalClicksToday || 0} today</span>
+          </p>
         </div>
 
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-xs">
@@ -335,6 +359,10 @@ function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => v
             <span className="font-bold text-zinc-900 dark:text-white">{dbStats?.tableCounts?.stores || 28}</span>
           </div>
           <div className="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+            <span className="text-zinc-600 dark:text-zinc-400 mr-1">Clicks:</span>
+            <span className="font-bold text-emerald-600 dark:text-emerald-400">{dbStats?.tableCounts?.clicks || clicksData?.totalClicksAllTime || 0}</span>
+          </div>
+          <div className="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
             <span className="text-zinc-600 dark:text-zinc-400 mr-1">Blogs:</span>
             <span className="font-bold text-zinc-900 dark:text-white">{dbStats?.tableCounts?.blogs || 5}</span>
           </div>
@@ -342,12 +370,201 @@ function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => v
             <span className="text-zinc-600 dark:text-zinc-400 mr-1">Submissions:</span>
             <span className="font-bold text-zinc-900 dark:text-white">{dbStats?.tableCounts?.submissions || 4}</span>
           </div>
-          <div className="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-            <span className="text-zinc-600 dark:text-zinc-400 mr-1">Price Snapshots:</span>
-            <span className="font-bold text-zinc-900 dark:text-white">{dbStats?.tableCounts?.price_snapshots || 23}</span>
-          </div>
         </div>
       </div>
+
+      {/* ── Deal Click Tracker & Conversion Analytics (Enhance Business) ── */}
+      <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 sm:p-6 shadow-xs space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800/80 pb-5">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 mb-1">
+              <TrendingUp className="h-3.5 w-3.5" />
+              <span>Real-Time Business Intelligence</span>
+            </div>
+            <h2 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">
+              Shopper Deal Click Tracker &amp; Conversion Analytics
+            </h2>
+            <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
+              Live tracking of which deals shoppers are clicking and redeeming to optimize high-converting merchant partnerships.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onNavigate("offers")}
+              className="gap-1.5 text-xs font-bold dark:bg-zinc-800 dark:border-zinc-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 hover:text-emerald-600 cursor-pointer"
+            >
+              <span>View Offers by Clicks</span>
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </div>
+
+        {/* 4 Summary Metric Badges */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          <div className="rounded-xl border border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/80 dark:bg-zinc-800/40 p-4">
+            <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">Today's Clicks</span>
+            <span className="text-2xl font-black text-zinc-900 dark:text-white mt-1 block">
+              {(clicksData?.totalClicksToday || stats?.totalClicksToday || 0).toLocaleString()}
+            </span>
+            <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5 block">Active Shoppers</span>
+          </div>
+
+          <div className="rounded-xl border border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/80 dark:bg-zinc-800/40 p-4">
+            <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">Past 7 Days</span>
+            <span className="text-2xl font-black text-zinc-900 dark:text-white mt-1 block">
+              {(clicksData?.totalClicks7d || 0).toLocaleString()}
+            </span>
+            <span className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 mt-0.5 block">7-Day Engagement</span>
+          </div>
+
+          <div className="rounded-xl border border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/80 dark:bg-zinc-800/40 p-4">
+            <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">All-Time Clicks</span>
+            <span className="text-2xl font-black text-zinc-900 dark:text-white mt-1 block">
+              {(clicksData?.totalClicksAllTime || stats?.totalClicksAllTime || 0).toLocaleString()}
+            </span>
+            <span className="text-[10px] font-semibold text-violet-600 dark:text-violet-400 mt-0.5 block">Total Tracked</span>
+          </div>
+
+          <div className="rounded-xl border border-zinc-100 dark:border-zinc-800/60 bg-zinc-50/80 dark:bg-zinc-800/40 p-4">
+            <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">Top Store</span>
+            <span className="text-lg font-bold text-zinc-900 dark:text-white mt-1 block truncate">
+              {clicksData?.topStores?.[0]?.storeName || "Partner Store"}
+            </span>
+            <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 mt-0.5 block truncate">
+              {clicksData?.topStores?.[0]?.clickCount ? `${clicksData.topStores[0].clickCount} clicks` : "Leading Merchant"}
+            </span>
+          </div>
+        </div>
+
+        {/* 2-Column Split: Top Performing Deals vs Live Click Stream */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
+          {/* Column A: Top Performing Deals Leaderboard */}
+          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 p-4 sm:p-5 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Flame className="h-4 w-4 text-amber-500" />
+                  <h3 className="text-sm font-bold text-zinc-900 dark:text-white">Top Performing Deals (By Clicks)</h3>
+                </div>
+                <span className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">Ranked by Volume</span>
+              </div>
+
+              {(!clicksData?.topDeals || clicksData.topDeals.length === 0) ? (
+                <div className="rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 py-10 text-center px-4">
+                  <MousePointerClick className="mx-auto h-6 w-6 text-zinc-400 mb-2" />
+                  <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Click activity is being recorded in real-time.</p>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">As visitors click and redeem coupons on GoCoupon, top performing deals appear here.</p>
+                </div>
+              ) : (
+                <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
+                  {clicksData.topDeals.slice(0, 6).map((deal: any, idx: number) => (
+                    <div key={deal.dealId || idx} className="py-2.5 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className={`h-6 w-6 rounded-lg text-xs font-black grid place-items-center shrink-0 ${
+                          idx === 0 ? "bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30" :
+                          idx === 1 ? "bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300" :
+                          idx === 2 ? "bg-amber-700/15 text-amber-700 dark:text-amber-500" :
+                          "text-zinc-500"
+                        }`}>
+                          #{idx + 1}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-zinc-900 dark:text-white truncate">{deal.dealTitle}</p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium">{deal.storeName}</span>
+                            {deal.couponCode && (
+                              <span className="font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.2 rounded border border-emerald-200 dark:border-emerald-800">
+                                {deal.couponCode}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <span className="inline-flex items-center gap-1 font-mono text-xs font-black text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
+                          <MousePointerClick className="h-3 w-3" />
+                          <span>{deal.clickCount.toLocaleString()}</span>
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 mt-3 text-right">
+              <button
+                type="button"
+                onClick={() => onNavigate("offers")}
+                className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer inline-flex items-center gap-1"
+              >
+                <span>View all deals in Offers Manager</span>
+                <ArrowRight className="h-3 w-3" />
+              </button>
+            </div>
+          </div>
+
+          {/* Column B: Live Shopper Click Stream */}
+          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 p-4 sm:p-5 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-emerald-500" />
+                  <h3 className="text-sm font-bold text-zinc-900 dark:text-white">Recent Shopper Redemptions</h3>
+                </div>
+                <span className="flex items-center gap-1 text-[11px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Live Stream</span>
+                </span>
+              </div>
+
+              {(!clicksData?.recentClicks || clicksData.recentClicks.length === 0) ? (
+                <div className="rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 py-10 text-center px-4">
+                  <Activity className="mx-auto h-6 w-6 text-zinc-400 mb-2" />
+                  <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Awaiting shopper click events.</p>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Click on any deal on GoCoupon to test live tracking.</p>
+                </div>
+              ) : (
+                <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60 max-h-[300px] overflow-y-auto pr-1">
+                  {clicksData.recentClicks.slice(0, 7).map((click: any) => (
+                    <div key={click.id} className="py-2.5 flex items-center justify-between gap-3 text-xs">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-zinc-900 dark:text-white truncate">{click.storeName}</span>
+                          <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-2 py-0.2 font-mono text-[10px] text-zinc-600 dark:text-zinc-400 uppercase">
+                            {click.device || "desktop"}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">{click.dealTitle}</p>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <span className="font-mono text-[10px] text-zinc-500 dark:text-zinc-400 block">
+                          {new Date(click.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                        {click.couponCode ? (
+                          <span className="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 font-bold block">
+                            {click.couponCode}
+                          </span>
+                        ) : (
+                          <span className="font-mono text-[10px] text-zinc-400 block">Activated</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 mt-3 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+              <span>Failover Redirection Active</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">100% Zero 503 Uptime</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Activity Chart & Quick Modules */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

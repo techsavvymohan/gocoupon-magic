@@ -14,6 +14,7 @@ module.exports = {
       name: "gocoupon-web",
       script: "./server/server.ts",
       interpreter: "./node_modules/.bin/tsx",
+      interpreter_args: "--env-file=.env",
       instances: 1,
       exec_mode: "fork",
       autorestart: true,

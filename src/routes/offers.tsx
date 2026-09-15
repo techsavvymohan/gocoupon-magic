@@ -5,7 +5,7 @@ import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import { useDeals } from "@/hooks/use-deals";
 import { useInternationalDeals } from "@/hooks/use-international-deals";
 import { triggerLiveSync, type DealSortField, type Deal } from "@/lib/api/deals-api";
-import { wrapAffiliateTracking } from "@/lib/services/store-registry";
+import { wrapAffiliateTracking, buildDealRedirectUrl } from "@/lib/services/store-registry";
 import { DealGridSkeleton } from "@/components/ui/DataSkeleton";
 import { StoreLogo } from "@/components/common/StoreLogo";
 import { RedeemCouponButton } from "@/components/common/RedeemCouponButton";
@@ -518,6 +518,23 @@ function OffersHubPage() {
       toast.success(`Activating ${deal.discount}! Opening ${deal.storeName}...`);
       setTimeout(() => setCopiedCode((curr) => (curr === deal.id ? null : curr)), 5000);
     }
+
+    // Fire background click tracker to ensure redemption is logged
+    try {
+      fetch("/api/deals/click", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          dealId: deal.id,
+          dealTitle: deal.title,
+          storeName: deal.storeName,
+          storeSlug: deal.storeSlug,
+          couponCode: deal.code,
+          destinationUrl: deal.link,
+          source: hasCode ? "offers_copy_code" : "offers_activate_deal",
+        }),
+      }).catch(() => {});
+    } catch {}
   };
 
   const handleCardBoxClick = (deal: Deal, e: React.MouseEvent) => {
@@ -525,7 +542,15 @@ function OffersHubPage() {
     if (target.closest("button, a, input, select, textarea")) {
       return;
     }
-    const affiliateUrl = wrapAffiliateTracking(deal.link, "gocoupon_offers_box");
+    const affiliateUrl = buildDealRedirectUrl({
+      url: deal.link,
+      dealId: deal.id,
+      storeName: deal.storeName,
+      storeSlug: deal.storeSlug,
+      title: deal.title,
+      code: deal.code,
+      source: "gocoupon_offers_box",
+    });
     handleRedeemDeal(deal, e);
     window.open(affiliateUrl, "_blank", "noopener,noreferrer");
   };

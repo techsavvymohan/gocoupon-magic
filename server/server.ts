@@ -11,22 +11,32 @@
  * - Integrated 24/7 background price monitoring worker
  * - Production health checks & graceful shutdown
  */
-// Automatically load environment variables from .env if running standalone outside Docker
-try {
-  process.loadEnvFile();
-} catch {}
-
+import "./env.js";
 import express, { type Request, type Response, type NextFunction } from "express";
 import cors from "cors";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { apiRouter } from "./routes/index.js";
+import { redirectRouter } from "./routes/redirect.js";
 import { startBackgroundWorkers, stopBackgroundWorkers } from "./workers/price-watcher.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const distDir = path.resolve(__dirname, "../dist");
+
+// Reliably load environment variables from .env using absolute path
+try {
+  const envPath = path.resolve(__dirname, "../.env");
+  if (fs.existsSync(envPath)) {
+    process.loadEnvFile(envPath);
+    console.log(`[Env] Loaded environment from ${envPath}`);
+  } else {
+    process.loadEnvFile();
+  }
+} catch (err: any) {
+  console.warn(`[Env] process.loadEnvFile notice: ${err?.message || err}`);
+}
 
 const app = express();
 const PORT = parseInt(process.env.PORT || "3000", 10);
@@ -73,11 +83,17 @@ app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 // This runs before routing so ../ cannot reach static files or API routes.
 app.use((req: Request, res: Response, next: NextFunction) => {
   const rawUrl = req.originalUrl || req.url || "";
-  // Decode twice to catch double-encoded sequences (%252e%252e)
-  const decoded = decodeURIComponent(decodeURIComponent(rawUrl).replace(/%/g, "%"));
-  if (/(?:\.\.|%2e%2e|%252e|\\\.\\\.)/i.test(decoded)) {
-    res.status(400).json({ error: "Bad Request: Path traversal not allowed." });
-    return;
+  try {
+    const decoded = decodeURIComponent(rawUrl);
+    if (/(?:\.\.|%2e%2e|%252e|\\\.\\\.)/i.test(decoded)) {
+      res.status(400).json({ error: "Bad Request: Path traversal not allowed." });
+      return;
+    }
+  } catch {
+    if (/(?:\.\.|%2e%2e|%252e|\\\.\\\.)/i.test(rawUrl)) {
+      res.status(400).json({ error: "Bad Request: Path traversal not allowed." });
+      return;
+    }
   }
   next();
 });
@@ -104,8 +120,9 @@ app.get("/api/health", (_req: Request, res: Response) => {
   });
 });
 
-// 2. Mount API Routes
+// 2. Mount API Routes & Outbound Deal Redirection
 app.use("/api", apiRouter);
+app.use("/out", redirectRouter);
 
 // 3. Static Files & SPA Pre-rendered Serving from dist/
 if (fs.existsSync(distDir)) {

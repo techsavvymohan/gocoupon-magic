@@ -180,6 +180,29 @@ CREATE TABLE IF NOT EXISTS gocoupon_settings (
 );
 
 -- -----------------------------------------------------------------------------
+-- 8. DEAL CLICKS & REDEMPTIONS (gocoupon_clicks)
+-- Live user click tracking on offers, coupon copies, and outbound store visits.
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS gocoupon_clicks (
+    id TEXT PRIMARY KEY,
+    deal_id TEXT NOT NULL,
+    deal_title TEXT NOT NULL,
+    store_name TEXT NOT NULL,
+    store_slug TEXT,
+    coupon_code TEXT,
+    destination_url TEXT NOT NULL,
+    source TEXT DEFAULT 'offers',
+    device TEXT,
+    ip TEXT,
+    user_agent TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_clicks_deal_id ON gocoupon_clicks(deal_id);
+CREATE INDEX IF NOT EXISTS idx_clicks_store_name ON gocoupon_clicks(store_name);
+CREATE INDEX IF NOT EXISTS idx_clicks_created_at ON gocoupon_clicks(created_at DESC);
+
+-- -----------------------------------------------------------------------------
 -- Row-Level Security (RLS) Policies
 -- Public read access for published deals, stores, and blogs.
 -- -----------------------------------------------------------------------------
@@ -190,6 +213,7 @@ ALTER TABLE gocoupon_submissions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gocoupon_alerts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gocoupon_price_snapshots ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gocoupon_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE gocoupon_clicks ENABLE ROW LEVEL SECURITY;
 
 -- Allow public read of active deals
 DO $$ 
