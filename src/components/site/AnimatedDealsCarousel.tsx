@@ -64,7 +64,8 @@ function CarouselDealCard({
                 alt={deal.storeName}
                 className="max-h-full max-w-full object-contain"
                 onError={(e) => {
-                  e.currentTarget.src = `https://www.google.com/s2/favicons?domain=store.com&sz=128`;
+                  const clean = deal.storeName.toLowerCase().replace(/[^a-z0-9]/g, "");
+                  e.currentTarget.src = `https://www.google.com/s2/favicons?domain=${clean}.com&sz=128`;
                 }}
                 loading="lazy"
               />

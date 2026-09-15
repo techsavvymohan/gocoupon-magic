@@ -62,6 +62,44 @@ function getRealStoreLogo(domain?: string, fallbackName = "Store"): string {
   return `https://www.google.com/s2/favicons?domain=${guessed}.com&sz=128`;
 }
 
+/**
+ * Resolves an authentic, verified brand logo.
+ * Strictly guarantees external merchants NEVER display the GoCoupon platform logo.
+ */
+function resolveStoreLogo(store: { name: string; domain?: string; logo?: string }): string {
+  if (store.logo && !store.logo.includes("gc-logo") && !store.logo.includes("icon.svg")) {
+    const lowerLogo = store.logo.toLowerCase();
+
+    // If it's an external favicon URL (e.g. Google S2), use it directly
+    if (lowerLogo.startsWith("http")) {
+      return store.logo;
+    }
+
+    // If it's a local brand asset, ensure it actually belongs to this store
+    const lowerName = store.name.toLowerCase();
+    if (
+      (lowerName.includes("tata cliq") && lowerLogo.includes("tata-cliq")) ||
+      (lowerName.includes("nykaa") && lowerLogo.includes("nykaa")) ||
+      (lowerName.includes("myntra") && lowerLogo.includes("myntra")) ||
+      (lowerName.includes("flipkart") && lowerLogo.includes("flipkart")) ||
+      (lowerName.includes("firstcry") && lowerLogo.includes("firstcry")) ||
+      (lowerName.includes("croma") && lowerLogo.includes("croma")) ||
+      (lowerName.includes("ajio") && lowerLogo.includes("ajio")) ||
+      (lowerName.includes("meesho") && lowerLogo.includes("meesho")) ||
+      (lowerName.includes("amazon") && lowerLogo.includes("amazon")) ||
+      (lowerName.includes("reliance") && lowerLogo.includes("reliance")) ||
+      (lowerName.includes("best buy") && lowerLogo.includes("bestbuy")) ||
+      (lowerName.includes("target") && lowerLogo.includes("target")) ||
+      (lowerName.includes("walmart") && lowerLogo.includes("wmt"))
+    ) {
+      return store.logo;
+    }
+  }
+
+  // Fallback to authentic Google S2 Favicon API for the store's domain
+  return getRealStoreLogo(store.domain, store.name);
+}
+
 export function HeroStoreDealSearch() {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
@@ -246,7 +284,7 @@ export function HeroStoreDealSearch() {
 
               <div className="space-y-1.5">
                 {matchingStores.map((store) => {
-                  const logoUrl = getRealStoreLogo(store.domain, store.name);
+                  const logoUrl = resolveStoreLogo(store);
                   const code = store.defaultCoupon?.code;
 
                   return (
@@ -268,11 +306,11 @@ export function HeroStoreDealSearch() {
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="h-10 w-10 shrink-0 rounded-xl border border-border/80 bg-white p-1.5 flex items-center justify-center shadow-2xs overflow-hidden">
                           <img
-                            src={store.logo || logoUrl}
+                            src={logoUrl}
                             alt={store.name}
                             className="max-h-full max-w-full object-contain"
                             onError={(e) => {
-                              e.currentTarget.src = logoUrl;
+                              e.currentTarget.src = getRealStoreLogo(store.domain, store.name);
                             }}
                             loading="eager"
                           />
@@ -339,7 +377,9 @@ export function HeroStoreDealSearch() {
 
               <div className="space-y-1.5">
                 {matchingDeals.map((deal) => {
-                  const dealLogo = deal.storeLogo || getRealStoreLogo(undefined, deal.storeName);
+                  const dealLogo = deal.storeLogo && !deal.storeLogo.includes("gc-logo")
+                    ? deal.storeLogo
+                    : getRealStoreLogo(undefined, deal.storeName);
                   const isDealCode = deal.code && deal.code !== "DEALACTIVATED";
 
                   return (
