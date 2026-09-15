@@ -1,11 +1,11 @@
 /**
  * @file Hero.tsx
- * @description Clean, centered hero section with top banner illustration and centered search box.
+ * @description Clean, centered hero section with top banner illustration and unified Store & Deal Search.
  */
 
 import { Link } from "@tanstack/react-router";
-import { Lightbulb, ArrowRight } from "lucide-react";
-import { UrlResolverSearch } from "../shopping/UrlResolverSearch";
+import { ShieldCheck, ArrowRight } from "lucide-react";
+import { HeroStoreDealSearch } from "./HeroStoreDealSearch";
 
 export function Hero() {
   return (
@@ -27,28 +27,28 @@ export function Hero() {
       <div className="relative mx-auto max-w-4xl px-4 sm:px-6 pt-5 sm:pt-8 text-center">
         {/* Main Headline */}
         <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">
-          Find Your Lowest Price in 1 Second
+          Find Working Coupons &amp; Deals in 1 Second
           <span className="block mt-1 sm:mt-2 text-xl sm:text-3xl md:text-4xl font-bold text-primary">
-            — Auto-Apply Coupons, Track Real Prices &amp; Stack Card Discounts
+            — Auto-Apply Promo Codes, Unlock Secret Discounts &amp; Save
           </span>
         </h1>
 
-        {/* Centered Search Box — Prioritized directly below heading */}
+        {/* Centered Store & Deal Search Box */}
         <div className="mt-6 sm:mt-8 mx-auto max-w-3xl text-left">
-          <UrlResolverSearch size="large" showPopularChips={true} showTrustBadges={true} />
+          <HeroStoreDealSearch />
         </div>
 
-        {/* Advisory Callout */}
-        <div className="mt-7 inline-flex items-center gap-2.5 rounded-full border border-border bg-card/90 px-4 sm:px-5 py-2 text-xs sm:text-sm text-foreground/80 shadow-2xs">
-          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <Lightbulb className="h-3 w-3" aria-hidden="true" />
+        {/* Trust Callout */}
+        <div className="mt-7 inline-flex items-center gap-2.5 rounded-full border border-border/80 bg-card/90 px-4 sm:px-5 py-2 text-xs sm:text-sm text-foreground/80 shadow-2xs">
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+            <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
           </span>
           <span>
-            <strong className="font-semibold text-foreground">Pro Tip:</strong> Works for everyone! Compare store prices instantly, auto-apply coupons, and optionally select your bank card to unlock extra savings.
+            <strong className="font-semibold text-foreground">100% Verified:</strong> 980+ live codes tested today across 240+ partner stores with instant 1-click tracking.
           </span>
         </div>
 
-        {/* Action CTAs — Relocated below primary search intent */}
+        {/* Action CTAs */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <Link
             to="/chrome-extension"
@@ -66,13 +66,13 @@ export function Hero() {
             />
             <span>Add to Chrome — It&apos;s 100% Free</span>
           </Link>
-          <a
-            href="#how-it-works"
+          <Link
+            to="/offers"
             className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-border bg-card/80 px-5 py-2.5 text-xs sm:text-sm font-semibold text-foreground hover:bg-muted active:scale-95 transition-all shadow-2xs touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
           >
-            <span>How It Works</span>
+            <span>Explore All 980+ Deals</span>
             <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
-          </a>
+          </Link>
         </div>
       </div>
     </section>
