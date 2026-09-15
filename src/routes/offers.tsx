@@ -633,7 +633,7 @@ function OffersHubPage() {
       {/* ───────────────────────────────────────────────────────────────────────── */}
       {/* 1. TOP QUICK NAVIGATION BAR                                              */}
       {/* ───────────────────────────────────────────────────────────────────────── */}
-      <div className="border-b border-border/80 bg-background/95 backdrop-blur-md px-4 sm:px-6 py-2.5 sticky top-0 z-30 shadow-xs">
+      <div className="border-b border-border/80 bg-background/95 backdrop-blur-md px-4 sm:px-6 py-2.5 shadow-xs">
         <div className="mx-auto max-w-7xl flex flex-wrap items-center justify-between gap-3 text-xs">
           {/* Left Quick Category & Festive Links */}
           <div className="flex items-center gap-4 sm:gap-6 overflow-x-auto no-scrollbar font-semibold">
@@ -774,9 +774,9 @@ function OffersHubPage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6">
         <div className="flex flex-col lg:flex-row items-start gap-8">
 
-          {/* ── Left Discovery Sidebar ── */}
-          <aside className="w-full lg:w-56 shrink-0 lg:sticky lg:top-20 z-20">
-            <div className="rounded-2xl border border-border/70 bg-card p-2.5 shadow-xs">
+          {/* ── Left Discovery Sidebar (Sticky on Desktop) ── */}
+          <aside className="w-full lg:w-56 shrink-0 lg:sticky lg:top-[92px] lg:self-start z-20">
+            <div className="rounded-2xl border border-border/70 bg-card p-2.5 shadow-xs lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto no-scrollbar">
               <div className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-bold hidden lg:block">
                 Navigation
               </div>

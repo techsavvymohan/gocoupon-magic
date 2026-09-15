@@ -43,7 +43,7 @@ export function SiteShell({ children, showParticles = true }: SiteShellProps) {
 
       <Navbar />
       {/* Main content layer positioned above background particles (z-10) */}
-      <div className="relative z-10 overflow-x-hidden">
+      <div className="relative z-10 overflow-x-clip" style={{ overflowX: "clip" }}>
         <main>{children}</main>
         <Footer />
       </div>

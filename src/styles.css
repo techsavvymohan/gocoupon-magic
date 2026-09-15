@@ -469,6 +469,12 @@ html:not(.dark) .bg-card:hover {
   }
 }
 
+/* ── Prevent horizontal overflow without breaking position: sticky ── */
+html,
+body {
+  overflow-x: clip;
+}
+
 /* ── Clean Touch Carousel / Pill Scroller ── */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
