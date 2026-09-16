@@ -388,10 +388,10 @@ function StoresPage() {
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
-                  to="/compare"
+                  to="/featured-deals"
                   className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card px-5 py-3.5 min-h-[48px] text-sm font-bold text-foreground hover:bg-muted transition-colors touch-manipulation"
                 >
-                  <span>Compare Prices</span>
+                  <span>Featured Deals</span>
                 </Link>
               </div>
             </div>

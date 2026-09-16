@@ -143,10 +143,10 @@ export function Footer() {
                   </li>
                   <li>
                     <Link
-                      to="/compare"
+                      to="/featured-deals"
                       className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
                     >
-                      Pricing
+                      Featured Deals
                     </Link>
                   </li>
                   <li>

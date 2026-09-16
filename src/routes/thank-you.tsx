@@ -5,7 +5,7 @@ import {
   CheckCircle2,
   ArrowRight,
   Zap,
-  Layers,
+  Tag,
   Flame,
   Home,
   ShieldCheck,
@@ -105,20 +105,20 @@ function ThankYouPage() {
                 </p>
               </Link>
 
-              {/* Option 2: Price Comparison */}
+              {/* Option 2: Featured Deals */}
               <Link
-                to="/compare"
+                to="/featured-deals"
                 className="group relative rounded-2xl border border-border bg-card p-5 shadow-xs transition-all hover:border-primary/50 hover:shadow-md active:scale-98"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 mb-3.5 group-hover:scale-110 transition-transform">
-                  <Layers className="h-5 w-5" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mb-3.5 group-hover:scale-110 transition-transform">
+                  <Tag className="h-5 w-5" />
                 </div>
                 <h3 className="font-display text-sm font-bold text-foreground group-hover:text-primary transition-colors flex items-center justify-between">
-                  Price Comparison
+                  Featured Deals
                   <ArrowRight className="h-3.5 w-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                 </h3>
                 <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
-                  Compare prices across Amazon, Flipkart, and 200+ retailers.
+                  Explore hand-verified partner discounts and exclusive coupon codes.
                 </p>
               </Link>
 

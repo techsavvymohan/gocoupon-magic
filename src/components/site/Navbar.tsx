@@ -16,7 +16,7 @@ import {
   X,
   ArrowRight,
   ExternalLink,
-  Layers,
+  Tag,
   Clock,
   Bot,
   Award,
@@ -41,7 +41,6 @@ type NavLink = {
 const desktopLinks: NavLink[] = [
   { label: "Offers", to: "/offers", badge: "HOT", badgeColor: "bg-rose-500/15 text-rose-500", i18nKey: "nav.offers" },
   { label: "Featured Deals", to: "/featured-deals", badge: "TOP", badgeColor: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" },
-  { label: "Compare", to: "/compare", badge: "NEW", badgeColor: "bg-primary/10 text-primary", i18nKey: "nav.compare" },
   { label: "Stores", to: "/stores", i18nKey: "nav.stores" },
   { label: "Ask", to: "/ask", i18nKey: "nav.ask" },
   { label: "Extension", to: "/chrome-extension", i18nKey: "nav.extension" },
@@ -338,13 +337,13 @@ export function Navbar() {
           </Link>
 
           <Link
-            to="/compare"
+            to="/featured-deals"
             className="flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 px-3 py-1 text-muted-foreground hover:text-foreground active:scale-95 touch-manipulation"
-            activeProps={{ className: "text-primary font-bold" }}
-            aria-label="Compare prices"
+            activeProps={{ className: "text-emerald-600 dark:text-emerald-400 font-bold" }}
+            aria-label="Featured Partner Deals"
           >
-            <Layers className="h-4 w-4" aria-hidden="true" />
-            <span className="text-[10px] font-medium">{t("nav.compare", "Compare")}</span>
+            <Tag className="h-4 w-4" aria-hidden="true" />
+            <span className="text-[10px] font-medium">Featured</span>
           </Link>
 
           <Link

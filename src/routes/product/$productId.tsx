@@ -120,7 +120,7 @@ function ProductDetailsPage() {
 
   const breadcrumb = breadcrumbSchema([
     { name: "Home", path: "/" },
-    { name: "Compare", path: "/compare" },
+    { name: "Offers", path: "/offers" },
     { name: product.title, path: `/product/${product.id}` },
   ]);
   const fallbackStoreLogo = bestDeal?.storeLogo || "/Brand logos/Amazon_logo.svg.webp";
@@ -144,7 +144,7 @@ function ProductDetailsPage() {
         <div className="mb-6 flex items-center gap-2 text-xs font-mono text-muted-foreground">
           <Link to="/" className="hover:text-foreground">Home</Link>
           <ChevronRight className="h-3 w-3" />
-          <Link to="/compare" className="hover:text-foreground">Compare</Link>
+          <Link to="/offers" className="hover:text-foreground">Offers</Link>
           <ChevronRight className="h-3 w-3" />
           <span className="text-foreground truncate max-w-xs">{product.brand}</span>
         </div>

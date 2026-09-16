@@ -195,7 +195,7 @@ export function HowItWorks() {
           {POPULAR_SEARCH_TOPICS.map((topic) => (
             <Link
               key={topic}
-              to="/compare"
+              to="/offers"
               className="rounded-full border border-border/70 bg-card/70 px-3 py-1 text-[11px] text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
             >
               {topic}
