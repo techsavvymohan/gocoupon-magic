@@ -860,7 +860,7 @@ export function ComparePage() {
               <option value="all">Best Available Deal (Any Card)</option>
               {allCards.map((card) => (
                 <option key={card.id} value={card.id}>
-                  {card.shortName} ({card.maxInstantDiscountPercent}% off)
+                  {card.shortName} ({Math.round(card.defaultCashbackPct * 100)}% off)
                 </option>
               ))}
             </select>

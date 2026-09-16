@@ -388,7 +388,7 @@ adminRouter.post("/login", (req: Request, res: Response) => {
   const cleanPass = String(password || "").trim();
 
   const configuredEmail = (process.env.ADMIN_EMAIL || "surya@gocoupon.io").trim().toLowerCase();
-  const configuredPass = (process.env.ADMIN_PASSWORD || EPHEMERAL_FALLBACK_SECRET).trim();
+  const configuredPass = (process.env.ADMIN_PASSWORD || getAdminTokenSecret()).trim();
 
   const isSuperadminMatch =
     cleanEmail === configuredEmail &&

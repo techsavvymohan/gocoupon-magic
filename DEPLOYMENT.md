@@ -121,7 +121,12 @@ Caddy automatically provisions free SSL/TLS certificates (Let's Encrypt / ZeroSS
 Create or update `/etc/caddy/Caddyfile` (or use the project's root `Caddyfile`):
 
 ```caddyfile
-gocoupon.io, www.gocoupon.io {
+# Canonical 301 Redirect: www -> apex
+www.gocoupon.io {
+    redir https://gocoupon.io{uri} permanent
+}
+
+gocoupon.io {
     encode gzip zstd
 
     # Security & HSTS Headers

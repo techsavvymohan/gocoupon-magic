@@ -91,5 +91,11 @@ jobs:
             rm -f build-artifacts.tar.gz
             pm2 reload gocoupon-web --update-env || pm2 start ecosystem.config.cjs
             pm2 status
+            # Sync & reload Caddy reverse proxy if present
+            if command -v caddy >/dev/null 2>&1; then
+              caddy reload --config /var/www/gocoupon/Caddyfile 2>/dev/null || systemctl reload caddy 2>/dev/null || true
+            elif systemctl is-active --quiet caddy 2>/dev/null; then
+              cp -f /var/www/gocoupon/Caddyfile /etc/caddy/Caddyfile 2>/dev/null && systemctl reload caddy 2>/dev/null || true
+            fi
             curl -sf http://127.0.0.1:3000/api/health || true
             echo "✅ GoCoupon successfully reloaded on VPS!"
