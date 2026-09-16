@@ -10,7 +10,6 @@ import { DealGridSkeleton } from "@/components/ui/DataSkeleton";
 import { StoreLogo } from "@/components/common/StoreLogo";
 import { RedeemCouponButton } from "@/components/common/RedeemCouponButton";
 import { SubmitCouponButton } from "@/components/submit_coupon";
-import { useLoadingBus } from "@/context/LoadingContext";
 import {
   DealCard,
   BankOfferCard,
@@ -209,8 +208,6 @@ const BANK_OFFERS_DATA: BankOffer[] = [
 ];
 
 function OffersHubPage() {
-  const { startLoading } = useLoadingBus();
-
   // Navigation & Filtering State
   const [activeSidebarTab, setActiveSidebarTab] = useState<SidebarTab>("categories");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -557,8 +554,7 @@ function OffersHubPage() {
 
   const handleLiveSync = async () => {
     setIsSyncing(true);
-    const stopLoading = startLoading("offers-sync");
-    toast.info("Connecting to Cuelinks & Admitad APIs... Ingesting fresh live deals.");
+    toast.info("Connecting to live deal feeds... Ingesting fresh verified discounts.");
     try {
       const res = await triggerLiveSync();
       await Promise.allSettled([refetchIndian(), refetchIntl()]);
@@ -571,7 +567,6 @@ function OffersHubPage() {
       toast.error("Could not sync right now, using active live deals pool.");
     } finally {
       setIsSyncing(false);
-      stopLoading();
     }
   };
 
@@ -758,7 +753,7 @@ function OffersHubPage() {
                 onClick={handleLiveSync}
                 disabled={isSyncing}
                 className="hidden lg:inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-bold text-primary hover:bg-primary/20 transition-all cursor-pointer disabled:opacity-50"
-                title="Refresh deals feed from Cuelinks and Admitad"
+                title="Sync live verified deals"
               >
                 <RefreshCw className={`h-3 w-3 ${isSyncing ? "animate-spin" : ""}`} />
                 <span>{isSyncing ? "Syncing..." : "Sync Live Deals"}</span>

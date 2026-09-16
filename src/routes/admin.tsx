@@ -198,7 +198,7 @@ function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => v
 
   const handleTriggerSync = async () => {
     setIsSyncing(true);
-    toast.info("Triggering 24/7 validity-based Cuelinks deal sync...");
+    toast.info("Triggering 24/7 validity-based live deal sync...");
     try {
       const res = await fetch("/api/deals/sync?pages=20", { method: "POST" });
       const data = await res.json();

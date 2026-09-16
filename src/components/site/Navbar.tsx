@@ -18,7 +18,7 @@ import {
   ExternalLink,
   Tag,
   Clock,
-  Bot,
+  Download,
   Award,
   Bell,
   Home,
@@ -42,14 +42,12 @@ const desktopLinks: NavLink[] = [
   { label: "Offers", to: "/offers", badge: "HOT", badgeColor: "bg-rose-500/15 text-rose-500", i18nKey: "nav.offers" },
   { label: "Featured Deals", to: "/featured-deals", badge: "TOP", badgeColor: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" },
   { label: "Stores", to: "/stores", i18nKey: "nav.stores" },
-  { label: "Ask", to: "/ask", i18nKey: "nav.ask" },
   { label: "Extension", to: "/chrome-extension", i18nKey: "nav.extension" },
   { label: "Blog", to: "/blog", i18nKey: "nav.blog" },
 ];
 
 const mobileLinks: NavLink[] = [
   ...desktopLinks,
-  { label: "Chat Assistant", isAction: true },
 ];
 
 export function Navbar() {
@@ -369,13 +367,13 @@ export function Navbar() {
           </Link>
 
           <Link
-            to="/ask"
+            to="/chrome-extension"
             className="flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 px-3 py-1 text-muted-foreground hover:text-foreground active:scale-95 touch-manipulation"
             activeProps={{ className: "text-primary font-bold" }}
-            aria-label="Shopping Assistant"
+            aria-label="Free Chrome Extension"
           >
-            <Bot className="h-4 w-4" aria-hidden="true" />
-            <span className="text-[10px] font-medium">{t("nav.ask", "Ask")}</span>
+            <Download className="h-4 w-4" aria-hidden="true" />
+            <span className="text-[10px] font-medium">{t("nav.extension", "Extension")}</span>
           </Link>
 
           <Link

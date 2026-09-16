@@ -3,13 +3,16 @@
  * @description "Ask GoCoupon" AI Shopping Research Assistant Hub.
  */
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import { AskGoCouponChat } from "@/components/shopping/AskGoCouponChat";
 import { Bot, ShieldCheck, Terminal, HelpCircle } from "lucide-react";
 
 export const Route = createFileRoute("/ask")({
+  beforeLoad: () => {
+    throw redirect({ to: "/" });
+  },
   component: AskGoCouponPage,
   head: () =>
     createSeoHead({
