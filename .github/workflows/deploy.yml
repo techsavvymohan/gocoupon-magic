@@ -89,6 +89,7 @@ jobs:
             cd /var/www/gocoupon
             tar -xzf build-artifacts.tar.gz
             rm -f build-artifacts.tar.gz
+            npm install --omit=dev --no-audit --no-fund
             pm2 reload gocoupon-web --update-env || pm2 start ecosystem.config.cjs
             pm2 status
             # Sync & reload Caddy reverse proxy if present
