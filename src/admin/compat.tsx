@@ -102,9 +102,9 @@ export function Image({
 
 export function Logo({ className = "h-7 w-auto" }: { className?: string }) {
   return (
-    <div className="flex items-center gap-2">
+    <TanstackLink to="/" className="flex items-center gap-2 cursor-pointer transition-transform hover:scale-105" title="Go to GoCoupon Homepage">
       <img src="/gc-logo.webp" alt="GoCoupon" className={`dark:hidden ${className}`} />
       <img src="/gc-logo-dark.webp" alt="GoCoupon" className={`hidden dark:block ${className}`} />
-    </div>
+    </TanstackLink>
   );
 }
