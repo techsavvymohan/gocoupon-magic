@@ -32,6 +32,7 @@ import {
   requireAdminAuth,
 } from "./admin.js";
 import { blogsRouter } from "./blogs.js";
+import { uploadRouter } from "./upload.js";
 import { openFoodFactRouter } from "../../src/open_food_fact/api-route.js";
 import { priceHistoryRouter } from "./price-history.js";
 import {
@@ -91,6 +92,7 @@ apiRouter.use("/events", eventsRouter);
 apiRouter.use("/users", adminRouter);
 apiRouter.use("/blogs", blogsRouter);
 apiRouter.use("/admin/blogs", blogsRouter);
+apiRouter.use("/admin", uploadRouter);
 apiRouter.use("/offers", dealsRouter);
 apiRouter.use("/homepage", adminRouter);
 

@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 const initialForm = {
   title: "",
@@ -15,7 +16,7 @@ const initialForm = {
   category: "Shopping Guide",
   author: "GoCoupon Editorial",
   readTime: "5 min read",
-  image: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=1200&auto=format&fit=crop&q=80",
+  image: "",
   bannerLink: "/offers",
   shortDescription: "",
   content: "",
@@ -81,6 +82,60 @@ export default function AdminBlogsManager() {
   const [linkUrl, setLinkUrl] = useState("");
   const [selectionRange, setSelectionRange] = useState({ start: 0, end: 0 });
   const textareaRef = useRef(null);
+  const coverFileInputRef = useRef(null);
+  const inlineFileInputRef = useRef(null);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [uploadingInline, setUploadingInline] = useState(false);
+
+  async function handleCoverFileUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploadingCover(true);
+      toast.loading("Uploading cover image to Cloudinary...", { id: "cover-upload" });
+      const res = await uploadToCloudinary(file, "gocoupon/blogs/covers");
+      setForm((prev) => ({ ...prev, image: res.secure_url || res.url }));
+      toast.success("Cover image uploaded to Cloudinary!", { id: "cover-upload" });
+    } catch (err) {
+      toast.error(err?.message || "Failed to upload cover image.", { id: "cover-upload" });
+    } finally {
+      setUploadingCover(false);
+      if (e.target) e.target.value = "";
+    }
+  }
+
+  async function handleInlineImageUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploadingInline(true);
+      toast.loading("Uploading image to Cloudinary...", { id: "inline-upload" });
+      const res = await uploadToCloudinary(file, "gocoupon/blogs/content");
+      const url = res.secure_url || res.url;
+      const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+      const markdownImg = `\n\n![${fileNameWithoutExt}](${url})\n\n`;
+
+      setForm((current) => {
+        const fullText = current.content || "";
+        let start = fullText.length;
+        if (textareaRef.current) {
+          start = textareaRef.current.selectionStart || fullText.length;
+        }
+        const newContent = fullText.substring(0, start) + markdownImg + fullText.substring(start);
+        return {
+          ...current,
+          content: newContent,
+        };
+      });
+
+      toast.success("Image inserted into blog article!", { id: "inline-upload" });
+    } catch (err) {
+      toast.error(err?.message || "Failed to upload image.", { id: "inline-upload" });
+    } finally {
+      setUploadingInline(false);
+      if (e.target) e.target.value = "";
+    }
+  }
 
   async function loadBlogs() {
     try {
@@ -186,8 +241,28 @@ export default function AdminBlogsManager() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setIsSubmitting(true);
     setError("");
+
+    const imgUrl = (form.image || "").trim();
+    if (!imgUrl) {
+      setError("Cloudinary Cover Image is required. Please upload an image or enter a Cloudinary URL.");
+      toast.error("Cloudinary cover image is required.");
+      return;
+    }
+
+    if (imgUrl.includes("unsplash.com")) {
+      setError("Unsplash URLs are not accepted. Please use your Cloudinary URL or click 'Upload to Cloudinary'.");
+      toast.error("Unsplash URLs not allowed. Please use Cloudinary.");
+      return;
+    }
+
+    if (!imgUrl.includes("cloudinary.com") && !imgUrl.startsWith("data:") && !imgUrl.startsWith("/")) {
+      setError("Invalid image host. Please provide a valid Cloudinary URL (https://res.cloudinary.com/...) or click 'Upload to Cloudinary'.");
+      toast.error("Please provide a valid Cloudinary URL.");
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
       const endpoint = editingBlog ? `/api/blogs/${editingBlog.slug}` : "/api/blogs";
@@ -534,16 +609,54 @@ export default function AdminBlogsManager() {
               </label>
             </div>
 
-            <label className="grid gap-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-              Featured Cover Image URL
+            <div className="grid gap-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <span>Cloudinary Cover Image URL</span>
+                  <span className="text-rose-500 font-bold">*</span>
+                  <span className="text-[10px] font-medium text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-2 py-0.5 rounded-full border border-sky-200 dark:border-sky-800">
+                    Cloudinary Required
+                  </span>
+                </span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    ref={coverFileInputRef}
+                    onChange={handleCoverFileUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    disabled={uploadingCover}
+                    onClick={() => coverFileInputRef.current?.click()}
+                    className="px-2.5 py-1 bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-400 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5 disabled:opacity-50 hover:bg-sky-100 dark:hover:bg-sky-900/60"
+                  >
+                    <span>☁️ {uploadingCover ? "Uploading to Cloudinary..." : "Upload to Cloudinary"}</span>
+                  </button>
+                </div>
+              </div>
               <Input
                 name="image"
                 value={form.image}
                 onChange={handleChange}
-                placeholder="https://images.unsplash.com/..."
-                className="bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-xs font-mono"
+                placeholder="https://res.cloudinary.com/pgzfcjir/image/upload/..."
+                className={`bg-zinc-50 dark:bg-zinc-800 border text-xs font-mono ${
+                  form.image?.includes("unsplash.com")
+                    ? "border-rose-500 text-rose-600 focus:border-rose-500"
+                    : "border-zinc-200 dark:border-zinc-700"
+                }`}
               />
-            </label>
+              {form.image?.includes("unsplash.com") ? (
+                <p className="text-[11px] text-rose-500 font-semibold">
+                  ⚠️ Unsplash URLs are no longer accepted. Please use your Cloudinary URL or click "Upload to Cloudinary".
+                </p>
+              ) : (
+                <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-normal">
+                  Provide a direct Cloudinary URL (e.g. https://res.cloudinary.com/pgzfcjir/...) or use the upload button above.
+                </p>
+              )}
+            </div>
 
             {form.image && (
               <div className="h-28 w-full rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 relative">
@@ -568,13 +681,30 @@ export default function AdminBlogsManager() {
             <div className="grid gap-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
               <div className="flex items-center justify-between">
                 <span>Article Body (Markdown Supported)</span>
-                <button
-                  type="button"
-                  onClick={handleOpenLinkModal}
-                  className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5"
-                >
-                  <span>🔗 Insert Link</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    ref={inlineFileInputRef}
+                    onChange={handleInlineImageUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    disabled={uploadingInline}
+                    onClick={() => inlineFileInputRef.current?.click()}
+                    className="px-2.5 py-1 bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-400 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                  >
+                    <span>☁️ {uploadingInline ? "Uploading..." : "Insert Cloudinary Image"}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleOpenLinkModal}
+                    className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5"
+                  >
+                    <span>🔗 Insert Link</span>
+                  </button>
+                </div>
               </div>
               <textarea
                 ref={textareaRef}

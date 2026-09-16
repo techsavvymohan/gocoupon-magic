@@ -7,7 +7,8 @@ export type PostSection =
   | { type: "link"; items: Array<{ label: string; to: string }> }
   | { type: "code"; language?: string; code: string; caption?: string }
   | { type: "table"; headers: string[]; rows: string[][] }
-  | { type: "callout"; title?: string; text: string; variant?: "info" | "warning" | "success" };
+  | { type: "callout"; title?: string; text: string; variant?: "info" | "warning" | "success" }
+  | { type: "image"; url: string; caption?: string; alt?: string };
 
 export type Post = {
   slug: string;

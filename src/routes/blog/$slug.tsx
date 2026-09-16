@@ -3,6 +3,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { getPostBySlug, posts, type Post, type PostSection } from "@/data/posts";
 import { absoluteUrl, breadcrumbSchema, createSeoHead } from "@/lib/seo";
+import { getOptimizedImageUrl } from "@/lib/cloudinary";
 import {
   Copy,
   Check,
@@ -34,6 +35,10 @@ export const Route = createFileRoute("/blog/$slug")({
                       const trimmed = chunk.trim();
                       if (trimmed.startsWith("## ")) return { type: "h2" as const, text: trimmed.replace(/^##\s+/, "") };
                       if (trimmed.startsWith("### ")) return { type: "h3" as const, text: trimmed.replace(/^###\s+/, "") };
+                      const imgMatch = trimmed.match(/^!\[(.*?)\]\((.*?)\)$/);
+                      if (imgMatch) {
+                        return { type: "image" as const, caption: imgMatch[1], url: imgMatch[2] };
+                      }
                       return { type: "p" as const, text: trimmed };
                     })
                   : [{ type: "p" as const, text: b.shortDescription || b.excerpt || "" }]
@@ -224,6 +229,17 @@ function PostPage() {
               )}
             </button>
           </div>
+
+          {post.cover && (
+            <div className="mt-10 overflow-hidden rounded-3xl border border-border/80 bg-muted/20 shadow-xl">
+              <img
+                src={getOptimizedImageUrl(post.cover, { width: 1200 })}
+                alt={post.title}
+                className="w-full h-auto max-h-[480px] object-cover"
+                loading="eager"
+              />
+            </div>
+          )}
         </div>
 
         {/* Post Body Content */}
@@ -393,6 +409,22 @@ function Section({ section }: { section: PostSection }) {
             ))}
           </ul>
         </aside>
+      );
+    case "image":
+      return (
+        <figure className="my-8 overflow-hidden rounded-2xl border border-border bg-card shadow-md">
+          <img
+            src={getOptimizedImageUrl(section.url)}
+            alt={section.alt || section.caption || "Blog article image"}
+            className="w-full object-cover max-h-[500px]"
+            loading="lazy"
+          />
+          {section.caption && (
+            <figcaption className="p-3 text-center font-mono text-xs text-muted-foreground border-t border-border/60 bg-muted/20">
+              {section.caption}
+            </figcaption>
+          )}
+        </figure>
       );
     default:
       return null;

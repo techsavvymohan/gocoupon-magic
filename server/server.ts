@@ -75,8 +75,8 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization", "Accept", "X-Requested-With"],
   })
 );
-app.use(express.json({ limit: "5mb" }));
-app.use(express.urlencoded({ extended: true, limit: "5mb" }));
+app.use(express.json({ limit: "15mb" }));
+app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 
 // ─── Global Path Traversal Guard ──────────────────────────────────────────────
 // Block any request whose raw URL contains directory traversal sequences.

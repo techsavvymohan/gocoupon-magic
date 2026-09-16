@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { posts as defaultPosts, type Post } from "@/data/posts";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
+import { getOptimizedImageUrl } from "@/lib/cloudinary";
 import {
   Search,
   ArrowRight,
@@ -639,6 +640,17 @@ function BlogIndex() {
                           </button>
                         </div>
                       </div>
+
+                      {post.cover && (
+                        <div className="mb-4 overflow-hidden rounded-2xl border border-border/60 bg-muted/20 aspect-video">
+                          <img
+                            src={getOptimizedImageUrl(post.cover, { width: 600, height: 340, crop: "fill" })}
+                            alt={post.title}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            loading="lazy"
+                          />
+                        </div>
+                      )}
 
                       <h3 className="font-display text-lg font-bold leading-snug tracking-tight text-foreground group-hover:text-primary transition-colors">
                         <Link to="/blog/$slug" params={{ slug: post.slug }}>
