@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
@@ -765,6 +765,33 @@ function OffersHubPage() {
               </button>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ───────────────────────────────────────────────────────────────────────── */}
+      {/* 2.5. FEATURED DEALS TOP DISCOVERY BANNER                                  */}
+      {/* ───────────────────────────────────────────────────────────────────────── */}
+      <section className="bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 text-white border-b border-indigo-900/40 px-4 sm:px-6 py-5 shadow-sm">
+        <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-1 max-w-2xl">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/20 border border-indigo-400/30 px-2.5 py-0.5 font-mono text-[10px] font-semibold text-indigo-300 uppercase tracking-wider">
+              <Tag className="h-3 w-3 text-indigo-300" />
+              Featured Partner Offers
+            </div>
+            <h2 className="font-display text-lg sm:text-xl font-bold tracking-tight text-white">
+              Featured Deals
+            </h2>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Discover handpicked coupon codes and limited-time savings from trusted brands worldwide.
+            </p>
+          </div>
+          <Link
+            to="/featured-deals"
+            className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-xs font-bold text-slate-950 shadow-sm transition-all hover:bg-slate-100 hover:scale-[1.02] active:scale-[0.98] shrink-0"
+          >
+            <span>Explore Featured Deals</span>
+            <ArrowRight className="h-3.5 w-3.5 text-slate-950" />
+          </Link>
         </div>
       </section>
 

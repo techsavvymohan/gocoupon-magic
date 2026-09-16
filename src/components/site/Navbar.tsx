@@ -40,6 +40,7 @@ type NavLink = {
 
 const desktopLinks: NavLink[] = [
   { label: "Offers", to: "/offers", badge: "HOT", badgeColor: "bg-rose-500/15 text-rose-500", i18nKey: "nav.offers" },
+  { label: "Featured Deals", to: "/featured-deals", badge: "TOP", badgeColor: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" },
   { label: "Compare", to: "/compare", badge: "NEW", badgeColor: "bg-primary/10 text-primary", i18nKey: "nav.compare" },
   { label: "Stores", to: "/stores", i18nKey: "nav.stores" },
   { label: "Ask", to: "/ask", i18nKey: "nav.ask" },

@@ -226,6 +226,35 @@ const routeConfigs = [
     `,
   },
   {
+    path: "featured-deals",
+    title: "Featured Deals & Exclusive Coupons | GoCoupon",
+    description: "Discover handpicked featured deals, verified coupon codes and exclusive savings from trusted partner brands worldwide. Shop smarter with GoCoupon.",
+    h1: "Featured Deals. Bigger Savings.",
+    lead: "Discover handpicked offers, verified coupon codes and exclusive savings from trusted partner brands worldwide.",
+    directAnswer: "GoCoupon's Featured Deals collection brings together hand-verified promo codes and limited-time savings from partner networks. Copy coupon codes directly and activate deals at official merchant stores.",
+    articleContent: `
+      <h2>Curated Featured Partner Deals &amp; Merchandising Hub</h2>
+      <p>GoCoupon’s Featured Deals collection brings together selected coupon codes and promotional offers from trusted brand networks. Each offer is organized by category and designed to help shoppers find savings faster. Before publishing, offers are checked for merchant availability, coupon details, and destination-link accuracy.</p>
+
+      <h2>Featured Categories &amp; Savings Overview</h2>
+      <ul>
+        <li><strong>Travel &amp; Intercity Transit:</strong> Up to 16.5% instant savings on bus tickets and luxury luggage sets.</li>
+        <li><strong>Healthcare &amp; Diagnostics:</strong> Flat 30% discount on online doctor consultations and full body health checkups.</li>
+        <li><strong>Electronics &amp; Audio:</strong> 10% instant promo vouchers on premium noise-cancelling headphones and speakers.</li>
+        <li><strong>Nutrition &amp; Wellness:</strong> Certified whey proteins, organic multivitamins, and fitness nutrition.</li>
+        <li><strong>Luxury Fragrances:</strong> Handcrafted pure attars and luxury Eau de Parfum fragrances.</li>
+      </ul>
+
+      <h2>How to Redeem Featured Coupon Codes</h2>
+      <ol style="line-height: 1.8; color: #cbd5e1; padding-left: 20px;">
+        <li>Select your preferred offer from the curated featured deals collection.</li>
+        <li>Click <strong>Copy Code</strong> to save the discount voucher to your clipboard.</li>
+        <li>Click <strong>Get Deal</strong> to open the official merchant checkout in a secure tab.</li>
+        <li>Paste your coupon code into the checkout promotion box to claim your instant discount.</li>
+      </ol>
+    `,
+  },
+  {
     path: "flipkart-coupons",
     title: "Flipkart Coupon Codes & Cashback (2026) | GoCoupon",
     description: "Get 100% verified working Flipkart promo codes, instant bank card discounts, and up to 8.5% cashback auto-applied at checkout with GoCoupon.",

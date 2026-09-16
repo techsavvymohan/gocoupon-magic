@@ -17,10 +17,18 @@ const initialForm = {
   storeSlug: "",
   storeName: "",
   affiliateLink: "",
+  merchantUrl: "",
   source: "Manual",
+  campaignSource: "manual",
   expiryDate: "",
   status: "Active",
   code: "",
+  discount: "",
+  badge: "Verified Offer",
+  targetCountry: "India Eligible",
+  terms: "",
+  isFeatured: false,
+  featuredPriority: 10,
 };
 
 function RefreshIcon() {
@@ -115,25 +123,33 @@ export default function AdminOffersManager() {
   function handleOpenEdit(offer) {
     setEditingOffer(offer);
     setForm({
-      title: offer.title,
+      title: offer.title || "",
       description: offer.description || "",
-      type: offer.type,
-      storeSlug: offer.storeSlug,
-      storeName: offer.storeName,
-      affiliateLink: offer.affiliateLink || "",
-      source: offer.source,
-      expiryDate: offer.expiryDate,
-      status: offer.status,
+      type: offer.type || "Coupon",
+      storeSlug: offer.storeSlug || "",
+      storeName: offer.storeName || "",
+      affiliateLink: offer.affiliateLink || offer.link || "",
+      merchantUrl: offer.merchantUrl || "",
+      source: offer.source || "Manual",
+      campaignSource: offer.campaignSource || "manual",
+      expiryDate: offer.expiryDate || offer.endDate || "",
+      status: offer.status || "Active",
       code: offer.code || "",
+      discount: offer.discount || "",
+      badge: offer.badge || "Verified Offer",
+      targetCountry: offer.targetCountry || "India Eligible",
+      terms: offer.terms || "",
+      isFeatured: Boolean(offer.isFeatured),
+      featuredPriority: offer.featuredPriority !== undefined ? offer.featuredPriority : 10,
     });
-    affiliateEditedRef.current = Boolean(offer.affiliateLink);
+    affiliateEditedRef.current = Boolean(offer.affiliateLink || offer.link);
     setError("");
     setOpen(true);
   }
 
   function handleChange(event) {
-    const { name, value } = event.target;
-    const nextState = { ...form, [name]: value };
+    const { name, value, type, checked } = event.target;
+    const nextState = { ...form, [name]: type === "checkbox" ? checked : value };
 
     if (name === "storeSlug") {
       const matchedStore = stores.find((store) => store.slug === value);
@@ -144,10 +160,32 @@ export default function AdminOffersManager() {
     }
 
     if (name === "affiliateLink") {
-      affiliateEditedRef.current = value.trim().length > 0;
+      affiliateEditedRef.current = String(value).trim().length > 0;
     }
 
     setForm(nextState);
+  }
+
+  async function handleToggleFeatured(offer) {
+    const nextFeatured = !offer.isFeatured;
+    try {
+      const response = await fetch(`/api/offers?id=${encodeURIComponent(offer.id)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
+        body: JSON.stringify({
+          ...offer,
+          isFeatured: nextFeatured,
+          featuredPriority: offer.featuredPriority || 10,
+        }),
+      });
+      if (response.ok) {
+        setOffers((prev) =>
+          prev.map((o) => (o.id === offer.id ? { ...o, isFeatured: nextFeatured } : o))
+        );
+      }
+    } catch (err) {
+      console.error("Toggle featured failed:", err);
+    }
   }
 
   async function handleSubmit(event) {
@@ -155,12 +193,12 @@ export default function AdminOffersManager() {
     setIsSubmitting(true);
     setError("");
 
-    const endpoint = editingOffer ? `/api/offers/${editingOffer.id}` : "/api/offers";
+    const endpoint = editingOffer ? `/api/offers?id=${encodeURIComponent(editingOffer.id)}` : "/api/offers";
     const method = editingOffer ? "PUT" : "POST";
 
     const response = await fetch(endpoint, {
       method,
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
       body: JSON.stringify(form),
     });
 
@@ -250,6 +288,8 @@ export default function AdminOffersManager() {
     ? processedOffers.filter((o) => o.isExpired)
     : activeFilterTab === "active"
     ? processedOffers.filter((o) => !o.isExpired)
+    : activeFilterTab === "featured"
+    ? processedOffers.filter((o) => Boolean(o.isFeatured))
     : processedOffers;
 
   // Sorted offers (by clicks if sortByClicks is active)
@@ -263,6 +303,7 @@ export default function AdminOffersManager() {
   }, [filteredOffers, sortByClicks, clickCounts]);
 
   const expiredCount = processedOffers.filter((o) => o.isExpired).length;
+  const featuredCount = processedOffers.filter((o) => Boolean(o.isFeatured)).length;
 
   return (
     <>
@@ -270,7 +311,7 @@ export default function AdminOffersManager() {
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <CardTitle>Coupons & Deals Management</CardTitle>
-            <CardDescription>Manage verified promo codes, discount deals, and real-time user redemption clicks.</CardDescription>
+            <CardDescription>Manage verified promo codes, discount deals, featured campaigns, and redemption clicks.</CardDescription>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             {/* Filter Tabs */}
@@ -281,6 +322,13 @@ export default function AdminOffersManager() {
                 className={`px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer ${filterTab === "all" && !sortByClicks ? "bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs" : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"}`}
               >
                 All ({offers.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => { setFilterTab("featured"); setSortByClicks(false); }}
+                className={`px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer ${filterTab === "featured" && !sortByClicks ? "bg-amber-600 text-white shadow-2xs" : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"}`}
+              >
+                Featured ({featuredCount})
               </button>
               <button
                 type="button"
@@ -384,7 +432,14 @@ export default function AdminOffersManager() {
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-bold text-zinc-900 dark:text-white text-xs truncate max-w-sm">{offer.title}</p>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <p className="font-bold text-zinc-900 dark:text-white text-xs truncate max-w-sm">{offer.title}</p>
+                            {offer.isFeatured ? (
+                              <span className="inline-flex items-center rounded-md bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 text-[9px] font-mono font-bold text-amber-600 dark:text-amber-400 shrink-0">
+                                Featured #{offer.featuredPriority || 1}
+                              </span>
+                            ) : null}
+                          </div>
                           <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate max-w-xs">{offer.description || "Active promotion"}</p>
                         </div>
                       </div>
@@ -436,6 +491,20 @@ export default function AdminOffersManager() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1.5">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className={`h-8 px-2.5 text-xs font-semibold transition ${
+                            offer.isFeatured
+                              ? "text-amber-600 dark:text-amber-400 bg-amber-500/10 hover:bg-amber-500/20"
+                              : "text-zinc-500 hover:text-amber-600 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                          }`}
+                          onClick={() => handleToggleFeatured(offer)}
+                          title={offer.isFeatured ? "Remove from Featured Deals" : "Mark as Featured Deal"}
+                        >
+                          {offer.isFeatured ? "Featured ★" : "Feature"}
+                        </Button>
                         <Button
                           type="button"
                           variant="outline"
@@ -565,6 +634,93 @@ export default function AdminOffersManager() {
               {form.type === "Deal" ? "Deal Code Optional" : "Coupon Code"}
               <Input name="code" value={form.code} onChange={handleChange} placeholder={form.type === "Deal" ? "Optional for direct deals" : "SAVE20"} className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white font-mono" />
             </label>
+
+            {/* ── Featured Merchandising Controls ── */}
+            <div className="md:col-span-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-3.5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-xs font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
+                    <span>Featured Deal Merchandising</span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 font-semibold">
+                      /featured-deals
+                    </span>
+                  </h4>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                    Control promotion to the permanent global featured deals hub.
+                  </p>
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    name="isFeatured"
+                    checked={Boolean(form.isFeatured)}
+                    onChange={handleChange}
+                    className="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 accent-amber-600 cursor-pointer"
+                  />
+                  <span className="text-xs font-bold text-zinc-900 dark:text-white">
+                    Promote to Featured Deals
+                  </span>
+                </label>
+              </div>
+
+              {form.isFeatured && (
+                <div className="grid gap-3 sm:grid-cols-2 pt-2 border-t border-amber-500/20">
+                  <label className="grid gap-1 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
+                    Display Priority (1 = Top priority)
+                    <Input
+                      type="number"
+                      name="featuredPriority"
+                      value={form.featuredPriority}
+                      onChange={handleChange}
+                      min={1}
+                      max={100}
+                      className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-xs h-9"
+                    />
+                  </label>
+                  <label className="grid gap-1 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
+                    Campaign Source
+                    <select
+                      name="campaignSource"
+                      value={form.campaignSource}
+                      onChange={handleChange}
+                      className="h-9 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 text-xs text-zinc-900 dark:text-white outline-none focus:border-amber-600"
+                    >
+                      <option value="analytics_clouds">Analytics Clouds Partner Campaign</option>
+                      <option value="manual">Manual Admin Feature</option>
+                      <option value="partner">Brand Network Partner</option>
+                    </select>
+                  </label>
+                  <label className="grid gap-1 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
+                    Featured Badge
+                    <select
+                      name="badge"
+                      value={form.badge}
+                      onChange={handleChange}
+                      className="h-9 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 text-xs text-zinc-900 dark:text-white outline-none focus:border-amber-600"
+                    >
+                      <option value="Best Saving">Best Saving</option>
+                      <option value="Featured Partner">Featured Partner</option>
+                      <option value="Popular Travel Deal">Popular Travel Deal</option>
+                      <option value="Verified Offer">Verified Offer</option>
+                      <option value="India Eligible">India Eligible</option>
+                    </select>
+                  </label>
+                  <label className="grid gap-1 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
+                    Target Region
+                    <select
+                      name="targetCountry"
+                      value={form.targetCountry}
+                      onChange={handleChange}
+                      className="h-9 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 text-xs text-zinc-900 dark:text-white outline-none focus:border-amber-600"
+                    >
+                      <option value="India Eligible">India Eligible</option>
+                      <option value="Global">Worldwide / Global</option>
+                      <option value="US Eligible">US Eligible</option>
+                    </select>
+                  </label>
+                </div>
+              )}
+            </div>
             {error ? <p className="text-xs text-rose-600 md:col-span-2">{error}</p> : null}
             <div className="flex gap-3 md:col-span-2 md:justify-end pt-3">
               <Button type="button" variant="outline" onClick={() => setOpen(false)} className="dark:bg-zinc-800 dark:border-zinc-700 dark:text-white">

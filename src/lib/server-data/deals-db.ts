@@ -45,6 +45,11 @@ export interface DealRecord {
   source?: string;
   status?: string;
   type?: string;
+  isFeatured?: boolean;
+  featuredPriority?: number;
+  campaignSource?: string;
+  targetCountry?: string;
+  verificationStatus?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -318,6 +323,7 @@ export function queryDeals(
     brand?: string;
     letter?: string;
     festive?: boolean;
+    featured?: boolean;
     city?: string;
     badge?: DealBadge;
     sortBy?: DealSortOption;
@@ -339,6 +345,11 @@ export function queryDeals(
     }
     return true;
   });
+
+  // Filter by featured status
+  if (options.featured !== undefined) {
+    results = results.filter((d) => Boolean(d.isFeatured) === options.featured);
+  }
 
   // Filter by store or merchant
   if (options.store && options.store.toLowerCase() !== "all") {

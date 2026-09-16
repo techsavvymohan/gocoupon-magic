@@ -23,6 +23,7 @@ import { Route as DealsRouteImport } from './routes/deals'
 import { Route as DisclosureRouteImport } from './routes/disclosure'
 import { Route as ExtensionRouteImport } from './routes/extension'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as FeaturedDealsRouteImport } from './routes/featured-deals'
 import { Route as FlipkartCouponsRouteImport } from './routes/flipkart-coupons'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
@@ -117,6 +118,11 @@ const ExtensionRoute = ExtensionRouteImport.update({
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturedDealsRoute = FeaturedDealsRouteImport.update({
+  id: '/featured-deals',
+  path: '/featured-deals',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FlipkartCouponsRoute = FlipkartCouponsRouteImport.update({
@@ -260,6 +266,7 @@ export interface FileRoutesByFullPath {
   '/disclosure': typeof DisclosureRoute
   '/extension': typeof ExtensionRoute
   '/faq': typeof FaqRoute
+  '/featured-deals': typeof FeaturedDealsRoute
   '/flipkart-coupons': typeof FlipkartCouponsRoute
   '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
@@ -301,6 +308,7 @@ export interface FileRoutesByTo {
   '/disclosure': typeof DisclosureRoute
   '/extension': typeof ExtensionRoute
   '/faq': typeof FaqRoute
+  '/featured-deals': typeof FeaturedDealsRoute
   '/flipkart-coupons': typeof FlipkartCouponsRoute
   '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
@@ -343,6 +351,7 @@ export interface FileRoutesById {
   '/disclosure': typeof DisclosureRoute
   '/extension': typeof ExtensionRoute
   '/faq': typeof FaqRoute
+  '/featured-deals': typeof FeaturedDealsRoute
   '/flipkart-coupons': typeof FlipkartCouponsRoute
   '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
@@ -386,6 +395,7 @@ export interface FileRouteTypes {
     | '/disclosure'
     | '/extension'
     | '/faq'
+    | '/featured-deals'
     | '/flipkart-coupons'
     | '/help'
     | '/how-it-works'
@@ -427,6 +437,7 @@ export interface FileRouteTypes {
     | '/disclosure'
     | '/extension'
     | '/faq'
+    | '/featured-deals'
     | '/flipkart-coupons'
     | '/help'
     | '/how-it-works'
@@ -468,6 +479,7 @@ export interface FileRouteTypes {
     | '/disclosure'
     | '/extension'
     | '/faq'
+    | '/featured-deals'
     | '/flipkart-coupons'
     | '/help'
     | '/how-it-works'
@@ -510,6 +522,7 @@ export interface RootRouteChildren {
   DisclosureRoute: typeof DisclosureRoute
   ExtensionRoute: typeof ExtensionRoute
   FaqRoute: typeof FaqRoute
+  FeaturedDealsRoute: typeof FeaturedDealsRoute
   FlipkartCouponsRoute: typeof FlipkartCouponsRoute
   HelpRoute: typeof HelpRoute
   HowItWorksRoute: typeof HowItWorksRoute
@@ -635,6 +648,13 @@ declare module '@tanstack/react-router' {
       path: '/faq'
       fullPath: '/faq'
       preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/featured-deals': {
+      id: '/featured-deals'
+      path: '/featured-deals'
+      fullPath: '/featured-deals'
+      preLoaderRoute: typeof FeaturedDealsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/flipkart-coupons': {
@@ -830,6 +850,7 @@ const rootRouteChildren: RootRouteChildren = {
   DisclosureRoute: DisclosureRoute,
   ExtensionRoute: ExtensionRoute,
   FaqRoute: FaqRoute,
+  FeaturedDealsRoute: FeaturedDealsRoute,
   FlipkartCouponsRoute: FlipkartCouponsRoute,
   HelpRoute: HelpRoute,
   HowItWorksRoute: HowItWorksRoute,

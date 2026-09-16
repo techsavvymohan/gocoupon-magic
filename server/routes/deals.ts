@@ -250,6 +250,7 @@ dealsRouter.get("/", async (req: Request, res: Response) => {
   const brand = (req.query.brand as string) ?? "";
   const letter = (req.query.letter as string)?.trim().toUpperCase() ?? "";
   const festive = req.query.festive === "true" || req.query.festive === "1";
+  const featured = req.query.featured !== undefined ? req.query.featured === "true" || req.query.featured === "1" : undefined;
   const city = (req.query.city as string) ?? "";
   const badge = (req.query.badge as DealBadge) ?? undefined;
   const sortBy = (req.query.sortBy as any) || "trending";
@@ -259,7 +260,7 @@ dealsRouter.get("/", async (req: Request, res: Response) => {
   const rawOffset = parseInt(req.query.offset as string, 10);
   const offset = isNaN(rawOffset) || rawOffset < 0 ? 0 : rawOffset;
 
-  const cacheKey = `deals:${category}:${store}:${brand}:${letter}:${festive}:${city}:${badge ?? "all"}:${q.toLowerCase()}:${sortBy}:${order}:${limit}:${offset}`;
+  const cacheKey = `deals:${category}:${store}:${brand}:${letter}:${festive}:${featured}:${city}:${badge ?? "all"}:${q.toLowerCase()}:${sortBy}:${order}:${limit}:${offset}`;
   const cachedData = await globalCache.get<any>(cacheKey);
 
   if (cachedData) {
@@ -274,7 +275,7 @@ dealsRouter.get("/", async (req: Request, res: Response) => {
 
     // 2. Query, filter, sort and paginate (with automatic expired pruning)
     const result = queryDeals(
-      { category, q, store, brand, letter, festive, city, badge, sortBy, order, limit, offset },
+      { category, q, store, brand, letter, festive, featured, city, badge, sortBy, order, limit, offset },
       livePool
     );
 
@@ -386,6 +387,11 @@ dealsRouter.post("/", requireAdminAuth, async (req: Request, res: Response) => {
       source: b.source || "admin",
       status: b.status || "active",
       type: b.type || (b.code ? "Coupon" : "Deal"),
+      isFeatured: b.isFeatured === true || b.isFeatured === "true" || b.isFeatured === 1,
+      featuredPriority: b.featuredPriority ? Number(b.featuredPriority) : 100,
+      campaignSource: b.campaignSource || "manual",
+      targetCountry: b.targetCountry || "India",
+      verificationStatus: b.verificationStatus || "verified",
     };
 
     addDealToPool(newDeal);
@@ -434,6 +440,11 @@ dealsRouter.put("/", requireAdminAuth, async (req: Request, res: Response) => {
       source: b.source || "admin",
       status: b.status || "active",
       type: b.type || (b.code ? "Coupon" : "Deal"),
+      isFeatured: b.isFeatured === true || b.isFeatured === "true" || b.isFeatured === 1,
+      featuredPriority: b.featuredPriority ? Number(b.featuredPriority) : 100,
+      campaignSource: b.campaignSource || "manual",
+      targetCountry: b.targetCountry || "India",
+      verificationStatus: b.verificationStatus || "verified",
     };
 
     addDealToPool(updatedDeal);
