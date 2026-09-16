@@ -8,6 +8,7 @@ import { ConfirmModal } from "@/components/ui/AppModal";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, useDialogA11yIds } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { X } from "lucide-react";
 import { PERMISSIONS, ROLE_LABELS, ROLE_PERMISSIONS } from "@/lib/access-control";
 import { cn } from "@/lib/utils";
 
@@ -316,133 +317,153 @@ export default function AdminUsersManager() {
 
       {/* User Create / Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent aria-labelledby={titleId} aria-describedby={descriptionId} className="max-w-2xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white">
-          <DialogHeader>
-            <DialogTitle id={titleId} className="text-base font-bold text-zinc-900 dark:text-white">
-              {isEditing ? "Edit Admin Account" : "Create New Admin User"}
-            </DialogTitle>
-            <DialogDescription id={descriptionId} className="text-xs text-zinc-500 dark:text-zinc-400">
-              Set credentials, account status, and dashboard access permissions.
-            </DialogDescription>
-          </DialogHeader>
-
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Full Name</label>
-                <Input
-                  value={form.name}
-                  onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
-                  placeholder="e.g. Syed Munir"
-                  required
-                  className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white text-xs"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Email Address (Login)</label>
-                <Input
-                  type="email"
-                  value={form.email}
-                  onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
-                  placeholder="admin@gocoupon.com"
-                  required
-                  className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white text-xs"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-                  {isEditing ? "New Password (Optional)" : "Password"}
-                </label>
-                <Input
-                  type="password"
-                  value={form.password}
-                  onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
-                  placeholder={isEditing ? "Leave blank to keep password" : "Minimum 8 characters"}
-                  className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white text-xs"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Account Role</label>
-                <select
-                  className="flex h-9 w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 text-xs text-zinc-900 dark:text-white outline-none"
-                  value={form.role}
-                  onChange={(event) => handleRoleChange(event.target.value)}
-                >
-                  {Object.entries(ROLE_LABELS).map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+        <DialogContent aria-labelledby={titleId} aria-describedby={descriptionId} className="max-w-2xl max-h-[calc(100dvh-3rem)] flex flex-col p-0 overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white shadow-2xl">
+          {/* Fixed Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200/80 dark:border-zinc-800 shrink-0 bg-zinc-50/80 dark:bg-zinc-850">
+            <div className="pr-6">
+              <DialogTitle id={titleId} className="text-base font-bold text-zinc-900 dark:text-white">
+                {isEditing ? "Edit Admin Account" : "Create New Admin User"}
+              </DialogTitle>
+              <DialogDescription id={descriptionId} className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                Set credentials, account status, and dashboard access permissions.
+              </DialogDescription>
             </div>
+            <button
+              type="button"
+              onClick={() => setDialogOpen(false)}
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition cursor-pointer"
+              aria-label="Close dialog"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
 
-            <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/40 p-4 space-y-3">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <h4 className="text-xs font-bold text-zinc-900 dark:text-white">Admin Module Permissions</h4>
-                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Dashboard is automatically included.</p>
-                </div>
-                <label className="flex items-center gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={form.isActive}
-                    onChange={(event) => setForm((current) => ({ ...current, isActive: event.target.checked }))}
-                    className="accent-emerald-600"
+          <form className="flex flex-col flex-1 min-h-0 overflow-hidden" onSubmit={handleSubmit}>
+            {/* Scrollable Body */}
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Full Name</label>
+                  <Input
+                    value={form.name}
+                    onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
+                    placeholder="e.g. Syed Munir"
+                    required
+                    className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white text-xs"
                   />
-                  Active Account
-                </label>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Email Address (Login)</label>
+                  <Input
+                    type="email"
+                    value={form.email}
+                    onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
+                    placeholder="admin@gocoupon.com"
+                    required
+                    className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white text-xs"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+                    {isEditing ? "New Password (Optional)" : "Password"}
+                  </label>
+                  <Input
+                    type="password"
+                    value={form.password}
+                    onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
+                    placeholder={isEditing ? "Leave blank to keep password" : "Minimum 8 characters"}
+                    className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white text-xs"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Account Role</label>
+                  <select
+                    className="flex h-9 w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 text-xs text-zinc-900 dark:text-white outline-none cursor-pointer"
+                    value={form.role}
+                    onChange={(event) => handleRoleChange(event.target.value)}
+                  >
+                    {Object.entries(ROLE_LABELS).map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
-              <div className="grid gap-2 md:grid-cols-2 pt-2">
-                {permissionOptions.map((permission) => {
-                  const checked =
-                    form.role === "admin" ? true : form.permissions.includes(permission.key);
+              <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/40 p-4 space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <h4 className="text-xs font-bold text-zinc-900 dark:text-white">Admin Module Permissions</h4>
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Dashboard is automatically included.</p>
+                  </div>
+                  <label className="flex items-center gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={form.isActive}
+                      onChange={(event) => setForm((current) => ({ ...current, isActive: event.target.checked }))}
+                      className="h-4 w-4 rounded accent-emerald-600 cursor-pointer"
+                    />
+                    Active Account
+                  </label>
+                </div>
 
-                  return (
-                    <label
-                      key={permission.key}
-                      className={cn(
-                        "flex items-start gap-2.5 rounded-xl border p-2.5 text-xs transition cursor-pointer",
-                        checked
-                          ? "bg-white dark:bg-zinc-800 border-emerald-500/40 text-zinc-900 dark:text-white font-semibold shadow-2xs"
-                          : "border-zinc-200 dark:border-zinc-700/60 text-zinc-500 dark:text-zinc-400"
-                      )}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        disabled={form.role === "admin"}
-                        onChange={() => togglePermission(permission.key)}
-                        className="mt-0.5 accent-emerald-600"
-                      />
-                      <span>
-                        <span className="block font-bold">{permission.label}</span>
-                        <span className="block text-[10px] text-zinc-400">{permission.href}</span>
-                      </span>
-                    </label>
-                  );
-                })}
+                <div className="grid gap-2 md:grid-cols-2 pt-2">
+                  {permissionOptions.map((permission) => {
+                    const checked =
+                      form.role === "admin" ? true : form.permissions.includes(permission.key);
+
+                    return (
+                      <label
+                        key={permission.key}
+                        className={cn(
+                          "flex items-start gap-2.5 rounded-xl border p-2.5 text-xs transition cursor-pointer select-none",
+                          checked
+                            ? "bg-white dark:bg-zinc-800 border-emerald-500/40 text-zinc-900 dark:text-white font-semibold shadow-2xs"
+                            : "border-zinc-200 dark:border-zinc-700/60 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/40"
+                        )}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          disabled={form.role === "admin"}
+                          onChange={() => togglePermission(permission.key)}
+                          className="mt-0.5 h-3.5 w-3.5 rounded accent-emerald-600 cursor-pointer"
+                        />
+                        <span>
+                          <span className="block font-bold">{permission.label}</span>
+                          <span className="block text-[10px] text-zinc-400">{permission.href}</span>
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setDialogOpen(false)}
-                className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2"
-              >
-                {isSubmitting ? <Spinner /> : null}
-                {isEditing ? "Save Changes" : "Create Account"}
-              </Button>
+            {/* Sticky Footer */}
+            <div className="shrink-0 flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/90 dark:bg-zinc-900/90 px-6 py-3.5">
+              <div className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+                {isEditing ? `Account: ${form.email}` : "New admin account"}
+              </div>
+              <div className="flex items-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setDialogOpen(false)}
+                  className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 h-9 px-4 cursor-pointer"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-9 px-5 shadow-xs transition cursor-pointer"
+                >
+                  {isSubmitting ? <Spinner /> : null}
+                  {isEditing ? "Save Changes" : "Create Account"}
+                </Button>
+              </div>
             </div>
           </form>
         </DialogContent>

@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { X } from "lucide-react";
 
 const initialForm = {
   title: "",
@@ -356,116 +357,143 @@ export default function AdminProductsManager() {
       </Card>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-3xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white">
-          <DialogHeader>
-            <DialogTitle className="text-zinc-900 dark:text-white">{editingProduct ? "Edit Product" : "Add Product"}</DialogTitle>
-            <DialogDescription className="text-zinc-600 dark:text-zinc-400">Create store-linked products that appear after offers on public store pages.</DialogDescription>
-          </DialogHeader>
+        <DialogContent className="max-w-3xl max-h-[calc(100dvh-3rem)] flex flex-col p-0 overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white shadow-2xl">
+          {/* Fixed Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200/80 dark:border-zinc-800 shrink-0 bg-zinc-50/80 dark:bg-zinc-850">
+            <div className="pr-6">
+              <DialogTitle className="text-base font-bold text-zinc-900 dark:text-white">
+                {editingProduct ? "Edit Product" : "Add Product"}
+              </DialogTitle>
+              <DialogDescription className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                Create store-linked products that appear after offers on public store pages.
+              </DialogDescription>
+            </div>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition cursor-pointer"
+              aria-label="Close dialog"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
 
-          <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
-            <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold md:col-span-2">
-              Product Title
-              <Input name="title" value={form.title} onChange={handleChange} placeholder="Nike Air Max 2026" className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white" />
-            </label>
-            <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold md:col-span-2">
-              Description
-              <textarea
-                name="description"
-                rows={3}
-                value={form.description}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-xs text-zinc-900 dark:text-white outline-none transition placeholder:text-zinc-400 focus:border-emerald-600"
-                placeholder="Short product description for the store page."
-              />
-            </label>
-            <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold">
-              Store
-              <select
-                name="storeSlug"
-                value={form.storeSlug}
-                onChange={handleChange}
-                className="h-10 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 text-xs text-zinc-900 dark:text-white outline-none focus:border-emerald-600"
-              >
-                <option value="">Select store</option>
-                {stores.map((store) => (
-                  <option key={store.slug} value={store.slug}>
-                    {store.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold">
-              Status
-              <select
-                name="status"
-                value={form.status}
-                onChange={handleChange}
-                className="h-10 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 text-xs text-zinc-900 dark:text-white outline-none focus:border-emerald-600"
-              >
-                <option>Active</option>
-                <option>Draft</option>
-                <option>Out of stock</option>
-              </select>
-            </label>
-            <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold">
-              Price ($)
-              <Input name="price" type="number" min="0" step="0.01" value={form.price} onChange={handleChange} placeholder="99.99" className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white" />
-            </label>
-            <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold">
-              Original Price ($)
-              <Input name="originalPrice" type="number" min="0" step="0.01" value={form.originalPrice} onChange={handleChange} placeholder="129.99" className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white" />
-            </label>
-            <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold md:col-span-2">
-              Product Image
-              <div className="grid gap-3">
-                {form.image ? (
-                  <div className="relative h-40 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800">
-                    <img src={form.image} alt="Product preview" className="h-full w-full object-cover" />
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+            {/* Scrollable Body */}
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold md:col-span-2">
+                  Product Title
+                  <Input name="title" value={form.title} onChange={handleChange} placeholder="Nike Air Max 2026" className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white" required />
+                </label>
+                <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold md:col-span-2">
+                  Description
+                  <textarea
+                    name="description"
+                    rows={3}
+                    value={form.description}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-xs text-zinc-900 dark:text-white outline-none transition placeholder:text-zinc-400 focus:border-emerald-600"
+                    placeholder="Short product description for the store page."
+                  />
+                </label>
+                <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold">
+                  Store
+                  <select
+                    name="storeSlug"
+                    value={form.storeSlug}
+                    onChange={handleChange}
+                    className="h-10 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 text-xs text-zinc-900 dark:text-white outline-none focus:border-emerald-600 cursor-pointer"
+                  >
+                    <option value="">Select store</option>
+                    {stores.map((store) => (
+                      <option key={store.slug} value={store.slug}>
+                        {store.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold">
+                  Status
+                  <select
+                    name="status"
+                    value={form.status}
+                    onChange={handleChange}
+                    className="h-10 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 text-xs text-zinc-900 dark:text-white outline-none focus:border-emerald-600 cursor-pointer"
+                  >
+                    <option>Active</option>
+                    <option>Draft</option>
+                    <option>Out of stock</option>
+                  </select>
+                </label>
+                <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold">
+                  Price ($)
+                  <Input name="price" type="number" min="0" step="0.01" value={form.price} onChange={handleChange} placeholder="99.99" className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white" />
+                </label>
+                <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold">
+                  Original Price ($)
+                  <Input name="originalPrice" type="number" min="0" step="0.01" value={form.originalPrice} onChange={handleChange} placeholder="129.99" className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white" />
+                </label>
+                <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold md:col-span-2">
+                  Product Image
+                  <div className="grid gap-3">
+                    {form.image ? (
+                      <div className="relative h-40 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800">
+                        <img src={form.image} alt="Product preview" className="h-full w-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="flex h-32 items-center justify-center rounded-xl border border-dashed border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/40 text-xs text-zinc-500 dark:text-zinc-400">
+                        No product image uploaded yet.
+                      </div>
+                    )}
+                    <div className="flex flex-wrap gap-3">
+                      <label className="inline-flex cursor-pointer">
+                        <input
+                          type="file"
+                          accept={ACCEPTED_IMAGE_TYPES.join(",")}
+                          className="hidden"
+                          onChange={(event) => handleImageSelection(event.target.files?.[0])}
+                        />
+                        <span className="inline-flex h-9 items-center justify-center rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 px-4 text-xs font-semibold text-zinc-800 dark:text-zinc-200 transition hover:bg-zinc-200 dark:hover:bg-zinc-700">
+                          {isUploadingImage ? "Uploading..." : "Upload Cloudinary Image"}
+                        </span>
+                      </label>
+                      {form.image ? (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="h-9 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs cursor-pointer"
+                          onClick={() => setForm((current) => ({ ...current, image: "" }))}
+                          disabled={isUploadingImage}
+                        >
+                          Remove Image
+                        </Button>
+                      ) : null}
+                    </div>
+                    <Input name="image" value={form.image} onChange={handleChange} placeholder="Or paste image URL manually" className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white text-xs" />
                   </div>
-                ) : (
-                  <div className="flex h-32 items-center justify-center rounded-xl border border-dashed border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/40 text-xs text-zinc-500 dark:text-zinc-400">
-                    No product image uploaded yet.
-                  </div>
-                )}
-                <div className="flex flex-wrap gap-3">
-                  <label className="inline-flex cursor-pointer">
-                    <input
-                      type="file"
-                      accept={ACCEPTED_IMAGE_TYPES.join(",")}
-                      className="hidden"
-                      onChange={(event) => handleImageSelection(event.target.files?.[0])}
-                    />
-                    <span className="inline-flex h-9 items-center justify-center rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 px-4 text-xs font-semibold text-zinc-800 dark:text-zinc-200 transition hover:bg-zinc-200 dark:hover:bg-zinc-700">
-                      {isUploadingImage ? "Uploading..." : "Upload Cloudinary Image"}
-                    </span>
-                  </label>
-                  {form.image ? (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="h-9 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs"
-                      onClick={() => setForm((current) => ({ ...current, image: "" }))}
-                      disabled={isUploadingImage}
-                    >
-                      Remove Image
-                    </Button>
-                  ) : null}
-                </div>
-                <Input name="image" value={form.image} onChange={handleChange} placeholder="Or paste image URL manually" className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white" />
+                </label>
+                <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold md:col-span-2">
+                  CTA Label
+                  <Input name="ctaLabel" value={form.ctaLabel} onChange={handleChange} placeholder="View Product" className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white" />
+                </label>
+                {error ? <p className="text-xs text-rose-600 md:col-span-2 font-medium">{error}</p> : null}
               </div>
-            </label>
-            <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold md:col-span-2">
-              CTA Label
-              <Input name="ctaLabel" value={form.ctaLabel} onChange={handleChange} placeholder="View Product" className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white" />
-            </label>
-            {error ? <p className="text-xs text-rose-600 md:col-span-2">{error}</p> : null}
-            <div className="flex gap-3 md:col-span-2 md:justify-end pt-3">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)} className="dark:bg-zinc-800 dark:border-zinc-700 dark:text-white">
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting || isUploadingImage} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold" leadingIcon={isSubmitting ? <Spinner /> : null}>
-                {isSubmitting ? "Saving Product..." : editingProduct ? "Update Product" : "Save Product"}
-              </Button>
+            </div>
+
+            {/* Sticky Footer */}
+            <div className="shrink-0 flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/90 dark:bg-zinc-900/90 px-6 py-3.5">
+              <div className="text-xs text-zinc-500 dark:text-zinc-400 font-medium truncate max-w-[200px]">
+                {editingProduct ? `ID: ${editingProduct.id}` : "New product entry"}
+              </div>
+              <div className="flex items-center gap-3">
+                <Button type="button" variant="outline" onClick={() => setOpen(false)} className="dark:bg-zinc-800 dark:border-zinc-700 dark:text-white text-xs font-semibold h-9 px-4 cursor-pointer">
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isSubmitting || isUploadingImage} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-9 px-5 shadow-xs transition cursor-pointer" leadingIcon={isSubmitting ? <Spinner /> : null}>
+                  {isSubmitting ? "Saving Product..." : editingProduct ? "Update Product" : "Save Product"}
+                </Button>
+              </div>
             </div>
           </form>
         </DialogContent>

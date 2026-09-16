@@ -3,20 +3,53 @@
  * @description Watchlist and Price Drop Alerts Dashboard.
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { getWatchlist, removeFromWatchlist, addToWatchlist } from "@/lib/services/watchlist-service";
 import type { UserWatchItem } from "@/lib/services/canonical-types";
+import { useCurrency } from "@/context/CurrencyContext";
 import { Bell, Trash2, ExternalLink, TrendingDown, ArrowRight, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 export function WatchlistGrid() {
   const [items, setItems] = useState<UserWatchItem[]>(() => getWatchlist());
+  const { formatPrice } = useCurrency();
+
+  // Keep state synchronized across browser tabs in real-time
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (!e.key || e.key === "gocoupon_user_watchlist_v1") {
+        setItems(getWatchlist());
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   const handleRemove = (productId: string, title: string) => {
+    const itemToRemove = items.find((i) => i.productId === productId);
     removeFromWatchlist(productId);
     setItems(getWatchlist());
-    toast.info(`Removed ${title.slice(0, 25)}... from Watchlist`);
+    toast.info(`Removed ${title.slice(0, 25)}... from Watchlist`, {
+      action: itemToRemove
+        ? {
+            label: "Undo",
+            onClick: () => {
+              addToWatchlist({
+                productId: itemToRemove.productId,
+                productTitle: itemToRemove.productTitle,
+                productImage: itemToRemove.productImage,
+                targetPrice: itemToRemove.targetPrice,
+                currentLowestPrice: itemToRemove.currentLowestPrice,
+                currency: itemToRemove.currency,
+                email: itemToRemove.notifyChannels?.email,
+              });
+              setItems(getWatchlist());
+              toast.success("Restored item to Watchlist");
+            },
+          }
+        : undefined,
+    });
   };
 
   if (items.length === 0) {
@@ -58,11 +91,16 @@ export function WatchlistGrid() {
                 <img
                   src={item.productImage}
                   alt={item.productTitle}
+                  onError={(e) => {
+                    e.currentTarget.src = "/icons/icon_128.png";
+                  }}
                   className="h-16 w-16 rounded-2xl object-cover border border-border"
                 />
                 <button
+                  type="button"
                   onClick={() => handleRemove(item.productId, item.productTitle)}
-                  className="rounded-full p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                  aria-label={`Remove ${item.productTitle} from Watchlist`}
+                  className="rounded-full p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors focus:outline-hidden focus:ring-2 focus:ring-destructive/30"
                   title="Remove from Watchlist"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -80,13 +118,13 @@ export function WatchlistGrid() {
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">Current Price:</span>
                   <span className="font-display font-bold text-foreground">
-                    ₹{item.currentLowestPrice.toLocaleString("en-IN")}
+                    {formatPrice(item.currentLowestPrice)}
                   </span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">Target Alert Price:</span>
                   <span className="font-display font-bold text-primary">
-                    ₹{item.targetPrice.toLocaleString("en-IN")}
+                    {formatPrice(item.targetPrice)}
                   </span>
                 </div>
 
@@ -96,7 +134,7 @@ export function WatchlistGrid() {
                   </div>
                 ) : (
                   <div className="text-[11px] text-muted-foreground font-mono text-center">
-                    Needs ₹{(item.currentLowestPrice - item.targetPrice).toLocaleString("en-IN")} more drop
+                    Needs {formatPrice(Math.max(0, item.currentLowestPrice - item.targetPrice))} more drop
                   </div>
                 )}
               </div>

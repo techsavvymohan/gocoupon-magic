@@ -278,7 +278,7 @@ function OffersHubPage() {
     sortBy: sortBy === "discount" ? "discount" : "trending",
   });
 
-  const isLoading = isIndianLoading && isIntlLoading;
+  const isLoading = isIndianLoading || isIntlLoading;
 
   // Active pool based on selected market region
   const allDeals = useMemo(() => {

@@ -52,6 +52,8 @@ import {
   Award,
   CreditCard,
   SlidersHorizontal,
+  AlertTriangle,
+  RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -262,6 +264,8 @@ export function ComparePage() {
 
   const [searchResult, setSearchResult] = useState<MultiPlatformSearchResult | null>(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   // Filter & Sorting State
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
@@ -311,11 +315,13 @@ export function ComparePage() {
     if (!trimmed) {
       setSearchResult(null);
       setFoodComparison(null);
+      setSearchError(null);
       return;
     }
 
     let isMounted = true;
     setIsSearching(true);
+    setSearchError(null);
     const stopLoading = startLoading("compare-search");
 
     // Check Open Food Facts if search query is a barcode
@@ -342,6 +348,7 @@ export function ComparePage() {
       .then((res) => {
         if (!isMounted) return;
         setSearchResult(res);
+        setSearchError(null);
         if (res.isDirectUrl && res.products.length === 1) {
           setSelectedProduct(res.products[0]);
         }
@@ -349,6 +356,9 @@ export function ComparePage() {
       .catch((err) => {
         console.error("Platform comparison search error:", err);
         if (!isMounted) return;
+        setSearchError(
+          err?.message || "Unable to retrieve price comparisons. Please check your network connection and try again."
+        );
         setSearchResult({
           query: trimmed,
           products: [],
@@ -368,7 +378,7 @@ export function ComparePage() {
       isMounted = false;
       stopLoading();
     };
-  }, [activeSearchParam, activeShoprs, startLoading]);
+  }, [activeSearchParam, activeShoprs, startLoading, retryCount]);
 
   const handleCopy = (code: string) => {
     navigator.clipboard.writeText(code).catch(() => {});
@@ -1139,8 +1149,17 @@ export function ComparePage() {
                         <div>
                           {/* Product Image Area */}
                           <div
+                            role="button"
+                            tabIndex={0}
+                            aria-label={`View price comparison for ${product.title}`}
                             onClick={() => setSelectedProduct(product)}
-                            className="relative aspect-square w-full overflow-hidden rounded-xl bg-muted/20 p-3 flex items-center justify-center cursor-pointer"
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                setSelectedProduct(product);
+                              }
+                            }}
+                            className="relative aspect-square w-full overflow-hidden rounded-xl bg-muted/20 p-3 flex items-center justify-center cursor-pointer focus:outline-hidden focus:ring-2 focus:ring-primary"
                           >
                             <ProductCardImg
                               src={product.imageUrl}
@@ -1196,9 +1215,17 @@ export function ComparePage() {
 
                             {/* Product Title */}
                             <h3
+                              role="button"
+                              tabIndex={0}
                               onClick={() => setSelectedProduct(product)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  setSelectedProduct(product);
+                                }
+                              }}
                               title={product.title}
-                              className="font-display text-sm font-semibold text-foreground line-clamp-2 leading-snug cursor-pointer hover:text-primary transition-colors min-h-[2.5rem]"
+                              className="font-display text-sm font-semibold text-foreground line-clamp-2 leading-snug cursor-pointer hover:text-primary transition-colors min-h-[2.5rem] focus:outline-hidden focus:underline"
                             >
                               {product.title}
                             </h3>
@@ -1275,6 +1302,28 @@ export function ComparePage() {
                         </div>
                       </article>
                     ))}
+                  </div>
+                ) : searchError ? (
+                  <div className="rounded-3xl border border-rose-500/30 bg-rose-500/5 p-10 sm:p-12 text-center max-w-lg mx-auto animate-in fade-in duration-200">
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-500 mb-3">
+                      <AlertTriangle className="h-6 w-6" />
+                    </div>
+                    <h3 className="font-display text-lg font-bold text-foreground">
+                      Unable to Load Comparisons
+                    </h3>
+                    <p className="mt-1.5 text-xs text-muted-foreground max-w-md mx-auto">
+                      {searchError}
+                    </p>
+                    <div className="mt-5 flex justify-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setRetryCount((c) => c + 1)}
+                        className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors cursor-pointer"
+                      >
+                        <RefreshCw className="h-3.5 w-3.5" />
+                        <span>Retry Search</span>
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <div className="rounded-3xl border border-dashed border-border bg-card/40 p-12 text-center max-w-lg mx-auto">

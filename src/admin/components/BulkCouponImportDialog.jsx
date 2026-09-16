@@ -377,13 +377,13 @@ export default function BulkCouponImportDialog({ open, onOpenChange, stores = []
       <DialogContent
         titleId={titleId}
         descriptionId={descriptionId}
-        className="relative max-w-[1080px] rounded-[32px] border border-white/10 bg-zinc-950 p-0 text-white shadow-2xl overflow-hidden"
+        className="relative max-w-[1080px] max-h-[calc(100dvh-2.5rem)] flex flex-col rounded-[32px] border border-white/10 bg-zinc-950 p-0 text-white shadow-2xl overflow-hidden"
       >
         {/* Top Cancel/Close Button */}
         <button
           type="button"
           onClick={() => handleOpenChange(false)}
-          className="absolute top-6 right-6 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-all shadow-md"
+          className="absolute top-6 right-6 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-all shadow-md cursor-pointer"
           aria-label="Cancel and Close"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -391,7 +391,7 @@ export default function BulkCouponImportDialog({ open, onOpenChange, stores = []
           </svg>
         </button>
 
-        <div className="grid gap-0 lg:grid-cols-[0.74fr_1.26fr]">
+        <div className="grid gap-0 lg:grid-cols-[0.74fr_1.26fr] flex-1 overflow-y-auto">
 
           {/* Left Instructions Column */}
           <div className="border-b border-white/10 bg-zinc-900/60 p-6 lg:border-r lg:border-b-0 lg:p-8">

@@ -23,6 +23,7 @@ import AdminActivityChart from "@/admin/components/AdminActivityChart";
 import RecentActivityTable from "@/admin/components/RecentActivityTable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { getPermissionsForRole, canAccessPermission } from "@/lib/access-control";
 import {
   Flame,
   Store,
@@ -81,6 +82,9 @@ function AdminContent() {
     return <AdminLoginScreen onLoginSuccess={() => setActiveTab("dashboard")} />;
   }
 
+  const userPermissions = getPermissionsForRole(user?.role, user?.permissions);
+  const isAuthorizedForTab = activeTab === "dashboard" || canAccessPermission(userPermissions, activeTab);
+
   return (
     <div className="flex min-h-screen flex-col lg:flex-row bg-background text-foreground transition-colors">
       {/* Fixed/Sticky Navigation Sidebar */}
@@ -97,17 +101,41 @@ function AdminContent() {
         />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
-          {activeTab === "dashboard" && <AdminOverviewDashboard onNavigate={handleSelectTab} />}
-          {activeTab === "offers" && <AdminOffersManager />}
-          {activeTab === "submissions" && <AdminSubmissionsManager />}
-          {activeTab === "stores" && <AdminStoresManager />}
-          {activeTab === "categories" && <AdminCategoriesManager />}
-          {activeTab === "blogs" && <AdminBlogsManager />}
-          {activeTab === "events" && <AdminEventsManager />}
-          {activeTab === "hero" && <AdminHeroManager />}
-          {activeTab === "sections" && <AdminHomepageSectionsManager />}
-          {activeTab === "users" && <AdminUsersManager />}
-          {activeTab === "settings" && <AdminSettingsPanel />}
+          {!isAuthorizedForTab ? (
+            <div className="rounded-3xl border border-rose-500/20 bg-card p-10 sm:p-14 text-center max-w-lg mx-auto shadow-sm animate-in fade-in duration-200">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-500 mb-4">
+                <Lock className="h-7 w-7" />
+              </div>
+              <h2 className="font-display text-xl font-bold text-foreground">
+                Access Restricted
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Your account ({user?.role || "viewer"}) does not have permission to access the <span className="font-semibold text-foreground">{getTabTitle(activeTab)}</span> module.
+              </p>
+              <div className="mt-6 flex justify-center">
+                <Button
+                  onClick={() => handleSelectTab("dashboard")}
+                  className="rounded-xl px-5 py-2.5 font-bold"
+                >
+                  Return to Operations Dashboard
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {activeTab === "dashboard" && <AdminOverviewDashboard onNavigate={handleSelectTab} />}
+              {activeTab === "offers" && <AdminOffersManager />}
+              {activeTab === "submissions" && <AdminSubmissionsManager />}
+              {activeTab === "stores" && <AdminStoresManager />}
+              {activeTab === "categories" && <AdminCategoriesManager />}
+              {activeTab === "blogs" && <AdminBlogsManager />}
+              {activeTab === "events" && <AdminEventsManager />}
+              {activeTab === "hero" && <AdminHeroManager />}
+              {activeTab === "sections" && <AdminHomepageSectionsManager />}
+              {activeTab === "users" && <AdminUsersManager />}
+              {activeTab === "settings" && <AdminSettingsPanel />}
+            </>
+          )}
         </main>
       </div>
     </div>

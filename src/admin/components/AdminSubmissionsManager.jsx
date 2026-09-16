@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/ui/AppModal";
+import { X } from "lucide-react";
 
 function CopyIcon({ className }) {
   return (
@@ -328,179 +329,187 @@ export default function AdminSubmissionsManager() {
         </CardHeader>
 
         <CardContent className="pt-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-zinc-50/80 dark:bg-zinc-800/60 border-b border-zinc-200 dark:border-zinc-800">
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Store / Merchant</TableHead>
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Promo Code</TableHead>
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Offer / Discount</TableHead>
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Category</TableHead>
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Submitter</TableHead>
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Status</TableHead>
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 text-right">Review Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredSubmissions.length > 0 ? (
-                filteredSubmissions.map((sub) => {
-                  const isPending = sub.status === "pending";
-                  const isApproved = sub.status === "approved";
-                  const isRejected = sub.status === "rejected";
-
-                  return (
-                    <TableRow key={sub.id} className="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40 transition border-b border-zinc-100 dark:border-zinc-800/60">
-                      <TableCell>
-                        <div className="flex items-center gap-2.5">
-                          <img
-                            src={`https://www.google.com/s2/favicons?domain=${sub.storeName.toLowerCase().replace(/[^a-z0-9]/g, "")}.com&sz=128`}
-                            alt={sub.storeName}
-                            className="h-7 w-7 rounded-lg border border-zinc-200 dark:border-zinc-700 p-0.5 object-contain bg-white dark:bg-zinc-800"
-                            onError={(e) => {
-                              e.currentTarget.style.display = "none";
-                            }}
-                          />
-                          <div>
-                            <p className="font-bold text-xs text-zinc-900 dark:text-white">{sub.storeName}</p>
-                            {sub.url && (
-                              <a
-                                href={sub.url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline truncate max-w-[160px] block font-mono"
-                              >
-                                {sub.url.replace(/^https?:\/\//, "")}
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      </TableCell>
-
-                      <TableCell>
-                        <div className="inline-flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-md border border-zinc-200 dark:border-zinc-700">
-                          <span className="font-mono text-xs font-bold text-zinc-900 dark:text-white">{sub.code}</span>
-                          <button
-                            type="button"
-                            onClick={() => handleCopy(sub.code)}
-                            title="Copy code"
-                            className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white cursor-pointer"
-                          >
-                            {copiedCode === sub.code ? <CheckIcon className="h-3 w-3 text-emerald-600" /> : <CopyIcon className="h-3 w-3" />}
-                          </button>
-                        </div>
-                      </TableCell>
-
-                      <TableCell>
-                        <p className="text-xs font-bold text-zinc-900 dark:text-white max-w-xs">{sub.discount || "Verified Deal"}</p>
-                        {sub.terms && <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate max-w-xs">{sub.terms}</p>}
-                      </TableCell>
-
-                      <TableCell>
-                        <span className="inline-block rounded-md bg-zinc-100 dark:bg-zinc-800 px-2.5 py-0.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200">
-                          {sub.category || "General"}
-                        </span>
-                      </TableCell>
-
-                      <TableCell>
-                        <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{sub.email || "Anonymous Guest"}</p>
-                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
-                          {new Date(sub.submittedAt).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </p>
-                      </TableCell>
-
-                      <TableCell>
-                        <span
-                          className={`inline-block rounded-md px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                            isApproved
-                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
-                              : isRejected
-                              ? "bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300 border border-rose-200 dark:border-rose-800"
-                              : "bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
-                          }`}
-                        >
-                          {sub.status}
-                        </span>
-                      </TableCell>
-
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          {isPending && (
-                            <Button
-                              size="sm"
-                              onClick={() => handleQuickApprove(sub)}
-                              className="h-7 px-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg cursor-pointer shadow-2xs"
-                              title="Approve and publish to live deals feed"
-                            >
-                              Approve
-                            </Button>
-                          )}
-
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleOpenEdit(sub)}
-                            className="h-7 px-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg cursor-pointer"
-                            title="Edit details before approving"
-                          >
-                            Edit
-                          </Button>
-
-                          {isPending && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => {
-                                setRejectTarget(sub);
-                                setRejectOpen(true);
-                              }}
-                              className="h-7 px-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg cursor-pointer"
-                              title="Reject submission"
-                            >
-                              Reject
-                            </Button>
-                          )}
-
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => setDeleteTarget(sub)}
-                            className="h-7 px-2 text-xs text-zinc-400 hover:text-rose-600 rounded-lg cursor-pointer"
-                            title="Delete permanently"
-                          >
-                            ✕
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-12 text-zinc-500 dark:text-zinc-400 text-xs">
-                    {loading ? "Loading community submissions..." : "No coupon submissions found matching criteria."}
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-zinc-50/80 dark:bg-zinc-800/60 border-b border-zinc-200 dark:border-zinc-800">
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Store / Merchant</TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Promo Code</TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Offer / Discount</TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Category</TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Submitter</TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Status</TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 text-right">Review Action</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredSubmissions.length > 0 ? (
+                  filteredSubmissions.map((sub) => {
+                    const isPending = sub.status === "pending";
+                    const isApproved = sub.status === "approved";
+                    const isRejected = sub.status === "rejected";
+
+                    return (
+                      <TableRow key={sub.id} className="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40 transition border-b border-zinc-100 dark:border-zinc-800/60">
+                        <TableCell>
+                          <div className="flex items-center gap-2.5">
+                            <img
+                              src={`https://www.google.com/s2/favicons?domain=${sub.storeName.toLowerCase().replace(/[^a-z0-9]/g, "")}.com&sz=128`}
+                              alt={sub.storeName}
+                              className="h-7 w-7 rounded-lg border border-zinc-200 dark:border-zinc-700 p-0.5 object-contain bg-white dark:bg-zinc-800"
+                              onError={(e) => {
+                                e.currentTarget.style.display = "none";
+                              }}
+                            />
+                            <div>
+                              <p className="font-bold text-xs text-zinc-900 dark:text-white">{sub.storeName}</p>
+                              {sub.url && (
+                                <a
+                                  href={sub.url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline truncate max-w-[160px] block font-mono"
+                                >
+                                  {sub.url.replace(/^https?:\/\//, "")}
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        </TableCell>
+
+                        <TableCell>
+                          <div className="inline-flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-md border border-zinc-200 dark:border-zinc-700">
+                            <span className="font-mono text-xs font-bold text-zinc-900 dark:text-white">{sub.code}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleCopy(sub.code)}
+                              title="Copy code"
+                              className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white cursor-pointer"
+                            >
+                              {copiedCode === sub.code ? <CheckIcon className="h-3 w-3 text-emerald-600" /> : <CopyIcon className="h-3 w-3" />}
+                            </button>
+                          </div>
+                        </TableCell>
+
+                        <TableCell>
+                          <p className="text-xs font-bold text-zinc-900 dark:text-white max-w-xs">{sub.discount || "Verified Deal"}</p>
+                          {sub.terms && <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate max-w-xs">{sub.terms}</p>}
+                        </TableCell>
+
+                        <TableCell>
+                          <span className="inline-block rounded-md bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[10px] font-medium text-zinc-600 dark:text-zinc-300">
+                            {sub.category || "General"}
+                          </span>
+                        </TableCell>
+
+                        <TableCell>
+                          <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{sub.email || "Anonymous Guest"}</p>
+                          <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
+                            {new Date(sub.submittedAt).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </p>
+                        </TableCell>
+
+                        <TableCell>
+                          <span
+                            className={`inline-block rounded-md px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                              isApproved
+                                ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
+                                : isRejected
+                                ? "bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300 border border-rose-200 dark:border-rose-800"
+                                : "bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
+                            }`}
+                          >
+                            {sub.status}
+                          </span>
+                        </TableCell>
+
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            {isPending && (
+                              <Button
+                                size="sm"
+                                onClick={() => handleQuickApprove(sub)}
+                                className="h-7 px-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg cursor-pointer shadow-2xs"
+                                title="Approve and publish to live deals feed"
+                              >
+                                Approve
+                              </Button>
+                            )}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleOpenEdit(sub)}
+                              className="h-7 px-2.5 text-xs rounded-lg cursor-pointer"
+                            >
+                              Review &amp; Edit
+                            </Button>
+                            {isPending && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleOpenReject(sub)}
+                                className="h-7 px-2 text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs rounded-lg cursor-pointer"
+                              >
+                                Reject
+                              </Button>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteClick(sub.id)}
+                              className="h-7 px-2 text-zinc-400 hover:text-rose-600 text-xs rounded-lg cursor-pointer"
+                              title="Delete permanently"
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-12 text-zinc-500 dark:text-zinc-400 text-xs">
+                      {loading ? "Loading community submissions..." : "No coupon submissions found matching criteria."}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
       {/* Edit & Approve Modal */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="max-w-xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white p-6">
-          <DialogHeader>
-            <DialogTitle className="text-zinc-900 dark:text-white">Review & Edit Submission</DialogTitle>
-            <DialogDescription className="text-zinc-600 dark:text-zinc-400 text-xs">
-              Adjust coupon code, discount text, or expiry date before approving to live GoCoupon feed.
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="max-w-xl max-h-[calc(100dvh-3rem)] flex flex-col p-0 overflow-hidden bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white shadow-2xl">
+          {/* Fixed Header */}
+          <div className="px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between gap-4">
+            <div className="space-y-0.5">
+              <DialogTitle className="text-base font-bold text-zinc-900 dark:text-white">Review &amp; Edit Submission</DialogTitle>
+              <DialogDescription className="text-zinc-500 dark:text-zinc-400 text-xs">
+                Adjust coupon code, discount text, or expiry date before approving to live GoCoupon feed.
+              </DialogDescription>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 shrink-0 cursor-pointer"
+              onClick={() => setEditOpen(false)}
+            >
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </Button>
+          </div>
 
-          <div className="grid gap-3.5 mt-2">
+          {/* Scrollable Body */}
+          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3.5">
             <div className="grid grid-cols-2 gap-3">
               <label className="grid gap-1 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
                 Store Name
@@ -572,7 +581,7 @@ export default function AdminSubmissionsManager() {
             </label>
 
             <label className="grid gap-1 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-              Terms & Conditions
+              Terms &amp; Conditions
               <Input
                 value={editForm.terms}
                 onChange={(e) => setEditForm((prev) => ({ ...prev, terms: e.target.value }))}
@@ -582,14 +591,15 @@ export default function AdminSubmissionsManager() {
             </label>
           </div>
 
-          <div className="flex items-center justify-end gap-2.5 mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-            <Button variant="ghost" size="sm" onClick={() => setEditOpen(false)} className="text-xs">
+          {/* Sticky Footer */}
+          <div className="px-6 py-3.5 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/40 flex items-center justify-end gap-2.5">
+            <Button variant="ghost" size="sm" onClick={() => setEditOpen(false)} className="text-xs cursor-pointer">
               Cancel
             </Button>
-            <Button variant="outline" size="sm" onClick={() => handleSaveEdit(false)} className="text-xs font-semibold">
+            <Button variant="outline" size="sm" onClick={() => handleSaveEdit(false)} className="text-xs font-semibold cursor-pointer">
               Save Changes
             </Button>
-            <Button size="sm" onClick={() => handleSaveEdit(true)} className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">
+            <Button size="sm" onClick={() => handleSaveEdit(true)} className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs cursor-pointer">
               Save &amp; Approve to Live Pool
             </Button>
           </div>

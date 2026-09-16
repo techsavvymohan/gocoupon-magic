@@ -257,9 +257,9 @@ export default function AdminEventsManager() {
         <DialogContent
           titleId={titleId}
           descriptionId={descriptionId}
-          className="max-w-5xl rounded-[30px] border border-[var(--border)] bg-[var(--surface)] p-0"
+          className="max-h-[calc(100vh-2rem)] max-w-5xl overflow-hidden rounded-[30px] border border-[var(--border)] bg-[var(--surface)] p-0 sm:max-h-[calc(100vh-3rem)]"
         >
-          <div className="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-h-[calc(100vh-3rem)] lg:grid lg:grid-cols-[0.9fr_1.1fr]">
             <div className="border-b border-[var(--border)] bg-[linear-gradient(180deg,var(--surface-soft),var(--surface))] p-6 lg:border-r lg:border-b-0 lg:p-8">
               <DialogHeader className="mb-6">
                 <Badge className="w-fit border border-[var(--color-primary)]/20 bg-[var(--surface)] px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-[var(--color-primary)]">

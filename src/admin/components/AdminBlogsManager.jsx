@@ -337,106 +337,108 @@ export default function AdminBlogsManager() {
         </CardHeader>
 
         <CardContent className="pt-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-zinc-50/80 dark:bg-zinc-800/60 border-b border-zinc-200 dark:border-zinc-800">
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Article Title &amp; Cover</TableHead>
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Category</TableHead>
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Author</TableHead>
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Read Time</TableHead>
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Status</TableHead>
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredBlogs.length > 0 ? (
-                filteredBlogs.map((blog) => (
-                  <TableRow key={blog.id || blog.slug} className="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40 transition border-b border-zinc-100 dark:border-zinc-800/60">
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-12 w-16 shrink-0 items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-2xs">
-                          {blog.image ? (
-                            <img src={blog.image} alt={blog.title} className="h-full w-full object-cover" />
-                          ) : (
-                            <span className="text-[10px] font-black text-zinc-600 dark:text-zinc-400">BLOG</span>
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-bold text-zinc-900 dark:text-white text-xs truncate max-w-md">{blog.title}</p>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">/blog/{blog.slug}</span>
-                            <a
-                              href={`/blog/${blog.slug}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center gap-1 text-[10.5px] font-semibold text-blue-600 dark:text-blue-400 hover:underline"
-                              title="View live article on storefront"
-                            >
-                              <span>View Live</span>
-                              <ExternalLinkIcon className="h-2.5 w-2.5" />
-                            </a>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-zinc-50/80 dark:bg-zinc-800/60 border-b border-zinc-200 dark:border-zinc-800">
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Article Title &amp; Cover</TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Category</TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Author</TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Read Time</TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Status</TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredBlogs.length > 0 ? (
+                  filteredBlogs.map((blog) => (
+                    <TableRow key={blog.id || blog.slug} className="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40 transition border-b border-zinc-100 dark:border-zinc-800/60">
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-12 w-16 shrink-0 items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-2xs">
+                            {blog.image ? (
+                              <img src={blog.image} alt={blog.title} className="h-full w-full object-cover" />
+                            ) : (
+                              <span className="text-[10px] font-black text-zinc-600 dark:text-zinc-400">BLOG</span>
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-zinc-900 dark:text-white text-xs truncate max-w-md">{blog.title}</p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">/blog/{blog.slug}</span>
+                              <a
+                                href={`/blog/${blog.slug}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1 text-[10.5px] font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+                                title="View live article on storefront"
+                              >
+                                <span>View Live</span>
+                                <ExternalLinkIcon className="h-2.5 w-2.5" />
+                              </a>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </TableCell>
+                      </TableCell>
 
-                    <TableCell>
-                      <span className="inline-block rounded-md bg-zinc-100 dark:bg-zinc-800 px-2.5 py-0.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200">
-                        {blog.category || "Shopping Guide"}
-                      </span>
-                    </TableCell>
+                      <TableCell>
+                        <span className="inline-block rounded-md bg-zinc-100 dark:bg-zinc-800 px-2.5 py-0.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+                          {blog.category || "Shopping Guide"}
+                        </span>
+                      </TableCell>
 
-                    <TableCell className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
-                      {blog.author || "Editorial"}
-                    </TableCell>
+                      <TableCell className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                        {blog.author || "Editorial"}
+                      </TableCell>
 
-                    <TableCell className="text-xs font-mono text-zinc-600 dark:text-zinc-400">
-                      {blog.readTime || "5 min read"}
-                    </TableCell>
+                      <TableCell className="text-xs font-mono text-zinc-600 dark:text-zinc-400">
+                        {blog.readTime || "5 min read"}
+                      </TableCell>
 
-                    <TableCell>
-                      <span
-                        className={`inline-block rounded-md px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                          blog.status === "Published"
-                            ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
-                            : "bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
-                        }`}
-                      >
-                        {blog.status || "Published"}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleOpenEdit(blog)}
-                          className="h-7 px-2.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg cursor-pointer"
+                      <TableCell>
+                        <span
+                          className={`inline-block rounded-md px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                            blog.status === "Published"
+                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
+                              : "bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
+                          }`}
                         >
-                          Edit
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setDeleteTarget(blog)}
-                          className="h-7 px-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg cursor-pointer"
-                        >
-                          Delete
-                        </Button>
-                      </div>
+                          {blog.status || "Published"}
+                        </span>
+                      </TableCell>
+
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleOpenEdit(blog)}
+                            className="h-7 px-2.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg cursor-pointer"
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setDeleteTarget(blog)}
+                            className="h-7 px-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg cursor-pointer"
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-12 text-zinc-500 dark:text-zinc-400 text-xs">
+                      {loading ? "Loading articles..." : "No articles found matching filters."}
                     </TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-12 text-zinc-500 dark:text-zinc-400 text-xs">
-                    {loading ? "Loading articles..." : "No articles found matching filters."}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 

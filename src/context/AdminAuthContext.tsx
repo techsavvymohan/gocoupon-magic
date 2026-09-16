@@ -5,6 +5,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { type RoleType, getPermissionsForRole } from "@/lib/access-control";
+import { toast } from "sonner";
 
 export interface AdminUser {
   id: string;
@@ -64,11 +65,12 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     const originalFetch = window.fetch;
     window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = typeof input === "string" ? input : input instanceof URL ? input.href : (input as Request).url;
-      if (
+      const isAdminApi =
         typeof url === "string" &&
         (url.startsWith("/api/") || url.includes("/api/")) &&
-        !url.includes("/api/admin/login")
-      ) {
+        !url.includes("/api/admin/login");
+
+      if (isAdminApi) {
         const currentToken = localStorage.getItem(TOKEN_KEY);
         if (currentToken) {
           const headers = new Headers(init?.headers || {});
@@ -78,7 +80,22 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
           init = { ...init, headers };
         }
       }
-      return originalFetch(input, init);
+
+      const response = await originalFetch(input, init);
+
+      if (response.status === 401 && isAdminApi) {
+        try {
+          localStorage.removeItem(TOKEN_KEY);
+          localStorage.removeItem(STORAGE_KEY);
+        } catch {
+          // Ignore storage issues
+        }
+        setUser(null);
+        setToken(null);
+        toast.error("Session expired. Please log in again.");
+      }
+
+      return response;
     };
 
     return () => {

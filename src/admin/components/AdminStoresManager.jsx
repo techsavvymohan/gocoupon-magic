@@ -1,5 +1,5 @@
 import { Image } from "@/admin/compat";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,6 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import BulkStoreImportDialog from "./BulkStoreImportDialog";
 import { cn } from "@/lib/utils";
 import { DEFAULT_COUNTRY_CODE, SUPPORTED_COUNTRIES, sanitizeCountryList } from "@/lib/countries";
+import { Search, X } from "lucide-react";
 
 const MAX_LOGO_SIZE = 2 * 1024 * 1024;
 const ACCEPTED_LOGO_TYPES = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
@@ -213,11 +214,22 @@ export default function AdminStoresManager() {
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [selectedStoreSlugs, setSelectedStoreSlugs] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const slugEditedRef = useRef(false);
   const logoTextEditedRef = useRef(false);
   const fileInputRef = useRef(null);
   const descriptionRef = useRef(null);
   const { titleId, descriptionId } = useDialogA11yIds();
+
+  const filteredStores = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return stores;
+    return stores.filter((s) =>
+      s.name?.toLowerCase().includes(q) ||
+      s.slug?.toLowerCase().includes(q) ||
+      s.category?.toLowerCase().includes(q)
+    );
+  }, [stores, searchQuery]);
 
   const {
     register,
@@ -485,7 +497,7 @@ export default function AdminStoresManager() {
   }
 
   function toggleSelectAllStores() {
-    setSelectedStoreSlugs((current) => (current.length === stores.length ? [] : stores.map((store) => store.slug)));
+    setSelectedStoreSlugs((current) => (current.length === filteredStores.length ? [] : filteredStores.map((store) => store.slug)));
   }
 
   async function handleDeleteConfirmed() {
@@ -526,122 +538,139 @@ export default function AdminStoresManager() {
             <CardDescription>Manage merchant details, slugs, trust signals, and offer coverage.</CardDescription>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="relative w-full sm:w-60">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search stores, slug, category..."
+                className="pl-8 h-9 text-xs bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white"
+              />
+            </div>
             {selectedStoreSlugs.length ? (
-              <Button type="button" variant="outline" className="rounded-lg" onClick={() => setDeleteTarget({ slug: "__bulk__", name: `${selectedStoreSlugs.length} selected stores` })}>
+              <Button type="button" variant="outline" className="rounded-lg text-xs" onClick={() => setDeleteTarget({ slug: "__bulk__", name: `${selectedStoreSlugs.length} selected stores` })}>
                 Delete Selected ({selectedStoreSlugs.length})
               </Button>
             ) : null}
-            <Button type="button" variant="ghost" size="sm" className="h-10 w-10 rounded-lg border border-[var(--border)] px-0" onClick={loadStores} aria-label="Refresh stores">
+            <Button type="button" variant="ghost" size="sm" className="h-9 w-9 rounded-lg border border-[var(--border)] px-0" onClick={loadStores} aria-label="Refresh stores">
               <RefreshIcon />
             </Button>
-            <Button type="button" onClick={openCreateModal}>
+            <Button type="button" onClick={openCreateModal} className="h-9 text-xs font-bold">
               Add New Store
             </Button>
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-zinc-100/90 dark:bg-zinc-800/80 border-b border-zinc-200 dark:border-zinc-800">
-                <TableHead className="w-14">
-                  <label className="flex items-center justify-center">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 accent-emerald-600 cursor-pointer"
-                      checked={stores.length > 0 && selectedStoreSlugs.length === stores.length}
-                      onChange={toggleSelectAllStores}
-                      aria-label="Select all stores"
-                    />
-                  </label>
-                </TableHead>
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Store Name</TableHead>
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Slug</TableHead>
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Category</TableHead>
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Country</TableHead>
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Offers Count</TableHead>
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Trust Signal</TableHead>
-                <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {stores.map((store) => (
-                <TableRow key={store.slug} className="hover:bg-zinc-50/60 dark:hover:bg-zinc-800/40 transition border-b border-zinc-100 dark:border-zinc-800">
-                  <TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-zinc-100/90 dark:bg-zinc-800/80 border-b border-zinc-200 dark:border-zinc-800">
+                  <TableHead className="w-14">
                     <label className="flex items-center justify-center">
                       <input
                         type="checkbox"
-                        className="h-4 w-4 rounded border-zinc-300 accent-emerald-600 cursor-pointer"
-                        checked={selectedStoreSlugs.includes(store.slug)}
-                        onChange={() => toggleStoreSelection(store.slug)}
-                        aria-label={`Select ${store.name}`}
+                        className="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 accent-emerald-600 cursor-pointer"
+                        checked={filteredStores.length > 0 && selectedStoreSlugs.length === filteredStores.length}
+                        onChange={toggleSelectAllStores}
+                        aria-label="Select all stores"
                       />
                     </label>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white border border-zinc-200 overflow-hidden shadow-2xs">
-                        {store.logoImage ? (
-                          <img src={store.logoImage} alt={store.name} className="h-6 w-6 object-contain" />
-                        ) : (
-                          <span className="text-xs font-black text-zinc-700">{store.logoText || store.name?.charAt(0) || "S"}</span>
-                        )}
-                      </div>
-                      <span className="font-bold text-zinc-900 text-xs">{store.name}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-mono text-xs text-zinc-600">/{store.slug}</TableCell>
-                  <TableCell>
-                    <span className="inline-block rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-semibold text-zinc-800">
-                      {store.category || "General"}
-                    </span>
-                  </TableCell>
-                  <TableCell className="font-xs font-bold text-zinc-700 dark:text-zinc-300">
-                    <span className="inline-block rounded-md bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                      Global
-                    </span>
-                  </TableCell>
-                  <TableCell className="font-mono text-xs font-extrabold text-emerald-700">
-                    {store.offersCount || 0}
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-block rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                        store.trustStatus === "Verified" || store.trustStatus === "Active"
-                          ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                          : store.trustStatus === "Trusted"
-                          ? "bg-blue-100 text-blue-800 border border-blue-200"
-                          : "bg-amber-100 text-amber-800 border border-amber-200"
-                      }`}
-                    >
-                      {store.trustStatus || "Active"}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1.5">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-8 px-3 text-xs font-semibold text-zinc-700 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition"
-                        onClick={() => openEditModal(store)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 px-2.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition"
-                        onClick={() => openDeleteModal(store)}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </TableCell>
+                  </TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Store Name</TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Slug</TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Category</TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Country</TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Offers Count</TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Trust Signal</TableHead>
+                  <TableHead className="text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredStores.map((store) => (
+                  <TableRow key={store.slug} className="hover:bg-zinc-50/60 dark:hover:bg-zinc-800/40 transition border-b border-zinc-100 dark:border-zinc-800">
+                    <TableCell>
+                      <label className="flex items-center justify-center">
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 accent-emerald-600 cursor-pointer"
+                          checked={selectedStoreSlugs.includes(store.slug)}
+                          onChange={() => toggleStoreSelection(store.slug)}
+                          aria-label={`Select ${store.name}`}
+                        />
+                      </label>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-2xs">
+                          {store.logoImage ? (
+                            <img src={store.logoImage} alt={store.name} className="h-6 w-6 object-contain" />
+                          ) : (
+                            <span className="text-xs font-black text-zinc-700 dark:text-zinc-200">{store.logoText || store.name?.charAt(0) || "S"}</span>
+                          )}
+                        </div>
+                        <span className="font-bold text-zinc-900 dark:text-white text-xs">{store.name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-mono text-xs text-zinc-600 dark:text-zinc-400">/{store.slug}</TableCell>
+                    <TableCell>
+                      <span className="inline-block rounded-md bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 border border-zinc-200/50 dark:border-zinc-700/60">
+                        {store.category || "General"}
+                      </span>
+                    </TableCell>
+                    <TableCell className="font-xs font-bold text-zinc-700 dark:text-zinc-300">
+                      <span className="inline-block rounded-md bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                        Global
+                      </span>
+                    </TableCell>
+                    <TableCell className="font-mono text-xs font-extrabold text-emerald-700 dark:text-emerald-400">
+                      {store.offersCount || 0}
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={`inline-block rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                          store.trustStatus === "Verified" || store.trustStatus === "Active"
+                            ? "bg-emerald-100 text-emerald-800 border border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800"
+                            : store.trustStatus === "Trusted"
+                            ? "bg-blue-100 text-blue-800 border border-blue-200 dark:bg-blue-950/70 dark:text-blue-300 dark:border-blue-800"
+                            : "bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800"
+                        }`}
+                      >
+                        {store.trustStatus || "Active"}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1.5">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-8 px-3 text-xs font-semibold text-zinc-700 dark:text-zinc-200 border-zinc-200 dark:border-zinc-700 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 dark:hover:text-white transition cursor-pointer"
+                          onClick={() => openEditModal(store)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 px-2.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                          onClick={() => openDeleteModal(store)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {stores.length > 0 && filteredStores.length === 0 ? (
+            <div className="py-12 text-center text-xs text-zinc-500 dark:text-zinc-400">
+              No stores match "{searchQuery}".
+            </div>
+          ) : null}
 
           {!stores.length && !isHydrating ? (
             <div className="mt-6 rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface-soft)] px-5 py-6 text-sm text-[var(--muted)]">
@@ -655,8 +684,17 @@ export default function AdminStoresManager() {
         <DialogContent
           titleId={titleId}
           descriptionId={descriptionId}
-          className="max-h-[calc(100vh-2rem)] max-w-5xl overflow-hidden rounded-[30px] border border-[var(--border)] bg-[var(--surface)] p-0 sm:max-h-[calc(100vh-3rem)]"
+          className="relative max-h-[calc(100vh-2rem)] max-w-5xl overflow-hidden rounded-[30px] border border-[var(--border)] bg-[var(--surface)] p-0 sm:max-h-[calc(100vh-3rem)]"
         >
+          {/* Explicit Close Button */}
+          <button
+            type="button"
+            onClick={closeModal}
+            className="absolute top-5 right-5 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-all shadow-sm cursor-pointer"
+            aria-label="Close"
+          >
+            <X className="h-4 w-4" />
+          </button>
           <div className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-h-[calc(100vh-3rem)] lg:grid lg:grid-cols-[0.9fr_1.1fr]">
             <div className="border-b border-[var(--border)] bg-[linear-gradient(180deg,var(--surface-soft),var(--surface))] p-6 lg:border-r lg:border-b-0 lg:p-8">
               <DialogHeader className="mb-8">

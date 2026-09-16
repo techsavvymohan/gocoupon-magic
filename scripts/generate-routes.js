@@ -132,7 +132,6 @@ function renderInterlinkingHub() {
             <li><a href="/price-history" style="color: #cbd5e1; text-decoration: none;">30-Day Price Tracker &amp; History</a></li>
             <li><a href="/deals" style="color: #cbd5e1; text-decoration: none;">Today's Verified Deals</a></li>
             <li><a href="/offers" style="color: #cbd5e1; text-decoration: none;">Exclusive Online Offers</a></li>
-            <li><a href="/ask" style="color: #cbd5e1; text-decoration: none;">AI Shopping Assistant</a></li>
             <li><a href="/extension" style="color: #cbd5e1; text-decoration: none;">Free Browser Extension</a></li>
           </ul>
         </div>
@@ -395,18 +394,6 @@ const routeConfigs = [
         <li>All-time lowest recorded price.</li>
         <li>Price Drop Anomaly Score: A clear badge telling you whether to Buy Now or Wait for a Lower Price.</li>
       </ul>
-    `,
-  },
-  {
-    path: "ask",
-    title: "AI Shopping Assistant & Deal Dossier | GoCoupon",
-    description: "Search any product to get an instant shopping intelligence report: lowest store price, active coupons, 30-day price trends, and best buying verdict.",
-    h1: "Ask GoCoupon Shopping Intelligence Assistant",
-    lead: "Search any gadget or product to generate a real-time price comparison dossier, coupon savings breakdown, and deal verdict.",
-    directAnswer: "The Ask GoCoupon AI Shopping Assistant generates deep product intelligence dossiers: comparing cross-store pricing, checking coupon availability, reviewing 30-day price trends, and delivering clear buying verdicts.",
-    articleContent: `
-      <h2>Intelligent Shopping Queries in Plain English</h2>
-      <p>Instead of opening 15 browser tabs to research a laptop, smartphone, or headphones, ask GoCoupon. Our shopping intelligence AI aggregates merchant catalog data, user reviews, and pricing history into a concise summary.</p>
     `,
   },
   {
@@ -1042,7 +1029,6 @@ const sitemapUrls = allRoutes.map((r) => {
       "price-history",
       "deals",
       "stores",
-      "ask",
       "flipkart-coupons",
       "amazon-coupons",
       "myntra-coupons",

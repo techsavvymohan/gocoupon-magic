@@ -40,9 +40,17 @@ export function MobileStickyCta() {
     }
   };
 
+  // Suppress while cookie consent banner is active to prevent stacking on small screens
+  let hasCookieConsent = true;
+  try {
+    hasCookieConsent = Boolean(localStorage.getItem("gocoupon_cookie_consent"));
+  } catch {
+    hasCookieConsent = true;
+  }
+
   // Don't show on product pages (product pages already have their own dedicated deal action bar)
-  // or if dismissed or not scrolled enough
-  if (isDismissed || !isVisible || pathname.startsWith("/product/")) {
+  // or if dismissed or not scrolled enough or if cookie consent banner is pending
+  if (isDismissed || !isVisible || !hasCookieConsent || pathname.startsWith("/product/")) {
     return null;
   }
 
