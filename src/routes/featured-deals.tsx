@@ -13,7 +13,7 @@
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import {
@@ -90,23 +90,76 @@ const FAQS = [
   },
 ];
 
+function mapDealToFeaturedItem(d: any, index: number): FeaturedDealItem {
+  const priority = d.featuredPriority !== undefined ? Number(d.featuredPriority) : index + 1;
+  const isTop = priority <= 6;
+  return {
+    id: d.id,
+    brandName: d.storeName || d.title,
+    brandSlug: d.storeSlug || (d.storeName || "brand").toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+    campaignId: d.campaignSource ? `${d.campaignSource}-${d.id}` : d.id,
+    category: (d.category as any) || "General",
+    couponCode: d.code || "",
+    discountText: d.discount || (d.code ? "Special Discount" : "Exclusive Deal"),
+    subTitle: d.description || d.title,
+    merchantUrl: d.merchantUrl || d.url || d.link || "https://gocoupon.io",
+    affiliateUrl: d.affiliateLink || d.link || d.url || "https://gocoupon.io",
+    targetCountry: d.targetCountry || "India Eligible",
+    badge: d.badge || (isTop ? "Best Saving" : "Featured Partner"),
+    badgeColor: isTop ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" : undefined,
+    priorityLevel: priority,
+    campaignSource: d.campaignSource || "analytics_clouds",
+    verificationStatus: (d.verificationStatus as any) || (d.verified ? "verified" : "pending_verification"),
+    lastVerifiedAt: d.verifiedDate || "Today",
+    terms: d.terms || "Standard merchant terms apply.",
+    topPriority: isTop,
+  };
+}
+
 function FeaturedDealsPage() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [expandedTermsId, setExpandedTermsId] = useState<string | null>(null);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const [dealsList, setDealsList] = useState<FeaturedDealItem[]>(FEATURED_DEALS_COLLECTION);
+
+  // Dynamic live fetch from /api/offers?featured=true
+  useEffect(() => {
+    let active = true;
+    async function loadLiveFeaturedDeals() {
+      try {
+        const res = await fetch("/api/offers?featured=true", { cache: "no-store" });
+        if (res.ok) {
+          const json = await res.json();
+          const serverItems = json.data || json.deals;
+          if (Array.isArray(serverItems) && serverItems.length > 0 && active) {
+            const mapped = serverItems.map((item: any, idx: number) => mapDealToFeaturedItem(item, idx));
+            mapped.sort((a, b) => a.priorityLevel - b.priorityLevel);
+            setDealsList(mapped);
+          }
+        }
+      } catch {
+        // Retain initial seeded collection
+      }
+    }
+    loadLiveFeaturedDeals();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // Top 6 priority offers
   const topPriorityOffers = useMemo(() => {
-    return FEATURED_DEALS_COLLECTION.filter((d) => d.topPriority).sort(
+    const priorityItems = dealsList.filter((d) => d.topPriority || d.priorityLevel <= 6);
+    return (priorityItems.length > 0 ? priorityItems.slice(0, 6) : dealsList.slice(0, 6)).sort(
       (a, b) => a.priorityLevel - b.priorityLevel
     );
-  }, []);
+  }, [dealsList]);
 
   // Filtered complete directory
   const filteredDirectoryOffers = useMemo(() => {
-    return FEATURED_DEALS_COLLECTION.filter((item) => {
+    return dealsList.filter((item) => {
       const matchesCat =
         selectedCategory === "all" || item.category.toLowerCase() === selectedCategory.toLowerCase();
       const q = searchQuery.trim().toLowerCase();
@@ -118,7 +171,7 @@ function FeaturedDealsPage() {
         item.category.toLowerCase().includes(q);
       return matchesCat && matchesQuery;
     }).sort((a, b) => a.priorityLevel - b.priorityLevel);
-  }, [selectedCategory, searchQuery]);
+  }, [dealsList, selectedCategory, searchQuery]);
 
   // Copy coupon code handler
   const handleCopyCode = (item: FeaturedDealItem, e?: React.MouseEvent) => {
