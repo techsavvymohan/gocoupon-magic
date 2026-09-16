@@ -1,12 +1,17 @@
 # GoCoupon Production Caddy Configuration — Auto SSL via Let's Encrypt
 # Managed on Bluehost Ubuntu 24.04 VPS (50.6.37.40)
 
-# Canonical 301 Redirect: www -> apex
-www.gocoupon.io {
+# Explicit HTTP -> HTTPS 301 Redirect (Resolves MXToolbox 308 warning)
+http://gocoupon.io, http://www.gocoupon.io {
 	redir https://gocoupon.io{uri} permanent
 }
 
-gocoupon.io {
+# Canonical 301 Redirect: https://www.gocoupon.io -> https://gocoupon.io
+https://www.gocoupon.io {
+	redir https://gocoupon.io{uri} permanent
+}
+
+https://gocoupon.io {
 	encode gzip zstd
 
 	reverse_proxy 127.0.0.1:3000
