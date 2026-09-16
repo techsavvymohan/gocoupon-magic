@@ -24,6 +24,11 @@ https://gocoupon.io {
 	}
 }
 
+mta-sts.gocoupon.io {
+	encode gzip zstd
+	reverse_proxy 127.0.0.1:3000
+}
+
 http://50.6.37.40 {
 	encode gzip zstd
 	reverse_proxy 127.0.0.1:3000

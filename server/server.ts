@@ -162,6 +162,23 @@ if (fs.existsSync(distDir)) {
     res.status(404).send("Not found");
   });
 
+  // RFC 8461 MTA-STS policy dedicated route
+  app.get("/.well-known/mta-sts.txt", (_req: Request, res: Response) => {
+    const candidatePaths = [
+      path.resolve(process.cwd(), "public", ".well-known", "mta-sts.txt"),
+      path.resolve(distDir, ".well-known", "mta-sts.txt"),
+      path.resolve(__dirname, "../public/.well-known/mta-sts.txt"),
+    ];
+    for (const target of candidatePaths) {
+      if (fs.existsSync(target)) {
+        res.setHeader("Content-Type", "text/plain; charset=utf-8");
+        res.setHeader("Cache-Control", "public, max-age=86400");
+        return res.send(fs.readFileSync(target, "utf-8"));
+      }
+    }
+    res.status(404).send("Not found");
+  });
+
   // Pre-rendered SEO HTML routes + SPA fallback
   app.use((req: Request, res: Response, next: NextFunction) => {
     // Only handle GET requests for web pages
