@@ -229,8 +229,8 @@ const routeConfigs = [
     path: "featured-deals",
     title: "Featured Deals & Exclusive Coupons | GoCoupon",
     description: "Discover handpicked featured deals, verified coupon codes and exclusive savings from trusted partner brands worldwide. Shop smarter with GoCoupon.",
-    h1: "Featured Deals. Bigger Savings.",
-    lead: "Discover handpicked offers, verified coupon codes and exclusive savings from trusted partner brands worldwide.",
+    h1: "Featured Deals & Exclusive Coupons",
+    lead: "Handpicked verified promo codes from partner brands. Copy code directly and claim instant savings at official merchant checkout.",
     directAnswer: "GoCoupon's Featured Deals collection brings together hand-verified promo codes and limited-time savings from partner networks. Copy coupon codes directly and activate deals at official merchant stores.",
     articleContent: `
       <h2>Curated Featured Partner Deals &amp; Merchandising Hub</h2>

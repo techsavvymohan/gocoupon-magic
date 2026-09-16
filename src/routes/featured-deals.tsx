@@ -243,85 +243,30 @@ function FeaturedDealsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />
 
-      {/* ── 1. Hero Section ────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-card/80 via-background to-background px-4 pb-14 pt-16 sm:px-6 sm:pb-20 sm:pt-24">
-        <div className="mx-auto max-w-5xl text-center">
-          {/* Badge */}
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 font-mono text-xs font-semibold uppercase tracking-widest text-primary shadow-xs">
-            <Tag className="h-3.5 w-3.5 text-primary" />
-            Curated Merchandising Hub
-          </div>
-
-          <h1 className="font-display text-4xl font-extrabold tracking-tight text-foreground sm:text-6xl sm:leading-[1.15]">
-            Featured Deals. Bigger Savings.
-          </h1>
-
-          <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Discover handpicked offers, verified coupon codes and exclusive savings from trusted
-            brands worldwide.
-          </p>
-
-          {/* Action CTAs */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-            <a
-              href="#top-offers"
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-primary-foreground shadow-md transition-all hover:opacity-95 hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <span>Explore Top Offers</span>
-              <ArrowRight className="h-4 w-4" />
-            </a>
-            <a
-              href="#all-deals"
-              className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-6 py-3.5 text-sm font-semibold text-foreground shadow-xs transition-all hover:bg-muted/50 hover:border-border/80"
-            >
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <span>Browse All Deals</span>
-            </a>
-          </div>
-
-          {/* Trust / Value Strip */}
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-y-2 gap-x-6 border-t border-border/60 pt-6 font-mono text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-emerald-500" />
-              Verified offers
-            </span>
-            <span className="hidden text-border sm:inline">•</span>
-            <span className="inline-flex items-center gap-1.5">
-              <Globe className="h-4 w-4 text-sky-500" />
-              Direct merchant links
-            </span>
-            <span className="hidden text-border sm:inline">•</span>
-            <span className="inline-flex items-center gap-1.5">
-              <CheckCircle2 className="h-4 w-4 text-indigo-500" />
-              Easy coupon redemption
-            </span>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 2. Featured Partner Campaign Showcase ─────────────────────────── */}
-      <section className="border-b border-border bg-muted/20 px-4 py-8 sm:px-6">
+      {/* ── Compact Header & Page Title ──────────────────────────────────────── */}
+      <section className="border-b border-border/80 bg-card/40 px-4 py-5 sm:px-6">
         <div className="mx-auto max-w-6xl">
-          <div className="rounded-2xl border border-border/80 bg-card p-6 sm:p-8 shadow-sm">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div>
-                <div className="inline-flex items-center gap-2 rounded-md border border-primary/20 bg-primary/10 px-2.5 py-1 text-[11px] font-mono font-semibold uppercase tracking-wider text-primary">
-                  {FEATURED_CAMPAIGN_INFO.partnerBadge}
-                </div>
-                <h2 className="mt-2.5 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                  {FEATURED_CAMPAIGN_INFO.campaignName}
-                </h2>
-                <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-                  {FEATURED_CAMPAIGN_INFO.campaignSubtitle} Copy your coupon code and shop directly
-                  from the official merchant website.
-                </p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <div className="inline-flex items-center gap-2 font-mono text-[11px] font-semibold text-primary">
+                <Tag className="h-3 w-3 text-primary" />
+                <span className="uppercase tracking-wider">{FEATURED_CAMPAIGN_INFO.partnerBadge}</span>
+                <span className="text-muted-foreground">•</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold">100% Hand-Verified</span>
               </div>
-              <div className="shrink-0">
-                <div className="rounded-xl border border-border bg-muted/40 px-4 py-3 text-center sm:text-right">
-                  <div className="font-mono text-xs text-muted-foreground">Campaign Status</div>
-                  <div className="mt-0.5 font-display text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                    Live &amp; Verified Today
-                  </div>
+              <h1 className="font-display text-xl sm:text-2xl font-extrabold tracking-tight text-foreground mt-0.5">
+                Featured Deals &amp; Exclusive Coupons
+              </h1>
+              <p className="text-xs text-muted-foreground max-w-xl mt-0.5">
+                Handpicked verified promo codes from partner brands. Copy code directly and claim instant savings at official merchant checkout.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="rounded-xl border border-border bg-card px-3.5 py-1.5 shadow-2xs">
+                <div className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Verified Offers</div>
+                <div className="font-display text-sm font-bold text-foreground">
+                  {dealsList.length} Active Deals
                 </div>
               </div>
             </div>
@@ -329,20 +274,20 @@ function FeaturedDealsPage() {
         </div>
       </section>
 
-      {/* ── 3. Top Priority Offers (Top 6) ─────────────────────────────────── */}
-      <section id="top-offers" className="border-b border-border px-4 py-16 sm:px-6">
+      {/* ── Top Priority Offers (Top 6) ─────────────────────────────────── */}
+      <section id="top-offers" className="border-b border-border px-4 py-8 sm:px-6">
         <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 pb-5">
             <div>
-              <div className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-primary">
+              <div className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-primary">
                 <Flame className="h-3.5 w-3.5 text-primary" />
-                Handpicked Savings
+                <span>Top Priority</span>
               </div>
-              <h2 className="mt-1 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              <h2 className="mt-0.5 font-display text-lg sm:text-xl font-bold tracking-tight text-foreground">
                 Top Featured Offers
               </h2>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               Highest-converting promo codes with immediate checkout eligibility.
             </p>
           </div>
