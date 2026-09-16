@@ -251,6 +251,7 @@ dealsRouter.get("/", async (req: Request, res: Response) => {
   const letter = (req.query.letter as string)?.trim().toUpperCase() ?? "";
   const festive = req.query.festive === "true" || req.query.festive === "1";
   const featured = req.query.featured !== undefined ? req.query.featured === "true" || req.query.featured === "1" : undefined;
+  const includeExpired = req.query.includeExpired === "true" || req.query.includeExpired === "1";
   const city = (req.query.city as string) ?? "";
   const badge = (req.query.badge as DealBadge) ?? undefined;
   const sortBy = (req.query.sortBy as any) || "trending";
@@ -260,7 +261,7 @@ dealsRouter.get("/", async (req: Request, res: Response) => {
   const rawOffset = parseInt(req.query.offset as string, 10);
   const offset = isNaN(rawOffset) || rawOffset < 0 ? 0 : rawOffset;
 
-  const cacheKey = `deals:${category}:${store}:${brand}:${letter}:${festive}:${featured}:${city}:${badge ?? "all"}:${q.toLowerCase()}:${sortBy}:${order}:${limit}:${offset}`;
+  const cacheKey = `deals:${category}:${store}:${brand}:${letter}:${festive}:${featured}:${includeExpired}:${city}:${badge ?? "all"}:${q.toLowerCase()}:${sortBy}:${order}:${limit}:${offset}`;
   const cachedData = await globalCache.get<any>(cacheKey);
 
   if (cachedData) {
@@ -273,9 +274,9 @@ dealsRouter.get("/", async (req: Request, res: Response) => {
     // 1. Ingest live Cuelinks deals from 24/7 memory pool (existing + live + new deals)
     const livePool = getLiveDealsPool();
 
-    // 2. Query, filter, sort and paginate (with automatic expired pruning)
+    // 2. Query, filter, sort and paginate (with automatic expired pruning unless includeExpired is true)
     const result = queryDeals(
-      { category, q, store, brand, letter, festive, featured, city, badge, sortBy, order, limit, offset },
+      { category, q, store, brand, letter, festive, featured, includeExpired, city, badge, sortBy, order, limit, offset },
       livePool
     );
 

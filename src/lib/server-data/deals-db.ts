@@ -324,6 +324,7 @@ export function queryDeals(
     letter?: string;
     festive?: boolean;
     featured?: boolean;
+    includeExpired?: boolean;
     city?: string;
     badge?: DealBadge;
     sortBy?: DealSortOption;
@@ -336,15 +337,17 @@ export function queryDeals(
   const now = Date.now();
   let results = customDeals ? [...customDeals] : getLiveDeals();
 
-  // Enforce dynamic expiry pruning so expired deals are never returned
-  results = results.filter((d) => {
-    if (d.expiresIn === "Expired") return false;
-    if (d.endDate) {
-      const end = new Date(d.endDate).getTime();
-      if (!isNaN(end) && end < now) return false;
-    }
-    return true;
-  });
+  // Enforce dynamic expiry pruning so expired deals are never returned (unless admin explicitly includes expired)
+  if (!options.includeExpired) {
+    results = results.filter((d) => {
+      if (d.expiresIn === "Expired") return false;
+      if (d.endDate) {
+        const end = new Date(d.endDate).getTime();
+        if (!isNaN(end) && end < now) return false;
+      }
+      return true;
+    });
+  }
 
   // Filter by featured status
   if (options.featured !== undefined) {

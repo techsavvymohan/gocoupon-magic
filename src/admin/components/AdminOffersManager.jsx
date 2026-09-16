@@ -6,7 +6,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { MousePointerClick, TrendingUp } from "lucide-react";
+import { ExternalLink, MousePointerClick, TrendingUp } from "lucide-react";
+import { toast } from "sonner";
 import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 import BulkCouponImportDialog from "./BulkCouponImportDialog";
 
@@ -182,9 +183,41 @@ export default function AdminOffersManager() {
         setOffers((prev) =>
           prev.map((o) => (o.id === offer.id ? { ...o, isFeatured: nextFeatured } : o))
         );
+        toast.success(nextFeatured ? `Promoted "${offer.title}" to Featured Deals` : `Removed "${offer.title}" from Featured Deals`);
+      } else {
+        toast.error("Failed to update featured status");
       }
     } catch (err) {
       console.error("Toggle featured failed:", err);
+      toast.error("Network error updating featured status");
+    }
+  }
+
+  async function handleBulkToggleFeatured(featuredState) {
+    if (!selectedOfferIds.length) return;
+    try {
+      await Promise.all(
+        selectedOfferIds.map(async (id) => {
+          const offer = offers.find((o) => o.id === id);
+          if (!offer) return;
+          await fetch(`/api/offers?id=${encodeURIComponent(id)}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
+            body: JSON.stringify({
+              ...offer,
+              isFeatured: featuredState,
+              featuredPriority: offer.featuredPriority || 10,
+            }),
+          });
+        })
+      );
+      setOffers((prev) =>
+        prev.map((o) => (selectedOfferIds.includes(o.id) ? { ...o, isFeatured: featuredState } : o))
+      );
+      toast.success(featuredState ? `Marked ${selectedOfferIds.length} offers as Featured` : `Removed ${selectedOfferIds.length} offers from Featured`);
+    } catch (err) {
+      console.error("Bulk toggle featured failed:", err);
+      toast.error("Failed to update selected offers");
     }
   }
 
@@ -206,10 +239,12 @@ export default function AdminOffersManager() {
 
     if (!response.ok) {
       setError(payload.error || "Unable to save offer.");
+      toast.error(payload.error || "Unable to save offer.");
       setIsSubmitting(false);
       return;
     }
 
+    toast.success(editingOffer ? "Offer updated successfully" : "New offer created successfully");
     await loadData();
     setOpen(false);
     setForm(initialForm);
@@ -310,7 +345,19 @@ export default function AdminOffersManager() {
       <Card>
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <CardTitle>Coupons & Deals Management</CardTitle>
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <CardTitle>Coupons & Deals Management</CardTitle>
+              <a
+                href="/featured-deals"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20 transition"
+                title="View live /featured-deals page in a new tab"
+              >
+                <span>Live /featured-deals</span>
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
             <CardDescription>Manage verified promo codes, discount deals, featured campaigns, and redemption clicks.</CardDescription>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -360,9 +407,37 @@ export default function AdminOffersManager() {
             </div>
 
             {selectedOfferIds.length ? (
-              <Button type="button" variant="outline" className="rounded-xl dark:bg-zinc-800 dark:border-zinc-700 text-rose-600 dark:text-rose-400" onClick={() => setDeleteTarget({ id: "__bulk__", title: `${selectedOfferIds.length} selected offers` })}>
-                Delete Selected ({selectedOfferIds.length})
-              </Button>
+              <div className="flex items-center gap-1.5">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 text-xs font-semibold h-9"
+                  onClick={() => handleBulkToggleFeatured(true)}
+                  title="Mark selected offers as featured"
+                >
+                  ★ Feature ({selectedOfferIds.length})
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 text-xs font-semibold h-9"
+                  onClick={() => handleBulkToggleFeatured(false)}
+                  title="Remove featured status from selected offers"
+                >
+                  Unfeature ({selectedOfferIds.length})
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-400 text-xs font-semibold h-9"
+                  onClick={() => setDeleteTarget({ id: "__bulk__", title: `${selectedOfferIds.length} selected offers` })}
+                >
+                  Delete ({selectedOfferIds.length})
+                </Button>
+              </div>
             ) : null}
             <Button
               type="button"
