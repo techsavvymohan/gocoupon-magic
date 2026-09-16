@@ -331,8 +331,8 @@ export default function AdminOffersManager() {
   const sortedOffers = useMemo(() => {
     if (!sortByClicks) return filteredOffers;
     return [...filteredOffers].sort((a, b) => {
-      const aClicks = clickCounts[a.id] || a.usesCount || 0;
-      const bClicks = clickCounts[b.id] || b.usesCount || 0;
+      const aClicks = clickCounts[a.id] || 0;
+      const bClicks = clickCounts[b.id] || 0;
       return bClicks - aClicks;
     });
   }, [filteredOffers, sortByClicks, clickCounts]);
@@ -561,7 +561,7 @@ export default function AdminOffersManager() {
                     <TableCell>
                       <span className="inline-flex items-center gap-1 font-mono text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-1 rounded-md border border-emerald-200 dark:border-emerald-800">
                         <MousePointerClick className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-                        <span>{(clickCounts[offer.id] || offer.usesCount || 0).toLocaleString()}</span>
+                        <span>{(clickCounts[offer.id] || 0).toLocaleString()}</span>
                       </span>
                     </TableCell>
                     <TableCell className="text-right">

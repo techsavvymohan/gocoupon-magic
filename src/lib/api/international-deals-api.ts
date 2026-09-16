@@ -35,7 +35,7 @@ export const FALLBACK_INTERNATIONAL_DEALS: Deal[] = [
     minOrder: "$20",
     terms: "Valid on all Choice-selected global items with worldwide expedited shipping.",
     link: "https://www.aliexpress.com",
-    usesCount: 4820,
+    usesCount: 0,
   },
   {
     id: "intl-deal-booking-01",
@@ -53,7 +53,7 @@ export const FALLBACK_INTERNATIONAL_DEALS: Deal[] = [
     minOrder: "$50",
     terms: "Discount applied directly to participating hotels and resort stays worldwide.",
     link: "https://www.booking.com",
-    usesCount: 3210,
+    usesCount: 0,
   },
   {
     id: "intl-deal-samsung-01",
@@ -71,7 +71,7 @@ export const FALLBACK_INTERNATIONAL_DEALS: Deal[] = [
     minOrder: "$500",
     terms: "Enter promo code at checkout on authorized Samsung global merchant storefronts.",
     link: "https://www.samsung.com",
-    usesCount: 1980,
+    usesCount: 0,
   },
   {
     id: "intl-deal-lenovo-01",
@@ -89,7 +89,7 @@ export const FALLBACK_INTERNATIONAL_DEALS: Deal[] = [
     minOrder: "$400",
     terms: "Stackable with eCoupon offers on select customizable laptop orders.",
     link: "https://www.lenovo.com",
-    usesCount: 1540,
+    usesCount: 0,
   },
   {
     id: "intl-deal-adobe-01",
@@ -107,7 +107,7 @@ export const FALLBACK_INTERNATIONAL_DEALS: Deal[] = [
     minOrder: "$30",
     terms: "Applies to new individual subscribers on Creative Cloud annual paid monthly plans.",
     link: "https://www.adobe.com",
-    usesCount: 2890,
+    usesCount: 0,
   },
   {
     id: "intl-deal-shein-01",
@@ -125,7 +125,7 @@ export const FALLBACK_INTERNATIONAL_DEALS: Deal[] = [
     minOrder: "$79",
     terms: "Applicable on women, men, curve, and home accessories worldwide.",
     link: "https://www.shein.com",
-    usesCount: 6540,
+    usesCount: 0,
   },
   {
     id: "intl-deal-hostinger-01",
@@ -143,7 +143,7 @@ export const FALLBACK_INTERNATIONAL_DEALS: Deal[] = [
     minOrder: "$35",
     terms: "Includes free SSL certificate, weekly backups, and free business email.",
     link: "https://www.hostinger.com",
-    usesCount: 4120,
+    usesCount: 0,
   },
   {
     id: "intl-deal-trip-01",
@@ -161,7 +161,7 @@ export const FALLBACK_INTERNATIONAL_DEALS: Deal[] = [
     minOrder: "$200",
     terms: "Valid on all major international airline routes departing from any hub.",
     link: "https://www.trip.com",
-    usesCount: 1870,
+    usesCount: 0,
   },
 ];
 

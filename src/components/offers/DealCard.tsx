@@ -1,5 +1,5 @@
 import React from "react";
-import { Clock, Users, ChevronDown } from "lucide-react";
+import { Clock, Users, ChevronDown, ShieldCheck } from "lucide-react";
 import { StoreLogo } from "@/components/common/StoreLogo";
 import { RedeemCouponButton } from "@/components/common/RedeemCouponButton";
 import { buildDealRedirectUrl, wrapAffiliateTracking } from "@/lib/services/store-registry";
@@ -108,10 +108,17 @@ export const DealCard = React.memo(function DealCard({
                 <Clock className="h-3 w-3 text-sky-400" />
                 <span>{deal.expiresIn}</span>
               </span>
-              <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-                <Users className="h-3 w-3" />
-                <span>{(deal.usesCount || 1200).toLocaleString()} shoppers saved</span>
-              </span>
+              {Boolean(deal.usesCount && deal.usesCount > 0) ? (
+                <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                  <Users className="h-3 w-3" />
+                  <span>{deal.usesCount.toLocaleString()} shoppers saved</span>
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                  <ShieldCheck className="h-3 w-3" />
+                  <span>Verified Working</span>
+                </span>
+              )}
             </div>
           </div>
         </div>
