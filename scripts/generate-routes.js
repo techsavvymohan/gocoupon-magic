@@ -245,6 +245,24 @@ const routeConfigs = [
         <li><strong>Luxury Fragrances:</strong> Handcrafted pure attars and luxury Eau de Parfum fragrances.</li>
       </ul>
 
+      <h2>Featured Partner Brands &amp; Verified Coupon Codes</h2>
+      <ul style="line-height: 1.8; color: #cbd5e1; padding-left: 20px;">
+        <li><strong>MediBuddy:</strong> Flat 30% OFF online consultations, health checkups &amp; medicines with coupon code <code>ACMB30</code>.</li>
+        <li><strong>FlixBus:</strong> Up to 16.5% OFF intercity luxury bus tickets across India with coupon code <code>FLXCNNXT2E</code>.</li>
+        <li><strong>JBL:</strong> Flat 10% OFF premium audio, headphones &amp; speakers with coupon code <code>FKM23R9GEWF8T</code>.</li>
+        <li><strong>Pure Nutrition:</strong> Flat 10% OFF certified multivitamins &amp; wellness nutrition with coupon code <code>CMPURE10AC</code>.</li>
+        <li><strong>Ajmal Perfumes:</strong> Flat 10% OFF luxury oriental fragrances with coupon code <code>ACAJMAL10</code>.</li>
+        <li><strong>Nasher Miles:</strong> Extra 7% OFF luxury trolley luggage &amp; bags with coupon code <code>CLINK07</code>.</li>
+        <li><strong>Sarkar Perfumes:</strong> 10% OFF pure attars &amp; oud fragrances with coupon code <code>SARKAR10</code>.</li>
+        <li><strong>The Formal Club:</strong> 10% OFF premium tailored men's formal shirts with coupon code <code>TFCFORMAL</code>.</li>
+        <li><strong>QNT Sports India:</strong> 10% OFF sports nutrition &amp; whey supplements with coupon code <code>QNTSAVE</code>.</li>
+        <li><strong>RedBus:</strong> Verified ticket booking discounts on intercity buses with code <code>REDBUSAC</code>.</li>
+        <li><strong>Nakpro Nutrition:</strong> Lab-tested pure protein concentrates &amp; isolates with code <code>NAKPROFIT</code>.</li>
+        <li><strong>Oliveboard:</strong> Test prep series for banking, SSC &amp; competitive exams with code <code>OBMAGIC</code>.</li>
+        <li><strong>Kleenest:</strong> Eco-friendly natural home hygiene products with code <code>KLEEN10</code> (Pending verification).</li>
+        <li><strong>AS-IT-IS Nutrition:</strong> Pure unflavoured whey protein with code <code>ASITISDEAL</code>.</li>
+      </ul>
+
       <h2>How to Redeem Featured Coupon Codes</h2>
       <ol style="line-height: 1.8; color: #cbd5e1; padding-left: 20px;">
         <li>Select your preferred offer from the curated featured deals collection.</li>
