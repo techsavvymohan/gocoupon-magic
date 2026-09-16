@@ -140,6 +140,7 @@ if (fs.existsSync(distDir)) {
     express.static(distDir, {
       maxAge: "1h",
       index: false, // Handle index routing explicitly below
+      redirect: false, // Prevent automatic 301 directory redirects so /route serves immediately
       dotfiles: "allow", // Allow RFC 9116 /.well-known/security.txt
     })
   );
