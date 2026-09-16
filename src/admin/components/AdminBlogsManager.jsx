@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { uploadToCloudinary } from "@/lib/cloudinary";
+import { autoFormatMarkdown, parseMarkdownToSections, FormattedText } from "@/lib/markdown";
 
 const initialForm = {
   title: "",
@@ -86,6 +87,50 @@ export default function AdminBlogsManager() {
   const inlineFileInputRef = useRef(null);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingInline, setUploadingInline] = useState(false);
+  const [editorTab, setEditorTab] = useState("write"); // 'write' | 'preview'
+
+  function handleAutoFormatContent() {
+    if (!form.content || !form.content.trim()) {
+      toast.info("Content is empty — paste your article first.");
+      return;
+    }
+    const formatted = autoFormatMarkdown(form.content);
+    setForm((prev) => ({ ...prev, content: formatted }));
+    toast.success("Article auto-formatted! Cleaned tables, lists, and spacing.");
+  }
+
+  function handleContentPaste(e) {
+    const clipboardData = e.clipboardData || window.clipboardData;
+    if (!clipboardData) return;
+    const pastedText = clipboardData.getData("text");
+    if (!pastedText) return;
+
+    // Check if pasted text looks like markdown with tables, lists, or headers
+    const hasTableOrList =
+      pastedText.includes("|") ||
+      /\d+\.\s+/.test(pastedText) ||
+      /[•–—*]\s+/.test(pastedText) ||
+      pastedText.includes("##");
+
+    if (hasTableOrList) {
+      e.preventDefault();
+      const formatted = autoFormatMarkdown(pastedText);
+      const textarea = textareaRef.current;
+      if (textarea) {
+        const start = textarea.selectionStart || 0;
+        const end = textarea.selectionEnd || 0;
+        const currentContent = form.content || "";
+        const updated = currentContent.substring(0, start) + formatted + currentContent.substring(end);
+        setForm((prev) => ({ ...prev, content: updated }));
+        setTimeout(() => {
+          textarea.selectionStart = textarea.selectionEnd = start + formatted.length;
+        }, 0);
+      } else {
+        setForm((prev) => ({ ...prev, content: formatted }));
+      }
+      toast.success("Article pasted & auto-formatted cleanly!");
+    }
+  }
 
   async function handleCoverFileUpload(e) {
     const file = e.target.files?.[0];
@@ -268,10 +313,16 @@ export default function AdminBlogsManager() {
       const endpoint = editingBlog ? `/api/blogs/${editingBlog.slug}` : "/api/blogs";
       const method = editingBlog ? "PUT" : "POST";
 
+      const cleanedContent = autoFormatMarkdown(form.content || "");
+      const submissionData = {
+        ...form,
+        content: cleanedContent,
+      };
+
       const res = await fetch(endpoint, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(submissionData),
       });
 
       const json = await res.json();
@@ -678,10 +729,44 @@ export default function AdminBlogsManager() {
               />
             </label>
 
-            <div className="grid gap-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-              <div className="flex items-center justify-between">
-                <span>Article Body (Markdown Supported)</span>
-                <div className="flex items-center gap-2">
+            <div className="grid gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg border border-zinc-200 dark:border-zinc-700">
+                  <button
+                    type="button"
+                    onClick={() => setEditorTab("write")}
+                    className={`px-3 py-1 rounded-md text-xs font-bold transition cursor-pointer ${
+                      editorTab === "write"
+                        ? "bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-xs"
+                        : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+                    }`}
+                  >
+                    📝 Write
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditorTab("preview")}
+                    className={`px-3 py-1 rounded-md text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                      editorTab === "preview"
+                        ? "bg-white dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 shadow-xs"
+                        : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+                    }`}
+                  >
+                    <span>👁️ Live Preview</span>
+                    {form.content && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
+                  </button>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={handleAutoFormatContent}
+                    className="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1 hover:bg-amber-100 dark:hover:bg-amber-900/60"
+                    title="Auto-format and clean tables, lists, and spacing"
+                  >
+                    <span>🪄 Auto-Format Text</span>
+                  </button>
+
                   <input
                     type="file"
                     ref={inlineFileInputRef}
@@ -693,28 +778,158 @@ export default function AdminBlogsManager() {
                     type="button"
                     disabled={uploadingInline}
                     onClick={() => inlineFileInputRef.current?.click()}
-                    className="px-2.5 py-1 bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-400 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                    className="px-2.5 py-1 bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-400 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1 disabled:opacity-50 hover:bg-sky-100"
                   >
-                    <span>☁️ {uploadingInline ? "Uploading..." : "Insert Cloudinary Image"}</span>
+                    <span>☁️ {uploadingInline ? "Uploading..." : "Insert Image"}</span>
                   </button>
+
                   <button
                     type="button"
                     onClick={handleOpenLinkModal}
-                    className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5"
+                    className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1 hover:bg-emerald-100"
                   >
                     <span>🔗 Insert Link</span>
                   </button>
                 </div>
               </div>
-              <textarea
-                ref={textareaRef}
-                name="content"
-                rows={10}
-                value={form.content}
-                onChange={handleChange}
-                placeholder="Write your article in Markdown. E.g. ## Heading, 1. List item, **Bold text**."
-                className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 p-3 text-xs text-zinc-900 dark:text-white font-mono outline-none focus:border-emerald-500 resize-y"
-              />
+
+              {editorTab === "write" ? (
+                <div>
+                  <textarea
+                    ref={textareaRef}
+                    name="content"
+                    rows={12}
+                    value={form.content}
+                    onChange={handleChange}
+                    onPaste={handleContentPaste}
+                    placeholder="Paste or write your article in Markdown. E.g. tables (| col | col |), lists (1. step or - bullet), ## Headings, and > [!NOTE] callouts are automatically formatted."
+                    className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 p-3 text-xs text-zinc-900 dark:text-white font-mono outline-none focus:border-emerald-500 resize-y leading-relaxed"
+                  />
+                  <div className="flex items-center justify-between text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">
+                    <span>💡 Pasting text automatically cleans tables, lists, and spacing. Click 🪄 Auto-Format Text anytime.</span>
+                    <span>{form.content ? `${form.content.length} chars` : "0 chars"}</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="w-full min-h-[260px] max-h-[420px] overflow-y-auto rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-900/50 p-4 space-y-4">
+                  {form.content && form.content.trim() ? (
+                    parseMarkdownToSections(form.content).map((sec, idx) => {
+                      if (sec.type === "h2") {
+                        return (
+                          <h2 key={idx} className="font-display text-lg font-bold text-zinc-900 dark:text-white border-b border-zinc-200 dark:border-zinc-800 pb-1 mt-3">
+                            <FormattedText text={sec.text} />
+                          </h2>
+                        );
+                      }
+                      if (sec.type === "h3") {
+                        return (
+                          <h3 key={idx} className="font-display text-base font-bold text-zinc-900 dark:text-white mt-2">
+                            <FormattedText text={sec.text} />
+                          </h3>
+                        );
+                      }
+                      if (sec.type === "p") {
+                        return (
+                          <p key={idx} className="text-xs leading-relaxed text-zinc-700 dark:text-zinc-300">
+                            <FormattedText text={sec.text} />
+                          </p>
+                        );
+                      }
+                      if (sec.type === "table") {
+                        return (
+                          <div key={idx} className="my-2 overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xs">
+                            <table className="w-full text-left text-xs border-collapse">
+                              <thead className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 uppercase font-mono text-[10px]">
+                                <tr>
+                                  {sec.headers.map((h, hIdx) => (
+                                    <th key={hIdx} className="px-3 py-2 font-bold border-b border-zinc-200 dark:border-zinc-700">
+                                      <FormattedText text={h} />
+                                    </th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                                {sec.rows.map((row, rIdx) => (
+                                  <tr key={rIdx} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                                    {row.map((cell, cIdx) => (
+                                      <td key={cIdx} className="px-3 py-2 text-zinc-700 dark:text-zinc-300">
+                                        <FormattedText text={cell} />
+                                      </td>
+                                    ))}
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        );
+                      }
+                      if (sec.type === "ol") {
+                        return (
+                          <ol key={idx} className="list-decimal pl-5 space-y-1 text-xs text-zinc-700 dark:text-zinc-300 marker:font-bold marker:text-emerald-600">
+                            {sec.items.map((it, i) => (
+                              <li key={i}>
+                                <FormattedText text={it} />
+                              </li>
+                            ))}
+                          </ol>
+                        );
+                      }
+                      if (sec.type === "ul") {
+                        return (
+                          <ul key={idx} className="list-disc pl-5 space-y-1 text-xs text-zinc-700 dark:text-zinc-300 marker:text-emerald-600">
+                            {sec.items.map((it, i) => (
+                              <li key={i}>
+                                <FormattedText text={it} />
+                              </li>
+                            ))}
+                          </ul>
+                        );
+                      }
+                      if (sec.type === "callout") {
+                        const isWarn = sec.variant === "warning";
+                        const isSucc = sec.variant === "success";
+                        return (
+                          <div
+                            key={idx}
+                            className={`p-3 rounded-lg border text-xs ${
+                              isWarn
+                                ? "bg-amber-500/10 border-amber-500/30 text-amber-900 dark:text-amber-200"
+                                : isSucc
+                                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-900 dark:text-emerald-200"
+                                : "bg-sky-500/10 border-sky-500/30 text-sky-900 dark:text-sky-200"
+                            }`}
+                          >
+                            {sec.title && (
+                              <strong className="block font-bold mb-1">
+                                <FormattedText text={sec.title} />
+                              </strong>
+                            )}
+                            <p className="leading-relaxed whitespace-pre-line">
+                              <FormattedText text={sec.text} />
+                            </p>
+                          </div>
+                        );
+                      }
+                      if (sec.type === "hr") {
+                        return <hr key={idx} className="my-3 border-zinc-200 dark:border-zinc-700" />;
+                      }
+                      if (sec.type === "image") {
+                        return (
+                          <figure key={idx} className="my-2 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700">
+                            <img src={sec.url} alt={sec.alt || ""} className="max-h-48 w-full object-cover" />
+                            {sec.caption && <figcaption className="p-1.5 text-center text-[10px] text-zinc-400 bg-zinc-100 dark:bg-zinc-800">{sec.caption}</figcaption>}
+                          </figure>
+                        );
+                      }
+                      return null;
+                    })
+                  ) : (
+                    <div className="py-12 text-center text-zinc-400 text-xs">
+                      No article content yet. Switch to the <strong>Write</strong> tab to paste or type your article.
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {error && <p className="text-xs text-rose-600 font-medium">{error}</p>}

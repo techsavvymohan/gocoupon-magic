@@ -3,6 +3,8 @@ export type PostSection =
   | { type: "h2"; text: string }
   | { type: "h3"; text: string }
   | { type: "ul"; items: string[] }
+  | { type: "ol"; items: string[] }
+  | { type: "hr" }
   | { type: "quote"; text: string; cite?: string }
   | { type: "link"; items: Array<{ label: string; to: string }> }
   | { type: "code"; language?: string; code: string; caption?: string }

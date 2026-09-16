@@ -4,6 +4,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { getPostBySlug, posts, type Post, type PostSection } from "@/data/posts";
 import { absoluteUrl, breadcrumbSchema, createSeoHead } from "@/lib/seo";
 import { getOptimizedImageUrl } from "@/lib/cloudinary";
+import { parseMarkdownToSections, FormattedText } from "@/lib/markdown";
 import {
   Copy,
   Check,
@@ -31,16 +32,7 @@ export const Route = createFileRoute("/blog/$slug")({
             const parsedBody: PostSection[] = Array.isArray(b.body) && b.body.length > 0
               ? b.body
               : (b.content
-                  ? b.content.split("\n\n").map((chunk: string) => {
-                      const trimmed = chunk.trim();
-                      if (trimmed.startsWith("## ")) return { type: "h2" as const, text: trimmed.replace(/^##\s+/, "") };
-                      if (trimmed.startsWith("### ")) return { type: "h3" as const, text: trimmed.replace(/^###\s+/, "") };
-                      const imgMatch = trimmed.match(/^!\[(.*?)\]\((.*?)\)$/);
-                      if (imgMatch) {
-                        return { type: "image" as const, caption: imgMatch[1], url: imgMatch[2] };
-                      }
-                      return { type: "p" as const, text: trimmed };
-                    })
+                  ? parseMarkdownToSections(b.content)
                   : [{ type: "p" as const, text: b.shortDescription || b.excerpt || "" }]
                 );
 
@@ -289,34 +281,52 @@ function Section({ section }: { section: PostSection }) {
     case "h2":
       return (
         <h2 className="mt-12 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl border-b border-border/60 pb-3">
-          {section.text}
+          <FormattedText text={section.text} />
         </h2>
       );
     case "h3":
       return (
         <h3 className="mt-8 font-display text-xl font-bold tracking-tight text-foreground">
-          {section.text}
+          <FormattedText text={section.text} />
         </h3>
       );
     case "p":
-      return <p className="text-base leading-7 text-foreground/85">{section.text}</p>;
+      return (
+        <p className="text-base leading-7 text-foreground/85">
+          <FormattedText text={section.text} />
+        </p>
+      );
     case "ul":
       return (
         <ul className="list-disc space-y-2.5 pl-6 text-foreground/85 marker:text-primary">
           {section.items.map((it, i) => (
             <li key={i} className="leading-7">
-              {it}
+              <FormattedText text={it} />
             </li>
           ))}
         </ul>
       );
+    case "ol":
+      return (
+        <ol className="list-decimal space-y-2.5 pl-6 text-foreground/85 marker:text-primary marker:font-bold">
+          {section.items.map((it, i) => (
+            <li key={i} className="leading-7">
+              <FormattedText text={it} />
+            </li>
+          ))}
+        </ol>
+      );
+    case "hr":
+      return <hr className="my-10 border-t border-border/70" />;
     case "quote":
       return (
         <blockquote className="my-6 border border-border/80 bg-muted/20 p-6 text-foreground/90 rounded-2xl">
-          <p className="font-display text-lg italic leading-relaxed text-foreground">“{section.text}”</p>
+          <p className="font-display text-lg italic leading-relaxed text-foreground">
+            “<FormattedText text={section.text} />”
+          </p>
           {section.cite && (
             <cite className="mt-3 block font-mono text-[11px] uppercase tracking-[0.2em] text-primary not-italic">
-              — {section.cite}
+              — <FormattedText text={section.cite} />
             </cite>
           )}
         </blockquote>
@@ -342,14 +352,14 @@ function Section({ section }: { section: PostSection }) {
         <aside className={`my-8 rounded-2xl border p-5 shadow-2xs backdrop-blur-xs ${borderClass}`}>
           <div className="flex items-start gap-3">
             <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${iconColor}`} />
-            <div>
+            <div className="w-full">
               {section.title && (
                 <strong className="block font-display text-sm font-bold text-foreground mb-1">
-                  {section.title}
+                  <FormattedText text={section.title} />
                 </strong>
               )}
               <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-line">
-                {section.text}
+                <FormattedText text={section.text} />
               </p>
             </div>
           </div>
@@ -360,24 +370,24 @@ function Section({ section }: { section: PostSection }) {
       return <CodeBlock code={section.code} language={section.language} caption={section.caption} />;
     case "table":
       return (
-        <div className="my-8 overflow-hidden rounded-2xl border border-border shadow-xs">
+        <div className="my-8 overflow-hidden rounded-2xl border border-border shadow-md bg-card">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-border bg-muted/60 font-mono text-xs uppercase tracking-wider text-muted-foreground">
+            <table className="w-full text-left text-sm border-collapse">
+              <thead className="border-b border-border bg-muted/80 font-mono text-xs uppercase tracking-wider text-foreground">
                 <tr>
                   {section.headers.map((h, i) => (
-                    <th key={i} className="px-5 py-3.5 font-semibold">
-                      {h}
+                    <th key={i} className="px-5 py-3.5 font-bold whitespace-nowrap">
+                      <FormattedText text={h} />
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border bg-card">
+              <tbody className="divide-y divide-border/60">
                 {section.rows.map((row, rIdx) => (
-                  <tr key={rIdx} className="hover:bg-muted/30 transition-colors">
+                  <tr key={rIdx} className="hover:bg-muted/30 transition-colors odd:bg-card even:bg-muted/10">
                     {row.map((cell, cIdx) => (
-                      <td key={cIdx} className="px-5 py-3.5 text-foreground/90 font-medium">
-                        {cell}
+                      <td key={cIdx} className="px-5 py-3.5 text-foreground/90 font-medium leading-relaxed">
+                        <FormattedText text={cell} />
                       </td>
                     ))}
                   </tr>
