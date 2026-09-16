@@ -13,7 +13,7 @@ export function Hero() {
       {/* Curved Transparent Top Banner */}
       <div className="relative w-full flex justify-center bg-transparent">
         <img
-          src="/hero-top-banner.webp"
+          src="https://res.cloudinary.com/pgzfcjir/image/upload/v1789583262/hero-top-banner.webp"
           alt="GoCoupon — Shop Smarter, Pay Less"
           className="w-full h-auto max-h-[140px] sm:max-h-[180px] md:max-h-[220px] lg:max-h-[260px] object-contain object-top"
           width={2048}
