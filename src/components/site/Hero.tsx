@@ -50,8 +50,10 @@ export function Hero() {
 
         {/* Action CTAs */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            to="/chrome-extension"
+          <a
+            href="https://chromewebstore.google.com/detail/gbmfihnboadlmmjbikajlmocjmlpehij"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs sm:text-sm font-bold text-primary-foreground shadow-md shadow-primary/20 transition-all hover:scale-105 active:scale-95 touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
           >
             <img
@@ -65,7 +67,7 @@ export function Hero() {
               height={20}
             />
             <span>Add to Chrome — It&apos;s 100% Free</span>
-          </Link>
+          </a>
           <Link
             to="/offers"
             className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-border bg-card/80 px-5 py-2.5 text-xs sm:text-sm font-semibold text-foreground hover:bg-muted active:scale-95 transition-all shadow-2xs touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
