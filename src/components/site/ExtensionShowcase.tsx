@@ -50,7 +50,7 @@ export function ExtensionShowcase() {
                   <Zap className="h-4 w-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs sm:text-sm font-bold text-foreground">1-Click Auto-Apply</h4>
+                  <h3 className="text-xs sm:text-sm font-bold text-foreground">1-Click Auto-Apply</h3>
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
                     Tests all active codes in under 1.8 seconds and applies the highest net savings automatically.
                   </p>
@@ -62,7 +62,7 @@ export function ExtensionShowcase() {
                   <Ticket className="h-4 w-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs sm:text-sm font-bold text-foreground">Voucher Auto-Clipper</h4>
+                  <h3 className="text-xs sm:text-sm font-bold text-foreground">Voucher Auto-Clipper</h3>
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
                     Spots and auto-clicks hidden discount checkboxes and on-page merchant vouchers.
                   </p>
@@ -74,7 +74,7 @@ export function ExtensionShowcase() {
                   <Percent className="h-4 w-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs sm:text-sm font-bold text-foreground">Bank Card &amp; Financing Stacking</h4>
+                  <h3 className="text-xs sm:text-sm font-bold text-foreground">Bank Card &amp; Financing Stacking</h3>
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
                     Stacks promo codes with eligible HDFC, SBI, ICICI, Chase, Amex &amp; Affirm financing for maximum savings.
                   </p>
@@ -86,7 +86,7 @@ export function ExtensionShowcase() {
                   <ShieldCheck className="h-4 w-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs sm:text-sm font-bold text-foreground">100% Safe &amp; Private</h4>
+                  <h3 className="text-xs sm:text-sm font-bold text-foreground">100% Safe &amp; Private</h3>
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
                     Bank-grade sandboxed security. Zero access to credit cards, passwords, or personal browsing data.
                   </p>
@@ -135,7 +135,10 @@ export function ExtensionShowcase() {
                   <ShoppingBag className="h-3 w-3 text-emerald-500" />
                   <span>flipkart.com/checkout</span>
                 </div>
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" title="Extension Connected" />
+                <span className="relative flex h-2 w-2 shrink-0" title="Extension Connected">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                </span>
               </div>
 
               {/* Extension Popup Card */}
@@ -144,11 +147,12 @@ export function ExtensionShowcase() {
                 <div className="flex items-center justify-between border-b border-border pb-3">
                   <div className="flex items-center gap-2">
                     <img
-                      src="/icons/icon.svg"
+                      src="/icons/icon_48.png"
                       onError={(e) => {
-                        e.currentTarget.src = "/icons/icon_128.png";
+                        e.currentTarget.src = "/gc-logo.webp";
                       }}
-                      alt="GoCoupon"
+                      alt=""
+                      aria-hidden="true"
                       className="h-5 w-5 object-contain"
                       width={20}
                       height={20}
@@ -174,9 +178,9 @@ export function ExtensionShowcase() {
                       <RefreshCw className="h-6 w-6 animate-spin text-primary" />
                     </div>
                     <div>
-                      <h4 className="font-display text-sm font-bold text-foreground">
+                      <p className="font-display text-sm font-bold text-foreground">
                         Testing 8 Verified Codes…
-                      </h4>
+                      </p>
                       <p className="mt-1 font-mono text-[11px] text-muted-foreground">
                         Running code: <span className="font-bold text-primary">FLIPDEAL500</span>
                       </p>

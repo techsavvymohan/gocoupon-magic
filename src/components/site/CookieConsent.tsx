@@ -38,7 +38,7 @@ export function CookieConsent() {
     <aside
       role="region"
       aria-label="Cookie preferences"
-      className="fixed bottom-20 md:bottom-6 left-4 right-4 md:left-auto md:right-6 md:max-w-md z-50 rounded-2xl border border-border/80 bg-card/95 p-4 sm:p-5 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-5 duration-300"
+      className="fixed bottom-20 md:bottom-6 left-4 right-4 md:left-auto md:right-6 md:max-w-md z-50 rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-2xl animate-in fade-in slide-in-from-bottom-5 duration-300"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2.5">

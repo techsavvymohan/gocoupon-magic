@@ -67,11 +67,12 @@ export function Footer() {
                   aria-label="GoCoupon — Home"
                 >
                   <img
-                    src="/icons/icon.svg"
+                    src="/icons/icon_48.png"
                     onError={(e) => {
                       e.currentTarget.src = "/icons/icon_128.png";
                     }}
-                    alt="GoCoupon"
+                    alt=""
+                    aria-hidden="true"
                     className="h-8 w-8 object-contain"
                     width={32}
                     height={32}
@@ -164,7 +165,7 @@ export function Footer() {
                       className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs flex items-center gap-1.5"
                     >
                       <span>B2B Pricing Intelligence</span>
-                      <span className="rounded-full bg-blue-500/15 px-1.5 py-0.5 text-[9px] font-bold text-blue-400">API</span>
+                      <span className="rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 px-1.5 py-0.5 text-[9px] font-bold">API</span>
                     </Link>
                   </li>
                   <li>
@@ -279,7 +280,7 @@ export function Footer() {
           <hr className="my-10 border-neutral-100 dark:border-neutral-800" />
 
           {/* Bottom Copyright, Region Controls & Legal Links */}
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-6 text-xs text-neutral-400 dark:text-neutral-500">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6 text-xs text-neutral-600 dark:text-neutral-400">
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
               <p>© 2026 GoCoupon. {t("footer.allRights", "All rights reserved.")}</p>
               <div className="flex items-center gap-2">
@@ -290,20 +291,20 @@ export function Footer() {
             <div className="flex flex-wrap items-center justify-center gap-6">
               <Link
                 to="/privacy"
-                className="hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
+                className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
               >
                 {t("footer.privacyPolicy", "Privacy Policy")}
               </Link>
               <Link
                 to="/terms"
-                className="hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
+                className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
               >
                 {t("footer.terms", "Terms of Service")}
               </Link>
               <button
                 type="button"
                 onClick={handleOpenCookiePreferences}
-                className="hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
+                className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
               >
                 Cookies Settings
               </button>

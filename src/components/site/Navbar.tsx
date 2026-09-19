@@ -39,8 +39,8 @@ type NavLink = {
 };
 
 const desktopLinks: NavLink[] = [
-  { label: "Offers", to: "/offers", badge: "HOT", badgeColor: "bg-rose-500/15 text-rose-500", i18nKey: "nav.offers" },
-  { label: "Featured Deals", to: "/featured-deals", badge: "TOP", badgeColor: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" },
+  { label: "Offers", to: "/offers", badge: "HOT", badgeColor: "bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 font-semibold", i18nKey: "nav.offers" },
+  { label: "Featured Deals", to: "/featured-deals", badge: "TOP", badgeColor: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 font-semibold", i18nKey: "nav.featuredDeals" },
   { label: "Stores", to: "/stores", i18nKey: "nav.stores" },
   { label: "Extension", to: "/chrome-extension", i18nKey: "nav.extension" },
   { label: "Blog", to: "/blog", i18nKey: "nav.blog" },
@@ -80,7 +80,7 @@ export function Navbar() {
                 src="/gc-logo.webp"
                 alt="GoCoupon"
                 className="h-7 w-auto dark:hidden transition-transform group-hover:scale-105"
-                width={120}
+                width={59}
                 height={28}
                 decoding="async"
                 fetchPriority="high"
@@ -89,7 +89,7 @@ export function Navbar() {
                 src="/gc-logo-dark.webp"
                 alt="GoCoupon"
                 className="hidden h-7 w-auto dark:block transition-transform group-hover:scale-105"
-                width={120}
+                width={58}
                 height={28}
                 decoding="async"
                 fetchPriority="high"

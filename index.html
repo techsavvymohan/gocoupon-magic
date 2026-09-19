@@ -6,7 +6,7 @@
     <!-- HTTP Security & Transport Policies (Fallback & Client-Side Enforcement) -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://utt.impactcdn.com https://www.thunderbolt.com https://www.googletagmanager.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.thunderbolt.com; img-src 'self' data: blob: https: http:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https: wss: http://localhost:* http://127.0.0.1:*; frame-src 'self' https://www.thunderbolt.com https://chromewebstore.google.com; object-src 'none'; base-uri 'self'; upgrade-insecure-requests;"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://utt.impactcdn.com https://www.thunderbolt.com https://www.googletagmanager.com https://apis.google.com https://s.skimresources.com https://*.skimresources.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.thunderbolt.com; img-src 'self' data: blob: https: http:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https: wss: http://localhost:* http://127.0.0.1:*; frame-src 'self' https://www.thunderbolt.com https://chromewebstore.google.com; object-src 'none'; base-uri 'self'; upgrade-insecure-requests;"
     />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -21,31 +21,41 @@
     <!-- Admitad / Mitgo Ad Space verification -->
     <meta name="admitad-verification" content="0826" />
     <meta name="admitad-code" content="0826" />
+    <!-- Impact Verification & Tracking (Non-blocking Lazy Load) -->
     <script type="text/javascript">
-      (function (i, m, p, a, c, t) {
-        c.ire_o = p;
-        c[p] =
-          c[p] ||
-          function () {
-            (c[p].a = c[p].a || []).push(arguments);
-          };
-        t = a.createElement(m);
-        var z = a.getElementsByTagName(m)[0];
-        t.async = 1;
-        t.src = i;
-        z.parentNode.insertBefore(t, z);
-      })(
-        "https://utt.impactcdn.com/P-A7244567-9a72-4f9c-a383-0361e4f6cdaa1.js",
-        "script",
-        "impactStat",
-        document,
-        window,
-      );
-      impactStat("transformLinks");
-      impactStat("trackImpression");
+      window.addEventListener("load", function () {
+        var loadImpact = function () {
+          (function (i, m, p, a, c, t) {
+            c.ire_o = p;
+            c[p] =
+              c[p] ||
+              function () {
+                (c[p].a = c[p].a || []).push(arguments);
+              };
+            t = a.createElement(m);
+            var z = a.getElementsByTagName(m)[0];
+            t.async = 1;
+            t.src = i;
+            z.parentNode.insertBefore(t, z);
+          })(
+            "https://utt.impactcdn.com/P-A7244567-9a72-4f9c-a383-0361e4f6cdaa1.js",
+            "script",
+            "impactStat",
+            document,
+            window,
+          );
+          impactStat("transformLinks");
+          impactStat("trackImpression");
+        };
+        if ("requestIdleCallback" in window) {
+          requestIdleCallback(loadImpact, { timeout: 3000 });
+        } else {
+          setTimeout(loadImpact, 1500);
+        }
+      });
     </script>
 
-    <!-- Thunderbolt AI Voice & Chat Support Agent -->
+    <!-- Thunderbolt AI Voice & Chat Support Agent (High-Performance Lazy Loader) -->
     <script>
       (function () {
         var origAttachShadow = Element.prototype.attachShadow;
@@ -68,12 +78,81 @@
           });
         };
 
+        var thunderboltLoaded = false;
+        var pendingOpen = false;
+
+        function loadThunderboltScript(andOpen) {
+          if (thunderboltLoaded) {
+            if (andOpen && window.Thunderbolt && typeof window.Thunderbolt.open === "function") {
+              window.Thunderbolt.open();
+            }
+            return;
+          }
+          thunderboltLoaded = true;
+          if (andOpen) pendingOpen = true;
+
+          var script = document.createElement("script");
+          script.async = true;
+          script.src = "https://www.thunderbolt.com/gateway/api/v1/thunderbolt-ui/embed.js";
+          script.onload = function () {
+            var checkCount = 0;
+            var checkInterval = setInterval(function () {
+              checkCount++;
+              if (window.Thunderbolt && typeof window.Thunderbolt.on === "function") {
+                clearInterval(checkInterval);
+                window.Thunderbolt.on("open", function () {
+                  window.setThunderboltOpen(true);
+                });
+                window.Thunderbolt.on("close", function () {
+                  window.setThunderboltOpen(false);
+                });
+                if (pendingOpen && typeof window.Thunderbolt.open === "function") {
+                  window.Thunderbolt.open();
+                  pendingOpen = false;
+                }
+              } else if (checkCount > 50) {
+                clearInterval(checkInterval);
+              }
+            }, 100);
+          };
+          document.body.appendChild(script);
+        }
+
         window.openThunderboltChat = function () {
           window.setThunderboltOpen(true);
           if (window.Thunderbolt && typeof window.Thunderbolt.open === "function") {
             window.Thunderbolt.open();
+          } else {
+            loadThunderboltScript(true);
           }
         };
+
+        // Defer loading until first user interaction or idle callback (saves ~1.1MB on initial mobile load)
+        var triggers = ["scroll", "touchstart", "mousemove", "keydown", "click"];
+        function onUserInteraction() {
+          triggers.forEach(function (t) {
+            window.removeEventListener(t, onUserInteraction);
+          });
+          loadThunderboltScript(false);
+        }
+        triggers.forEach(function (t) {
+          window.addEventListener(t, onUserInteraction, { once: true, passive: true });
+        });
+
+        // Fallback idle load after 4 seconds so widget is ready even without interaction
+        if ("requestIdleCallback" in window) {
+          window.addEventListener("load", function () {
+            requestIdleCallback(function () {
+              loadThunderboltScript(false);
+            }, { timeout: 4000 });
+          });
+        } else {
+          window.addEventListener("load", function () {
+            setTimeout(function () {
+              loadThunderboltScript(false);
+            }, 3000);
+          });
+        }
 
         window.addEventListener("message", function (e) {
           if (!e.data || typeof e.data !== "object") return;
@@ -87,25 +166,8 @@
             window.setThunderboltOpen(true);
           }
         });
-
-        var checkCount = 0;
-        var checkInterval = setInterval(function () {
-          checkCount++;
-          if (window.Thunderbolt && typeof window.Thunderbolt.on === "function") {
-            clearInterval(checkInterval);
-            window.Thunderbolt.on("open", function () {
-              window.setThunderboltOpen(true);
-            });
-            window.Thunderbolt.on("close", function () {
-              window.setThunderboltOpen(false);
-            });
-          } else if (checkCount > 50) {
-            clearInterval(checkInterval);
-          }
-        }, 200);
       })();
     </script>
-    <script defer src="https://www.thunderbolt.com/gateway/api/v1/thunderbolt-ui/embed.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -184,8 +246,30 @@
     <!-- Performance: preconnect to critical origins -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+    <link rel="dns-prefetch" href="https://api.country.is" />
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
     <link rel="dns-prefetch" href="https://utt.impactcdn.com" />
+    <link rel="dns-prefetch" href="https://s.skimresources.com" />
+
+    <!-- Google Fonts Async Non-blocking Load -->
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      />
+    </noscript>
 
 
     <!-- Theme flash prevention — must run before first paint -->
@@ -408,7 +492,7 @@
       }
     </script>
     <!-- Skimlinks Universal Commerce Monetization -->
-    <script type="text/javascript" src="https://s.skimresources.com/js/308997X1797324.skimlinks.js"></script>
+    <script type="text/javascript" async defer src="https://s.skimresources.com/js/308997X1797324.skimlinks.js"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

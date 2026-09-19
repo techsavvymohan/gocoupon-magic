@@ -133,7 +133,7 @@ export function HowItWorks() {
                 <div>
                   {/* Step Number & Clean Icon */}
                   <div className="flex items-center justify-between pb-4 border-b border-border/50">
-                    <span className="font-mono text-2xl font-black tracking-tight text-foreground/30 group-hover:text-primary transition-colors">
+                    <span className="font-mono text-2xl font-black tracking-tight text-foreground/70 group-hover:text-primary transition-colors">
                       {pillar.step}
                     </span>
                     <div className="grid h-9 w-9 place-items-center rounded-xl border border-border/80 bg-background text-foreground/80 group-hover:border-primary/40 group-hover:text-primary transition-colors">

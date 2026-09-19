@@ -164,7 +164,7 @@ export function WhyUsExpenseSaviour() {
                 Why manual coupon aggregators (GrabOn, CouponDuniya, Dealspotr) and passive trackers fail modern shoppers
               </p>
             </div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3.5 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 shrink-0">
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300 dark:border-emerald-800 bg-emerald-100 dark:bg-emerald-950/60 px-3.5 py-1 text-xs font-semibold text-emerald-800 dark:text-emerald-300 shrink-0">
               <CheckCircle2 className="h-3.5 w-3.5" />
               <span>All 4 Savings Tiers Covered</span>
             </div>
@@ -205,8 +205,8 @@ export function WhyUsExpenseSaviour() {
                       </div>
                     </td>
                     <td className="p-4 sm:p-5 font-medium text-foreground bg-primary/5">
-                      <div className="flex items-start gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                      <div className="flex items-start gap-1.5 text-emerald-800 dark:text-emerald-300 font-semibold">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                         <span>{row.gocoupon}</span>
                       </div>
                     </td>

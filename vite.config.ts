@@ -269,6 +269,7 @@ export default defineConfig({
     TanStackRouterVite({
       routesDirectory: "./src/routes",
       generatedRouteTree: "./src/routeTree.gen.ts",
+      autoCodeSplitting: true,
     }),
     react(),
     tailwindcss(),
@@ -284,11 +285,12 @@ export default defineConfig({
     host: true,
     headers: {
       "Content-Security-Policy":
-        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://utt.impactcdn.com https://www.thunderbolt.com https://www.googletagmanager.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.thunderbolt.com; img-src 'self' data: blob: https: http:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https: wss: http://localhost:* http://127.0.0.1:*; frame-src 'self' https://www.thunderbolt.com https://chromewebstore.google.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self' https:; upgrade-insecure-requests;",
+        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://utt.impactcdn.com https://www.thunderbolt.com https://www.googletagmanager.com https://apis.google.com https://s.skimresources.com https://*.skimresources.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.thunderbolt.com; img-src 'self' data: blob: https: http:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https: wss: http://localhost:* http://127.0.0.1:*; frame-src 'self' https://www.thunderbolt.com https://chromewebstore.google.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self' https:; upgrade-insecure-requests;",
       "X-Frame-Options": "DENY",
       "X-Content-Type-Options": "nosniff",
       "Referrer-Policy": "strict-origin-when-cross-origin",
       "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+      "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
       "Permissions-Policy":
         'camera=(), microphone=(self "https://www.thunderbolt.com"), geolocation=(), payment=(self)',
       "X-XSS-Protection": "1; mode=block",
@@ -309,11 +311,12 @@ export default defineConfig({
     host: true,
     headers: {
       "Content-Security-Policy":
-        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://utt.impactcdn.com https://www.thunderbolt.com https://www.googletagmanager.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.thunderbolt.com; img-src 'self' data: blob: https: http:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https: wss: http://localhost:* http://127.0.0.1:*; frame-src 'self' https://www.thunderbolt.com https://chromewebstore.google.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self' https:; upgrade-insecure-requests;",
+        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://utt.impactcdn.com https://www.thunderbolt.com https://www.googletagmanager.com https://apis.google.com https://s.skimresources.com https://*.skimresources.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.thunderbolt.com; img-src 'self' data: blob: https: http:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https: wss: http://localhost:* http://127.0.0.1:*; frame-src 'self' https://www.thunderbolt.com https://chromewebstore.google.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self' https:; upgrade-insecure-requests;",
       "X-Frame-Options": "DENY",
       "X-Content-Type-Options": "nosniff",
       "Referrer-Policy": "strict-origin-when-cross-origin",
       "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+      "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
       "Permissions-Policy":
         'camera=(), microphone=(self "https://www.thunderbolt.com"), geolocation=(), payment=(self)',
       "X-XSS-Protection": "1; mode=block",
@@ -326,13 +329,22 @@ export default defineConfig({
   },
   build: {
     outDir: "dist",
-    // esbuild is Vite's default minifier — fast, no extra devDep required.
-    // Swap to 'terser' once `terser` is installed (npm i -D terser) for slightly
-    // smaller output at the cost of build speed.
     minify: "esbuild",
     cssMinify: true,
     sourcemap: false,
     target: "es2020",
+    modulePreload: {
+      resolveDependencies(filename, deps, { hostId, hostType }) {
+        // Never preload secondary pages or massive catalogs on initial home navigation
+        return deps.filter(
+          (dep) =>
+            !dep.includes("page-") &&
+            !dep.includes("data-") &&
+            !dep.includes("vendor-forms") &&
+            !dep.includes("vendor-radix")
+        );
+      },
+    },
     // Split vendor + feature chunks so first paint ships less JS and caching is long-lived.
     rollupOptions: {
       output: {

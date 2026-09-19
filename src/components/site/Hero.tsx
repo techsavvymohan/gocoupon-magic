@@ -12,15 +12,26 @@ export function Hero() {
     <section className="relative overflow-hidden pb-16 sm:pb-24">
       {/* Curved Transparent Top Banner */}
       <div className="relative w-full flex justify-center bg-transparent">
-        <img
-          src="https://res.cloudinary.com/pgzfcjir/image/upload/v1789583262/hero-top-banner.webp"
-          alt="GoCoupon — Shop Smarter, Pay Less"
-          className="w-full h-auto max-h-[140px] sm:max-h-[180px] md:max-h-[220px] lg:max-h-[260px] object-contain object-top"
-          width={2048}
-          height={252}
-          loading="eager"
-          fetchPriority="high"
-        />
+        <picture className="w-full flex justify-center">
+          <source
+            media="(max-width: 640px)"
+            srcSet="https://res.cloudinary.com/pgzfcjir/image/upload/f_auto,q_auto,w_750/v1789583262/hero-top-banner.webp"
+          />
+          <source
+            media="(max-width: 1024px)"
+            srcSet="https://res.cloudinary.com/pgzfcjir/image/upload/f_auto,q_auto,w_1200/v1789583262/hero-top-banner.webp"
+          />
+          <img
+            src="https://res.cloudinary.com/pgzfcjir/image/upload/f_auto,q_auto,w_1600/v1789583262/hero-top-banner.webp"
+            alt="GoCoupon — Shop Smarter, Pay Less"
+            className="w-full h-auto max-h-[140px] sm:max-h-[180px] md:max-h-[220px] lg:max-h-[260px] object-contain object-top"
+            width={2048}
+            height={252}
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+          />
+        </picture>
       </div>
 
       {/* Centered Hero Content & Search Box */}
@@ -57,11 +68,12 @@ export function Hero() {
             className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs sm:text-sm font-bold text-primary-foreground shadow-md shadow-primary/20 transition-all hover:scale-105 active:scale-95 touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
           >
             <img
-              src="/icons/icon.svg"
+              src="/icons/icon_48.png"
               onError={(e) => {
                 e.currentTarget.src = "/icons/icon_128.png";
               }}
-              alt="GoCoupon"
+              alt=""
+              aria-hidden="true"
               className="h-5 w-5 object-contain"
               width={20}
               height={20}

@@ -52,8 +52,9 @@ app.set("trust proxy", 1);
 app.use((_req: Request, res: Response, next: NextFunction) => {
   res.setHeader(
     "Content-Security-Policy",
-    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://utt.impactcdn.com https://www.thunderbolt.com https://www.googletagmanager.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.thunderbolt.com; img-src 'self' data: blob: https: http:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https: wss: http://localhost:* http://127.0.0.1:*; frame-src 'self' https://www.thunderbolt.com https://chromewebstore.google.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self' https:; upgrade-insecure-requests;"
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://utt.impactcdn.com https://www.thunderbolt.com https://www.googletagmanager.com https://apis.google.com https://s.skimresources.com https://*.skimresources.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.thunderbolt.com; img-src 'self' data: blob: https: http:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https: wss: http://localhost:* http://127.0.0.1:* https://s.skimresources.com https://*.skimresources.com; frame-src 'self' https://www.thunderbolt.com https://chromewebstore.google.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self' https:; upgrade-insecure-requests;"
   );
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
   res.setHeader("X-Frame-Options", "DENY");
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -135,10 +136,15 @@ if (fs.existsSync(distDir)) {
     })
   );
 
-  // General static files (favicon, sitemap.xml, robots.txt, etc.)
+  // General static files (favicon, sitemap.xml, robots.txt, images, etc.)
   app.use(
     express.static(distDir, {
       maxAge: "1h",
+      setHeaders: (res, filePath) => {
+        if (/\.(webp|png|svg|ico|jpg|jpeg|woff2)$/i.test(filePath)) {
+          res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+        }
+      },
       index: false, // Handle index routing explicitly below
       redirect: false, // Prevent automatic 301 directory redirects so /route serves immediately
       dotfiles: "allow", // Allow RFC 9116 /.well-known/security.txt

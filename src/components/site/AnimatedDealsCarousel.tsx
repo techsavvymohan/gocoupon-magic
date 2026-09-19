@@ -68,6 +68,8 @@ function CarouselDealCard({
                   e.currentTarget.src = `https://www.google.com/s2/favicons?domain=${clean}.com&sz=128`;
                 }}
                 loading="lazy"
+                width={24}
+                height={24}
               />
             </div>
             <div className="min-w-0">
@@ -139,6 +141,7 @@ function CarouselDealCard({
           href={redirectUrl}
           target="_blank"
           rel="noopener noreferrer"
+          aria-label={`Redeem ${deal.storeName} deal: ${deal.title}`}
           className="rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-primary-foreground transition-opacity hover:opacity-90 shrink-0 inline-flex items-center gap-1 shadow-2xs"
           onClick={() => {
             if (hasWorkingCode) {
@@ -181,7 +184,10 @@ export function AnimatedDealsCarousel() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 mb-10 flex flex-wrap items-end justify-between gap-6">
         <div>
           <div className="mb-2 font-mono text-[11px] uppercase tracking-[0.2em] text-primary font-bold flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="relative flex h-2 w-2 shrink-0">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+            </span>
             Live Verified Deals Pool
           </div>
           <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
