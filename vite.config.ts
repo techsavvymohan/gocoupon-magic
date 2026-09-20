@@ -341,7 +341,9 @@ export default defineConfig({
             !dep.includes("page-") &&
             !dep.includes("data-") &&
             !dep.includes("vendor-forms") &&
-            !dep.includes("vendor-radix")
+            !dep.includes("vendor-radix") &&
+            !dep.includes("vendor-charts") &&
+            !dep.includes("vendor-supabase")
         );
       },
     },
@@ -351,38 +353,82 @@ export default defineConfig({
         manualChunks: (id) => {
           const normalized = id.replace(/\\/g, "/");
 
-          // 1. Heavy application data modules
+          // 1. Heavy application data modules (isolated so they are never bundled into the homepage)
           if (normalized.includes("/src/data/posts")) {
             return "data-posts";
           }
-          if (normalized.includes("/src/data/")) {
+          if (
+            normalized.includes("/src/data/canonicalCatalogData") ||
+            normalized.includes("/src/data/live-deals.json") ||
+            normalized.includes("/src/data/dealsData") ||
+            normalized.includes("/src/data/featured-deals-campaign") ||
+            normalized.includes("/src/data/collectionsData")
+          ) {
             return "data-catalog";
           }
 
-          // 2. Heavy feature page route modules
-          if (normalized.includes("/src/routes/offers") || normalized.includes("/src/components/offers/")) {
-            return "page-offers";
-          }
-          if (normalized.includes("/src/routes/admin") || normalized.includes("/src/admin/")) {
-            return "page-admin";
-          }
-          if (normalized.includes("/src/routes/stores")) {
-            return "page-stores";
-          }
-          if (normalized.includes("/src/routes/blog/")) {
-            return "page-blog";
-          }
-          if (normalized.includes("/src/routes/compare")) {
-            return "page-compare";
-          }
-          if (normalized.includes("/src/routes/product/")) {
-            return "page-product";
-          }
-          if (normalized.includes("/src/routes/collections/")) {
-            return "page-collections";
+          // 2. Shared core layout, contexts, and critical site components
+          if (
+            normalized.includes("/src/components/site/SiteShell") ||
+            normalized.includes("/src/components/site/Navbar") ||
+            normalized.includes("/src/components/site/Footer") ||
+            normalized.includes("/src/components/common/") ||
+            normalized.includes("/src/components/shared/") ||
+            normalized.includes("/src/context/CurrencyContext") ||
+            normalized.includes("/src/context/UserCardsContext") ||
+            normalized.includes("/src/context/LoadingContext") ||
+            normalized.includes("/src/context/I18nContext") ||
+            normalized.includes("/src/lib/seo") ||
+            normalized.includes("/src/lib/cloudinary")
+          ) {
+            return "shared-core";
           }
 
-          // 3. Third-party vendor dependencies
+          // 3. Heavy feature page route lazy modules
+          if (normalized.includes("/src/routes/offers.lazy") || normalized.includes("/src/components/offers/")) {
+            return "page-offers";
+          }
+          if (normalized.includes("/src/routes/admin.lazy") || normalized.includes("/src/admin/")) {
+            return "page-admin";
+          }
+          if (normalized.includes("/src/routes/stores.lazy")) {
+            return "page-stores";
+          }
+          if (normalized.includes("/src/routes/blog/") && normalized.includes(".lazy")) {
+            return "page-blog";
+          }
+          if (normalized.includes("/src/routes/compare.lazy") || normalized.includes("/src/components/shopping/")) {
+            return "page-compare";
+          }
+          if (normalized.includes("/src/routes/product/") && normalized.includes(".lazy")) {
+            return "page-product";
+          }
+          if (normalized.includes("/src/routes/collections/") && normalized.includes(".lazy")) {
+            return "page-collections";
+          }
+          if (normalized.includes("/src/routes/featured-deals.lazy")) {
+            return "page-featured-deals";
+          }
+          if (normalized.includes("/src/routes/pricing-intelligence.lazy")) {
+            return "page-pricing-intelligence";
+          }
+          if (normalized.includes("/src/routes/privacy.lazy")) {
+            return "page-privacy";
+          }
+          if (normalized.includes("/src/routes/how-it-works.lazy")) {
+            return "page-how-it-works";
+          }
+          if (normalized.includes("/src/routes/about.lazy")) {
+            return "page-about";
+          }
+          if (normalized.includes("/src/routes/submit-coupon.lazy") || normalized.includes("/src/components/submit_coupon/")) {
+            return "page-submit-coupon";
+          }
+          if (normalized.includes("/src/routes/chrome-extension.lazy") || normalized.includes("/src/routes/extension.lazy")) {
+            return "page-extension";
+          }
+
+          // 4. Third-party vendor dependencies
           if (normalized.includes("node_modules")) {
             if (
               normalized.includes("react-dom") ||

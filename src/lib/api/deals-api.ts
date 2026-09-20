@@ -68,9 +68,8 @@ export interface FetchDealsOptions {
   offset?: number;
 }
 
-import { DEALS_DATA } from "@/data/dealsData";
-
-function getStaticDeals(options: FetchDealsOptions = {}): DealsApiResponse {
+async function getStaticDeals(options: FetchDealsOptions = {}): Promise<DealsApiResponse> {
+  const { DEALS_DATA } = await import("@/data/dealsData");
   const now = Date.now();
   let filtered = DEALS_DATA.filter((d) => {
     if (d.expiresIn === "Expired") return false;
@@ -191,7 +190,7 @@ export async function fetchDeals(options: FetchDealsOptions = {}): Promise<Deals
     // API not reachable or running on static Vercel frontend — seamless fallback
   }
 
-  return getStaticDeals(options);
+  return await getStaticDeals(options);
 }
 
 /**

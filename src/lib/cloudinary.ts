@@ -7,7 +7,6 @@ import { Cloudinary } from "@cloudinary/url-gen";
 import { auto } from "@cloudinary/url-gen/actions/resize";
 import { autoGravity } from "@cloudinary/url-gen/qualifiers/gravity";
 import { format, quality } from "@cloudinary/url-gen/actions/delivery";
-import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 
 export const CLOUDINARY_CLOUD_NAME =
   (import.meta as any).env?.VITE_CLOUDINARY_CLOUD_NAME || "pgzfcjir";
@@ -114,6 +113,7 @@ export async function uploadToCloudinary(
     throw new Error("Invalid file provided. Must be a File object or base64 data string.");
   }
 
+  const { getAdminAuthHeaders } = await import("@/context/AdminAuthContext");
   const authHeaders = getAdminAuthHeaders();
 
   const response = await fetch("/api/admin/upload", {

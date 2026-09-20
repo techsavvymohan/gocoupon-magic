@@ -58,12 +58,12 @@ const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/admin.lazy').then((d) => d.Route))
 const AmazonCouponsRoute = AmazonCouponsRouteImport.update({
   id: '/amazon-coupons',
   path: '/amazon-coupons',
@@ -83,12 +83,14 @@ const ChromeExtensionRoute = ChromeExtensionRouteImport.update({
   id: '/chrome-extension',
   path: '/chrome-extension',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() =>
+  import('./routes/chrome-extension.lazy').then((d) => d.Route),
+)
 const CompareRoute = CompareRouteImport.update({
   id: '/compare',
   path: '/compare',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/compare.lazy').then((d) => d.Route))
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -108,7 +110,7 @@ const ExtensionRoute = ExtensionRouteImport.update({
   id: '/extension',
   path: '/extension',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/extension.lazy').then((d) => d.Route))
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
@@ -118,7 +120,9 @@ const FeaturedDealsRoute = FeaturedDealsRouteImport.update({
   id: '/featured-deals',
   path: '/featured-deals',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() =>
+  import('./routes/featured-deals.lazy').then((d) => d.Route),
+)
 const FlipkartCouponsRoute = FlipkartCouponsRouteImport.update({
   id: '/flipkart-coupons',
   path: '/flipkart-coupons',
@@ -133,7 +137,7 @@ const HowItWorksRoute = HowItWorksRouteImport.update({
   id: '/how-it-works',
   path: '/how-it-works',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/how-it-works.lazy').then((d) => d.Route))
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -153,7 +157,7 @@ const OffersRoute = OffersRouteImport.update({
   id: '/offers',
   path: '/offers',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/offers.lazy').then((d) => d.Route))
 const PressRoute = PressRouteImport.update({
   id: '/press',
   path: '/press',
@@ -163,12 +167,14 @@ const PricingIntelligenceRoute = PricingIntelligenceRouteImport.update({
   id: '/pricing-intelligence',
   path: '/pricing-intelligence',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() =>
+  import('./routes/pricing-intelligence.lazy').then((d) => d.Route),
+)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/privacy.lazy').then((d) => d.Route))
 const ResourcesRoute = ResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
@@ -188,12 +194,12 @@ const StoresRoute = StoresRouteImport.update({
   id: '/stores',
   path: '/stores',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/stores.lazy').then((d) => d.Route))
 const SubmitCouponRoute = SubmitCouponRouteImport.update({
   id: '/submit-coupon',
   path: '/submit-coupon',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/submit-coupon.lazy').then((d) => d.Route))
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -223,27 +229,33 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/blog/index.lazy').then((d) => d.Route))
 const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/blog/$slug',
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/blog/$slug.lazy').then((d) => d.Route))
 const CollectionsIndexRoute = CollectionsIndexRouteImport.update({
   id: '/collections/',
   path: '/collections/',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() =>
+  import('./routes/collections/index.lazy').then((d) => d.Route),
+)
 const CollectionsSlugRoute = CollectionsSlugRouteImport.update({
   id: '/collections/$slug',
   path: '/collections/$slug',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() =>
+  import('./routes/collections/$slug.lazy').then((d) => d.Route),
+)
 const ProductProductIdRoute = ProductProductIdRouteImport.update({
   id: '/product/$productId',
   path: '/product/$productId',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() =>
+  import('./routes/product/$productId.lazy').then((d) => d.Route),
+)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute

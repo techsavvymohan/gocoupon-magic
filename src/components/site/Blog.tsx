@@ -1,13 +1,46 @@
 import { Link } from "@tanstack/react-router";
-import { posts } from "@/data/posts";
+
+interface FeaturedPost {
+  slug: string;
+  tag: string;
+  date: string;
+  title: string;
+  excerpt: string;
+  read: string;
+  cover?: string;
+}
+
+const featured: FeaturedPost[] = [
+  {
+    slug: "why-other-coupon-apps-fail-and-how-gocoupon-saves-thousands",
+    tag: "Expense Saviour",
+    date: "Sep 8, 2026",
+    title: "Why Other Coupon Apps Leave 70% of Your Money on the Table (And How GoCoupon Rescues Your Budget)",
+    excerpt:
+      "Most coupon apps only test dead promo codes while you overpay by ₹3,000 to $100 on every order. Here is how GoCoupon's 4-tier savings collapse puts ₹50,000+ back into your family budget every year.",
+    read: "5 min read",
+  },
+  {
+    slug: "how-gocoupon-finds-best-discounts",
+    tag: "Shopping Tips",
+    date: "Aug 19, 2026",
+    title: "How GoCoupon Automatically Finds the Biggest Online Discounts in Seconds",
+    excerpt:
+      "Stop wasting time searching for expired coupon codes on random websites. Here is how GoCoupon tests real codes and saves you money in one click.",
+    read: "4 min read",
+  },
+  {
+    slug: "amazon-clip-coupons-vs-promo-codes",
+    tag: "Amazon Tips",
+    date: "Aug 15, 2026",
+    title: "The Amazon Green Coupon Trick: How to Save an Extra 20% on Every Order",
+    excerpt:
+      "Did you know Amazon hides secret green discount checkboxes on product pages? Here is how they work and how GoCoupon automatically clips them for you.",
+    read: "5 min read",
+  },
+];
 
 export function Blog() {
-  // Select top consumer-centric expense-saving articles
-  const featured = [
-    posts.find((p) => p.slug === "why-other-coupon-apps-fail-and-how-gocoupon-saves-thousands"),
-    posts.find((p) => p.slug === "how-to-stack-coupons-and-cashback"),
-    posts.find((p) => p.slug === "amazon-clip-coupons-vs-promo-codes"),
-  ].filter(Boolean) as typeof posts;
 
   return (
     <section id="blog" className="border-t border-border px-6 py-24">
