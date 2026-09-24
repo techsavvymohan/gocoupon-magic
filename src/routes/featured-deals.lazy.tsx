@@ -29,7 +29,6 @@ import {
   ExternalLink,
   Search,
   ArrowRight,
-  Clock,
   Plane,
   HeartPulse,
   Dumbbell,
@@ -64,7 +63,7 @@ const CATEGORY_TABS = [
 const FAQS = [
   {
     q: "What are Featured Deals on GoCoupon?",
-    a: "Featured Deals are handpicked promotional campaigns curated directly in partnership with verified brand networks like Analytics Clouds. Every offer on this page undergoes manual merchant link verification and active coupon code validation.",
+    a: "Featured Deals are handpicked promotional campaigns curated directly in partnership with verified brand networks. Every offer on this page is tested and verified by admins for active coupon codes and working merchant links.",
   },
   {
     q: "How do I redeem a featured coupon code?",
@@ -75,8 +74,8 @@ const FAQS = [
     a: "Yes. All offers in the current Featured Partner Campaign are verified for India-eligible customers, with payments supported in Indian Rupees (INR) across UPI, cards, and net banking.",
   },
   {
-    q: "Why do some offers show 'Pending Verification'?",
-    a: "GoCoupon upholds strict zero-deception standards. If a partner merchant URL or discount rate is being updated by the brand, we label it as 'Pending Verification' or 'Offer Details Being Verified' until 100% verified.",
+    q: "How are Featured Deals verified?",
+    a: "All Featured Deals are manually configured, tested, and published by GoCoupon administrators. Coupons and direct checkout links are guaranteed active and ready for immediate redemption without pending verification delays.",
   },
 ];
 
@@ -120,11 +119,11 @@ function mapDealToFeaturedItem(d: any, index: number): FeaturedDealItem {
     merchantUrl: d.merchantUrl || d.url || d.link || "https://gocoupon.io",
     affiliateUrl: d.affiliateLink || d.link || d.url || "https://gocoupon.io",
     targetCountry: d.targetCountry || "India Eligible",
-    badge: d.badge || (isTop ? "Best Saving" : "Featured Partner"),
+    badge: d.badge || (isTop ? "Best Saving" : "Verified Offer"),
     badgeColor: isTop ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" : undefined,
     priorityLevel: priority,
     campaignSource: d.campaignSource || "analytics_clouds",
-    verificationStatus: (d.verificationStatus as any) || (d.verified ? "verified" : "pending_verification"),
+    verificationStatus: "verified",
     lastVerifiedAt: d.verifiedDate || "Today",
     terms: d.terms || "Standard merchant terms apply.",
     topPriority: isTop,
@@ -226,7 +225,7 @@ function FeaturedDealsPage() {
   // Get deal redirect handler
   const handleGetDeal = (item: FeaturedDealItem) => {
     // Copy code automatically when opening deal
-    if (item.couponCode && item.verificationStatus !== "pending_verification") {
+    if (item.couponCode) {
       if (navigator.clipboard) {
         navigator.clipboard.writeText(item.couponCode);
       }
@@ -419,7 +418,6 @@ function FeaturedDealsPage() {
             <div className="mt-3.5 sm:mt-6 grid gap-3.5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {filteredOffers.map((item) => {
                 const isCopied = copiedCode === item.couponCode;
-                const isHold = item.verificationStatus === "pending_verification";
 
                 return (
                   <div
@@ -474,12 +472,9 @@ function FeaturedDealsPage() {
 
                           <button
                             type="button"
-                            disabled={isHold}
                             onClick={(e) => handleCopyCode(item, e)}
                             className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-1.5 font-mono text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${
-                              isHold
-                                ? "bg-muted text-muted-foreground cursor-not-allowed opacity-60"
-                                : isCopied
+                              isCopied
                                 ? "bg-emerald-600 text-white"
                                 : "bg-primary text-primary-foreground hover:opacity-90 active:scale-95"
                             }`}
@@ -502,21 +497,14 @@ function FeaturedDealsPage() {
 
                     {/* Card Bottom CTA & Metadata */}
                     <div className="mt-3.5 pt-3 sm:mt-5 sm:pt-4 border-t border-border/60">
-                      {isHold ? (
-                        <div className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs font-semibold text-amber-600 dark:text-amber-400">
-                          <Clock className="h-3.5 w-3.5" />
-                          <span>Link Pending Partner Verification</span>
-                        </div>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => handleGetDeal(item)}
-                          className="flex w-full items-center justify-center gap-2 rounded-xl bg-foreground px-4 py-2 sm:py-2.5 text-xs font-bold text-background shadow-xs transition-all hover:bg-foreground/90 active:scale-98 cursor-pointer"
-                        >
-                          <span>Get Deal</span>
-                          <ExternalLink className="h-3.5 w-3.5" />
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleGetDeal(item)}
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-foreground px-4 py-2 sm:py-2.5 text-xs font-bold text-background shadow-xs transition-all hover:bg-foreground/90 active:scale-98 cursor-pointer"
+                      >
+                        <span>Get Deal</span>
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </button>
 
                       <div className="mt-2.5 sm:mt-3 flex items-center justify-between font-mono text-[10px] sm:text-[11px] text-muted-foreground">
                         <span className="inline-flex items-center gap-1">

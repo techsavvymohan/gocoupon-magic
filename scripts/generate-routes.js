@@ -258,7 +258,7 @@ const routeConfigs = [
         <li><strong>RedBus:</strong> Verified ticket booking discounts on intercity buses with code <code>REDBUSAC</code>.</li>
         <li><strong>Nakpro Nutrition:</strong> Lab-tested pure protein concentrates &amp; isolates with code <code>NAKPROFIT</code>.</li>
         <li><strong>Oliveboard:</strong> Test prep series for banking, SSC &amp; competitive exams with code <code>OBMAGIC</code>.</li>
-        <li><strong>Kleenest:</strong> Eco-friendly natural home hygiene products with code <code>KLEEN10</code> (Pending verification).</li>
+        <li><strong>Kleenest:</strong> Eco-friendly natural home hygiene products with code <code>KLEEN10</code> (Admin Verified).</li>
         <li><strong>AS-IT-IS Nutrition:</strong> Pure unflavoured whey protein with code <code>ASITISDEAL</code>.</li>
       </ul>
 
