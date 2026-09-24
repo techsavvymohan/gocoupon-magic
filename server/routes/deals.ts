@@ -396,6 +396,7 @@ dealsRouter.post("/", requireAdminAuth, async (req: Request, res: Response) => {
     };
 
     addDealToPool(newDeal);
+    dealsDb.upsertDeals([newDeal]).catch((e) => console.warn("[Deals DB Upsert Warning]:", e.message));
     await globalCache.deletePrefix("deals:");
     res.json({ success: true, data: newDeal });
   } catch (err: any) {
@@ -449,6 +450,7 @@ dealsRouter.put("/", requireAdminAuth, async (req: Request, res: Response) => {
     };
 
     addDealToPool(updatedDeal);
+    dealsDb.upsertDeals([updatedDeal]).catch((e) => console.warn("[Deals DB Upsert Warning]:", e.message));
     await globalCache.deletePrefix("deals:");
     res.json({ success: true, data: updatedDeal });
   } catch (err: any) {
@@ -469,6 +471,7 @@ dealsRouter.delete("/", requireAdminAuth, async (req: Request, res: Response) =>
     }
 
     deleteDealFromPool(id);
+    dealsDb.deleteDeal(id).catch((e) => console.warn("[Deals DB Delete Warning]:", e.message));
     await globalCache.deletePrefix("deals:");
     res.json({ success: true, message: `Offer ${id} removed.` });
   } catch (err: any) {
@@ -518,6 +521,10 @@ dealsRouter.post("/bulk", requireAdminAuth, async (req: Request, res: Response) 
       };
       addDealToPool(deal);
       addedCount++;
+    }
+
+    if (items.length > 0) {
+      dealsDb.upsertDeals(getLiveDealsPool()).catch((e) => console.warn("[Deals DB Bulk Upsert Warning]:", e.message));
     }
 
     await globalCache.deletePrefix("deals:");

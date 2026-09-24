@@ -14,6 +14,8 @@ import { Router, type Request, type Response } from "express";
 import { queryStores, STORES_DB } from "../../src/lib/server-data/stores-db.js";
 import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
 import { globalCache } from "../../src/lib/services/cache-service.js";
+import { storesDb } from "../services/db.js";
+import { requireAdminAuth } from "./admin.js";
 
 export const storesRouter = Router();
 
@@ -67,24 +69,82 @@ storesRouter.get("/", async (req: Request, res: Response) => {
 });
 
 /**
- * POST /api/stores
- * Create new store
+ * Helper to process store update
  */
-storesRouter.post("/", async (req: Request, res: Response) => {
+async function handleStoreUpdate(idOrSlug: string, b: any, res: Response) {
+  const slug = idOrSlug.toLowerCase();
+  const idx = STORES_DB.findIndex((s: any) => s.id?.toLowerCase() === slug || s.slug?.toLowerCase() === slug);
+  
+  const existing = idx >= 0 ? STORES_DB[idx] : null;
+  const updatedStore: any = {
+    id: existing?.id || slug,
+    name: b.name || existing?.name || "Merchant Store",
+    slug: b.slug ? b.slug.toLowerCase() : (existing?.slug || slug),
+    category: b.category || existing?.category || "General",
+    description: b.description || existing?.description || "",
+    link: b.affiliateLink || b.link || existing?.link || "",
+    logo: b.logoImage || b.logo || existing?.logo || "",
+    badge: b.trustStatus || b.badge || existing?.badge || "Verified",
+    rating: Number(b.rating || existing?.rating || 4.8),
+    cashbackRate: b.cashbackRate || existing?.cashbackRate || "Available",
+    couponsCount: Number(b.couponsCount || existing?.couponsCount || 0),
+    offersCount: Number(b.offersCount || (existing as any)?.offersCount || 0),
+  };
+
+  if (idx >= 0) {
+    STORES_DB[idx] = { ...STORES_DB[idx], ...updatedStore };
+  } else {
+    STORES_DB.unshift(updatedStore);
+  }
+
+  // Persist to Supabase PostgreSQL cloud database
+  await storesDb.upsertStore(updatedStore).catch((e) =>
+    console.warn("[Stores DB Upsert Warning]:", e.message)
+  );
+
+  await globalCache.deletePrefix("stores:");
+  return res.json({ success: true, data: updatedStore });
+}
+
+/**
+ * Helper to process store delete
+ */
+async function handleStoreDelete(idOrSlug: string, res: Response) {
+  const slug = idOrSlug.toLowerCase();
+  const idx = STORES_DB.findIndex((s: any) => s.id?.toLowerCase() === slug || s.slug?.toLowerCase() === slug);
+  if (idx >= 0) {
+    STORES_DB.splice(idx, 1);
+  }
+
+  // Delete from Supabase PostgreSQL cloud database
+  await storesDb.deleteStore(slug).catch((e) =>
+    console.warn("[Stores DB Delete Warning]:", e.message)
+  );
+
+  await globalCache.deletePrefix("stores:");
+  return res.json({ success: true, message: `Store ${idOrSlug} deleted.` });
+}
+
+/**
+ * POST /api/stores
+ * Create new store (Secured with Admin Auth)
+ */
+storesRouter.post("/", requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const b = req.body || {};
+    const slug = (b.slug || b.name || `store-${Date.now()}`).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
     const newStore: any = {
-      id: b.slug || `store-${Date.now()}`,
+      id: slug,
       name: b.name || "New Merchant",
-      slug: b.slug || "new-store",
+      slug,
       category: b.category || "General",
       logo: b.logoImage || b.logo || "",
       fallbackIcon: "🛍️",
       badge: b.trustStatus || "Verified",
-      rating: 4.8,
-      couponsCount: 0,
-      maxDiscount: "Special Offer",
-      cashbackRate: "Available",
+      rating: Number(b.rating) || 4.8,
+      couponsCount: Number(b.couponsCount) || 0,
+      maxDiscount: b.maxDiscount || "Special Offer",
+      cashbackRate: b.cashbackRate || "Available",
       description: b.description || "",
       features: [],
       popularCoupon: {
@@ -92,7 +152,7 @@ storesRouter.post("/", async (req: Request, res: Response) => {
         description: "Latest verified offers",
         discount: "Up to 50% OFF",
       },
-      link: b.affiliateLink || "",
+      link: b.affiliateLink || b.link || "",
       countryCode: b.countryCode || "IN",
       trustStatus: b.trustStatus || "Verified",
       faq1Question: b.faq1Question,
@@ -103,9 +163,37 @@ storesRouter.post("/", async (req: Request, res: Response) => {
       faq3Answer: b.faq3Answer,
     };
 
-    STORES_DB.unshift(newStore);
+    const existingIdx = STORES_DB.findIndex((s: any) => s.slug === slug || s.id === slug);
+    if (existingIdx >= 0) {
+      STORES_DB[existingIdx] = { ...STORES_DB[existingIdx], ...newStore };
+    } else {
+      STORES_DB.unshift(newStore);
+    }
+
+    // Persist directly to Supabase PostgreSQL cloud database
+    await storesDb.upsertStore(newStore).catch((e) =>
+      console.warn("[Stores DB Upsert Warning]:", e.message)
+    );
+
     await globalCache.deletePrefix("stores:");
-    res.json({ success: true, data: newStore });
+    res.status(201).json({ success: true, data: newStore });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * PUT /api/stores/:slug
+ * Update store by URL slug (Called by AdminStoresManager)
+ */
+storesRouter.put("/:slug", requireAdminAuth, async (req: Request, res: Response) => {
+  try {
+    const slug = String(req.params.slug || "");
+    if (!slug) {
+      res.status(400).json({ success: false, error: "Store slug required." });
+      return;
+    }
+    await handleStoreUpdate(slug, req.body || {}, res);
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -113,33 +201,33 @@ storesRouter.post("/", async (req: Request, res: Response) => {
 
 /**
  * PUT /api/stores
- * Update store
+ * Update store by query param or body id
  */
-storesRouter.put("/", async (req: Request, res: Response) => {
+storesRouter.put("/", requireAdminAuth, async (req: Request, res: Response) => {
   try {
-    const id = (req.query.id as string) || req.body?.id || req.body?.slug;
+    const id = String((req.query.id as string) || req.body?.id || req.body?.slug || "");
     if (!id) {
       res.status(400).json({ success: false, error: "Store ID/Slug required." });
       return;
     }
+    await handleStoreUpdate(id, req.body || {}, res);
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 
-    const b = req.body || {};
-    const idx = STORES_DB.findIndex((s: any) => s.id === id || s.slug === id);
-    if (idx >= 0) {
-      STORES_DB[idx] = {
-        ...STORES_DB[idx],
-        name: b.name || STORES_DB[idx].name,
-        category: b.category || STORES_DB[idx].category,
-        description: b.description || STORES_DB[idx].description,
-        link: b.affiliateLink || b.link || STORES_DB[idx].link,
-        logo: b.logoImage || b.logo || STORES_DB[idx].logo,
-        badge: b.trustStatus || STORES_DB[idx].badge,
-      };
-      await globalCache.deletePrefix("stores:");
-      res.json({ success: true, data: STORES_DB[idx] });
-    } else {
-      res.status(404).json({ success: false, error: "Store not found." });
+/**
+ * DELETE /api/stores/:slug
+ * Delete store by URL slug (Called by AdminStoresManager)
+ */
+storesRouter.delete("/:slug", requireAdminAuth, async (req: Request, res: Response) => {
+  try {
+    const slug = String(req.params.slug || "");
+    if (!slug) {
+      res.status(400).json({ success: false, error: "Store slug required." });
+      return;
     }
+    await handleStoreDelete(slug, res);
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -147,24 +235,16 @@ storesRouter.put("/", async (req: Request, res: Response) => {
 
 /**
  * DELETE /api/stores
- * Delete store
+ * Delete store by query param id or slug
  */
-storesRouter.delete("/", async (req: Request, res: Response) => {
+storesRouter.delete("/", requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const id = (req.query.id as string) || (req.query.slug as string);
     if (!id) {
       res.status(400).json({ success: false, error: "Store ID/Slug required." });
       return;
     }
-
-    const idx = STORES_DB.findIndex((s: any) => s.id === id || s.slug === id);
-    if (idx >= 0) {
-      STORES_DB.splice(idx, 1);
-      await globalCache.deletePrefix("stores:");
-      res.json({ success: true, message: `Store ${id} deleted.` });
-    } else {
-      res.status(404).json({ success: false, error: "Store not found." });
-    }
+    await handleStoreDelete(id, res);
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -172,30 +252,39 @@ storesRouter.delete("/", async (req: Request, res: Response) => {
 
 /**
  * POST /api/stores/bulk
- * Bulk store import
+ * Bulk store import (Secured with Admin Auth)
  */
-storesRouter.post("/bulk", async (req: Request, res: Response) => {
+storesRouter.post("/bulk", requireAdminAuth, async (req: Request, res: Response) => {
   try {
-    const items = req.body?.items || [];
+    let items = req.body?.items;
+    if (!items && req.body?.rows) {
+      items = typeof req.body.rows === "string" ? JSON.parse(req.body.rows) : req.body.rows;
+    }
+
     if (!Array.isArray(items) || items.length === 0) {
-      res.status(400).json({ success: false, error: "Items array is required." });
+      res.status(400).json({ success: false, error: "Items or rows array is required." });
       return;
     }
 
-    let added = 0;
+    const createdStores: any[] = [];
     for (const b of items) {
+      const slug = (b.slug || b.name || `store-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
       const store: any = {
-        id: b.slug || `store-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        id: slug,
         name: b.name || "Merchant Store",
-        slug: b.slug || "merchant",
+        slug,
         category: b.category || "General",
-        logo: b.logoImage || "",
+        logo: b.logoImage || b.logo || "",
         fallbackIcon: "🛍️",
         badge: b.trustStatus || "Verified",
-        rating: 4.8,
-        couponsCount: 0,
-        maxDiscount: "Special Offer",
-        cashbackRate: "Available",
+        rating: Number(b.rating) || 4.8,
+        couponsCount: Number(b.couponsCount) || 0,
+        maxDiscount: b.maxDiscount || "Special Offer",
+        cashbackRate: b.cashbackRate || "Available",
         description: b.description || "",
         features: [],
         popularCoupon: {
@@ -203,16 +292,33 @@ storesRouter.post("/bulk", async (req: Request, res: Response) => {
           description: "Exclusive discounts",
           discount: "Best Price",
         },
-        link: b.affiliateLink || "",
+        link: b.affiliateLink || b.link || "",
         countryCode: b.countryCode || "IN",
       };
-      STORES_DB.unshift(store);
-      added++;
+
+      const existingIdx = STORES_DB.findIndex((s: any) => s.slug === slug || s.id === slug);
+      if (existingIdx >= 0) {
+        STORES_DB[existingIdx] = { ...STORES_DB[existingIdx], ...store };
+      } else {
+        STORES_DB.unshift(store);
+      }
+      createdStores.push(store);
     }
 
+    // Persist bulk stores to Supabase PostgreSQL cloud database
+    await storesDb.upsertStores(createdStores).catch((e) =>
+      console.warn("[Stores DB Bulk Upsert Warning]:", e.message)
+    );
+
     await globalCache.deletePrefix("stores:");
-    res.json({ success: true, count: added, message: `Successfully imported ${added} stores.` });
+    res.json({
+      success: true,
+      count: createdStores.length,
+      data: { successfullyImported: createdStores.length, errors: [] },
+      message: `Successfully imported ${createdStores.length} stores.`,
+    });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
+

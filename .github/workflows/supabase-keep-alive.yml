@@ -1,0 +1,33 @@
+name: Supabase Database Keep-Alive
+
+on:
+  schedule:
+    # Runs every 2 days at 04:00 UTC (well within the 7-day Supabase inactivity window)
+    - cron: '0 4 */2 * *'
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    name: Ping Supabase Project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API & Database
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.VITE_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY || secrets.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_ANON_KEY" ]; then
+            echo "Sending keep-alive ping to Supabase..."
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+              -H "apikey: $SUPABASE_ANON_KEY" \
+              -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+              "$SUPABASE_URL/rest/v1/gocoupon_deals?select=id&limit=1")
+            echo "Supabase response HTTP status: $HTTP_CODE"
+            if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; then
+              echo "✅ Supabase project pinged successfully! 7-day inactivity reset."
+            else
+              echo "⚠️ Ping returned status $HTTP_CODE"
+            fi
+          else
+            echo "ℹ️ SUPABASE_URL or SUPABASE_ANON_KEY secrets not configured in GitHub repository."
+          fi

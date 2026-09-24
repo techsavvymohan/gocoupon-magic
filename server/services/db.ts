@@ -16,6 +16,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import type { DealRecord, UserCouponSubmission } from "../../src/lib/server-data/deals-db.js";
 import { getLiveDeals, setLiveDeals } from "../../src/lib/server-data/deals-db.js";
+import { STORES_DB } from "../../src/lib/server-data/stores-db.js";
 import type { BlogPost } from "../routes/blogs.js";
 import type { PushAlertRegistration } from "../routes/alerts.js";
 
@@ -80,7 +81,106 @@ if (DATABASE_URL) {
           CREATE INDEX IF NOT EXISTS idx_clicks_deal_id ON gocoupon_clicks(deal_id);
           CREATE INDEX IF NOT EXISTS idx_clicks_store_name ON gocoupon_clicks(store_name);
           CREATE INDEX IF NOT EXISTS idx_clicks_created_at ON gocoupon_clicks(created_at DESC);
+          ALTER TABLE gocoupon_clicks ENABLE ROW LEVEL SECURITY;
         `).catch((e) => console.warn("[Database] Could not verify gocoupon_clicks table:", e.message));
+
+        // Hydrate live deals pool from Supabase PostgreSQL to prevent any loss across deployments
+        pgPool
+          ?.query(`
+            SELECT 
+              id, store_name AS "storeName", store_slug AS "storeSlug", store_logo AS "storeLogo",
+              title, code, discount, category, badge, verified, verified_date AS "verifiedDate",
+              expires_in AS "expiresIn", end_date AS "endDate", min_order AS "minOrder",
+              terms, link, uses_count AS "usesCount", rating, votes_count AS "votesCount",
+              source, status, type
+            FROM gocoupon_deals
+            WHERE status = 'active' AND (end_date IS NULL OR end_date > NOW())
+          `)
+          .then((res) => {
+            if (res && res.rows.length > 0) {
+              console.log(`📦 [Database] Hydrated ${res.rows.length} verified deals from Supabase PostgreSQL into live pool.`);
+              const current = getLiveDeals();
+              const cloudIds = new Set(res.rows.map((r: any) => String(r.id)));
+              const merged = [...res.rows, ...current.filter((d: any) => !cloudIds.has(String(d.id)))];
+              setLiveDeals(merged);
+            }
+          })
+          .catch((e) => console.warn("[Database] Could not hydrate cloud deals:", e.message));
+
+        // Hydrate stores from Supabase PostgreSQL into STORES_DB
+        pgPool
+          ?.query(`
+            SELECT 
+              id, name, slug, logo, category, tagline AS description,
+              cashback_rate AS "cashbackRate", affiliate_url_template AS link,
+              trust_score AS rating, is_featured AS "isFeatured",
+              coupons_count AS "couponsCount", offers_count AS "offersCount"
+            FROM gocoupon_stores
+          `)
+          .then((res) => {
+            if (res && res.rows.length > 0) {
+              console.log(`🏢 [Database] Hydrated ${res.rows.length} stores from Supabase PostgreSQL.`);
+              for (const s of res.rows) {
+                const idx = STORES_DB.findIndex((cur) => cur.slug === s.slug || cur.id === s.id);
+                if (idx >= 0) {
+                  STORES_DB[idx] = { ...STORES_DB[idx], ...s };
+                } else {
+                  STORES_DB.unshift({
+                    id: s.id,
+                    name: s.name,
+                    slug: s.slug,
+                    category: s.category || "General",
+                    logo: s.logo,
+                    fallbackIcon: "🛍️",
+                    rating: Number(s.rating) || 4.8,
+                    couponsCount: Number(s.couponsCount) || 0,
+                    maxDiscount: "Special Offer",
+                    cashbackRate: s.cashbackRate || "Available",
+                    description: s.description || "",
+                    features: [],
+                    popularCoupon: { code: "", description: "Latest offers", discount: "Verified Deal" },
+                    link: s.link || "",
+                  });
+                }
+              }
+            }
+          })
+          .catch((e) => console.warn("[Database] Could not hydrate stores:", e.message));
+
+        // Hydrate admin users from Supabase PostgreSQL into local fallback
+        pgPool
+          ?.query(`
+            SELECT 
+              id, name, email, password_hash AS "passwordHash", role,
+              permissions, is_active AS "isActive",
+              created_at AS "createdAt", updated_at AS "updatedAt"
+            FROM gocoupon_admin_users
+            ORDER BY created_at ASC
+          `)
+          .then((res) => {
+            if (res && res.rows.length > 0) {
+              console.log(`👤 [Database] Hydrated ${res.rows.length} admin user(s) from Supabase PostgreSQL.`);
+              const users = res.rows.map((r) => ({
+                ...r,
+                permissions: typeof r.permissions === "string" ? JSON.parse(r.permissions) : r.permissions || [],
+              }));
+              writeJsonFallback("admin-users.json", users);
+            }
+          })
+          .catch((e) => console.warn("[Database] Could not hydrate admin users:", e.message));
+
+        // Hydrate settings from Supabase PostgreSQL into local fallbacks
+        pgPool
+          ?.query("SELECT key, value FROM gocoupon_settings")
+          .then((res) => {
+            if (res && res.rows.length > 0) {
+              console.log(`⚙️ [Database] Hydrated ${res.rows.length} settings records from Supabase PostgreSQL.`);
+              for (const row of res.rows) {
+                writeJsonFallback(`admin-${row.key}.json`, row.value);
+              }
+            }
+          })
+          .catch((e) => console.warn("[Database] Could not hydrate settings:", e.message));
       })
       .catch((err) => {
         console.warn("⚠️ [Database] Initial PostgreSQL connection check failed, using fallback engine:", err.message);
@@ -355,9 +455,9 @@ export const submissionsDb = {
    * Creates a new coupon submission.
    */
   async createSubmission(
-    data: Omit<UserCouponSubmission, "id" | "submittedAt" | "status">
+    data: Omit<UserCouponSubmission, "id" | "submittedAt" | "status"> & { id?: string }
   ): Promise<UserCouponSubmission> {
-    const id = `sub_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const id = data.id || `sub_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const submission: UserCouponSubmission = {
       id,
       ...data,
@@ -685,7 +785,7 @@ export const storesDb = {
   async getStores(): Promise<any[]> {
     const res = await queryPg(`
       SELECT 
-        id, name, slug, logo, category, tagline AS description,
+        id, name, slug, domain, logo, category, tagline AS description,
         cashback_rate AS "cashbackRate", affiliate_url_template AS link,
         trust_score AS rating, is_featured AS "isFeatured",
         coupons_count AS "couponsCount", offers_count AS "offersCount"
@@ -694,6 +794,84 @@ export const storesDb = {
     `);
     if (res && res.rows.length > 0) return res.rows;
     return [];
+  },
+
+  /**
+   * Retrieves a single store by slug.
+   */
+  async getStoreBySlug(slug: string): Promise<any | null> {
+    const res = await queryPg(
+      `SELECT 
+        id, name, slug, domain, logo, category, tagline AS description,
+        cashback_rate AS "cashbackRate", affiliate_url_template AS link,
+        trust_score AS rating, is_featured AS "isFeatured",
+        coupons_count AS "couponsCount", offers_count AS "offersCount"
+      FROM gocoupon_stores WHERE slug = $1 LIMIT 1`,
+      [slug.toLowerCase()]
+    );
+    if (res && res.rows.length > 0) return res.rows[0];
+    return null;
+  },
+
+  /**
+   * Upserts a store into Supabase PostgreSQL gocoupon_stores.
+   */
+  async upsertStore(store: any): Promise<any> {
+    const slug = (store.slug || store.name || "store").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    const id = store.id || slug;
+    const name = store.name || "Merchant Store";
+    const logo = store.logo || store.logoImage || null;
+    const category = store.category || "General";
+    const description = store.description || store.tagline || "";
+    const cashbackRate = store.cashbackRate || "Available";
+    const link = store.link || store.affiliateLink || store.affiliate_url_template || "";
+    const rating = Number(store.rating || store.trust_score || 4.8);
+    const isFeatured = store.isFeatured === true || store.is_featured === true;
+    const couponsCount = Number(store.couponsCount || store.coupons_count || 0);
+    const offersCount = Number(store.offersCount || store.offers_count || 0);
+
+    await queryPg(`
+      INSERT INTO gocoupon_stores (
+        id, name, slug, domain, logo, category, tagline, cashback_rate,
+        affiliate_url_template, trust_score, is_featured, coupons_count, offers_count, updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW())
+      ON CONFLICT (slug) DO UPDATE SET
+        name = EXCLUDED.name,
+        logo = COALESCE(EXCLUDED.logo, gocoupon_stores.logo),
+        category = EXCLUDED.category,
+        tagline = EXCLUDED.tagline,
+        cashback_rate = EXCLUDED.cashback_rate,
+        affiliate_url_template = EXCLUDED.affiliate_url_template,
+        trust_score = EXCLUDED.trust_score,
+        is_featured = EXCLUDED.is_featured,
+        updated_at = NOW();
+    `, [
+      id, name, slug, store.domain || null, logo, category, description,
+      cashbackRate, link, rating, isFeatured, couponsCount, offersCount
+    ]);
+
+    return { ...store, id, slug, name, logo, category, description, link };
+  },
+
+  /**
+   * Batch upserts stores into Supabase PostgreSQL.
+   */
+  async upsertStores(stores: any[]): Promise<number> {
+    let count = 0;
+    for (const s of stores) {
+      await this.upsertStore(s).catch((err) => console.warn(`[storesDb] Could not upsert store ${s.name}:`, err.message));
+      count++;
+    }
+    return count;
+  },
+
+  /**
+   * Deletes a store by slug or ID from Supabase PostgreSQL.
+   */
+  async deleteStore(slugOrId: string): Promise<boolean> {
+    const slug = slugOrId.toLowerCase();
+    await queryPg("DELETE FROM gocoupon_stores WHERE slug = $1 OR id = $1", [slug]);
+    return true;
   },
 };
 
@@ -966,7 +1144,243 @@ export const clicksDb = {
 };
 
 // =============================================================================
-// 7. OVERALL DATABASE HEALTH & METRICS
+// 7. ADMIN USERS DATABASE SERVICE
+// =============================================================================
+export interface StoredAdminUser {
+  id: string;
+  name: string;
+  email: string;
+  passwordHash?: string;
+  role: "admin" | "editor" | "viewer";
+  permissions: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export const adminUsersDb = {
+  /**
+   * Retrieves all registered admin users.
+   */
+  async getUsers(): Promise<StoredAdminUser[]> {
+    const res = await queryPg<any>(`
+      SELECT 
+        id, name, email, password_hash AS "passwordHash", role,
+        permissions, is_active AS "isActive",
+        created_at AS "createdAt", updated_at AS "updatedAt"
+      FROM gocoupon_admin_users
+      ORDER BY created_at ASC
+    `);
+    if (res && res.rows.length > 0) {
+      const users: StoredAdminUser[] = res.rows.map((r) => ({
+        ...r,
+        permissions: typeof r.permissions === "string" ? JSON.parse(r.permissions) : r.permissions || [],
+      }));
+      writeJsonFallback("admin-users.json", users);
+      return users;
+    }
+    return readJsonFallback<StoredAdminUser[]>("admin-users.json", []);
+  },
+
+  /**
+   * Retrieves an admin user by email (for authentication).
+   */
+  async getUserByEmail(email: string): Promise<StoredAdminUser | null> {
+    const cleanEmail = email.toLowerCase().trim();
+    const res = await queryPg<any>(
+      `SELECT 
+        id, name, email, password_hash AS "passwordHash", role,
+        permissions, is_active AS "isActive",
+        created_at AS "createdAt", updated_at AS "updatedAt"
+      FROM gocoupon_admin_users
+      WHERE LOWER(email) = $1
+      LIMIT 1`,
+      [cleanEmail]
+    );
+
+    if (res && res.rows.length > 0) {
+      const r = res.rows[0];
+      return {
+        ...r,
+        permissions: typeof r.permissions === "string" ? JSON.parse(r.permissions) : r.permissions || [],
+      };
+    }
+    const local = readJsonFallback<StoredAdminUser[]>("admin-users.json", []);
+    return local.find((u) => u.email.toLowerCase() === cleanEmail) || null;
+  },
+
+  /**
+   * Retrieves an admin user by ID.
+   */
+  async getUserById(id: string): Promise<StoredAdminUser | null> {
+    const res = await queryPg<any>(
+      `SELECT 
+        id, name, email, password_hash AS "passwordHash", role,
+        permissions, is_active AS "isActive",
+        created_at AS "createdAt", updated_at AS "updatedAt"
+      FROM gocoupon_admin_users
+      WHERE id = $1
+      LIMIT 1`,
+      [id]
+    );
+
+    if (res && res.rows.length > 0) {
+      const r = res.rows[0];
+      return {
+        ...r,
+        permissions: typeof r.permissions === "string" ? JSON.parse(r.permissions) : r.permissions || [],
+      };
+    }
+    const local = readJsonFallback<StoredAdminUser[]>("admin-users.json", []);
+    return local.find((u) => u.id === id) || null;
+  },
+
+  /**
+   * Creates a new admin user in PostgreSQL and local fallback.
+   */
+  async createUser(user: StoredAdminUser): Promise<StoredAdminUser> {
+    await queryPg(
+      `INSERT INTO gocoupon_admin_users (
+        id, name, email, password_hash, role, permissions, is_active, created_at, updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+      ON CONFLICT (email) DO UPDATE SET
+        name = EXCLUDED.name,
+        password_hash = EXCLUDED.password_hash,
+        role = EXCLUDED.role,
+        permissions = EXCLUDED.permissions,
+        is_active = EXCLUDED.is_active,
+        updated_at = NOW()`,
+      [
+        user.id,
+        user.name,
+        user.email.toLowerCase().trim(),
+        user.passwordHash || "",
+        user.role || "editor",
+        JSON.stringify(user.permissions || []),
+        user.isActive ?? true,
+        user.createdAt ? new Date(user.createdAt) : new Date(),
+      ]
+    );
+
+    const users = readJsonFallback<StoredAdminUser[]>("admin-users.json", []);
+    const idx = users.findIndex((u) => u.id === user.id || u.email.toLowerCase() === user.email.toLowerCase());
+    if (idx >= 0) {
+      users[idx] = user;
+    } else {
+      users.push(user);
+    }
+    writeJsonFallback("admin-users.json", users);
+    return user;
+  },
+
+  /**
+   * Updates an admin user in PostgreSQL and local fallback.
+   */
+  async updateUser(id: string, updates: Partial<StoredAdminUser>): Promise<StoredAdminUser | null> {
+    const fields: string[] = ["updated_at = NOW()"];
+    const values: any[] = [id];
+    let pIdx = 2;
+
+    if (updates.name !== undefined) {
+      fields.push(`name = $${pIdx++}`);
+      values.push(updates.name);
+    }
+    if (updates.email !== undefined) {
+      fields.push(`email = $${pIdx++}`);
+      values.push(updates.email.toLowerCase().trim());
+    }
+    if (updates.passwordHash !== undefined) {
+      fields.push(`password_hash = $${pIdx++}`);
+      values.push(updates.passwordHash);
+    }
+    if (updates.role !== undefined) {
+      fields.push(`role = $${pIdx++}`);
+      values.push(updates.role);
+    }
+    if (updates.permissions !== undefined) {
+      fields.push(`permissions = $${pIdx++}`);
+      values.push(JSON.stringify(updates.permissions));
+    }
+    if (updates.isActive !== undefined) {
+      fields.push(`is_active = $${pIdx++}`);
+      values.push(updates.isActive);
+    }
+
+    const res = await queryPg<any>(
+      `UPDATE gocoupon_admin_users
+      SET ${fields.join(", ")}
+      WHERE id = $1
+      RETURNING 
+        id, name, email, password_hash AS "passwordHash", role,
+        permissions, is_active AS "isActive",
+        created_at AS "createdAt", updated_at AS "updatedAt"`,
+      values
+    );
+
+    const users = readJsonFallback<StoredAdminUser[]>("admin-users.json", []);
+    const idx = users.findIndex((u) => u.id === id);
+    if (idx >= 0) {
+      users[idx] = { ...users[idx], ...updates, updatedAt: new Date().toISOString() };
+      writeJsonFallback("admin-users.json", users);
+      return users[idx];
+    }
+    if (res && res.rows.length > 0) return res.rows[0];
+    return null;
+  },
+
+  /**
+   * Deletes an admin user by ID.
+   */
+  async deleteUser(id: string): Promise<boolean> {
+    await queryPg("DELETE FROM gocoupon_admin_users WHERE id = $1", [id]);
+    const users = readJsonFallback<StoredAdminUser[]>("admin-users.json", []);
+    writeJsonFallback(
+      "admin-users.json",
+      users.filter((u) => u.id !== id)
+    );
+    return true;
+  },
+};
+
+// =============================================================================
+// 8. SITE SETTINGS & CONFIGURATION SERVICE
+// =============================================================================
+export const settingsDb = {
+  /**
+   * Retrieves a configuration setting by key.
+   */
+  async getSetting<T>(key: string, defaultValue: T): Promise<T> {
+    const res = await queryPg(
+      "SELECT value FROM gocoupon_settings WHERE key = $1 LIMIT 1",
+      [key]
+    );
+    if (res && res.rows.length > 0) {
+      const val = res.rows[0].value;
+      writeJsonFallback(`admin-${key}.json`, val);
+      return val as T;
+    }
+    return readJsonFallback<T>(`admin-${key}.json`, defaultValue);
+  },
+
+  /**
+   * Saves a configuration setting to PostgreSQL and local disk fallback.
+   */
+  async setSetting<T>(key: string, value: T): Promise<T> {
+    await queryPg(
+      `INSERT INTO gocoupon_settings (key, value, updated_at)
+       VALUES ($1, $2, NOW())
+       ON CONFLICT (key) DO UPDATE SET
+         value = EXCLUDED.value,
+         updated_at = NOW()`,
+      [key, JSON.stringify(value)]
+    );
+    writeJsonFallback(`admin-${key}.json`, value);
+    return value;
+  },
+};
+
+// =============================================================================
+// 9. OVERALL DATABASE HEALTH & METRICS
 // =============================================================================
 export async function getDatabaseDiagnostics(): Promise<{
   status: "connected" | "degraded" | "offline";
@@ -983,6 +1397,8 @@ export async function getDatabaseDiagnostics(): Promise<{
     alerts: 0,
     price_snapshots: 0,
     clicks: 0,
+    admin_users: 0,
+    settings: 0,
   };
 
   const dealsC = await queryPg("SELECT COUNT(*) FROM gocoupon_deals");
@@ -993,6 +1409,8 @@ export async function getDatabaseDiagnostics(): Promise<{
     const alertsC = await queryPg("SELECT COUNT(*) FROM gocoupon_alerts");
     const snapsC = await queryPg("SELECT COUNT(*) FROM gocoupon_price_snapshots");
     const clicksC = await queryPg("SELECT COUNT(*) FROM gocoupon_clicks");
+    const usersC = await queryPg("SELECT COUNT(*) FROM gocoupon_admin_users");
+    const settingsC = await queryPg("SELECT COUNT(*) FROM gocoupon_settings");
 
     counts.deals = parseInt(dealsC.rows[0].count, 10);
     counts.stores = storesC ? parseInt(storesC.rows[0].count, 10) : 0;
@@ -1001,6 +1419,8 @@ export async function getDatabaseDiagnostics(): Promise<{
     counts.alerts = alertsC ? parseInt(alertsC.rows[0].count, 10) : 0;
     counts.price_snapshots = snapsC ? parseInt(snapsC.rows[0].count, 10) : 0;
     counts.clicks = clicksC ? parseInt(clicksC.rows[0].count, 10) : 0;
+    counts.admin_users = usersC ? parseInt(usersC.rows[0].count, 10) : 0;
+    counts.settings = settingsC ? parseInt(settingsC.rows[0].count, 10) : 0;
 
     return {
       status: "connected",
@@ -1015,11 +1435,13 @@ export async function getDatabaseDiagnostics(): Promise<{
   const fallbackSubs = readJsonFallback<any[]>("admin-submissions.json", []);
   const fallbackDeals = getLiveDeals();
   const fallbackClicks = readJsonFallback<any[]>("admin-clicks.json", []);
+  const fallbackUsers = readJsonFallback<any[]>("admin-users.json", []);
 
   counts.deals = fallbackDeals.length;
   counts.blogs = fallbackBlogs.length;
   counts.submissions = fallbackSubs.length;
   counts.clicks = fallbackClicks.length;
+  counts.admin_users = fallbackUsers.length;
 
   return {
     status: isPgConnected ? "degraded" : "offline",

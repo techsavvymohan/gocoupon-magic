@@ -8,12 +8,13 @@
  */
 
 import { memoryAlertRegistrations } from "../routes/alerts.js";
-import { alertsDb } from "../services/db.js";
+import { alertsDb, dealsDb, queryPg } from "../services/db.js";
 import { sendPriceDropEmail } from "../services/email.js";
 import {
   syncLiveCuelinksDeals,
   fetchCuelinksCampaigns,
   getCuelinksConfig,
+  getLiveDealsPool,
 } from "../services/providers/cuelinks-client.js";
 import { syncAdmitadDeals, getAdmitadConfig } from "../services/providers/admitad-client.js";
 
@@ -37,6 +38,11 @@ export function startBackgroundWorkers(intervalMs: number = 15 * 60 * 1000) {
           syncLiveCuelinksDeals(0),
           fetchCuelinksCampaigns({ limit: 50 }),
         ]);
+        const liveDeals = getLiveDealsPool();
+        if (liveDeals.length > 0) {
+          const upserted = await dealsDb.upsertDeals(liveDeals);
+          console.log(`⚡ [Worker] Synced ${upserted} live deals to Supabase PostgreSQL.`);
+        }
         console.log("✅ [Worker] Cuelinks 24/7 live sync initialized successfully.");
       }
     } catch (err: any) {
@@ -68,9 +74,20 @@ export function startBackgroundWorkers(intervalMs: number = 15 * 60 * 1000) {
           syncLiveCuelinksDeals(0),
           fetchCuelinksCampaigns({ limit: 40 }),
         ]);
+        const liveDeals = getLiveDealsPool();
+        if (liveDeals.length > 0) {
+          await dealsDb.upsertDeals(liveDeals).catch((e) =>
+            console.warn("⚠️ [Worker] Supabase deals sync error:", e?.message)
+          );
+        }
       }
 
-      // 2. Admitad hourly sync (every 4th tick = 4 × 15 min = 60 min)
+      // 2. Supabase Keep-Alive Heartbeat: ensures Supabase Free Tier never auto-pauses due to 7-day inactivity
+      await queryPg("SELECT 1").catch((e) =>
+        console.warn("⚠️ [Worker] Supabase keep-alive ping notice:", e?.message)
+      );
+
+      // 3. Admitad hourly sync (every 4th tick = 4 × 15 min = 60 min)
       if (admitadTickCount % 4 === 0) {
         const admitadConfig = getAdmitadConfig();
         if (admitadConfig.isConfigured) {

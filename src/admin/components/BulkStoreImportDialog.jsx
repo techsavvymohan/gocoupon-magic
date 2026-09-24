@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, useDialogA11yIds } from "@/components/ui/dialog";
 import { DEFAULT_COUNTRY_CODE, normalizeCountryCode } from "@/lib/countries";
 import { cn } from "@/lib/utils";
+import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 
 const TEMPLATE_HEADERS = [
   "name",
@@ -323,6 +324,7 @@ export default function BulkStoreImportDialog({ open, onOpenChange, stores = [],
     try {
       const response = await fetch("/api/stores/bulk", {
         method: "POST",
+        headers: getAdminAuthHeaders(),
         body: (() => {
           const formData = new FormData();
           formData.append("rows", JSON.stringify(rowsToImport));

@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import pg from "pg";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -342,6 +343,78 @@ export async function runCuelinksSync(maxPages = 0) {
   if (fs.existsSync(distDir)) {
     fs.writeFileSync(path.join(distDir, "live-deals.json"), JSON.stringify(payload, null, 2), "utf-8");
     console.log(`[Cuelinks Sync] Also mirrored to dist/data/live-deals.json`);
+  }
+
+  // Push to Supabase PostgreSQL cloud database if DATABASE_URL is available
+  if (process.env.DATABASE_URL) {
+    try {
+      console.log(`⚡ [Cuelinks Sync] Syncing ${accumulatedDeals.length} live deals to Supabase PostgreSQL...`);
+      const pool = new pg.Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false },
+      });
+      const client = await pool.connect();
+      try {
+        const BATCH_SIZE = 50;
+        for (let i = 0; i < accumulatedDeals.length; i += BATCH_SIZE) {
+          const batch = accumulatedDeals.slice(i, i + BATCH_SIZE);
+          const values = [];
+          const rowPlaceholders = [];
+
+          batch.forEach((d, rowIdx) => {
+            const offset = rowIdx * 22;
+            const placeholders = Array.from({ length: 22 }, (_, k) => `$${offset + k + 1}`).join(", ");
+            rowPlaceholders.push(`(${placeholders})`);
+
+            values.push(
+              String(d.id),
+              d.storeName || "Store",
+              d.storeSlug || (d.storeName || "store").toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+              d.storeLogo || null,
+              d.title,
+              d.code || "",
+              d.discount || "Exclusive Offer",
+              d.category || "General",
+              d.badge || "Verified",
+              d.verified ?? true,
+              d.verifiedDate || "Verified Today",
+              d.expiresIn || "Active",
+              d.endDate ? new Date(d.endDate) : null,
+              d.minOrder || null,
+              d.terms || null,
+              d.link || "https://gocoupon.io",
+              d.usesCount || 1,
+              d.rating || 4.8,
+              d.votesCount || 12,
+              d.source || "cuelinks",
+              d.status || "active",
+              d.type || "coupon"
+            );
+          });
+
+          await client.query(`
+            INSERT INTO gocoupon_deals (
+              id, store_name, store_slug, store_logo, title, code, discount, category,
+              badge, verified, verified_date, expires_in, end_date, min_order, terms,
+              link, uses_count, rating, votes_count, source, status, type
+            ) VALUES ${rowPlaceholders.join(",\n")}
+            ON CONFLICT (id) DO UPDATE SET
+              title = EXCLUDED.title,
+              code = EXCLUDED.code,
+              discount = EXCLUDED.discount,
+              uses_count = EXCLUDED.uses_count,
+              verified = EXCLUDED.verified,
+              updated_at = NOW();
+          `, values);
+        }
+        console.log(`✅ [Cuelinks Sync] Successfully synced all ${accumulatedDeals.length} live deals into Supabase PostgreSQL (gocoupon_deals)!`);
+      } finally {
+        client.release();
+        await pool.end();
+      }
+    } catch (dbErr) {
+      console.warn("⚠️ [Cuelinks Sync] Cloud database sync warning:", dbErr.message);
+    }
   }
 
   return payload;

@@ -1,6 +1,31 @@
 import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import pg from 'pg';
 
-const dealsSnapshotPath = './src/data/live-deals.json';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const projectRoot = path.resolve(__dirname, '..');
+
+// Load environment variables from .env
+const envPath = path.join(projectRoot, '.env');
+if (fs.existsSync(envPath)) {
+  const envContent = fs.readFileSync(envPath, 'utf-8');
+  for (const line of envContent.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eqIdx = trimmed.indexOf('=');
+    if (eqIdx > 0) {
+      const key = trimmed.slice(0, eqIdx).trim();
+      const val = trimmed.slice(eqIdx + 1).trim().replace(/^["']|["']$/g, '');
+      if (!process.env[key]) {
+        process.env[key] = val;
+      }
+    }
+  }
+}
+
+const dealsSnapshotPath = path.join(projectRoot, 'src/data/live-deals.json');
 const snapshot = JSON.parse(fs.readFileSync(dealsSnapshotPath, 'utf-8'));
 
 const FEATURED_DEALS_COLLECTION = [
@@ -306,10 +331,85 @@ const converted = FEATURED_DEALS_COLLECTION.map(item => ({
   type: "Coupon"
 }));
 
-const filtered = (snapshot.deals || []).filter(d => !d.id.startsWith("ac-"));
-snapshot.deals = [...converted, ...filtered];
+// Non-destructive upsert: update matching IDs from collection, keep any manual deals intact
+const convertedMap = new Map(converted.map(c => [c.id, c]));
+const updatedExisting = (snapshot.deals || []).map(d => {
+  if (convertedMap.has(d.id)) {
+    const fresh = convertedMap.get(d.id);
+    convertedMap.delete(d.id);
+    return { ...d, ...fresh };
+  }
+  return d;
+});
+// Prepend newly added deals that weren't in snapshot yet
+snapshot.deals = [...convertedMap.values(), ...updatedExisting];
 snapshot.activeCount = snapshot.deals.length;
 snapshot.updatedAt = new Date().toISOString();
 
 fs.writeFileSync(dealsSnapshotPath, JSON.stringify(snapshot, null, 2), "utf-8");
-console.log("SEEDED_SUCCESSFULLY:", converted.length);
+console.log("SEEDED_TO_DISK_SUCCESSFULLY:", converted.length);
+
+// Sync directly to Supabase PostgreSQL database if configured
+async function syncToSupabase() {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    console.log("ℹ️ DATABASE_URL not set in .env; skipping Supabase PostgreSQL cloud sync.");
+    return;
+  }
+
+  try {
+    const pool = new pg.Pool({
+      connectionString: databaseUrl,
+      ssl: { rejectUnauthorized: false },
+    });
+    console.log("⚡ Connecting to Supabase PostgreSQL to sync featured deals...");
+    const client = await pool.connect();
+    try {
+      let count = 0;
+      for (const d of converted) {
+        await client.query(`
+          INSERT INTO gocoupon_deals (
+            id, store_name, store_slug, title, code, discount, category,
+            badge, verified, verified_date, expires_in, end_date, terms,
+            link, uses_count, source, status, type
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+          ON CONFLICT (id) DO UPDATE SET
+            title = EXCLUDED.title,
+            code = EXCLUDED.code,
+            discount = EXCLUDED.discount,
+            uses_count = EXCLUDED.uses_count,
+            verified = EXCLUDED.verified,
+            updated_at = NOW();
+        `, [
+          d.id,
+          d.storeName,
+          d.storeSlug,
+          d.title,
+          d.code || "",
+          d.discount,
+          d.category || "General",
+          d.badge || "Verified",
+          d.verified ?? true,
+          d.verifiedDate || "Live Verified",
+          d.expiresIn || "30 days left",
+          d.endDate ? new Date(d.endDate) : null,
+          d.terms || null,
+          d.link || "https://gocoupon.io",
+          d.usesCount || 150,
+          d.source || "analytics_clouds",
+          d.status || "active",
+          d.type || "Coupon",
+        ]);
+        count++;
+      }
+      console.log(`✅ Synced ${count} featured deals directly into Supabase PostgreSQL (gocoupon_deals)!`);
+    } finally {
+      client.release();
+      await pool.end();
+    }
+  } catch (err) {
+    console.warn("⚠️ Could not sync featured deals to Supabase database:", err.message);
+  }
+}
+
+syncToSupabase().catch((err) => console.error("Sync error:", err));

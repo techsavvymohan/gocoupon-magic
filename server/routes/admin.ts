@@ -17,7 +17,7 @@ import {
 import { STORES_DB } from "../../src/lib/server-data/stores-db.js";
 import { globalCache } from "../../src/lib/services/cache-service.js";
 import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
-import { submissionsDb, dealsDb, clicksDb, getDatabaseDiagnostics } from "../services/db.js";
+import { submissionsDb, dealsDb, clicksDb, adminUsersDb, settingsDb, getDatabaseDiagnostics } from "../services/db.js";
 
 export const adminRouter = Router();
 
@@ -365,7 +365,7 @@ function verifyPassword(password: string, storedHash?: string): boolean {
   return safeCompareStrings(hash, testHash);
 }
 
-adminRouter.post("/login", (req: Request, res: Response) => {
+adminRouter.post("/login", async (req: Request, res: Response) => {
   const clientIp =
     (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
     req.socket.remoteAddress ||
@@ -394,11 +394,15 @@ adminRouter.post("/login", (req: Request, res: Response) => {
     cleanEmail === configuredEmail &&
     safeCompareStrings(cleanPass, configuredPass);
 
-  const users: StoredAdminUser[] = loadJson(USERS_FILE, defaultUsers);
-  const matchedUser = users.find((u) => u.email.toLowerCase() === cleanEmail && u.isActive);
+  let matchedUser = await adminUsersDb.getUserByEmail(cleanEmail);
+  if (!matchedUser) {
+    const users: StoredAdminUser[] = loadJson(USERS_FILE, defaultUsers);
+    matchedUser = users.find((u) => u.email.toLowerCase() === cleanEmail && u.isActive) || null;
+  }
 
   const isUserPasswordMatch =
     matchedUser &&
+    matchedUser.isActive !== false &&
     (matchedUser.passwordHash
       ? verifyPassword(cleanPass, matchedUser.passwordHash)
       : (matchedUser as any).password
@@ -447,13 +451,13 @@ adminRouter.get("/verify", requireAdminAuth, (req: Request, res: Response) => {
 // ---------------------------------------------------------------------------
 // 3.1 Admin Users Management CRUD Endpoints
 // ---------------------------------------------------------------------------
-adminRouter.get("/users", requireAdminAuth, (_req: Request, res: Response) => {
-  const users: StoredAdminUser[] = loadJson(USERS_FILE, defaultUsers);
+adminRouter.get("/users", requireAdminAuth, async (_req: Request, res: Response) => {
+  const users = await adminUsersDb.getUsers();
   const safeUsers = users.map(({ passwordHash, ...rest }) => rest);
   res.json({ success: true, data: safeUsers });
 });
 
-adminRouter.post("/users", requireAdminAuth, (req: Request, res: Response) => {
+adminRouter.post("/users", requireAdminAuth, async (req: Request, res: Response) => {
   const { name, email, password, role, permissions, isActive } = req.body || {};
   const cleanEmail = String(email || "").trim().toLowerCase();
   const cleanPass = String(password || "").trim();
@@ -467,8 +471,8 @@ adminRouter.post("/users", requireAdminAuth, (req: Request, res: Response) => {
     return;
   }
 
-  const users: StoredAdminUser[] = loadJson(USERS_FILE, defaultUsers);
-  if (users.some((u) => u.email.toLowerCase() === cleanEmail)) {
+  const existing = await adminUsersDb.getUserByEmail(cleanEmail);
+  if (existing) {
     res.status(409).json({ success: false, error: `A user with email '${cleanEmail}' already exists.` });
     return;
   }
@@ -483,87 +487,83 @@ adminRouter.post("/users", requireAdminAuth, (req: Request, res: Response) => {
     name: String(name || "").trim() || cleanEmail.split("@")[0],
     email: cleanEmail,
     passwordHash: hashPassword(cleanPass),
-    role: validRole,
+    role: validRole as any,
     permissions: validPermissions,
     isActive: isActive !== false,
     createdAt: new Date().toISOString(),
   };
 
-  users.push(newUser);
-  saveJson(USERS_FILE, users);
+  await adminUsersDb.createUser(newUser);
 
   const { passwordHash: _, ...safeUser } = newUser;
   res.status(201).json({ success: true, data: safeUser, message: "Admin user created successfully." });
 });
 
-adminRouter.patch("/users/:id", requireAdminAuth, (req: Request, res: Response) => {
+adminRouter.patch("/users/:id", requireAdminAuth, async (req: Request, res: Response) => {
   const id = String(req.params.id);
-  const users: StoredAdminUser[] = loadJson(USERS_FILE, defaultUsers);
-  const idx = users.findIndex((u) => u.id === id);
+  const existing = await adminUsersDb.getUserById(id);
 
-  if (idx === -1) {
+  if (!existing) {
     res.status(404).json({ success: false, error: `User '${id}' not found.` });
     return;
   }
 
   const { name, email, password, role, permissions, isActive } = req.body || {};
-  if (name !== undefined) users[idx].name = String(name).trim();
-  if (email !== undefined) users[idx].email = String(email).trim().toLowerCase();
+  const updates: Partial<StoredAdminUser> = {};
+  if (name !== undefined) updates.name = String(name).trim();
+  if (email !== undefined) updates.email = String(email).trim().toLowerCase();
   if (password && String(password).trim().length >= 6) {
-    users[idx].passwordHash = hashPassword(String(password).trim());
+    updates.passwordHash = hashPassword(String(password).trim());
   }
   if (role && ["admin", "editor", "viewer"].includes(role)) {
-    users[idx].role = role;
+    updates.role = role as any;
   }
   if (Array.isArray(permissions)) {
-    users[idx].permissions = permissions;
+    updates.permissions = permissions;
   }
   if (isActive !== undefined) {
-    users[idx].isActive = Boolean(isActive);
+    updates.isActive = Boolean(isActive);
   }
-  users[idx].updatedAt = new Date().toISOString();
 
-  saveJson(USERS_FILE, users);
-  const { passwordHash: _, ...safeUser } = users[idx];
+  const updated = await adminUsersDb.updateUser(id, updates);
+  const safeUser = updated ? (({ passwordHash, ...rest }) => rest)(updated) : null;
   res.json({ success: true, data: safeUser, message: "User updated successfully." });
 });
 
-adminRouter.put("/users/:id", requireAdminAuth, (req: Request, res: Response) => {
+adminRouter.put("/users/:id", requireAdminAuth, async (req: Request, res: Response) => {
   const id = String(req.params.id);
-  const users: StoredAdminUser[] = loadJson(USERS_FILE, defaultUsers);
-  const idx = users.findIndex((u) => u.id === id);
+  const existing = await adminUsersDb.getUserById(id);
 
-  if (idx === -1) {
+  if (!existing) {
     res.status(404).json({ success: false, error: `User '${id}' not found.` });
     return;
   }
 
   const { name, email, password, role, permissions, isActive } = req.body || {};
-  if (name !== undefined) users[idx].name = String(name).trim();
-  if (email !== undefined) users[idx].email = String(email).trim().toLowerCase();
+  const updates: Partial<StoredAdminUser> = {};
+  if (name !== undefined) updates.name = String(name).trim();
+  if (email !== undefined) updates.email = String(email).trim().toLowerCase();
   if (password && String(password).trim().length >= 6) {
-    users[idx].passwordHash = hashPassword(String(password).trim());
+    updates.passwordHash = hashPassword(String(password).trim());
   }
   if (role && ["admin", "editor", "viewer"].includes(role)) {
-    users[idx].role = role;
+    updates.role = role as any;
   }
   if (Array.isArray(permissions)) {
-    users[idx].permissions = permissions;
+    updates.permissions = permissions;
   }
   if (isActive !== undefined) {
-    users[idx].isActive = Boolean(isActive);
+    updates.isActive = Boolean(isActive);
   }
-  users[idx].updatedAt = new Date().toISOString();
 
-  saveJson(USERS_FILE, users);
-  const { passwordHash: _, ...safeUser } = users[idx];
+  const updated = await adminUsersDb.updateUser(id, updates);
+  const safeUser = updated ? (({ passwordHash, ...rest }) => rest)(updated) : null;
   res.json({ success: true, data: safeUser, message: "User updated successfully." });
 });
 
-adminRouter.delete("/users/:id", requireAdminAuth, (req: Request, res: Response) => {
+adminRouter.delete("/users/:id", requireAdminAuth, async (req: Request, res: Response) => {
   const id = String(req.params.id);
-  let users: StoredAdminUser[] = loadJson(USERS_FILE, defaultUsers);
-  const target = users.find((u) => u.id === id);
+  const target = await adminUsersDb.getUserById(id);
 
   if (!target) {
     res.status(404).json({ success: false, error: `User '${id}' not found.` });
@@ -576,8 +576,7 @@ adminRouter.delete("/users/:id", requireAdminAuth, (req: Request, res: Response)
     return;
   }
 
-  users = users.filter((u) => u.id !== id);
-  saveJson(USERS_FILE, users);
+  await adminUsersDb.deleteUser(id);
   res.json({ success: true, message: `User '${target.email}' deleted successfully.` });
 });
 
@@ -693,16 +692,16 @@ adminRouter.delete("/notifications", requireAdminAuth, (req: Request, res: Respo
 // ---------------------------------------------------------------------------
 // 6. Settings Endpoints
 // ---------------------------------------------------------------------------
-export function handleGetSettings(req: Request, res: Response) {
-  const settings = loadJson(SETTINGS_FILE, defaultSettings);
+export async function handleGetSettings(req: Request, res: Response) {
+  const settings = await settingsDb.getSetting("settings", defaultSettings);
   res.json({ success: true, data: settings });
 }
 
-export function handlePutSettings(req: Request, res: Response) {
-  const existing = loadJson(SETTINGS_FILE, defaultSettings);
+export async function handlePutSettings(req: Request, res: Response) {
+  const existing = await settingsDb.getSetting("settings", defaultSettings);
   const patch = req.body || {};
   const merged = { ...existing, ...patch };
-  saveJson(SETTINGS_FILE, merged);
+  await settingsDb.setSetting("settings", merged);
   res.json({ success: true, message: "Settings saved successfully.", data: merged });
 }
 
@@ -871,72 +870,74 @@ adminRouter.delete("/users", requireAdminAuth, (req: Request, res: Response) => 
 // ---------------------------------------------------------------------------
 // 9. Hero & Homepage Sections Endpoints
 // ---------------------------------------------------------------------------
-adminRouter.get("/hero", (req: Request, res: Response) => {
-  const hero = loadJson(HERO_FILE, defaultHero);
+const defaultSections = {
+  featuredStores: true,
+  trendingDeals: true,
+  bankArbitrage: true,
+  categoriesGrid: true,
+  testimonials: true,
+  faq: true,
+};
+
+adminRouter.get("/hero", async (req: Request, res: Response) => {
+  const hero = await settingsDb.getSetting("hero", defaultHero);
   res.json({ success: true, data: hero });
 });
 
-adminRouter.put("/hero", requireAdminAuth, (req: Request, res: Response) => {
+adminRouter.put("/hero", requireAdminAuth, async (req: Request, res: Response) => {
   const hero = req.body || {};
-  saveJson(HERO_FILE, hero);
+  await settingsDb.setSetting("hero", hero);
   res.json({ success: true, message: "Hero settings saved.", data: hero });
 });
 
-adminRouter.get("/sections", (req: Request, res: Response) => {
-  const sections = loadJson(SECTIONS_FILE, {
-    featuredStores: true,
-    trendingDeals: true,
-    bankArbitrage: true,
-    categoriesGrid: true,
-    testimonials: true,
-    faq: true,
-  });
+adminRouter.get("/sections", async (req: Request, res: Response) => {
+  const sections = await settingsDb.getSetting("sections", defaultSections);
   res.json({ success: true, data: sections });
 });
 
-adminRouter.put("/sections", requireAdminAuth, (req: Request, res: Response) => {
+adminRouter.put("/sections", requireAdminAuth, async (req: Request, res: Response) => {
   const sections = req.body || {};
-  saveJson(SECTIONS_FILE, sections);
+  await settingsDb.setSetting("sections", sections);
   res.json({ success: true, message: "Homepage sections saved.", data: sections });
 });
 
 // ---------------------------------------------------------------------------
 // 10. Events / Festivals Endpoints
 // ---------------------------------------------------------------------------
-export function handleGetEvents(req: Request, res: Response) {
-  const events = loadJson(EVENTS_FILE, defaultEvents);
+export async function handleGetEvents(req: Request, res: Response) {
+  const events = await settingsDb.getSetting("events", defaultEvents);
   res.json({ success: true, data: events });
 }
 
-export function handleCreateEvent(req: Request, res: Response) {
+export async function handleCreateEvent(req: Request, res: Response) {
   const event = req.body || {};
-  const events = loadJson(EVENTS_FILE, defaultEvents);
+  const events = await settingsDb.getSetting("events", defaultEvents);
   const newEvent = { ...event, id: `evt-${Date.now()}` };
   events.unshift(newEvent);
-  saveJson(EVENTS_FILE, events);
+  await settingsDb.setSetting("events", events);
   res.json({ success: true, data: newEvent });
 }
 
-export function handleUpdateEvent(req: Request, res: Response) {
+export async function handleUpdateEvent(req: Request, res: Response) {
   const event = req.body || {};
-  const events = loadJson(EVENTS_FILE, defaultEvents);
-  const idx = events.findIndex((e) => e.id === event.id || e.slug === event.slug);
+  const events = await settingsDb.getSetting("events", defaultEvents);
+  const idx = events.findIndex((e: any) => e.id === event.id || e.slug === event.slug);
   if (idx !== -1) {
     events[idx] = { ...events[idx], ...event };
-    saveJson(EVENTS_FILE, events);
+    await settingsDb.setSetting("events", events);
     res.json({ success: true, data: events[idx] });
   } else {
     events.unshift(event);
-    saveJson(EVENTS_FILE, events);
+    await settingsDb.setSetting("events", events);
     res.json({ success: true, data: event });
   }
 }
 
-export function handleDeleteEvent(req: Request, res: Response) {
+export async function handleDeleteEvent(req: Request, res: Response) {
   const id = (req.query.id as string) || (req.query.slug as string) || req.params.id;
-  let events = loadJson(EVENTS_FILE, defaultEvents);
-  events = events.filter((e) => e.id !== id && e.slug !== id);
-  saveJson(EVENTS_FILE, events);
+  let events = await settingsDb.getSetting("events", defaultEvents);
+  events = events.filter((e: any) => e.id !== id && e.slug !== id);
+  await settingsDb.setSetting("events", events);
   res.json({ success: true, message: "Event deleted." });
 }
 
@@ -968,19 +969,21 @@ export interface StoredSubmission {
 const defaultSubmissions: StoredSubmission[] = [];
 
 export function recordNewSubmission(sub: Omit<StoredSubmission, "id" | "submittedAt" | "status">): StoredSubmission {
-  const submissions = loadJson(SUBMISSIONS_FILE, defaultSubmissions);
+  const subId = `sub-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
   const newSub: StoredSubmission = {
-    id: `sub-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    id: subId,
     ...sub,
     submittedAt: new Date().toISOString(),
     status: "pending",
   };
+  const submissions = loadJson(SUBMISSIONS_FILE, defaultSubmissions);
   submissions.unshift(newSub);
   saveJson(SUBMISSIONS_FILE, submissions);
 
-  // Asynchronously persist to PostgreSQL cloud database
+  // Asynchronously persist to PostgreSQL cloud database with matching ID
   submissionsDb
     .createSubmission({
+      id: subId,
       storeName: sub.storeName,
       code: sub.code,
       discount: sub.discount,
@@ -996,9 +999,9 @@ export function recordNewSubmission(sub: Omit<StoredSubmission, "id" | "submitte
 
 /**
  * GET /api/admin/submissions
- * Retrieve submitted community coupons with optional status filter
+ * Retrieve submitted community coupons with optional status filter (Secured with Admin Auth)
  */
-adminRouter.get("/submissions", async (req: Request, res: Response) => {
+adminRouter.get("/submissions", requireAdminAuth, async (req: Request, res: Response) => {
   const status = (req.query.status as string || "").toLowerCase();
   const q = (req.query.q as string || "").toLowerCase().trim();
 

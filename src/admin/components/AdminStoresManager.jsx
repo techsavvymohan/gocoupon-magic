@@ -15,6 +15,7 @@ import BulkStoreImportDialog from "./BulkStoreImportDialog";
 import { cn } from "@/lib/utils";
 import { DEFAULT_COUNTRY_CODE, SUPPORTED_COUNTRIES, sanitizeCountryList } from "@/lib/countries";
 import { Search, X } from "lucide-react";
+import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 
 const MAX_LOGO_SIZE = 2 * 1024 * 1024;
 const ACCEPTED_LOGO_TYPES = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
@@ -461,7 +462,7 @@ export default function AdminStoresManager() {
 
     const response = await fetch(endpoint, {
       method,
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
       body: JSON.stringify({
         ...values,
         category: selectedCategory.name,
@@ -509,7 +510,10 @@ export default function AdminStoresManager() {
     const slugsToDelete = deleteTarget?.slug === "__bulk__" ? selectedStoreSlugs : deleteTarget ? [deleteTarget.slug] : selectedStoreSlugs;
     const responses = await Promise.all(
       slugsToDelete.map(async (slug) => {
-        const response = await fetch(`/api/stores/${slug}`, { method: "DELETE" });
+        const response = await fetch(`/api/stores/${slug}`, {
+          method: "DELETE",
+          headers: getAdminAuthHeaders(),
+        });
         const payload = await response.json().catch(() => ({}));
         return { response, payload };
       })

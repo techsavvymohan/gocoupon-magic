@@ -180,7 +180,25 @@ CREATE TABLE IF NOT EXISTS gocoupon_settings (
 );
 
 -- -----------------------------------------------------------------------------
--- 8. DEAL CLICKS & REDEMPTIONS (gocoupon_clicks)
+-- 8. ADMIN USERS & ACCESS CONTROL (gocoupon_admin_users)
+-- Secured admin credentials, roles, and granular permission sets.
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS gocoupon_admin_users (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'editor',
+    permissions JSONB DEFAULT '[]',
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_admin_users_email ON gocoupon_admin_users(email);
+
+-- -----------------------------------------------------------------------------
+-- 9. DEAL CLICKS & REDEMPTIONS (gocoupon_clicks)
 -- Live user click tracking on offers, coupon copies, and outbound store visits.
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS gocoupon_clicks (
@@ -213,6 +231,7 @@ ALTER TABLE gocoupon_submissions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gocoupon_alerts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gocoupon_price_snapshots ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gocoupon_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE gocoupon_admin_users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gocoupon_clicks ENABLE ROW LEVEL SECURITY;
 
 -- Allow public read of active deals
@@ -230,9 +249,17 @@ BEGIN
     DROP POLICY IF EXISTS "Public price snapshots read policy" ON gocoupon_price_snapshots;
     CREATE POLICY "Public price snapshots read policy" ON gocoupon_price_snapshots FOR SELECT USING (true);
 
+    DROP POLICY IF EXISTS "Public price snapshots insert policy" ON gocoupon_price_snapshots;
+    CREATE POLICY "Public price snapshots insert policy" ON gocoupon_price_snapshots FOR INSERT WITH CHECK (true);
+
     DROP POLICY IF EXISTS "Public submissions insert policy" ON gocoupon_submissions;
     CREATE POLICY "Public submissions insert policy" ON gocoupon_submissions FOR INSERT WITH CHECK (true);
 
     DROP POLICY IF EXISTS "Public alerts insert policy" ON gocoupon_alerts;
     CREATE POLICY "Public alerts insert policy" ON gocoupon_alerts FOR INSERT WITH CHECK (true);
+
+    -- Protected telemetry for deal clicks: allow public insert if needed, deny public read/update/delete
+    DROP POLICY IF EXISTS "Public clicks insert policy" ON gocoupon_clicks;
+    CREATE POLICY "Public clicks insert policy" ON gocoupon_clicks FOR INSERT WITH CHECK (true);
 END $$;
+
