@@ -80,6 +80,7 @@ export default function AdminOffersManager() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [selectedOfferIds, setSelectedOfferIds] = useState([]);
   const [error, setError] = useState("");
+  const [isCustomStore, setIsCustomStore] = useState(false);
   const affiliateEditedRef = useRef(false);
 
   async function loadData() {
@@ -97,7 +98,7 @@ export default function AdminOffersManager() {
       } catch {}
     }
     setOffers(offersPayload.data || []);
-    setStores(storesPayload.data || []);
+    setStores(storesPayload.data || storesPayload.stores || []);
     setSelectedOfferIds((current) => current.filter((id) => (offersPayload.data || []).some((offer) => offer.id === id)));
   }
 
@@ -121,7 +122,7 @@ export default function AdminOffersManager() {
           } catch {}
         }
         setOffers(offersPayload.data || []);
-        setStores(storesPayload.data || []);
+        setStores(storesPayload.data || storesPayload.stores || []);
         setSelectedOfferIds([]);
       }
     }
@@ -136,6 +137,7 @@ export default function AdminOffersManager() {
   function handleOpenCreate() {
     setEditingOffer(null);
     setForm(initialForm);
+    setIsCustomStore(false);
     affiliateEditedRef.current = false;
     setError("");
     setOpen(true);
@@ -147,6 +149,9 @@ export default function AdminOffersManager() {
     if (cleanExpiry && cleanExpiry.includes("T")) {
       cleanExpiry = cleanExpiry.split("T")[0];
     }
+    const isKnown = stores.some((s) => s.slug === offer.storeSlug);
+    setIsCustomStore(!isKnown && Boolean(offer.storeSlug));
+
     setForm({
       title: offer.title || "",
       description: offer.description || "",
@@ -179,6 +184,16 @@ export default function AdminOffersManager() {
     const nextState = { ...form, [name]: type === "checkbox" ? checked : value };
 
     if (name === "storeSlug") {
+      if (value === "__other__") {
+        setIsCustomStore(true);
+        setForm((prev) => ({
+          ...prev,
+          storeSlug: "",
+          storeName: "",
+        }));
+        return;
+      }
+      setIsCustomStore(false);
       const matchedStore = stores.find((store) => store.slug === value);
       nextState.storeName = matchedStore?.name || "";
       if (!affiliateEditedRef.current && matchedStore?.affiliateLink) {
@@ -258,13 +273,79 @@ export default function AdminOffersManager() {
     setIsSubmitting(true);
     setError("");
 
+    const cleanStoreName = (form.storeName || "").trim();
+    if (!cleanStoreName) {
+      setError("Store / brand name is required.");
+      toast.error("Store / brand name is required.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    const finalStoreSlug = (form.storeSlug || cleanStoreName)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    const cleanLogo = (form.storeLogo || "").trim();
+    const cleanCategory = form.category || "General";
+    const cleanLink = form.affiliateLink || form.merchantUrl || `/store/${finalStoreSlug}`;
+
+    const submissionPayload = {
+      ...form,
+      storeName: cleanStoreName,
+      storeSlug: finalStoreSlug,
+      storeLogo: cleanLogo,
+      imageUrl: cleanLogo || form.imageUrl || "",
+      category: cleanCategory,
+    };
+
+    // Auto-upsert store directly to /api/stores so it immediately updates the website's Stores Directory
+    if (isCustomStore || !stores.some((s) => s.slug === finalStoreSlug)) {
+      try {
+        const storePayload = {
+          id: finalStoreSlug,
+          slug: finalStoreSlug,
+          name: cleanStoreName,
+          logo: cleanLogo,
+          logoImage: cleanLogo,
+          category: cleanCategory,
+          link: cleanLink,
+          affiliateLink: cleanLink,
+          description: form.description || `Verified promo codes, deals, and vouchers for ${cleanStoreName}.`,
+          badge: "Verified Partner",
+          rating: 4.8,
+          couponsCount: 1,
+          maxDiscount: form.discount || "Special Offer",
+          cashbackRate: "Available",
+          popularCoupon: {
+            code: form.code || "",
+            description: form.title || "Featured discount offer",
+            discount: form.discount || "Special Offer",
+          },
+        };
+
+        const storeRes = await fetch("/api/stores", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
+          body: JSON.stringify(storePayload),
+        });
+
+        if (storeRes.ok) {
+          const storeData = await storeRes.json();
+          const registeredStore = storeData.data || storePayload;
+          setStores((prev) => [registeredStore, ...prev.filter((s) => s.slug !== finalStoreSlug)]);
+        }
+      } catch (storeErr) {
+        console.warn("Could not register store via /api/stores:", storeErr);
+      }
+    }
+
     const endpoint = editingOffer ? `/api/offers?id=${encodeURIComponent(editingOffer.id)}` : "/api/offers";
     const method = editingOffer ? "PUT" : "POST";
 
     const response = await fetch(endpoint, {
       method,
       headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
-      body: JSON.stringify(form),
+      body: JSON.stringify(submissionPayload),
     });
 
     const payload = await response.json();
@@ -281,6 +362,7 @@ export default function AdminOffersManager() {
     setOpen(false);
     setForm(initialForm);
     setEditingOffer(null);
+    setIsCustomStore(false);
     affiliateEditedRef.current = false;
     setIsSubmitting(false);
   }
@@ -820,25 +902,35 @@ export default function AdminOffersManager() {
                   </label>
 
                   <label className="grid gap-1.5 text-xs text-zinc-300 font-semibold">
-                    <span>Store / Brand <span className="text-rose-400">*</span></span>
+                    <span className="flex items-center justify-between">
+                      <span>Store / Brand <span className="text-rose-400">*</span></span>
+                      {isCustomStore && (
+                        <span className="text-[10px] text-emerald-400 font-bold">New Store Mode</span>
+                      )}
+                    </span>
                     <select
                       name="storeSlug"
-                      value={form.storeSlug}
+                      value={isCustomStore ? "__other__" : form.storeSlug}
                       onChange={handleChange}
-                      className="h-9 rounded-xl border border-zinc-700 bg-zinc-800/90 px-3 text-xs text-white outline-none focus:border-emerald-500 cursor-pointer"
-                      required
+                      className="h-9 rounded-xl border border-zinc-700 bg-zinc-800/90 px-3 text-xs text-white outline-none focus:border-emerald-500 cursor-pointer font-medium"
+                      required={!isCustomStore}
                     >
                       <option value="">Select store / brand</option>
-                      {stores.map((store) => (
-                        <option key={store.slug} value={store.slug}>
-                          {store.name}
-                        </option>
-                      ))}
+                      <option value="__other__" className="font-bold text-emerald-400 bg-zinc-900 py-1">
+                        ➕ Other (Add New Store)
+                      </option>
+                      <optgroup label="── Registered Stores ──">
+                        {stores.map((store) => (
+                          <option key={store.slug} value={store.slug}>
+                            {store.name}
+                          </option>
+                        ))}
+                      </optgroup>
                     </select>
                   </label>
 
                   <label className="grid gap-1.5 text-xs text-zinc-300 font-semibold">
-                    <span>Category</span>
+                    <span>Category <span className="text-rose-400">*</span></span>
                     <select
                       name="category"
                       value={form.category}
@@ -853,6 +945,93 @@ export default function AdminOffersManager() {
                     </select>
                   </label>
 
+                  {/* New Store Registration Panel (when 'Other' is selected) */}
+                  {isCustomStore && (
+                    <div className="sm:col-span-2 rounded-xl border border-emerald-500/50 bg-emerald-950/30 p-4 space-y-3.5 shadow-inner">
+                      <div className="flex items-center justify-between flex-wrap gap-2 border-b border-emerald-900/60 pb-2.5">
+                        <div className="flex items-center gap-2">
+                          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-black">
+                            +
+                          </span>
+                          <span className="text-xs font-bold text-emerald-300">
+                            Register Brand-New Store
+                          </span>
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                            Auto-syncs to Stores Directory
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsCustomStore(false);
+                            setForm((prev) => ({ ...prev, storeSlug: "", storeName: "" }));
+                          }}
+                          className="text-[11px] text-zinc-400 hover:text-white underline cursor-pointer"
+                        >
+                          ✕ Pick Existing Store
+                        </button>
+                      </div>
+
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <label className="grid gap-1.5 text-xs text-zinc-300 font-semibold">
+                          <span className="flex items-center justify-between">
+                            <span>New Store Name <span className="text-rose-400">*</span></span>
+                            <span className="text-[10px] text-zinc-400">e.g. Zara, Sephora, Croma</span>
+                          </span>
+                          <Input
+                            name="customStoreName"
+                            value={form.storeName}
+                            onChange={(e) => {
+                              const name = e.target.value;
+                              const autoSlug = name
+                                .toLowerCase()
+                                .trim()
+                                .replace(/[^a-z0-9]+/g, "-")
+                                .replace(/^-+|-+$/g, "");
+                              setForm((prev) => ({
+                                ...prev,
+                                storeName: name,
+                                storeSlug: autoSlug,
+                              }));
+                            }}
+                            placeholder="Enter store name"
+                            className="bg-zinc-800/90 border-zinc-700 text-white placeholder:text-zinc-500 text-xs h-9 focus:border-emerald-500"
+                            required={isCustomStore}
+                          />
+                        </label>
+
+                        <label className="grid gap-1.5 text-xs text-zinc-300 font-semibold">
+                          <span className="flex items-center justify-between">
+                            <span>Store Slug (Directory URL identifier) <span className="text-rose-400">*</span></span>
+                            <span className="text-[10px] text-zinc-400">Auto-slugified</span>
+                          </span>
+                          <div className="flex items-center rounded-xl border border-zinc-700 bg-zinc-800/90 px-3 text-xs text-white">
+                            <span className="text-zinc-500 text-[11px] font-mono shrink-0">/store/</span>
+                            <input
+                              type="text"
+                              name="customStoreSlug"
+                              value={form.storeSlug}
+                              onChange={(e) => {
+                                const slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, "-");
+                                setForm((prev) => ({ ...prev, storeSlug: slug }));
+                              }}
+                              placeholder="store-slug"
+                              className="w-full bg-transparent py-2 pl-1 text-xs text-emerald-400 font-mono outline-none"
+                              required={isCustomStore}
+                            />
+                          </div>
+                        </label>
+                      </div>
+
+                      <div className="flex items-start gap-2 text-[11px] text-emerald-300/90 bg-emerald-950/60 p-2.5 rounded-lg border border-emerald-900/60">
+                        <Sparkles className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+                        <span>
+                          This store will auto-publish into the website&apos;s <strong>Stores Directory (/stores)</strong> with your selected <strong>Category</strong>, entered <strong>Store Name</strong>, and <strong>Cloudinary Logo URL</strong> below.
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Brand Logo URL with Live Preview & Cloudinary Support */}
                   <div className="sm:col-span-2 rounded-xl border border-zinc-800 bg-zinc-950/60 p-3.5 space-y-2.5">
                     <div className="flex items-center justify-between">
@@ -863,17 +1042,23 @@ export default function AdminOffersManager() {
                           Cloudinary Supported
                         </span>
                       </div>
-                      {form.storeSlug && stores.find(s => s.slug === form.storeSlug)?.logo && form.storeLogo !== stores.find(s => s.slug === form.storeSlug)?.logo && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const s = stores.find(st => st.slug === form.storeSlug);
-                            if (s?.logo) setForm(prev => ({ ...prev, storeLogo: s.logo }));
-                          }}
-                          className="text-[11px] text-emerald-400 hover:underline font-semibold cursor-pointer"
-                        >
-                          Use Store Default Logo
-                        </button>
+                      {isCustomStore ? (
+                        <span className="text-[11px] text-emerald-400 font-semibold">
+                          ★ Saved as Store Directory Logo
+                        </span>
+                      ) : (
+                        form.storeSlug && stores.find(s => s.slug === form.storeSlug)?.logo && form.storeLogo !== stores.find(s => s.slug === form.storeSlug)?.logo && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const s = stores.find(st => st.slug === form.storeSlug);
+                              if (s?.logo) setForm(prev => ({ ...prev, storeLogo: s.logo }));
+                            }}
+                            className="text-[11px] text-emerald-400 hover:underline font-semibold cursor-pointer"
+                          >
+                            Use Store Default Logo
+                          </button>
+                        )
                       )}
                     </div>
 

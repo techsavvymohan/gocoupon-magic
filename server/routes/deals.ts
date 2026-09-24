@@ -36,7 +36,8 @@ import {
   deleteDealFromPool,
 } from "../services/providers/cuelinks-client.js";
 import { recordNewSubmission, requireAdminAuth } from "./admin.js";
-import { dealsDb, submissionsDb } from "../services/db.js";
+import { dealsDb, submissionsDb, storesDb } from "../services/db.js";
+import { upsertStoreInDb } from "../../src/lib/server-data/stores-db.js";
 
 export const dealsRouter = Router();
 
@@ -398,6 +399,28 @@ dealsRouter.post("/", requireAdminAuth, async (req: Request, res: Response) => {
 
     addDealToPool(newDeal);
     dealsDb.upsertDeals([newDeal]).catch((e) => console.warn("[Deals DB Upsert Warning]:", e.message));
+
+    // Auto-upsert store to STORES_DB, live-stores.json, and Supabase PostgreSQL gocoupon_stores
+    if (newDeal.storeSlug && newDeal.storeName) {
+      const savedStore = upsertStoreInDb({
+        slug: newDeal.storeSlug,
+        name: newDeal.storeName,
+        logo: newDeal.storeLogo || newDeal.imageUrl || "",
+        category: newDeal.category || "General",
+        link: newDeal.link || `/store/${newDeal.storeSlug}`,
+        affiliateLink: newDeal.link || "",
+        popularCoupon: {
+          code: newDeal.code || "",
+          description: newDeal.title || "Featured discount offer",
+          discount: newDeal.discount || "Special Offer",
+        },
+      });
+      storesDb.upsertStore(savedStore).catch((e) =>
+        console.warn("[Stores DB Auto-Upsert Warning]:", e.message)
+      );
+      globalCache.deletePrefix("stores:").catch(() => {});
+    }
+
     await globalCache.deletePrefix("deals:");
     res.json({ success: true, data: newDeal });
   } catch (err: any) {
@@ -453,6 +476,27 @@ dealsRouter.put("/", requireAdminAuth, async (req: Request, res: Response) => {
 
     addDealToPool(updatedDeal);
     dealsDb.upsertDeals([updatedDeal]).catch((e) => console.warn("[Deals DB Upsert Warning]:", e.message));
+
+    // Auto-upsert store to STORES_DB, live-stores.json, and Supabase PostgreSQL gocoupon_stores
+    if (updatedDeal.storeSlug && updatedDeal.storeName) {
+      const savedStore = upsertStoreInDb({
+        slug: updatedDeal.storeSlug,
+        name: updatedDeal.storeName,
+        logo: updatedDeal.storeLogo || updatedDeal.imageUrl || "",
+        category: updatedDeal.category || "General",
+        link: updatedDeal.link || `/store/${updatedDeal.storeSlug}`,
+        affiliateLink: updatedDeal.link || "",
+        popularCoupon: {
+          code: updatedDeal.code || "",
+          description: updatedDeal.title || "Featured discount offer",
+          discount: updatedDeal.discount || "Special Offer",
+        },
+      });
+      storesDb.upsertStore(savedStore).catch((e) =>
+        console.warn("[Stores DB Auto-Upsert Warning]:", e.message)
+      );
+      globalCache.deletePrefix("stores:").catch(() => {});
+    }
     await globalCache.deletePrefix("deals:");
     res.json({ success: true, data: updatedDeal });
   } catch (err: any) {

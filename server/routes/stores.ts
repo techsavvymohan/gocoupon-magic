@@ -11,7 +11,7 @@
  */
 
 import { Router, type Request, type Response } from "express";
-import { queryStores, STORES_DB } from "../../src/lib/server-data/stores-db.js";
+import { queryStores, STORES_DB, upsertStoreInDb } from "../../src/lib/server-data/stores-db.js";
 import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
 import { globalCache } from "../../src/lib/services/cache-service.js";
 import { storesDb } from "../services/db.js";
@@ -91,19 +91,15 @@ async function handleStoreUpdate(idOrSlug: string, b: any, res: Response) {
     offersCount: Number(b.offersCount || (existing as any)?.offersCount || 0),
   };
 
-  if (idx >= 0) {
-    STORES_DB[idx] = { ...STORES_DB[idx], ...updatedStore };
-  } else {
-    STORES_DB.unshift(updatedStore);
-  }
+  const savedStore = upsertStoreInDb(updatedStore);
 
   // Persist to Supabase PostgreSQL cloud database
-  await storesDb.upsertStore(updatedStore).catch((e) =>
+  await storesDb.upsertStore(savedStore).catch((e) =>
     console.warn("[Stores DB Upsert Warning]:", e.message)
   );
 
   await globalCache.deletePrefix("stores:");
-  return res.json({ success: true, data: updatedStore });
+  return res.json({ success: true, data: savedStore });
 }
 
 /**
@@ -142,15 +138,15 @@ storesRouter.post("/", requireAdminAuth, async (req: Request, res: Response) => 
       fallbackIcon: "🛍️",
       badge: b.trustStatus || "Verified",
       rating: Number(b.rating) || 4.8,
-      couponsCount: Number(b.couponsCount) || 0,
+      couponsCount: Number(b.couponsCount) || 1,
       maxDiscount: b.maxDiscount || "Special Offer",
       cashbackRate: b.cashbackRate || "Available",
-      description: b.description || "",
+      description: b.description || `Verified promo codes, deals, and vouchers for ${b.name || "this store"}.`,
       features: [],
       popularCoupon: {
-        code: "",
-        description: "Latest verified offers",
-        discount: "Up to 50% OFF",
+        code: b.code || "",
+        description: b.couponDescription || "Latest verified offers",
+        discount: b.discount || "Up to 50% OFF",
       },
       link: b.affiliateLink || b.link || "",
       countryCode: b.countryCode || "IN",
@@ -163,20 +159,15 @@ storesRouter.post("/", requireAdminAuth, async (req: Request, res: Response) => 
       faq3Answer: b.faq3Answer,
     };
 
-    const existingIdx = STORES_DB.findIndex((s: any) => s.slug === slug || s.id === slug);
-    if (existingIdx >= 0) {
-      STORES_DB[existingIdx] = { ...STORES_DB[existingIdx], ...newStore };
-    } else {
-      STORES_DB.unshift(newStore);
-    }
+    const savedStore = upsertStoreInDb(newStore);
 
     // Persist directly to Supabase PostgreSQL cloud database
-    await storesDb.upsertStore(newStore).catch((e) =>
+    await storesDb.upsertStore(savedStore).catch((e) =>
       console.warn("[Stores DB Upsert Warning]:", e.message)
     );
 
     await globalCache.deletePrefix("stores:");
-    res.status(201).json({ success: true, data: newStore });
+    res.status(201).json({ success: true, data: savedStore });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }

@@ -6,68 +6,32 @@ import tailwindcss from "@tailwindcss/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 function searxngDevPlugin() {
-  return {
-    name: "vite-plugin-searxng-dev",
-    configureServer(server: any) {
-      server.middlewares.use(async (req: any, res: any, next: any) => {
-        if (req.url?.startsWith("/api/shopping")) {
-          try {
-            const urlObj = new URL(req.url, "http://localhost:8080");
-            const q = urlObj.searchParams.get("q")?.trim();
-            if (!q) {
-              res.statusCode = 400;
-              res.setHeader("Content-Type", "application/json");
-              res.end(JSON.stringify({ error: "Query 'q' is required" }));
-              return;
-            }
+  const devMiddleware = async (req: any, res: any, next: any) => {
+    if (req.url?.startsWith("/api/shopping")) {
+      try {
+        const urlObj = new URL(req.url, "http://localhost:8080");
+        const q = urlObj.searchParams.get("q")?.trim();
+        if (!q) {
+          res.statusCode = 400;
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify({ error: "Query 'q' is required" }));
+          return;
+        }
 
-            // Check in-memory cache (15 min TTL)
-            const cacheKey = q.toLowerCase();
-            const cached = (globalThis as any).__shoppingCache?.get(cacheKey);
-            if (cached && cached.expiry > Date.now()) {
-              res.statusCode = 200;
-              res.setHeader("Content-Type", "application/json");
-              res.setHeader("Access-Control-Allow-Origin", "*");
-              res.end(JSON.stringify(cached.data));
-              return;
-            }
+        // Check in-memory cache (15 min TTL)
+        const cacheKey = q.toLowerCase();
+        const cached = (globalThis as any).__shoppingCache?.get(cacheKey);
+        if (cached && cached.expiry > Date.now()) {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.setHeader("Access-Control-Allow-Origin", "*");
+          res.end(JSON.stringify(cached.data));
+          return;
+        }
 
-            const apiKey = process.env.SERPAPI_API_KEY || process.env.SERPAPI_KEY || "";
-            if (!apiKey) {
-              console.warn("SERPAPI_API_KEY not set in environment. Returning empty shopping results.");
-              res.statusCode = 200;
-              res.setHeader("Content-Type", "application/json");
-              res.setHeader("Access-Control-Allow-Origin", "*");
-              res.end(JSON.stringify({ shopping_results: [] }));
-              return;
-            }
-
-            const serpUrl = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
-              q
-            )}&gl=in&hl=en&api_key=${apiKey}&num=20`;
-
-            const upstream = await fetch(serpUrl, { signal: AbortSignal.timeout(12000) });
-            if (upstream.ok) {
-              const data = await upstream.json();
-              if (data.shopping_results && data.shopping_results.length > 0) {
-                if (!(globalThis as any).__shoppingCache) {
-                  (globalThis as any).__shoppingCache = new Map();
-                }
-                (globalThis as any).__shoppingCache.set(cacheKey, {
-                  data,
-                  expiry: Date.now() + 15 * 60 * 1000,
-                });
-              }
-              res.statusCode = 200;
-              res.setHeader("Content-Type", "application/json");
-              res.setHeader("Access-Control-Allow-Origin", "*");
-              res.end(JSON.stringify(data));
-              return;
-            }
-          } catch (err: any) {
-            console.warn("Shopping dev proxy error:", err.message);
-          }
-
+        const apiKey = process.env.SERPAPI_API_KEY || process.env.SERPAPI_KEY || "";
+        if (!apiKey) {
+          console.warn("SERPAPI_API_KEY not set in environment. Returning empty shopping results.");
           res.statusCode = 200;
           res.setHeader("Content-Type", "application/json");
           res.setHeader("Access-Control-Allow-Origin", "*");
@@ -75,14 +39,205 @@ function searxngDevPlugin() {
           return;
         }
 
-        if (req.url?.startsWith("/api/deals") || req.url?.startsWith("/api/offers")) {
-          try {
-            const fs = await import("node:fs");
-            const path = await import("node:path");
-            const dataPath = path.resolve(process.cwd(), "src/data/live-deals.json");
-            const urlObj = new URL(req.url, "http://localhost:8080");
+        const serpUrl = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
+          q
+        )}&gl=in&hl=en&api_key=${apiKey}&num=20`;
 
-            if (req.url.startsWith("/api/deals/sync") || req.url.startsWith("/api/offers/sync")) {
+        const upstream = await fetch(serpUrl, { signal: AbortSignal.timeout(12000) });
+        if (upstream.ok) {
+          const data = await upstream.json();
+          if (data.shopping_results && data.shopping_results.length > 0) {
+            if (!(globalThis as any).__shoppingCache) {
+              (globalThis as any).__shoppingCache = new Map();
+            }
+            (globalThis as any).__shoppingCache.set(cacheKey, {
+              data,
+              expiry: Date.now() + 15 * 60 * 1000,
+            });
+          }
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.setHeader("Access-Control-Allow-Origin", "*");
+          res.end(JSON.stringify(data));
+          return;
+        }
+      } catch (err: any) {
+        console.warn("Shopping dev proxy error:", err.message);
+      }
+
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.end(JSON.stringify({ shopping_results: [] }));
+      return;
+    }
+
+    // ── Dedicated Live Stores API Dev/Preview Handler ──
+    if (req.url?.startsWith("/api/stores")) {
+      try {
+        const fs = await import("node:fs");
+        const path = await import("node:path");
+        const storesPath = path.resolve(process.cwd(), "src/data/live-stores.json");
+        const urlObj = new URL(req.url, "http://localhost:8080");
+
+        let diskStores: any[] = [];
+        if (fs.existsSync(storesPath)) {
+          try {
+            const parsed = JSON.parse(fs.readFileSync(storesPath, "utf-8"));
+            if (Array.isArray(parsed.stores)) diskStores = parsed.stores;
+          } catch {}
+        }
+
+        // Handle mutations (POST, PUT, DELETE)
+        if (req.method === "POST" || req.method === "PUT" || req.method === "DELETE") {
+          const bodyChunks: any[] = [];
+          req.on("data", (chunk: any) => bodyChunks.push(chunk));
+          req.on("end", async () => {
+            try {
+              const rawBody = Buffer.concat(bodyChunks).toString("utf-8");
+              const body = rawBody ? JSON.parse(rawBody) : {};
+              const slug = (body.slug || body.name || `store-${Date.now()}`)
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/^-+|-+$/g, "");
+              const id = body.id || slug;
+              const name = (body.name || "Merchant Store").trim();
+              const logo = (body.logo || body.logoImage || body.storeLogo || "").trim();
+              const category = body.category || "General";
+              const link = body.link || body.affiliateLink || `/store/${slug}`;
+
+              const storeItem = {
+                id,
+                name,
+                slug,
+                category,
+                logo,
+                fallbackIcon: "🛍️",
+                badge: body.badge || "Verified Partner",
+                rating: Number(body.rating) || 4.8,
+                couponsCount: Number(body.couponsCount) || 1,
+                maxDiscount: body.maxDiscount || "Special Offer",
+                cashbackRate: body.cashbackRate || "Available",
+                description: body.description || `Verified promo codes, deals, and vouchers for ${name}.`,
+                features: body.features || [],
+                popularCoupon: {
+                  code: body.popularCoupon?.code || body.code || "",
+                  description: body.popularCoupon?.description || body.title || "Latest verified offers",
+                  discount: body.popularCoupon?.discount || body.discount || "Up to 50% OFF",
+                },
+                link,
+                isInternalRoute: Boolean(link.startsWith("/") || !link),
+              };
+
+              if (req.method === "POST" || req.method === "PUT") {
+                const idx = diskStores.findIndex((s: any) => s.slug === slug || s.id === id);
+                if (idx >= 0) {
+                  diskStores[idx] = { ...diskStores[idx], ...storeItem };
+                } else {
+                  diskStores.unshift(storeItem);
+                }
+              } else if (req.method === "DELETE") {
+                diskStores = diskStores.filter((s: any) => s.slug !== slug && s.id !== id);
+              }
+
+              const snapshot = { stores: diskStores, updatedAt: new Date().toISOString() };
+              fs.writeFileSync(storesPath, JSON.stringify(snapshot, null, 2), "utf-8");
+              const distPath = path.resolve(__dirname, "dist/data/live-stores.json");
+              if (fs.existsSync(path.dirname(distPath))) {
+                try { fs.writeFileSync(distPath, JSON.stringify(snapshot, null, 2), "utf-8"); } catch {}
+              }
+
+              res.statusCode = req.method === "POST" ? 201 : 200;
+              res.setHeader("Content-Type", "application/json");
+              res.setHeader("Access-Control-Allow-Origin", "*");
+              res.end(JSON.stringify({ success: true, data: storeItem }));
+              return;
+            } catch (e: any) {
+              res.statusCode = 500;
+              res.setHeader("Content-Type", "application/json");
+              res.setHeader("Access-Control-Allow-Origin", "*");
+              res.end(JSON.stringify({ success: false, error: e.message }));
+            }
+          });
+          return;
+        }
+
+        // GET /api/stores: merge baseline stores with live custom stores
+        // @ts-ignore
+        const { STORES_DATA } = await import("./src/data/storesData.ts");
+        let allStores: any[] = [...diskStores];
+        for (const s of STORES_DATA) {
+          if (!allStores.some((cur) => cur.slug === s.slug || cur.id === s.id)) {
+            allStores.push(s);
+          }
+        }
+
+        const category = (urlObj.searchParams.get("category") || "").toLowerCase().trim();
+        const q = (urlObj.searchParams.get("q") || "").toLowerCase().trim();
+        const sortBy = urlObj.searchParams.get("sortBy") || "popularity";
+        const order = urlObj.searchParams.get("order") || "desc";
+        const rawLimit = parseInt(urlObj.searchParams.get("limit") || "", 10);
+        const limit = isNaN(rawLimit) ? 200 : Math.min(rawLimit, 200);
+        const rawOffset = parseInt(urlObj.searchParams.get("offset") || "", 10);
+        const offset = isNaN(rawOffset) ? 0 : rawOffset;
+
+        if (category && category !== "all") {
+          allStores = allStores.filter((s: any) => {
+            const sCat = (s.category || "").toLowerCase();
+            return sCat === category || sCat.includes(category) || category.includes(sCat);
+          });
+        }
+
+        if (q) {
+          allStores = allStores.filter(
+            (s: any) =>
+              (s.name || "").toLowerCase().includes(q) ||
+              (s.description || "").toLowerCase().includes(q) ||
+              (s.category || "").toLowerCase().includes(q)
+          );
+        }
+
+        allStores.sort((a: any, b: any) => {
+          if (sortBy === "name") {
+            return order === "asc"
+              ? (a.name || "").localeCompare(b.name || "")
+              : (b.name || "").localeCompare(a.name || "");
+          }
+          const rA = Number(a.rating) || 0;
+          const rB = Number(b.rating) || 0;
+          return order === "asc" ? rA - rB : rB - rA;
+        });
+
+        const total = allStores.length;
+        const paginated = allStores.slice(offset, offset + limit);
+
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.end(
+          JSON.stringify({
+            stores: paginated,
+            data: paginated,
+            total,
+            count: paginated.length,
+            cached: false,
+            meta: { category, q: q || null, limit, offset },
+          })
+        );
+        return;
+      } catch (err: any) {
+        console.warn("[Vite Stores Dev] Route error:", err?.message);
+      }
+    }
+
+    if (req.url?.startsWith("/api/deals") || req.url?.startsWith("/api/offers")) {
+      try {
+        const fs = await import("node:fs");
+        const path = await import("node:path");
+        const dataPath = path.resolve(process.cwd(), "src/data/live-deals.json");
+        const urlObj = new URL(req.url, "http://localhost:8080");
+
+        if (req.url.startsWith("/api/deals/sync") || req.url.startsWith("/api/offers/sync")) {
               try {
                 // @ts-ignore
                 const { runCuelinksSync } = (await import("./scripts/sync-cuelinks-live.mjs")) as any;
@@ -127,6 +282,62 @@ function searxngDevPlugin() {
                     }
                   };
 
+                  const autoSyncStore = (dealItem: any) => {
+                    if (!dealItem.storeSlug && !dealItem.storeName) return;
+                    try {
+                      const storesPath = path.resolve(process.cwd(), "src/data/live-stores.json");
+                      let sData: any = { stores: [] };
+                      if (fs.existsSync(storesPath)) {
+                        try { sData = JSON.parse(fs.readFileSync(storesPath, "utf-8")); } catch {}
+                      }
+                      if (!Array.isArray(sData.stores)) sData.stores = [];
+                      const slug = (dealItem.storeSlug || dealItem.storeName || "store")
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]+/g, "-")
+                        .replace(/^-+|-+$/g, "");
+                      const name = (dealItem.storeName || "Merchant Store").trim();
+                      const logo = (dealItem.storeLogo || dealItem.imageUrl || "").trim();
+                      const category = dealItem.category || "General";
+                      const link = dealItem.link || dealItem.affiliateLink || `/store/${slug}`;
+                      const sIdx = sData.stores.findIndex((st: any) => st.slug === slug || st.id === slug);
+                      const storeObj = {
+                        id: slug,
+                        slug,
+                        name,
+                        logo: logo || (sIdx >= 0 ? sData.stores[sIdx].logo : ""),
+                        category,
+                        fallbackIcon: "🛍️",
+                        badge: sIdx >= 0 ? sData.stores[sIdx].badge : "Verified Partner",
+                        rating: sIdx >= 0 ? sData.stores[sIdx].rating : 4.8,
+                        couponsCount: sIdx >= 0 ? sData.stores[sIdx].couponsCount + 1 : 1,
+                        maxDiscount: dealItem.discount || (sIdx >= 0 ? sData.stores[sIdx].maxDiscount : "Special Offer"),
+                        cashbackRate: sIdx >= 0 ? sData.stores[sIdx].cashbackRate : "Available",
+                        description: sIdx >= 0 && sData.stores[sIdx].description ? sData.stores[sIdx].description : `Verified promo codes, deals, and vouchers for ${name}.`,
+                        features: sIdx >= 0 ? sData.stores[sIdx].features : [],
+                        popularCoupon: {
+                          code: dealItem.code || "",
+                          description: dealItem.title || "Featured discount offer",
+                          discount: dealItem.discount || "Special Offer",
+                        },
+                        link,
+                        isInternalRoute: Boolean(link.startsWith("/") || !link),
+                      };
+                      if (sIdx >= 0) {
+                        sData.stores[sIdx] = { ...sData.stores[sIdx], ...storeObj };
+                      } else {
+                        sData.stores.unshift(storeObj);
+                      }
+                      sData.updatedAt = new Date().toISOString();
+                      fs.writeFileSync(storesPath, JSON.stringify(sData, null, 2), "utf-8");
+                      const distStoresPath = path.resolve(__dirname, "dist/data/live-stores.json");
+                      if (fs.existsSync(path.dirname(distStoresPath))) {
+                        try { fs.writeFileSync(distStoresPath, JSON.stringify(sData, null, 2), "utf-8"); } catch {}
+                      }
+                    } catch (syncErr: any) {
+                      console.warn("[Vite Deals Dev] Auto-store sync error:", syncErr?.message);
+                    }
+                  };
+
                   if (req.method === "POST") {
                     const id = body.id || `offer-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
                     const storeLogo = body.storeLogo || body.imageUrl || body.logoUrl || "";
@@ -145,6 +356,7 @@ function searxngDevPlugin() {
                     };
                     allDeals.unshift(newDeal);
                     persistSnapshot();
+                    autoSyncStore(newDeal);
                     res.statusCode = 201;
                     res.setHeader("Content-Type", "application/json");
                     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -172,10 +384,12 @@ function searxngDevPlugin() {
                       allDeals.unshift({ ...body, id, storeLogo, imageUrl: storeLogo, verified: true, verificationStatus: "verified" });
                     }
                     persistSnapshot();
+                    const updatedDeal = allDeals[idx >= 0 ? idx : 0];
+                    autoSyncStore(updatedDeal);
                     res.statusCode = 200;
                     res.setHeader("Content-Type", "application/json");
                     res.setHeader("Access-Control-Allow-Origin", "*");
-                    res.end(JSON.stringify({ success: true, data: allDeals[idx >= 0 ? idx : 0] }));
+                    res.end(JSON.stringify({ success: true, data: updatedDeal }));
                     return;
                   }
 
@@ -374,10 +588,18 @@ function searxngDevPlugin() {
           res.setHeader("Content-Type", "application/json");
           res.end(JSON.stringify({ error: err.message }));
         }
-      });
-    },
-  };
-}
+      };
+
+      return {
+        name: "vite-plugin-searxng-dev",
+        configureServer(server: any) {
+          server.middlewares.use(devMiddleware);
+        },
+        configurePreviewServer(server: any) {
+          server.middlewares.use(devMiddleware);
+        },
+      };
+    }
 
 export default defineConfig({
   plugins: [

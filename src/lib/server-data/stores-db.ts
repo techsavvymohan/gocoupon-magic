@@ -11,6 +11,8 @@
  *   return data;
  */
 
+import fs from "node:fs";
+import path from "node:path";
 import { STORES_DATA } from "../../data/storesData.js";
 
 export interface StoreRecord {
@@ -50,6 +52,122 @@ export interface StoreRecord {
 // ---------------------------------------------------------------------------
 
 export const STORES_DB: StoreRecord[] = [...STORES_DATA];
+
+// Hydrate live custom stores from src/data/live-stores.json if present
+try {
+  const customStoresPath = path.resolve(process.cwd(), "src/data/live-stores.json");
+  if (fs.existsSync(customStoresPath)) {
+    const raw = JSON.parse(fs.readFileSync(customStoresPath, "utf-8"));
+    if (Array.isArray(raw?.stores)) {
+      for (const s of raw.stores) {
+        const idx = STORES_DB.findIndex((item) => item.slug === s.slug || item.id === s.id);
+        if (idx >= 0) {
+          STORES_DB[idx] = { ...STORES_DB[idx], ...s };
+        } else {
+          STORES_DB.unshift(s);
+        }
+      }
+    }
+  }
+} catch {
+  // Silent fallback
+}
+
+/**
+ * Persists a new or updated store to STORES_DB and live-stores.json
+ */
+export function upsertStoreInDb(storeInput: any): StoreRecord {
+  const slug = (storeInput.slug || storeInput.name || `store-${Date.now()}`)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  const id = storeInput.id || slug;
+  const name = storeInput.name || "Merchant Store";
+  const logo = storeInput.logo || storeInput.storeLogo || storeInput.logoImage || storeInput.imageUrl || "";
+  const category = storeInput.category || "General";
+  const link = storeInput.link || storeInput.affiliateLink || `/store/${slug}`;
+  const description =
+    storeInput.description ||
+    storeInput.tagline ||
+    `Verified promo codes, deals, and vouchers for ${name}.`;
+
+  const existingIdx = STORES_DB.findIndex(
+    (s) => s.slug?.toLowerCase() === slug || s.id?.toLowerCase() === id
+  );
+
+  const mergedStore: StoreRecord = {
+    id,
+    name,
+    slug,
+    category,
+    logo: logo || (existingIdx >= 0 ? STORES_DB[existingIdx].logo : ""),
+    fallbackIcon: "🛍️",
+    badge: storeInput.badge || (existingIdx >= 0 ? STORES_DB[existingIdx].badge : "Verified Partner"),
+    rating: Number(storeInput.rating || (existingIdx >= 0 ? STORES_DB[existingIdx].rating : 4.8)),
+    couponsCount: Number(
+      storeInput.couponsCount || (existingIdx >= 0 ? STORES_DB[existingIdx].couponsCount + 1 : 1)
+    ),
+    maxDiscount:
+      storeInput.maxDiscount || (existingIdx >= 0 ? STORES_DB[existingIdx].maxDiscount : "Special Offer"),
+    cashbackRate:
+      storeInput.cashbackRate || (existingIdx >= 0 ? STORES_DB[existingIdx].cashbackRate : "Available"),
+    description,
+    features: storeInput.features || (existingIdx >= 0 ? STORES_DB[existingIdx].features : []),
+    popularCoupon: {
+      code:
+        storeInput.popularCoupon?.code ||
+        storeInput.code ||
+        (existingIdx >= 0 ? STORES_DB[existingIdx].popularCoupon.code : ""),
+      description:
+        storeInput.popularCoupon?.description ||
+        storeInput.couponDescription ||
+        storeInput.title ||
+        (existingIdx >= 0 ? STORES_DB[existingIdx].popularCoupon.description : "Latest verified offers"),
+      discount:
+        storeInput.popularCoupon?.discount ||
+        storeInput.discount ||
+        (existingIdx >= 0 ? STORES_DB[existingIdx].popularCoupon.discount : "Exclusive Deal"),
+    },
+    link,
+    isInternalRoute: Boolean(storeInput.isInternalRoute ?? (link.startsWith("/") || !link)),
+  };
+
+  if (existingIdx >= 0) {
+    STORES_DB[existingIdx] = { ...STORES_DB[existingIdx], ...mergedStore };
+  } else {
+    STORES_DB.unshift(mergedStore);
+  }
+
+  // Persist to disk in src/data/live-stores.json
+  try {
+    const customStoresPath = path.resolve(process.cwd(), "src/data/live-stores.json");
+    let diskData: any = { stores: [], updatedAt: new Date().toISOString() };
+    if (fs.existsSync(customStoresPath)) {
+      diskData = JSON.parse(fs.readFileSync(customStoresPath, "utf-8"));
+      if (!Array.isArray(diskData.stores)) diskData.stores = [];
+    }
+    const diskIdx = diskData.stores.findIndex(
+      (s: any) => s.slug?.toLowerCase() === slug || s.id?.toLowerCase() === id
+    );
+    if (diskIdx >= 0) {
+      diskData.stores[diskIdx] = { ...diskData.stores[diskIdx], ...mergedStore };
+    } else {
+      diskData.stores.unshift(mergedStore);
+    }
+    diskData.updatedAt = new Date().toISOString();
+    fs.writeFileSync(customStoresPath, JSON.stringify(diskData, null, 2), "utf-8");
+
+    // Also persist in dist if present
+    const distPath = path.resolve(process.cwd(), "dist/data/live-stores.json");
+    if (fs.existsSync(path.dirname(distPath))) {
+      fs.writeFileSync(distPath, JSON.stringify(diskData, null, 2), "utf-8");
+    }
+  } catch (err: any) {
+    console.warn("[Stores DB Disk Write Warning]:", err.message);
+  }
+
+  return mergedStore;
+}
 
 export type StoreSortOption = "popularity" | "rating" | "couponsCount" | "maxDiscount" | "cashback" | "name";
 
