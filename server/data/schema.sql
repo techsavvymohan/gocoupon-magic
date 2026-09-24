@@ -34,6 +34,10 @@ CREATE TABLE IF NOT EXISTS gocoupon_deals (
     source TEXT DEFAULT 'cuelinks',
     status TEXT DEFAULT 'active',
     type TEXT DEFAULT 'coupon',
+    is_featured BOOLEAN DEFAULT false,
+    featured_priority INTEGER DEFAULT 100,
+    campaign_source TEXT DEFAULT 'manual',
+    verification_status TEXT DEFAULT 'verified',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -42,6 +46,7 @@ CREATE INDEX IF NOT EXISTS idx_deals_store_slug ON gocoupon_deals(store_slug);
 CREATE INDEX IF NOT EXISTS idx_deals_category ON gocoupon_deals(category);
 CREATE INDEX IF NOT EXISTS idx_deals_status ON gocoupon_deals(status);
 CREATE INDEX IF NOT EXISTS idx_deals_verified ON gocoupon_deals(verified);
+CREATE INDEX IF NOT EXISTS idx_deals_is_featured ON gocoupon_deals(is_featured);
 CREATE INDEX IF NOT EXISTS idx_deals_created_at ON gocoupon_deals(created_at DESC);
 
 -- -----------------------------------------------------------------------------
