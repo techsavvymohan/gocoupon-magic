@@ -150,8 +150,15 @@ function FeaturedDealsPage() {
           const serverItems = json.data || json.deals;
           if (Array.isArray(serverItems) && serverItems.length > 0 && active) {
             const mapped = serverItems.map((item: any, idx: number) => mapDealToFeaturedItem(item, idx));
-            mapped.sort((a, b) => a.priorityLevel - b.priorityLevel);
-            setDealsList(mapped);
+            const seenIds = new Set(mapped.map((d: any) => d.id));
+            const merged = [...mapped];
+            for (const defItem of FEATURED_DEALS_COLLECTION) {
+              if (!seenIds.has(defItem.id)) {
+                merged.push(defItem);
+              }
+            }
+            merged.sort((a, b) => a.priorityLevel - b.priorityLevel);
+            setDealsList(merged);
           }
         }
       } catch {

@@ -75,13 +75,14 @@ function searxngDevPlugin() {
           return;
         }
 
-        if (req.url?.startsWith("/api/deals")) {
+        if (req.url?.startsWith("/api/deals") || req.url?.startsWith("/api/offers")) {
           try {
             const fs = await import("node:fs");
             const path = await import("node:path");
             const dataPath = path.resolve(process.cwd(), "src/data/live-deals.json");
+            const urlObj = new URL(req.url, "http://localhost:8080");
 
-            if (req.url.startsWith("/api/deals/sync")) {
+            if (req.url.startsWith("/api/deals/sync") || req.url.startsWith("/api/offers/sync")) {
               try {
                 // @ts-ignore
                 const { runCuelinksSync } = (await import("./scripts/sync-cuelinks-live.mjs")) as any;
@@ -100,6 +101,98 @@ function searxngDevPlugin() {
               }
             }
 
+            // Handle admin mutations (POST, PUT, DELETE) so admin-added featured deals are immediately saved to disk
+            if (req.method === "POST" || req.method === "PUT" || req.method === "DELETE") {
+              const bodyChunks: any[] = [];
+              req.on("data", (chunk: any) => bodyChunks.push(chunk));
+              req.on("end", async () => {
+                try {
+                  const rawBody = Buffer.concat(bodyChunks).toString("utf-8");
+                  const body = rawBody ? JSON.parse(rawBody) : {};
+                  let snapshotData: any = { deals: [] };
+                  if (fs.existsSync(dataPath)) {
+                    snapshotData = JSON.parse(fs.readFileSync(dataPath, "utf-8"));
+                  }
+                  let allDeals: any[] = Array.isArray(snapshotData.deals) ? snapshotData.deals : [];
+
+                  const persistSnapshot = () => {
+                    snapshotData.deals = allDeals;
+                    snapshotData.updatedAt = new Date().toISOString();
+                    fs.writeFileSync(dataPath, JSON.stringify(snapshotData, null, 2), "utf-8");
+                    const distPath = path.resolve(__dirname, "dist/data/live-deals.json");
+                    if (fs.existsSync(path.dirname(distPath))) {
+                      try {
+                        fs.writeFileSync(distPath, JSON.stringify(snapshotData, null, 2), "utf-8");
+                      } catch {}
+                    }
+                  };
+
+                  if (req.method === "POST") {
+                    const id = body.id || `offer-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+                    const newDeal = {
+                      ...body,
+                      id,
+                      verified: true,
+                      status: body.status || "active",
+                      isFeatured: body.isFeatured === true || body.isFeatured === "true" || body.isFeatured === 1,
+                      featuredPriority: body.featuredPriority ? Number(body.featuredPriority) : 10,
+                      campaignSource: body.campaignSource || "manual",
+                      source: body.source || "admin",
+                      verificationStatus: "verified",
+                    };
+                    allDeals.unshift(newDeal);
+                    persistSnapshot();
+                    res.statusCode = 201;
+                    res.setHeader("Content-Type", "application/json");
+                    res.setHeader("Access-Control-Allow-Origin", "*");
+                    res.end(JSON.stringify({ success: true, data: newDeal }));
+                    return;
+                  }
+
+                  if (req.method === "PUT") {
+                    const id = (urlObj.searchParams.get("id") as string) || body.id;
+                    const idx = allDeals.findIndex((d) => d.id === id);
+                    if (idx >= 0) {
+                      allDeals[idx] = {
+                        ...allDeals[idx],
+                        ...body,
+                        id,
+                        verified: true,
+                        isFeatured: body.isFeatured === true || body.isFeatured === "true" || body.isFeatured === 1,
+                        featuredPriority: body.featuredPriority ? Number(body.featuredPriority) : 10,
+                        verificationStatus: "verified",
+                      };
+                    } else {
+                      allDeals.unshift({ ...body, id, verified: true, verificationStatus: "verified" });
+                    }
+                    persistSnapshot();
+                    res.statusCode = 200;
+                    res.setHeader("Content-Type", "application/json");
+                    res.setHeader("Access-Control-Allow-Origin", "*");
+                    res.end(JSON.stringify({ success: true, data: allDeals[idx >= 0 ? idx : 0] }));
+                    return;
+                  }
+
+                  if (req.method === "DELETE") {
+                    const id = (urlObj.searchParams.get("id") as string) || req.url.split("/").pop();
+                    allDeals = allDeals.filter((d) => d.id !== id);
+                    persistSnapshot();
+                    res.statusCode = 200;
+                    res.setHeader("Content-Type", "application/json");
+                    res.setHeader("Access-Control-Allow-Origin", "*");
+                    res.end(JSON.stringify({ success: true, deletedId: id }));
+                    return;
+                  }
+                } catch (writeErr: any) {
+                  res.statusCode = 500;
+                  res.setHeader("Content-Type", "application/json");
+                  res.setHeader("Access-Control-Allow-Origin", "*");
+                  res.end(JSON.stringify({ success: false, error: writeErr.message }));
+                }
+              });
+              return;
+            }
+
             let snapshot: any = {};
             if (fs.existsSync(dataPath)) {
               snapshot = JSON.parse(fs.readFileSync(dataPath, "utf-8"));
@@ -108,6 +201,17 @@ function searxngDevPlugin() {
             const now = Date.now();
             let deals: any[] = Array.isArray(snapshot.deals) ? snapshot.deals : [];
             deals = deals.filter((d: any) => {
+              // Admin & Featured deals permanent immunity
+              if (
+                d.isFeatured ||
+                (d.id && String(d.id).startsWith("ac-")) ||
+                (d.id && String(d.id).startsWith("offer-")) ||
+                (d.id && String(d.id).startsWith("admin-")) ||
+                d.source === "admin" ||
+                d.campaignSource === "manual"
+              ) {
+                return true;
+              }
               if (d.expiresIn === "Expired") return false;
               if (d.endDate) {
                 const end = new Date(d.endDate).getTime();
@@ -116,17 +220,23 @@ function searxngDevPlugin() {
               return true;
             });
 
-            const urlObj = new URL(req.url, "http://localhost:8080");
             const category = (urlObj.searchParams.get("category") || "").toLowerCase().trim();
             const q = (urlObj.searchParams.get("q") || "").toLowerCase().trim();
             const store = (urlObj.searchParams.get("store") || urlObj.searchParams.get("merchant") || "").toLowerCase().trim();
             const badge = urlObj.searchParams.get("badge") || "";
+            const featured = urlObj.searchParams.get("featured");
             const sortBy = urlObj.searchParams.get("sortBy") || "trending";
             const order = urlObj.searchParams.get("order") || "desc";
             const rawLimit = parseInt(urlObj.searchParams.get("limit") || "", 10);
             const limit = isNaN(rawLimit) ? 100 : rawLimit <= 0 ? 2000 : Math.min(rawLimit, 2000);
             const rawOffset = parseInt(urlObj.searchParams.get("offset") || "", 10);
             const offset = isNaN(rawOffset) ? 0 : rawOffset;
+
+            if (featured === "true" || featured === "1") {
+              deals = deals.filter((d: any) => Boolean(d.isFeatured) || (d.id && String(d.id).startsWith("ac-")));
+            } else if (featured === "false" || featured === "0") {
+              deals = deals.filter((d: any) => !Boolean(d.isFeatured) && (!d.id || !String(d.id).startsWith("ac-")));
+            }
 
             if (category && category !== "all") {
               deals = deals.filter((d: any) => {

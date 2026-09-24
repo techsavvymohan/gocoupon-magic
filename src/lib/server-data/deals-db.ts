@@ -342,6 +342,18 @@ export function queryDeals(
   // Enforce dynamic expiry pruning so expired deals are never returned (unless admin explicitly includes expired)
   if (!options.includeExpired) {
     results = results.filter((d) => {
+      // ADMIN & FEATURED DEALS PERMANENT IMMUNITY:
+      // Featured and admin-created deals remain active and never vanish automatically
+      if (
+        d.isFeatured ||
+        (d.id && String(d.id).startsWith("ac-")) ||
+        (d.id && String(d.id).startsWith("offer-")) ||
+        (d.id && String(d.id).startsWith("admin-")) ||
+        d.source === "admin" ||
+        d.campaignSource === "manual"
+      ) {
+        return true;
+      }
       if (d.expiresIn === "Expired") return false;
       if (d.endDate) {
         const end = new Date(d.endDate).getTime();
@@ -353,7 +365,11 @@ export function queryDeals(
 
   // Filter by featured status
   if (options.featured !== undefined) {
-    results = results.filter((d) => Boolean(d.isFeatured) === options.featured);
+    results = results.filter((d) =>
+      options.featured
+        ? Boolean(d.isFeatured) || (d.id && String(d.id).startsWith("ac-"))
+        : !Boolean(d.isFeatured) && (!d.id || !String(d.id).startsWith("ac-"))
+    );
   }
 
   // Filter by store or merchant

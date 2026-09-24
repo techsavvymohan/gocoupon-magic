@@ -382,6 +382,21 @@ export async function runCuelinksSync(maxPages = 0) {
       const diskData = JSON.parse(fs.readFileSync(targetPath, "utf-8"));
       if (Array.isArray(diskData?.deals)) {
         for (const d of diskData.deals) {
+          // ADMIN & FEATURED DEALS PERMANENT IMMUNITY:
+          // Admin-curated deals and featured deals MUST NEVER be automatically purged or vanish.
+          if (
+            d.isFeatured ||
+            d.source === "admin" ||
+            d.campaignSource === "manual" ||
+            String(d.id).startsWith("ac-") ||
+            String(d.id).startsWith("offer-") ||
+            String(d.id).startsWith("admin-")
+          ) {
+            const key = getDealDedupKey(d);
+            dealMap.set(key, d);
+            continue;
+          }
+
           if (d.expiresIn === "Expired" || d.status === "expired" || d.status === "inactive") {
             expiredCount++;
             continue;
@@ -410,6 +425,14 @@ export async function runCuelinksSync(maxPages = 0) {
       dealMap.set(key, {
         ...existing,
         ...d,
+        // Preserve admin overrides and featured status permanently
+        isFeatured: existing.isFeatured || d.isFeatured,
+        featuredPriority: existing.featuredPriority ?? d.featuredPriority,
+        source: existing.source === "admin" ? "admin" : (d.source || existing.source),
+        campaignSource: existing.campaignSource || d.campaignSource,
+        targetCountry: existing.targetCountry || d.targetCountry,
+        verificationStatus: existing.verificationStatus || d.verificationStatus || "verified",
+        badge: existing.source === "admin" ? (existing.badge || d.badge) : (d.badge || existing.badge),
         usesCount: Math.max(existing.usesCount || 0, d.usesCount || 0),
       });
     } else {
@@ -456,6 +479,14 @@ export async function runCuelinksSync(maxPages = 0) {
       });
       const client = await pool.connect();
       try {
+        await client.query(`
+          ALTER TABLE gocoupon_deals ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT false;
+          ALTER TABLE gocoupon_deals ADD COLUMN IF NOT EXISTS featured_priority INTEGER DEFAULT 100;
+          ALTER TABLE gocoupon_deals ADD COLUMN IF NOT EXISTS campaign_source TEXT DEFAULT 'manual';
+          ALTER TABLE gocoupon_deals ADD COLUMN IF NOT EXISTS verification_status TEXT DEFAULT 'verified';
+          CREATE INDEX IF NOT EXISTS idx_deals_is_featured ON gocoupon_deals(is_featured);
+        `).catch(() => {});
+
         const BATCH_SIZE = 50;
         for (let i = 0; i < accumulatedDeals.length; i += BATCH_SIZE) {
           const batch = accumulatedDeals.slice(i, i + BATCH_SIZE);
@@ -463,8 +494,8 @@ export async function runCuelinksSync(maxPages = 0) {
           const rowPlaceholders = [];
 
           batch.forEach((d, rowIdx) => {
-            const offset = rowIdx * 22;
-            const placeholders = Array.from({ length: 22 }, (_, k) => `$${offset + k + 1}`).join(", ");
+            const offset = rowIdx * 26;
+            const placeholders = Array.from({ length: 26 }, (_, k) => `$${offset + k + 1}`).join(", ");
             rowPlaceholders.push(`(${placeholders})`);
 
             values.push(
@@ -489,7 +520,11 @@ export async function runCuelinksSync(maxPages = 0) {
               d.votesCount || 12,
               d.source || "cuelinks",
               d.status || "active",
-              d.type || "coupon"
+              d.type || "coupon",
+              Boolean(d.isFeatured),
+              d.featuredPriority ? Number(d.featuredPriority) : 100,
+              d.campaignSource || "manual",
+              d.verificationStatus || "verified"
             );
           });
 
@@ -497,7 +532,8 @@ export async function runCuelinksSync(maxPages = 0) {
             INSERT INTO gocoupon_deals (
               id, store_name, store_slug, store_logo, title, code, discount, category,
               badge, verified, verified_date, expires_in, end_date, min_order, terms,
-              link, uses_count, rating, votes_count, source, status, type
+              link, uses_count, rating, votes_count, source, status, type,
+              is_featured, featured_priority, campaign_source, verification_status
             ) VALUES ${rowPlaceholders.join(",\n")}
             ON CONFLICT (id) DO UPDATE SET
               title = EXCLUDED.title,
@@ -505,6 +541,10 @@ export async function runCuelinksSync(maxPages = 0) {
               discount = EXCLUDED.discount,
               uses_count = EXCLUDED.uses_count,
               verified = EXCLUDED.verified,
+              is_featured = EXCLUDED.is_featured,
+              featured_priority = EXCLUDED.featured_priority,
+              campaign_source = EXCLUDED.campaign_source,
+              verification_status = EXCLUDED.verification_status,
               updated_at = NOW();
           `, values);
         }

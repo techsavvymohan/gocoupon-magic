@@ -84,6 +84,15 @@ if (DATABASE_URL) {
           ALTER TABLE gocoupon_clicks ENABLE ROW LEVEL SECURITY;
         `).catch((e) => console.warn("[Database] Could not verify gocoupon_clicks table:", e.message));
 
+        // Ensure gocoupon_deals table has columns for featured deals and admin immunity
+        await pgPool?.query(`
+          ALTER TABLE gocoupon_deals ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT false;
+          ALTER TABLE gocoupon_deals ADD COLUMN IF NOT EXISTS featured_priority INTEGER DEFAULT 100;
+          ALTER TABLE gocoupon_deals ADD COLUMN IF NOT EXISTS campaign_source TEXT DEFAULT 'manual';
+          ALTER TABLE gocoupon_deals ADD COLUMN IF NOT EXISTS verification_status TEXT DEFAULT 'verified';
+          CREATE INDEX IF NOT EXISTS idx_deals_is_featured ON gocoupon_deals(is_featured);
+        `).catch((e) => console.warn("[Database] Could not verify gocoupon_deals featured columns:", e.message));
+
         // Hydrate live deals pool from Supabase PostgreSQL to prevent any loss across deployments
         pgPool
           ?.query(`
@@ -92,9 +101,22 @@ if (DATABASE_URL) {
               title, code, discount, category, badge, verified, verified_date AS "verifiedDate",
               expires_in AS "expiresIn", end_date AS "endDate", min_order AS "minOrder",
               terms, link, uses_count AS "usesCount", rating, votes_count AS "votesCount",
-              source, status, type
+              source, status, type,
+              COALESCE(is_featured, false) AS "isFeatured",
+              COALESCE(featured_priority, 100) AS "featuredPriority",
+              COALESCE(campaign_source, 'manual') AS "campaignSource",
+              COALESCE(verification_status, 'verified') AS "verificationStatus"
             FROM gocoupon_deals
-            WHERE status = 'active' AND (end_date IS NULL OR end_date > NOW())
+            WHERE status = 'active' AND (
+              is_featured = true OR 
+              source = 'admin' OR 
+              campaign_source = 'manual' OR 
+              id LIKE 'ac-%' OR 
+              id LIKE 'offer-%' OR 
+              id LIKE 'admin-%' OR 
+              end_date IS NULL OR 
+              end_date > NOW()
+            )
           `)
           .then((res) => {
             if (res && res.rows.length > 0) {
@@ -253,12 +275,24 @@ export const dealsDb = {
     storeSlug?: string;
     category?: string;
     search?: string;
+    featured?: boolean;
     limit?: number;
     offset?: number;
   }): Promise<DealRecord[]> {
-    const conditions: string[] = ["status = 'active'", "(end_date IS NULL OR end_date > NOW())"];
+    const conditions: string[] = [
+      "status = 'active'",
+      "(is_featured = true OR source = 'admin' OR campaign_source = 'manual' OR id LIKE 'ac-%' OR id LIKE 'offer-%' OR id LIKE 'admin-%' OR end_date IS NULL OR end_date > NOW())"
+    ];
     const params: any[] = [];
     let pIdx = 1;
+
+    if (options?.featured !== undefined) {
+      if (options.featured) {
+        conditions.push("(is_featured = true OR id LIKE 'ac-%')");
+      } else {
+        conditions.push("(is_featured = false AND id NOT LIKE 'ac-%')");
+      }
+    }
 
     if (options?.storeSlug) {
       conditions.push(`store_slug = $${pIdx++}`);
@@ -282,10 +316,14 @@ export const dealsDb = {
         title, code, discount, category, badge, verified, verified_date AS "verifiedDate",
         expires_in AS "expiresIn", end_date AS "endDate", min_order AS "minOrder",
         terms, link, uses_count AS "usesCount", rating, votes_count AS "votesCount",
-        source, status, type
+        source, status, type,
+        COALESCE(is_featured, false) AS "isFeatured",
+        COALESCE(featured_priority, 100) AS "featuredPriority",
+        COALESCE(campaign_source, 'manual') AS "campaignSource",
+        COALESCE(verification_status, 'verified') AS "verificationStatus"
       FROM gocoupon_deals
       WHERE ${conditions.join(" AND ")}
-      ORDER BY verified DESC, uses_count DESC, created_at DESC
+      ORDER BY is_featured DESC, featured_priority ASC, verified DESC, uses_count DESC, created_at DESC
     `;
 
     if (options?.limit) {
@@ -304,6 +342,13 @@ export const dealsDb = {
 
     // Fallback: Read from in-memory / live deals pool
     let deals = getLiveDeals();
+    if (options?.featured !== undefined) {
+      deals = deals.filter((d) =>
+        options.featured
+          ? Boolean(d.isFeatured) || String(d.id).startsWith("ac-")
+          : !Boolean(d.isFeatured) && !String(d.id).startsWith("ac-")
+      );
+    }
     if (options?.storeSlug) {
       deals = deals.filter((d) => d.storeSlug?.toLowerCase() === options.storeSlug?.toLowerCase());
     }
@@ -337,7 +382,11 @@ export const dealsDb = {
         title, code, discount, category, badge, verified, verified_date AS "verifiedDate",
         expires_in AS "expiresIn", end_date AS "endDate", min_order AS "minOrder",
         terms, link, uses_count AS "usesCount", rating, votes_count AS "votesCount",
-        source, status, type
+        source, status, type,
+        COALESCE(is_featured, false) AS "isFeatured",
+        COALESCE(featured_priority, 100) AS "featuredPriority",
+        COALESCE(campaign_source, 'manual') AS "campaignSource",
+        COALESCE(verification_status, 'verified') AS "verificationStatus"
       FROM gocoupon_deals WHERE id = $1 LIMIT 1`,
       [id]
     );
@@ -365,8 +414,8 @@ export const dealsDb = {
           const rowPlaceholders: string[] = [];
 
           batch.forEach((d, idx) => {
-            const offset = idx * 22;
-            rowPlaceholders.push(`(${Array.from({ length: 22 }, (_, k) => `$${offset + k + 1}`).join(", ")})`);
+            const offset = idx * 26;
+            rowPlaceholders.push(`(${Array.from({ length: 26 }, (_, k) => `$${offset + k + 1}`).join(", ")})`);
 
             values.push(
               String(d.id),
@@ -390,7 +439,11 @@ export const dealsDb = {
               d.votesCount || 12,
               d.source || "cuelinks",
               d.status || "active",
-              d.type || "coupon"
+              d.type || "coupon",
+              Boolean(d.isFeatured),
+              d.featuredPriority ? Number(d.featuredPriority) : 100,
+              d.campaignSource || "manual",
+              d.verificationStatus || "verified"
             );
           });
 
@@ -398,7 +451,8 @@ export const dealsDb = {
             INSERT INTO gocoupon_deals (
               id, store_name, store_slug, store_logo, title, code, discount, category,
               badge, verified, verified_date, expires_in, end_date, min_order, terms,
-              link, uses_count, rating, votes_count, source, status, type
+              link, uses_count, rating, votes_count, source, status, type,
+              is_featured, featured_priority, campaign_source, verification_status
             ) VALUES ${rowPlaceholders.join(",\n")}
             ON CONFLICT (id) DO UPDATE SET
               title = EXCLUDED.title,
@@ -406,6 +460,10 @@ export const dealsDb = {
               discount = EXCLUDED.discount,
               uses_count = EXCLUDED.uses_count,
               verified = EXCLUDED.verified,
+              is_featured = EXCLUDED.is_featured,
+              featured_priority = EXCLUDED.featured_priority,
+              campaign_source = EXCLUDED.campaign_source,
+              verification_status = EXCLUDED.verification_status,
               updated_at = NOW();
           `;
 
