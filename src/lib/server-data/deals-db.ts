@@ -50,6 +50,8 @@ export interface DealRecord {
   campaignSource?: string;
   targetCountry?: string;
   verificationStatus?: string;
+  seoKeywords?: string[];
+  directAnswer?: string;
 }
 
 // ---------------------------------------------------------------------------

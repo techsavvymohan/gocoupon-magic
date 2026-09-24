@@ -26,6 +26,8 @@ export interface Deal {
   terms: string;
   link: string;
   usesCount: number;
+  seoKeywords?: string[];
+  directAnswer?: string;
 }
 
 export function isDealActive(deal: { endDate?: string; expiresIn?: string }): boolean {

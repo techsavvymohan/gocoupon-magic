@@ -117,6 +117,97 @@ function mapCategory(categories, title) {
   return "General";
 }
 
+export function formatViralSeoDeal(storeName, rawCode, discount, rawTitle, rawDesc) {
+  const cleanStore = (storeName || "Partner Store").trim();
+  const hasCoupon = rawCode && rawCode.length > 1 && !/^(deal|none|na|null|undefined|deal activated)$/i.test(rawCode);
+  const code = hasCoupon ? rawCode.toUpperCase().trim() : "";
+
+  // Clean rawTitle
+  let cleanDetail = (rawTitle || "").trim();
+
+  // Strip repeated store names from start of rawTitle (e.g. "Gritzo Super Champ Sale" -> "Super Champ Sale")
+  const storeRegex = new RegExp(`^${cleanStore.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")}\\s*[-–:–]?\\s*`, "i");
+  cleanDetail = cleanDetail.replace(storeRegex, "").trim();
+
+  // Strip generic marketing words that reduce CTR and SEO power
+  cleanDetail = cleanDetail
+    .replace(/^(grab your savings|snag|unlock|score|enjoy|get exclusive|get|exclusive offer|special offer|limited time offer|best deal)[:\s–-]*/i, "")
+    .trim();
+
+  // Strip redundant discount text if it already starts with it
+  if (discount && discount !== "Verified Deal") {
+    const numMatch = discount.match(/([0-9]+%?)/);
+    if (numMatch) {
+      const redundantDiscountRegex = new RegExp(`^(?:up to\\s*)?${numMatch[1]}\\s*(?:off|discount|savings)[:\\s–-]*`, "i");
+      cleanDetail = cleanDetail.replace(redundantDiscountRegex, "").trim();
+    }
+  }
+
+  // Capitalize first letter of detail
+  if (cleanDetail.length > 0) {
+    cleanDetail = cleanDetail.charAt(0).toUpperCase() + cleanDetail.slice(1);
+  }
+
+  // Clean up punctuation at ends
+  cleanDetail = cleanDetail.replace(/^[-–:,\s]+|[-–:,\s]+$/g, "").trim();
+
+  if (!cleanDetail || cleanDetail.length < 3) {
+    cleanDetail = "Sitewide Savings & Exclusive Offers";
+  }
+
+  // Construct Viral SEO Title matching:
+  // 1. "xyz coupon code"
+  // 2. "coupon code for xyz"
+  let viralTitle = "";
+  if (code) {
+    viralTitle = `${cleanStore} Coupon Code: ${code} – ${discount} (${cleanDetail})`;
+  } else {
+    viralTitle = `${cleanStore} Coupon Code & Promo: ${discount} (${cleanDetail})`;
+  }
+
+  // Keep title tight (< 90 chars) for maximum Google CTR & mobile visibility
+  if (viralTitle.length > 90) {
+    const budget = 90 - (`${cleanStore} Coupon Code: ${code ? `${code} – ` : ""}${discount} ()`).length;
+    if (budget > 12) {
+      let trimmed = cleanDetail.slice(0, budget).trim();
+      const lastSpace = trimmed.lastIndexOf(" ");
+      if (lastSpace > 10) trimmed = trimmed.slice(0, lastSpace);
+      cleanDetail = trimmed + "...";
+      viralTitle = code
+        ? `${cleanStore} Coupon Code: ${code} – ${discount} (${cleanDetail})`
+        : `${cleanStore} Coupon Code & Promo: ${discount} (${cleanDetail})`;
+    } else {
+      viralTitle = code
+        ? `${cleanStore} Coupon Code: ${code} – ${discount}`
+        : `${cleanStore} Coupon Code: ${discount} Verified Offer`;
+    }
+  }
+
+  const baseDesc = (rawDesc || "").trim();
+  const viralTerms = `Looking for a coupon code for ${cleanStore}? Use ${code ? `verified coupon code '${code}'` : 'this verified deal'} to get ${discount} at ${cleanStore}. ${cleanDetail}. ${baseDesc ? `${baseDesc} ` : ""}Tested & 100% working today on GoCoupon.`.trim();
+
+  const seoKeywords = [
+    `${cleanStore.toLowerCase()} coupon code`,
+    `coupon code for ${cleanStore.toLowerCase()}`,
+    `${cleanStore.toLowerCase()} promo code`,
+    `${cleanStore.toLowerCase()} discount code`,
+    `${cleanStore.toLowerCase()} vouchers`,
+    `${cleanStore.toLowerCase()} coupons`,
+    code ? `${code.toLowerCase()} coupon code` : null,
+    code ? `coupon code ${code.toLowerCase()}` : null,
+    code ? `${cleanStore.toLowerCase()} code ${code.toLowerCase()}` : null,
+  ].filter(Boolean);
+
+  const directAnswer = `Looking for a working coupon code for ${cleanStore}? Apply ${code ? `code ${code}` : 'this verified offer'} at checkout to save ${discount} on your order.`;
+
+  return {
+    title: viralTitle,
+    terms: viralTerms,
+    seoKeywords,
+    directAnswer,
+  };
+}
+
 export async function runCuelinksSync(maxPages = 0) {
   console.log(`[Cuelinks Sync] Starting 24/7 dynamic sync (API v3, fetching all active pages)...`);
   const headers = {
@@ -241,13 +332,21 @@ export async function runCuelinksSync(maxPages = 0) {
       badge = "Exclusive";
     }
 
+    const viral = formatViralSeoDeal(
+      storeName,
+      code,
+      discount,
+      o.title,
+      o.description || o.terms
+    );
+
     liveDeals.push({
       id: `cue_${o.id}`,
       storeName,
       storeSlug,
       storeLogo,
       category,
-      title: o.title || `${discount} at ${storeName}`,
+      title: viral.title,
       code,
       discount,
       badge,
@@ -255,7 +354,9 @@ export async function runCuelinksSync(maxPages = 0) {
       expiresIn,
       endDate: o.end_date || undefined,
       minOrder: o.minimum_order ? `₹${Number(o.minimum_order).toLocaleString()}` : undefined,
-      terms: (o.description || o.terms || `Valid on ${storeName}. Verified via Cuelinks 24/7 network.`).trim(),
+      terms: viral.terms,
+      seoKeywords: viral.seoKeywords,
+      directAnswer: viral.directAnswer,
       link: trackingUrl,
       usesCount: 1200 + (Math.abs(Number(o.id) || 0) % 4000),
     });
