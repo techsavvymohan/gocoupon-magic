@@ -27,6 +27,7 @@ export interface FeaturedDealItem {
   lastVerifiedAt: string;
   terms: string;
   topPriority?: boolean; // Featured in top 6 showcase
+  logoUrl?: string;
 }
 
 export const FEATURED_CAMPAIGN_INFO = {
@@ -59,6 +60,7 @@ export const FEATURED_DEALS_COLLECTION: FeaturedDealItem[] = [
     lastVerifiedAt: "Today",
     terms: "Valid on online doctor consultations, lab tests, medicine delivery, and annual health checkup plans.",
     topPriority: true,
+    logoUrl: "https://res.cloudinary.com/pgzfcjir/image/upload/v1790245983/companylogo.jpg",
   },
   {
     id: "ac-flixbus-16",
@@ -80,6 +82,7 @@ export const FEATURED_DEALS_COLLECTION: FeaturedDealItem[] = [
     lastVerifiedAt: "Today",
     terms: "Valid on confirmed bus bookings made via the official FlixBus app and website. No minimum fare required.",
     topPriority: true,
+    logoUrl: "https://res.cloudinary.com/pgzfcjir/image/upload/v1790246090/_xckHFchRcdSo2EexTBAkO6QvInupeGdXdphN2Ea1PT4e2mJjxUvdnv6_p_B247dC6-hxenpgMPJqAfNdjs-9No.png",
   },
   {
     id: "ac-jbl-10",
@@ -101,6 +104,7 @@ export const FEATURED_DEALS_COLLECTION: FeaturedDealItem[] = [
     lastVerifiedAt: "Today",
     terms: "Valid on eligible audio products, Bluetooth speakers, and gaming headsets on official store.",
     topPriority: true,
+    logoUrl: "https://res.cloudinary.com/pgzfcjir/image/upload/v1790246148/1280px-JBL-Logo.svg.png.png",
   },
   {
     id: "ac-pure-nutrition-10",
@@ -143,6 +147,7 @@ export const FEATURED_DEALS_COLLECTION: FeaturedDealItem[] = [
     lastVerifiedAt: "Today",
     terms: "Valid across all luxury fragrances, gift sets, concentrated perfume oils, and oriental perfumes.",
     topPriority: true,
+    logoUrl: "https://res.cloudinary.com/pgzfcjir/image/upload/v1790246251/62a0d49057ac647f6fc2f6bd_Ajmal_Perfume_Logo.svg",
   },
   {
     id: "ac-nasher-miles-7",
@@ -164,6 +169,7 @@ export const FEATURED_DEALS_COLLECTION: FeaturedDealItem[] = [
     lastVerifiedAt: "Today",
     terms: "Valid on polycarbonate trolley luggage, travel duffels, and laptop backpacks.",
     topPriority: true,
+    logoUrl: "https://res.cloudinary.com/pgzfcjir/image/upload/v1790246302/nasher_miles_logo.jpg",
   },
 
   // ── Complete Directory Offers (7 to 14) ──────────────────────────────────
@@ -186,6 +192,7 @@ export const FEATURED_DEALS_COLLECTION: FeaturedDealItem[] = [
     verificationStatus: "verified",
     lastVerifiedAt: "Today",
     terms: "Valid on handcrafted non-alcoholic attars, oriental blends, and luxury reed diffusers.",
+    logoUrl: "https://res.cloudinary.com/pgzfcjir/image/upload/v1790246353/3Square.png",
   },
   {
     id: "ac-oliveboard",
@@ -206,6 +213,7 @@ export const FEATURED_DEALS_COLLECTION: FeaturedDealItem[] = [
     verificationStatus: "verified",
     lastVerifiedAt: "Today",
     terms: "Valid on test passes, video courses, and all-India test series for banking and regulatory exams.",
+    logoUrl: "https://res.cloudinary.com/pgzfcjir/image/upload/v1790246420/oliveboard.jpg",
   },
   {
     id: "ac-kleenest",
@@ -226,6 +234,7 @@ export const FEATURED_DEALS_COLLECTION: FeaturedDealItem[] = [
     verificationStatus: "pending_verification",
     lastVerifiedAt: "Pending",
     terms: "Offer details and official merchant link currently being verified with Analytics Clouds.",
+    logoUrl: "https://res.cloudinary.com/pgzfcjir/image/upload/v1790246503/4ed58352-eba0-4315-8e58-10a090983bae-1751289307WhatsApp_Image_2025-06-30_at_6.44.36_PM.jpg",
   },
   {
     id: "ac-the-formal-club",
@@ -246,6 +255,7 @@ export const FEATURED_DEALS_COLLECTION: FeaturedDealItem[] = [
     verificationStatus: "verified",
     lastVerifiedAt: "Today",
     terms: "Valid on 100% Giza cotton formal shirts, linen collections, and executive essentials.",
+    logoUrl: "https://res.cloudinary.com/pgzfcjir/image/upload/v1790246638/vzLBZ2WyLb_KAtarKKu-7lwbET1YUWBjRWJU1friL01k2Vd63sR-MOv782m3jO0lTiNV7MwzPeXf6SLV8FSo.png",
   },
   {
     id: "ac-qnt-sports",
@@ -266,6 +276,7 @@ export const FEATURED_DEALS_COLLECTION: FeaturedDealItem[] = [
     verificationStatus: "verified",
     lastVerifiedAt: "Today",
     terms: "Valid on Belgian-formulated whey protein, pre-workouts, amino acids, and energy bars.",
+    logoUrl: "https://res.cloudinary.com/pgzfcjir/image/upload/v1790246941/0x0.png",
   },
   {
     id: "ac-redbus",
@@ -286,6 +297,7 @@ export const FEATURED_DEALS_COLLECTION: FeaturedDealItem[] = [
     verificationStatus: "verified",
     lastVerifiedAt: "Today",
     terms: "Valid across certified private bus operators and government state transport corporations.",
+    logoUrl: "https://res.cloudinary.com/pgzfcjir/image/upload/v1790246770/redbus-logo-png_seeklogo-483976.png",
   },
   {
     id: "ac-nakpro",
@@ -306,6 +318,7 @@ export const FEATURED_DEALS_COLLECTION: FeaturedDealItem[] = [
     verificationStatus: "verified",
     lastVerifiedAt: "Today",
     terms: "Valid on all unflavoured and flavoured whey protein isolates, creatine, and glutamine.",
+    logoUrl: "https://res.cloudinary.com/pgzfcjir/image/upload/v1790246877/6700c3f2-5769-4fed-9b32-f145281b74ed.__CR184_114_3675_2273_PT0_SX970_V1___.jpg",
   },
   {
     id: "ac-as-it-is",
@@ -326,5 +339,6 @@ export const FEATURED_DEALS_COLLECTION: FeaturedDealItem[] = [
     verificationStatus: "verifying_terms",
     lastVerifiedAt: "Verifying",
     terms: "Exact discount percentage being verified. Coupon code can be tested at merchant checkout.",
+    logoUrl: "https://res.cloudinary.com/pgzfcjir/image/upload/v1790246825/ASITIS_Black_Text_Logo_Without_BG.png",
   },
 ];

@@ -3,13 +3,13 @@
  * @description Permanent Global Featured Deals Hub for GoCoupon.io.
  *
  * Merchandises high-priority partner campaigns (Launch: Analytics Clouds)
- * with instant coupon copying, direct merchant tracking, category filters,
- * verification status badges, and SEO metadata.
- *
- * Strictly adheres to clean, premium UI design:
- * - Sharp typography
- * - Zero sparkle icons
- * - Clear merchant terms & trust indicators
+ * in a clean, systematic, single-directory layout:
+ * - Instant coupon copying with toast feedback
+ * - Direct merchant affiliate tracking
+ * - Real-time category pills with counts & instant search
+ * - Zero duplicated deal cards
+ * - 100% verified status & terms transparency
+ * - Responsive, modern typography and clean UI design
  */
 
 import { createLazyFileRoute, Link } from "@tanstack/react-router";
@@ -28,10 +28,8 @@ import {
   Check,
   ExternalLink,
   Search,
-  Filter,
   ArrowRight,
   Clock,
-  Globe,
   Plane,
   HeartPulse,
   Dumbbell,
@@ -39,10 +37,11 @@ import {
   GraduationCap,
   Shirt,
   Flame,
-  HelpCircle,
   ChevronDown,
   Info,
   CheckCircle2,
+  X,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -69,7 +68,7 @@ const FAQS = [
   },
   {
     q: "How do I redeem a featured coupon code?",
-    a: "Simply click 'Copy Code' on any offer card to copy the discount code to your clipboard. Then click 'Get Deal' to open the merchant's official checkout page in a new tab, and paste your code into the coupon/promo box before making payment.",
+    a: "Simply click 'Copy' on any offer card to copy the discount code to your clipboard. Then click 'Get Deal' to open the merchant's official checkout page in a new tab, and paste your code into the coupon/promo box before making payment.",
   },
   {
     q: "Are these deals valid for shoppers in India?",
@@ -80,6 +79,31 @@ const FAQS = [
     a: "GoCoupon upholds strict zero-deception standards. If a partner merchant URL or discount rate is being updated by the brand, we label it as 'Pending Verification' or 'Offer Details Being Verified' until 100% verified.",
   },
 ];
+
+function DealBrandLogo({ brandName, logoUrl }: { brandName: string; logoUrl?: string }) {
+  const [imgError, setImgError] = useState(false);
+  const initials = brandName.slice(0, 2).toUpperCase();
+
+  if (logoUrl && !imgError) {
+    return (
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border/80 bg-white p-1.5 shadow-2xs group-hover:border-primary/40 transition-colors overflow-hidden">
+        <img
+          src={logoUrl}
+          alt={`${brandName} logo`}
+          className="h-full w-full object-contain"
+          onError={() => setImgError(true)}
+          loading="lazy"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-muted/40 font-display text-base font-bold text-foreground group-hover:border-primary/40 transition-colors">
+      {initials}
+    </div>
+  );
+}
 
 function mapDealToFeaturedItem(d: any, index: number): FeaturedDealItem {
   const priority = d.featuredPriority !== undefined ? Number(d.featuredPriority) : index + 1;
@@ -104,6 +128,7 @@ function mapDealToFeaturedItem(d: any, index: number): FeaturedDealItem {
     lastVerifiedAt: d.verifiedDate || "Today",
     terms: d.terms || "Standard merchant terms apply.",
     topPriority: isTop,
+    logoUrl: d.logoUrl || d.storeLogo || d.logo || d.image || undefined,
   };
 }
 
@@ -140,28 +165,32 @@ function FeaturedDealsPage() {
     };
   }, []);
 
-  // Top 6 priority offers
-  const topPriorityOffers = useMemo(() => {
-    const priorityItems = dealsList.filter((d) => d.topPriority || d.priorityLevel <= 6);
-    return (priorityItems.length > 0 ? priorityItems.slice(0, 6) : dealsList.slice(0, 6)).sort(
-      (a, b) => a.priorityLevel - b.priorityLevel
-    );
+  // Category counts computed systematically from dealsList
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: dealsList.length };
+    for (const deal of dealsList) {
+      counts[deal.category] = (counts[deal.category] || 0) + 1;
+    }
+    return counts;
   }, [dealsList]);
 
-  // Filtered complete directory
-  const filteredDirectoryOffers = useMemo(() => {
-    return dealsList.filter((item) => {
-      const matchesCat =
-        selectedCategory === "all" || item.category.toLowerCase() === selectedCategory.toLowerCase();
-      const q = searchQuery.trim().toLowerCase();
-      const matchesQuery =
-        !q ||
-        item.brandName.toLowerCase().includes(q) ||
-        item.subTitle.toLowerCase().includes(q) ||
-        item.couponCode.toLowerCase().includes(q) ||
-        item.category.toLowerCase().includes(q);
-      return matchesCat && matchesQuery;
-    }).sort((a, b) => a.priorityLevel - b.priorityLevel);
+  // Unified single filtered directory (zero duplicates)
+  const filteredOffers = useMemo(() => {
+    return dealsList
+      .filter((item) => {
+        const matchesCat =
+          selectedCategory === "all" ||
+          item.category.toLowerCase() === selectedCategory.toLowerCase();
+        const q = searchQuery.trim().toLowerCase();
+        const matchesQuery =
+          !q ||
+          item.brandName.toLowerCase().includes(q) ||
+          item.subTitle.toLowerCase().includes(q) ||
+          item.couponCode.toLowerCase().includes(q) ||
+          item.category.toLowerCase().includes(q);
+        return matchesCat && matchesQuery;
+      })
+      .sort((a, b) => a.priorityLevel - b.priorityLevel);
   }, [dealsList, selectedCategory, searchQuery]);
 
   // Copy coupon code handler
@@ -184,7 +213,7 @@ function FeaturedDealsPage() {
         coupon_code: item.couponCode,
         category: item.category,
         discount_value: item.discountText,
-        placement: item.topPriority ? "top_priority_grid" : "directory_grid",
+        placement: "featured_catalog",
         campaign_source: item.campaignSource,
       });
     }
@@ -222,6 +251,8 @@ function FeaturedDealsPage() {
     window.open(item.affiliateUrl || item.merchantUrl, "_blank", "noopener,noreferrer");
   };
 
+  const hasActiveFilters = selectedCategory !== "all" || Boolean(searchQuery.trim());
+
   const breadcrumb = breadcrumbSchema([
     { name: "Home", path: "/" },
     { name: "Featured Deals", path: "/featured-deals" },
@@ -234,30 +265,39 @@ function FeaturedDealsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />
 
-      {/* ── Compact Header & Page Title ──────────────────────────────────────── */}
-      <section className="border-b border-border/80 bg-card/40 px-4 py-5 sm:px-6">
+      {/* ── 1. Clean Systematic Header ────────────────────────────────────────── */}
+      <section className="border-b border-border/80 bg-card/40 px-4 py-8 sm:px-6">
         <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="max-w-2xl">
               <div className="inline-flex items-center gap-2 font-mono text-[11px] font-semibold text-primary">
                 <Tag className="h-3 w-3 text-primary" />
                 <span className="uppercase tracking-wider">{FEATURED_CAMPAIGN_INFO.partnerBadge}</span>
                 <span className="text-muted-foreground">•</span>
                 <span className="text-emerald-600 dark:text-emerald-400 font-bold">100% Hand-Verified</span>
               </div>
-              <h1 className="font-display text-xl sm:text-2xl font-extrabold tracking-tight text-foreground mt-0.5">
+              <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground mt-1">
                 Featured Deals &amp; Exclusive Coupons
               </h1>
-              <p className="text-xs text-muted-foreground max-w-xl mt-0.5">
+              <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
                 Handpicked verified promo codes from partner brands. Copy code directly and claim instant savings at official merchant checkout.
               </p>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
-              <div className="rounded-xl border border-border bg-card px-3.5 py-1.5 shadow-2xs">
-                <div className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Verified Offers</div>
-                <div className="font-display text-sm font-bold text-foreground">
-                  {dealsList.length} Active Deals
+            {/* Quick Trust Metrics Strip */}
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+              <div className="rounded-xl border border-border bg-card px-4 py-2.5 shadow-2xs">
+                <div className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Active Catalog</div>
+                <div className="font-display text-base font-bold text-foreground">
+                  {dealsList.length} Partner Deals
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-border bg-card px-4 py-2.5 shadow-2xs">
+                <div className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Verification</div>
+                <div className="font-display text-base font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4" />
+                  <span>100% Live</span>
                 </div>
               </div>
             </div>
@@ -265,191 +305,66 @@ function FeaturedDealsPage() {
         </div>
       </section>
 
-      {/* ── Top Priority Offers (Top 6) ─────────────────────────────────── */}
-      <section id="top-offers" className="border-b border-border px-4 py-8 sm:px-6">
+      {/* ── 2. Unified Systematic Catalog (Zero Duplicates) ────────────────── */}
+      <section id="featured-catalog" className="px-4 py-8 sm:py-10 sm:px-6">
         <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 pb-5">
-            <div>
-              <div className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-primary">
-                <Flame className="h-3.5 w-3.5 text-primary" />
-                <span>Top Priority</span>
-              </div>
-              <h2 className="mt-0.5 font-display text-lg sm:text-xl font-bold tracking-tight text-foreground">
-                Top Featured Offers
-              </h2>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Highest-converting promo codes with immediate checkout eligibility.
-            </p>
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {topPriorityOffers.map((item) => {
-              const isCopied = copiedCode === item.couponCode;
-              return (
-                <div
-                  key={item.id}
-                  className="group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-6 shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
-                >
-                  <div>
-                    {/* Top Row: Brand & Badge */}
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-muted/50 font-display text-base font-bold text-foreground group-hover:border-primary/40">
-                          {item.brandName.slice(0, 2).toUpperCase()}
-                        </div>
-                        <div className="min-w-0">
-                          <h3 className="truncate font-display text-lg font-bold text-foreground">
-                            {item.brandName}
-                          </h3>
-                          <span className="font-mono text-xs text-muted-foreground">
-                            {item.category}
-                          </span>
-                        </div>
-                      </div>
-
-                      <span
-                        className={`shrink-0 rounded-full border px-2.5 py-0.5 font-mono text-[11px] font-semibold ${
-                          item.badgeColor || "bg-primary/10 text-primary border-primary/20"
-                        }`}
-                      >
-                        {item.badge}
-                      </span>
-                    </div>
-
-                    {/* Discount Headline */}
-                    <div className="mt-5">
-                      <div className="font-display text-3xl font-extrabold tracking-tight text-foreground">
-                        {item.discountText}
-                      </div>
-                      <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
-                        {item.subTitle}
-                      </p>
-                    </div>
-
-                    {/* Coupon Code Block */}
-                    <div className="mt-5 rounded-xl border border-dashed border-border/90 bg-muted/30 p-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <div>
-                          <span className="font-mono text-[10px] uppercase text-muted-foreground block">
-                            Coupon Code
-                          </span>
-                          <span className="font-mono text-base font-bold tracking-wider text-foreground select-all">
-                            {item.couponCode}
-                          </span>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={(e) => handleCopyCode(item, e)}
-                          className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-mono text-xs font-bold transition-all cursor-pointer ${
-                            isCopied
-                              ? "bg-emerald-600 text-white"
-                              : "bg-primary text-primary-foreground hover:opacity-90 active:scale-95"
-                          }`}
-                        >
-                          {isCopied ? (
-                            <>
-                              <Check className="h-3.5 w-3.5" />
-                              <span>Copied!</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="h-3.5 w-3.5" />
-                              <span>Copy</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card Bottom CTA & Metadata */}
-                  <div className="mt-6 pt-4 border-t border-border/60">
-                    <button
-                      type="button"
-                      onClick={() => handleGetDeal(item)}
-                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-foreground px-4 py-2.5 text-xs font-bold text-background shadow-xs transition-all hover:bg-foreground/90 active:scale-98 cursor-pointer"
-                    >
-                      <span>Get Deal</span>
-                      <ExternalLink className="h-3.5 w-3.5" />
-                    </button>
-
-                    <div className="mt-3 flex items-center justify-between font-mono text-[11px] text-muted-foreground">
-                      <span className="inline-flex items-center gap-1">
-                        <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-                        {item.targetCountry}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setExpandedTermsId(expandedTermsId === item.id ? null : item.id)
-                        }
-                        className="hover:text-foreground underline underline-offset-2 cursor-pointer"
-                      >
-                        Terms apply
-                      </button>
-                    </div>
-
-                    {/* Expandable Terms */}
-                    {expandedTermsId === item.id && (
-                      <div className="mt-3 rounded-lg border border-border bg-background p-2.5 text-[11px] text-muted-foreground leading-relaxed">
-                        {item.terms}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 4. Complete Directory with Filters ─────────────────────────────── */}
-      <section id="all-deals" className="px-4 py-16 sm:px-6">
-        <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between pb-8">
-            <div>
-              <div className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-primary">
-                <Globe className="h-3.5 w-3.5 text-primary" />
-                Directory Catalog
-              </div>
-              <h2 className="mt-1 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                All Featured Partner Offers
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Showing {filteredDirectoryOffers.length} handpicked offers sorted by verified campaign
-                priority.
-              </p>
-            </div>
-
-            {/* Search Input */}
-            <div className="relative w-full md:w-72">
+          {/* Controls: Search + Category Pills */}
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between pb-6 border-b border-border/70">
+            {/* Search Bar */}
+            <div className="relative w-full md:w-80">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Search brand, category, code..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-border bg-card py-2 pl-9 pr-4 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary shadow-2xs"
+                className="w-full rounded-xl border border-border bg-card py-2.5 pl-9 pr-8 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary shadow-2xs transition-all"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[10px] text-muted-foreground hover:text-foreground cursor-pointer"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground cursor-pointer rounded-md hover:bg-muted"
+                  title="Clear search"
                 >
-                  Clear
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Active Filter Counter & Reset */}
+            <div className="flex items-center justify-between md:justify-end gap-3 font-mono text-xs text-muted-foreground">
+              <span>
+                Showing <strong className="text-foreground">{filteredOffers.length}</strong> of{" "}
+                <strong className="text-foreground">{dealsList.length}</strong> verified offers
+              </span>
+
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedCategory("all");
+                    setSearchQuery("");
+                  }}
+                  className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-semibold cursor-pointer"
+                >
+                  <X className="h-3 w-3" />
+                  <span>Reset filters</span>
                 </button>
               )}
             </div>
           </div>
 
-          {/* Category Filter Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-4 scrollbar-none">
+          {/* Category Filter Pills with Item Counts */}
+          <div className="pt-4 pb-2 flex items-center gap-2 overflow-x-auto scrollbar-none">
             {CATEGORY_TABS.map((cat) => {
               const Icon = cat.icon;
               const isSelected = selectedCategory === cat.id;
+              const count = categoryCounts[cat.id] ?? 0;
+
+              // Don't show pills for categories with 0 items unless it's "all"
+              if (cat.id !== "all" && count === 0) return null;
+
               return (
                 <button
                   key={cat.id}
@@ -463,33 +378,39 @@ function FeaturedDealsPage() {
                 >
                   <Icon className="h-3.5 w-3.5" />
                   <span>{cat.label}</span>
+                  <span
+                    className={`ml-0.5 rounded-full px-1.5 py-0.2 text-[10px] ${
+                      isSelected
+                        ? "bg-primary-foreground/20 text-primary-foreground"
+                        : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {count}
+                  </span>
                 </button>
               );
             })}
           </div>
 
-          {/* Offers Grid */}
-          {filteredDirectoryOffers.length > 0 ? (
+          {/* Unified Deals Grid (Every deal appears exactly ONCE) */}
+          {filteredOffers.length > 0 ? (
             <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredDirectoryOffers.map((item) => {
+              {filteredOffers.map((item) => {
                 const isCopied = copiedCode === item.couponCode;
                 const isHold = item.verificationStatus === "pending_verification";
-                const isCheckingTerms = item.verificationStatus === "verifying_terms";
 
                 return (
                   <div
                     key={item.id}
-                    className="flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-5 shadow-xs transition-all hover:border-border hover:shadow-sm"
+                    className="group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-2xs transition-all duration-200 hover:border-primary/40 hover:shadow-md"
                   >
                     <div>
-                      {/* Brand Header */}
+                      {/* Top Row: Brand & Category + Badge */}
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-muted/40 font-display text-sm font-bold text-foreground">
-                            {item.brandName.slice(0, 2).toUpperCase()}
-                          </div>
+                          <DealBrandLogo brandName={item.brandName} logoUrl={item.logoUrl} />
                           <div className="min-w-0">
-                            <h3 className="truncate font-display text-base font-bold text-foreground">
+                            <h3 className="truncate font-display text-base sm:text-lg font-bold text-foreground">
                               {item.brandName}
                             </h3>
                             <span className="font-mono text-xs text-muted-foreground">
@@ -499,32 +420,32 @@ function FeaturedDealsPage() {
                         </div>
 
                         <span
-                          className={`shrink-0 rounded-full border px-2 py-0.5 font-mono text-[10px] font-semibold ${
-                            item.badgeColor || "bg-muted text-muted-foreground border-border"
+                          className={`shrink-0 rounded-full border px-2.5 py-0.5 font-mono text-[11px] font-semibold ${
+                            item.badgeColor || "bg-primary/10 text-primary border-primary/20"
                           }`}
                         >
                           {item.badge}
                         </span>
                       </div>
 
-                      {/* Discount info */}
+                      {/* Discount Headline */}
                       <div className="mt-4">
-                        <div className="font-display text-2xl font-bold tracking-tight text-foreground">
+                        <div className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
                           {item.discountText}
                         </div>
-                        <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                        <p className="mt-1 text-xs sm:text-sm text-muted-foreground line-clamp-2">
                           {item.subTitle}
                         </p>
                       </div>
 
-                      {/* Code Box */}
-                      <div className="mt-4 rounded-xl border border-dashed border-border bg-muted/20 p-2.5">
+                      {/* Coupon Code Block */}
+                      <div className="mt-4 rounded-xl border border-dashed border-border/90 bg-muted/30 p-3">
                         <div className="flex items-center justify-between gap-2">
                           <div className="min-w-0">
-                            <span className="font-mono text-[9px] uppercase text-muted-foreground block">
-                              Promo Code
+                            <span className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground block">
+                              Coupon Code
                             </span>
-                            <span className="font-mono text-sm font-bold tracking-wider text-foreground select-all truncate block">
+                            <span className="font-mono text-sm sm:text-base font-bold tracking-wider text-foreground select-all truncate block">
                               {item.couponCode}
                             </span>
                           </div>
@@ -533,7 +454,7 @@ function FeaturedDealsPage() {
                             type="button"
                             disabled={isHold}
                             onClick={(e) => handleCopyCode(item, e)}
-                            className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 font-mono text-[11px] font-bold transition-all cursor-pointer ${
+                            className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-mono text-xs font-bold transition-all cursor-pointer ${
                               isHold
                                 ? "bg-muted text-muted-foreground cursor-not-allowed opacity-60"
                                 : isCopied
@@ -543,12 +464,12 @@ function FeaturedDealsPage() {
                           >
                             {isCopied ? (
                               <>
-                                <Check className="h-3 w-3" />
-                                <span>Copied</span>
+                                <Check className="h-3.5 w-3.5" />
+                                <span>Copied!</span>
                               </>
                             ) : (
                               <>
-                                <Copy className="h-3 w-3" />
+                                <Copy className="h-3.5 w-3.5" />
                                 <span>Copy</span>
                               </>
                             )}
@@ -557,10 +478,10 @@ function FeaturedDealsPage() {
                       </div>
                     </div>
 
-                    {/* Actions & Verification */}
-                    <div className="mt-5 pt-3 border-t border-border/50">
+                    {/* Card Bottom CTA & Metadata */}
+                    <div className="mt-5 pt-4 border-t border-border/60">
                       {isHold ? (
-                        <div className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs font-semibold text-amber-600 dark:text-amber-400">
+                        <div className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-2.5 text-xs font-semibold text-amber-600 dark:text-amber-400">
                           <Clock className="h-3.5 w-3.5" />
                           <span>Link Pending Partner Verification</span>
                         </div>
@@ -568,28 +489,32 @@ function FeaturedDealsPage() {
                         <button
                           type="button"
                           onClick={() => handleGetDeal(item)}
-                          className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-foreground px-3 py-2 text-xs font-bold text-background shadow-2xs transition-all hover:bg-foreground/90 active:scale-98 cursor-pointer"
+                          className="flex w-full items-center justify-center gap-2 rounded-xl bg-foreground px-4 py-2.5 text-xs font-bold text-background shadow-xs transition-all hover:bg-foreground/90 active:scale-98 cursor-pointer"
                         >
                           <span>Get Deal</span>
                           <ExternalLink className="h-3.5 w-3.5" />
                         </button>
                       )}
 
-                      <div className="mt-2.5 flex items-center justify-between font-mono text-[10px] text-muted-foreground">
-                        <span>{item.targetCountry}</span>
+                      <div className="mt-3 flex items-center justify-between font-mono text-[11px] text-muted-foreground">
+                        <span className="inline-flex items-center gap-1">
+                          <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                          {item.targetCountry}
+                        </span>
                         <button
                           type="button"
                           onClick={() =>
                             setExpandedTermsId(expandedTermsId === item.id ? null : item.id)
                           }
-                          className="hover:text-foreground underline cursor-pointer"
+                          className="hover:text-foreground underline underline-offset-2 cursor-pointer transition-colors"
                         >
-                          Terms
+                          {expandedTermsId === item.id ? "Hide Terms" : "Terms apply"}
                         </button>
                       </div>
 
+                      {/* Expandable Terms */}
                       {expandedTermsId === item.id && (
-                        <div className="mt-2 rounded-lg border border-border bg-background p-2 text-[10px] text-muted-foreground leading-normal">
+                        <div className="mt-2.5 rounded-lg border border-border bg-background p-2.5 text-[11px] text-muted-foreground leading-relaxed animate-in fade-in duration-150">
                           {item.terms}
                         </div>
                       )}
@@ -599,13 +524,14 @@ function FeaturedDealsPage() {
               })}
             </div>
           ) : (
-            <div className="mt-12 rounded-2xl border border-dashed border-border p-12 text-center">
+            /* Empty Filter State */
+            <div className="mt-12 rounded-2xl border border-dashed border-border bg-card/40 p-12 text-center">
               <Info className="mx-auto h-8 w-8 text-muted-foreground" />
               <h3 className="mt-3 font-display text-lg font-bold text-foreground">
                 No featured offers found
               </h3>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Try selecting &ldquo;All Deals&rdquo; or clearing your search term.
+              <p className="mt-1 text-xs text-muted-foreground max-w-sm mx-auto">
+                No deals matched your search &ldquo;{searchQuery}&rdquo; in category &ldquo;{selectedCategory}&rdquo;.
               </p>
               <button
                 type="button"
@@ -613,16 +539,16 @@ function FeaturedDealsPage() {
                   setSelectedCategory("all");
                   setSearchQuery("");
                 }}
-                className="mt-4 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+                className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 cursor-pointer"
               >
-                Reset Filters
+                <span>Reset All Filters</span>
               </button>
             </div>
           )}
         </div>
       </section>
 
-      {/* ── 5. How to Redeem (4 Step Process) ──────────────────────────────── */}
+      {/* ── 3. How to Redeem (4 Step Process) ──────────────────────────────── */}
       <section className="border-t border-border bg-muted/20 px-4 py-16 sm:px-6">
         <div className="mx-auto max-w-5xl">
           <div className="text-center">
@@ -630,7 +556,7 @@ function FeaturedDealsPage() {
               <CheckCircle2 className="h-3.5 w-3.5" />
               Simple 4-Step Process
             </div>
-            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            <h2 className="mt-2 font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
               How to Use a Featured Coupon
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
@@ -638,7 +564,7 @@ function FeaturedDealsPage() {
             </p>
           </div>
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-2xl border border-border bg-card p-6 shadow-xs">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary font-mono text-sm font-bold text-primary-foreground">
                 01
@@ -659,7 +585,7 @@ function FeaturedDealsPage() {
                 Copy the Code
               </h3>
               <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                Click &ldquo;Copy Code&rdquo; on the card to instantly save the promo voucher to your clipboard.
+                Click &ldquo;Copy&rdquo; on any card to instantly save the promo voucher to your clipboard.
               </p>
             </div>
 
@@ -690,7 +616,7 @@ function FeaturedDealsPage() {
         </div>
       </section>
 
-      {/* ── 6. Verification & Terms Notice ─────────────────────────────────── */}
+      {/* ── 4. Verification & Trust Policy ─────────────────────────────────── */}
       <section className="border-t border-border px-4 py-12 sm:px-6">
         <div className="mx-auto max-w-4xl rounded-2xl border border-border/80 bg-card p-6 sm:p-8">
           <div className="flex items-start gap-4">
@@ -710,11 +636,11 @@ function FeaturedDealsPage() {
         </div>
       </section>
 
-      {/* ── 7. Frequently Asked Questions (Accordion) ─────────────────────── */}
+      {/* ── 5. Frequently Asked Questions (Accordion) ─────────────────────── */}
       <section className="border-t border-border bg-muted/10 px-4 py-16 sm:px-6">
         <div className="mx-auto max-w-3xl">
           <div className="text-center">
-            <h2 className="font-display text-3xl font-bold tracking-tight text-foreground">
+            <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
               Frequently Asked Questions
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
@@ -754,10 +680,10 @@ function FeaturedDealsPage() {
         </div>
       </section>
 
-      {/* ── 8. Final CTA Banner ────────────────────────────────────────────── */}
+      {/* ── 6. Final CTA Banner ────────────────────────────────────────────── */}
       <section className="border-t border-border bg-gradient-to-b from-card to-background px-4 py-16 text-center sm:px-6">
         <div className="mx-auto max-w-3xl">
-          <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
             Looking for More Store Discounts?
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
