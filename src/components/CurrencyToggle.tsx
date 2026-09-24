@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useCurrency, SUPPORTED_CURRENCIES, CurrencyCode } from "@/context/CurrencyContext";
-import { Coins, Check, ChevronDown, MapPin } from "lucide-react";
+import { Coins, Check, ChevronDown } from "lucide-react";
 
 interface CurrencyToggleProps {
   className?: string;
@@ -51,18 +51,15 @@ export function CurrencyToggle({ className = "", variant = "default" }: Currency
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label={`Current currency: ${currency} (${currentCurrency.symbol}). Click to change currency.`}
-        title={`Location: ${countryName || country || "Global"}. Current: ${currency} (${currentCurrency.symbol})`}
+        title={`Current currency: ${currency} (${currentCurrency.symbol})`}
         className={`group inline-flex items-center gap-1.5 rounded-full border border-border/80 bg-background/80 px-2.5 py-1.5 text-xs font-semibold text-foreground shadow-2xs backdrop-blur-md transition-all duration-200 hover:border-border hover:bg-accent active:scale-95 cursor-pointer touch-manipulation focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary ${
           variant === "footer"
             ? "border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300"
             : ""
         }`}
       >
-        <span className="text-sm leading-none" aria-hidden="true">
-          {currentCurrency.flag}
-        </span>
         <span className="font-mono font-bold text-primary">{currentCurrency.symbol}</span>
-        <span className="font-mono text-[11px] text-muted-foreground uppercase">{currentCurrency.code}</span>
+        <span className="font-mono text-[11px] font-semibold text-muted-foreground uppercase">{currentCurrency.code}</span>
         <ChevronDown
           className={`h-3 w-3 text-muted-foreground transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
@@ -82,12 +79,6 @@ export function CurrencyToggle({ className = "", variant = "default" }: Currency
               <Coins className="h-3 w-3" />
               <span>Select Currency</span>
             </div>
-            {countryName && (
-              <div className="flex items-center gap-1 text-[10px] text-muted-foreground/80 font-mono">
-                <MapPin className="h-2.5 w-2.5 text-primary" />
-                <span className="truncate max-w-[80px]">{countryName}</span>
-              </div>
-            )}
           </div>
 
           <div className="space-y-0.5 max-h-72 overflow-y-auto">
@@ -107,8 +98,11 @@ export function CurrencyToggle({ className = "", variant = "default" }: Currency
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <span className="text-base leading-none" aria-hidden="true">
-                      {curr.flag}
+                    <span
+                      className="flex h-6 w-6 items-center justify-center rounded-md bg-muted font-mono text-xs font-bold text-primary shrink-0"
+                      aria-hidden="true"
+                    >
+                      {curr.symbol.trim()}
                     </span>
                     <div className="flex flex-col items-start leading-tight">
                       <div className="flex items-center gap-1.5">

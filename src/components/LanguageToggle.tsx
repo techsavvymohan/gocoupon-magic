@@ -57,9 +57,7 @@ export function LanguageToggle({ className = "", variant = "default" }: Language
             : ""
         }`}
       >
-        <span className="text-sm leading-none" aria-hidden="true">
-          {currentLanguage.flag}
-        </span>
+        <Globe className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
         <span className="font-mono uppercase tracking-wider">{currentLanguage.code}</span>
         <ChevronDown
           className={`h-3 w-3 text-muted-foreground transition-transform duration-200 ${
@@ -99,8 +97,11 @@ export function LanguageToggle({ className = "", variant = "default" }: Language
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <span className="text-base leading-none" aria-hidden="true">
-                      {lang.flag}
+                    <span
+                      className="flex h-6 w-6 items-center justify-center rounded-md bg-muted font-mono text-[10px] font-bold uppercase text-foreground/80 shrink-0"
+                      aria-hidden="true"
+                    >
+                      {lang.code}
                     </span>
                     <div className="flex flex-col items-start leading-tight">
                       <span className="font-medium">{lang.nativeName}</span>
