@@ -86,7 +86,7 @@ function DealBrandLogo({ brandName, logoUrl }: { brandName: string; logoUrl?: st
 
   if (logoUrl && !imgError) {
     return (
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border/80 bg-white p-1.5 shadow-2xs group-hover:border-primary/40 transition-colors overflow-hidden">
+      <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl border border-border/80 bg-white p-1 sm:p-1.5 shadow-2xs group-hover:border-primary/40 transition-colors overflow-hidden">
         <img
           src={logoUrl}
           alt={`${brandName} logo`}
@@ -99,7 +99,7 @@ function DealBrandLogo({ brandName, logoUrl }: { brandName: string; logoUrl?: st
   }
 
   return (
-    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-muted/40 font-display text-base font-bold text-foreground group-hover:border-primary/40 transition-colors">
+    <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-muted/40 font-display text-sm sm:text-base font-bold text-foreground group-hover:border-primary/40 transition-colors">
       {initials}
     </div>
   );
@@ -265,10 +265,32 @@ function FeaturedDealsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />
 
-      {/* ── 1. Clean Systematic Header ────────────────────────────────────────── */}
-      <section className="border-b border-border/80 bg-card/40 px-4 py-8 sm:px-6">
+      {/* ── 1. Clean Systematic Header (Mobile Compact + Desktop Rich) ──── */}
+      <section className="border-b border-border/80 bg-card/40 px-3.5 py-3 sm:px-6 sm:py-6">
         <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          {/* Mobile Ultra-Compact Header (Takes ~40px total, zero wasted space) */}
+          <div className="flex sm:hidden items-center justify-between gap-2">
+            <div className="min-w-0">
+              <div className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold text-primary">
+                <Tag className="h-2.5 w-2.5 text-primary" />
+                <span className="uppercase tracking-wider">India Hub</span>
+                <span className="text-muted-foreground">•</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold">100% Verified</span>
+              </div>
+              <h1 className="font-display text-base font-extrabold tracking-tight text-foreground truncate mt-0.5">
+                Featured Deals &amp; Coupons
+              </h1>
+            </div>
+            <div className="shrink-0 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-2 py-1 shadow-2xs">
+              <div className="font-display text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <CheckCircle2 className="h-3 w-3" />
+                <span>{dealsList.length} Live</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Spacious Header */}
+          <div className="hidden sm:flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="max-w-2xl">
               <div className="inline-flex items-center gap-2 font-mono text-[11px] font-semibold text-primary">
                 <Tag className="h-3 w-3 text-primary" />
@@ -306,25 +328,25 @@ function FeaturedDealsPage() {
       </section>
 
       {/* ── 2. Unified Systematic Catalog (Zero Duplicates) ────────────────── */}
-      <section id="featured-catalog" className="px-4 py-8 sm:py-10 sm:px-6">
+      <section id="featured-catalog" className="px-3.5 py-3 sm:px-6 sm:py-8 pb-28 sm:pb-16">
         <div className="mx-auto max-w-6xl">
-          {/* Controls: Search + Category Pills */}
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between pb-6 border-b border-border/70">
+          {/* Controls: Search + Counter in compact layout */}
+          <div className="flex flex-col gap-2.5 sm:gap-4 md:flex-row md:items-center md:justify-between pb-3 sm:pb-5 border-b border-border/70">
             {/* Search Bar */}
             <div className="relative w-full md:w-80">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Search brand, category, code..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-border bg-card py-2.5 pl-9 pr-8 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary shadow-2xs transition-all"
+                className="w-full rounded-xl border border-border bg-card py-2 sm:py-2.5 pl-8 sm:pl-9 pr-8 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary shadow-2xs transition-all"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground cursor-pointer rounded-md hover:bg-muted"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground cursor-pointer rounded-md hover:bg-muted"
                   title="Clear search"
                 >
                   <X className="h-3.5 w-3.5" />
@@ -333,7 +355,7 @@ function FeaturedDealsPage() {
             </div>
 
             {/* Active Filter Counter & Reset */}
-            <div className="flex items-center justify-between md:justify-end gap-3 font-mono text-xs text-muted-foreground">
+            <div className="flex items-center justify-between md:justify-end gap-2 font-mono text-[11px] sm:text-xs text-muted-foreground">
               <span>
                 Showing <strong className="text-foreground">{filteredOffers.length}</strong> of{" "}
                 <strong className="text-foreground">{dealsList.length}</strong> verified offers
@@ -346,7 +368,7 @@ function FeaturedDealsPage() {
                     setSelectedCategory("all");
                     setSearchQuery("");
                   }}
-                  className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-semibold cursor-pointer"
+                  className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-primary hover:underline font-semibold cursor-pointer"
                 >
                   <X className="h-3 w-3" />
                   <span>Reset filters</span>
@@ -356,7 +378,7 @@ function FeaturedDealsPage() {
           </div>
 
           {/* Category Filter Pills with Item Counts */}
-          <div className="pt-4 pb-2 flex items-center gap-2 overflow-x-auto scrollbar-none">
+          <div className="pt-2.5 sm:pt-4 pb-1 sm:pb-2 flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none">
             {CATEGORY_TABS.map((cat) => {
               const Icon = cat.icon;
               const isSelected = selectedCategory === cat.id;
@@ -370,16 +392,16 @@ function FeaturedDealsPage() {
                   key={cat.id}
                   type="button"
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`inline-flex items-center gap-2 rounded-xl px-3.5 py-2 font-mono text-xs font-semibold shrink-0 transition-all cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 sm:gap-2 rounded-xl px-2.5 py-1.5 sm:px-3.5 sm:py-2 font-mono text-[11px] sm:text-xs font-semibold shrink-0 transition-all cursor-pointer ${
                     isSelected
                       ? "bg-primary text-primary-foreground shadow-xs font-bold"
                       : "border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/40"
                   }`}
                 >
-                  <Icon className="h-3.5 w-3.5" />
+                  <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                   <span>{cat.label}</span>
                   <span
-                    className={`ml-0.5 rounded-full px-1.5 py-0.2 text-[10px] ${
+                    className={`ml-0.5 rounded-full px-1.5 py-0.2 text-[9px] sm:text-[10px] ${
                       isSelected
                         ? "bg-primary-foreground/20 text-primary-foreground"
                         : "bg-muted text-muted-foreground"
@@ -394,7 +416,7 @@ function FeaturedDealsPage() {
 
           {/* Unified Deals Grid (Every deal appears exactly ONCE) */}
           {filteredOffers.length > 0 ? (
-            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-3.5 sm:mt-6 grid gap-3.5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {filteredOffers.map((item) => {
                 const isCopied = copiedCode === item.couponCode;
                 const isHold = item.verificationStatus === "pending_verification";
@@ -402,25 +424,25 @@ function FeaturedDealsPage() {
                 return (
                   <div
                     key={item.id}
-                    className="group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-2xs transition-all duration-200 hover:border-primary/40 hover:shadow-md"
+                    className="group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-4 sm:p-6 shadow-2xs transition-all duration-200 hover:border-primary/40 hover:shadow-md"
                   >
                     <div>
                       {/* Top Row: Brand & Category + Badge */}
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-center gap-3 min-w-0">
+                      <div className="flex items-start justify-between gap-2.5 sm:gap-3">
+                        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                           <DealBrandLogo brandName={item.brandName} logoUrl={item.logoUrl} />
                           <div className="min-w-0">
-                            <h3 className="truncate font-display text-base sm:text-lg font-bold text-foreground">
+                            <h3 className="truncate font-display text-sm sm:text-base font-bold text-foreground">
                               {item.brandName}
                             </h3>
-                            <span className="font-mono text-xs text-muted-foreground">
+                            <span className="font-mono text-[11px] sm:text-xs text-muted-foreground">
                               {item.category}
                             </span>
                           </div>
                         </div>
 
                         <span
-                          className={`shrink-0 rounded-full border px-2.5 py-0.5 font-mono text-[11px] font-semibold ${
+                          className={`shrink-0 rounded-full border px-2 py-0.5 font-mono text-[10px] sm:text-[11px] font-semibold ${
                             item.badgeColor || "bg-primary/10 text-primary border-primary/20"
                           }`}
                         >
@@ -429,23 +451,23 @@ function FeaturedDealsPage() {
                       </div>
 
                       {/* Discount Headline */}
-                      <div className="mt-4">
-                        <div className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+                      <div className="mt-3 sm:mt-4">
+                        <div className="font-display text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-foreground">
                           {item.discountText}
                         </div>
-                        <p className="mt-1 text-xs sm:text-sm text-muted-foreground line-clamp-2">
+                        <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted-foreground line-clamp-1 sm:line-clamp-2">
                           {item.subTitle}
                         </p>
                       </div>
 
                       {/* Coupon Code Block */}
-                      <div className="mt-4 rounded-xl border border-dashed border-border/90 bg-muted/30 p-3">
+                      <div className="mt-3 sm:mt-4 rounded-xl border border-dashed border-border/90 bg-muted/30 p-2.5 sm:p-3">
                         <div className="flex items-center justify-between gap-2">
                           <div className="min-w-0">
                             <span className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground block">
                               Coupon Code
                             </span>
-                            <span className="font-mono text-sm sm:text-base font-bold tracking-wider text-foreground select-all truncate block">
+                            <span className="font-mono text-xs sm:text-sm md:text-base font-bold tracking-wider text-foreground select-all truncate block">
                               {item.couponCode}
                             </span>
                           </div>
@@ -454,7 +476,7 @@ function FeaturedDealsPage() {
                             type="button"
                             disabled={isHold}
                             onClick={(e) => handleCopyCode(item, e)}
-                            className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-mono text-xs font-bold transition-all cursor-pointer ${
+                            className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-1.5 font-mono text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${
                               isHold
                                 ? "bg-muted text-muted-foreground cursor-not-allowed opacity-60"
                                 : isCopied
@@ -464,12 +486,12 @@ function FeaturedDealsPage() {
                           >
                             {isCopied ? (
                               <>
-                                <Check className="h-3.5 w-3.5" />
+                                <Check className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                                 <span>Copied!</span>
                               </>
                             ) : (
                               <>
-                                <Copy className="h-3.5 w-3.5" />
+                                <Copy className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                                 <span>Copy</span>
                               </>
                             )}
@@ -479,9 +501,9 @@ function FeaturedDealsPage() {
                     </div>
 
                     {/* Card Bottom CTA & Metadata */}
-                    <div className="mt-5 pt-4 border-t border-border/60">
+                    <div className="mt-3.5 pt-3 sm:mt-5 sm:pt-4 border-t border-border/60">
                       {isHold ? (
-                        <div className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-2.5 text-xs font-semibold text-amber-600 dark:text-amber-400">
+                        <div className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs font-semibold text-amber-600 dark:text-amber-400">
                           <Clock className="h-3.5 w-3.5" />
                           <span>Link Pending Partner Verification</span>
                         </div>
@@ -489,14 +511,14 @@ function FeaturedDealsPage() {
                         <button
                           type="button"
                           onClick={() => handleGetDeal(item)}
-                          className="flex w-full items-center justify-center gap-2 rounded-xl bg-foreground px-4 py-2.5 text-xs font-bold text-background shadow-xs transition-all hover:bg-foreground/90 active:scale-98 cursor-pointer"
+                          className="flex w-full items-center justify-center gap-2 rounded-xl bg-foreground px-4 py-2 sm:py-2.5 text-xs font-bold text-background shadow-xs transition-all hover:bg-foreground/90 active:scale-98 cursor-pointer"
                         >
                           <span>Get Deal</span>
                           <ExternalLink className="h-3.5 w-3.5" />
                         </button>
                       )}
 
-                      <div className="mt-3 flex items-center justify-between font-mono text-[11px] text-muted-foreground">
+                      <div className="mt-2.5 sm:mt-3 flex items-center justify-between font-mono text-[10px] sm:text-[11px] text-muted-foreground">
                         <span className="inline-flex items-center gap-1">
                           <CheckCircle2 className="h-3 w-3 text-emerald-500" />
                           {item.targetCountry}
@@ -514,7 +536,7 @@ function FeaturedDealsPage() {
 
                       {/* Expandable Terms */}
                       {expandedTermsId === item.id && (
-                        <div className="mt-2.5 rounded-lg border border-border bg-background p-2.5 text-[11px] text-muted-foreground leading-relaxed animate-in fade-in duration-150">
+                        <div className="mt-2 rounded-lg border border-border bg-background p-2.5 text-[11px] text-muted-foreground leading-relaxed animate-in fade-in duration-150">
                           {item.terms}
                         </div>
                       )}
