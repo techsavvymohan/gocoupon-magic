@@ -129,9 +129,12 @@ function searxngDevPlugin() {
 
                   if (req.method === "POST") {
                     const id = body.id || `offer-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+                    const storeLogo = body.storeLogo || body.imageUrl || body.logoUrl || "";
                     const newDeal = {
                       ...body,
                       id,
+                      storeLogo,
+                      imageUrl: storeLogo || body.imageUrl || "",
                       verified: true,
                       status: body.status || "active",
                       isFeatured: body.isFeatured === true || body.isFeatured === "true" || body.isFeatured === 1,
@@ -152,18 +155,21 @@ function searxngDevPlugin() {
                   if (req.method === "PUT") {
                     const id = (urlObj.searchParams.get("id") as string) || body.id;
                     const idx = allDeals.findIndex((d) => d.id === id);
+                    const storeLogo = body.storeLogo || body.imageUrl || body.logoUrl || (idx >= 0 ? allDeals[idx]?.storeLogo : "");
                     if (idx >= 0) {
                       allDeals[idx] = {
                         ...allDeals[idx],
                         ...body,
                         id,
+                        storeLogo,
+                        imageUrl: storeLogo || body.imageUrl || allDeals[idx]?.imageUrl || "",
                         verified: true,
                         isFeatured: body.isFeatured === true || body.isFeatured === "true" || body.isFeatured === 1,
                         featuredPriority: body.featuredPriority ? Number(body.featuredPriority) : 10,
                         verificationStatus: "verified",
                       };
                     } else {
-                      allDeals.unshift({ ...body, id, verified: true, verificationStatus: "verified" });
+                      allDeals.unshift({ ...body, id, storeLogo, imageUrl: storeLogo, verified: true, verificationStatus: "verified" });
                     }
                     persistSnapshot();
                     res.statusCode = 200;

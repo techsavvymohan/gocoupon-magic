@@ -6,10 +6,25 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ExternalLink, MousePointerClick, TrendingUp, Search, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { ExternalLink, MousePointerClick, TrendingUp, Search, X, ChevronLeft, ChevronRight, Image as ImageIcon, Sparkles, Tag, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 import BulkCouponImportDialog from "./BulkCouponImportDialog";
+
+const CATEGORY_OPTIONS = [
+  "General",
+  "Electronics",
+  "Fashion",
+  "Health",
+  "Nutrition",
+  "Travel",
+  "Perfumes",
+  "Beauty",
+  "Food & Grocery",
+  "Education",
+  "Home & Living",
+  "Finance",
+];
 
 const initialForm = {
   title: "",
@@ -17,6 +32,8 @@ const initialForm = {
   type: "Coupon",
   storeSlug: "",
   storeName: "",
+  storeLogo: "",
+  category: "General",
   affiliateLink: "",
   merchantUrl: "",
   source: "Manual",
@@ -136,6 +153,8 @@ export default function AdminOffersManager() {
       type: offer.type || "Coupon",
       storeSlug: offer.storeSlug || "",
       storeName: offer.storeName || "",
+      storeLogo: offer.storeLogo || offer.logoUrl || offer.imageUrl || offer.logo || "",
+      category: offer.category || "General",
       affiliateLink: offer.affiliateLink || offer.link || "",
       merchantUrl: offer.merchantUrl || "",
       source: offer.source || "Manual",
@@ -164,6 +183,12 @@ export default function AdminOffersManager() {
       nextState.storeName = matchedStore?.name || "";
       if (!affiliateEditedRef.current && matchedStore?.affiliateLink) {
         nextState.affiliateLink = matchedStore.affiliateLink;
+      }
+      if (!nextState.storeLogo && (matchedStore?.logo || matchedStore?.storeLogo)) {
+        nextState.storeLogo = matchedStore?.logo || matchedStore?.storeLogo;
+      }
+      if (matchedStore?.category && (!nextState.category || nextState.category === "General")) {
+        nextState.category = matchedStore.category;
       }
     }
 
@@ -560,7 +585,7 @@ export default function AdminOffersManager() {
               </TableHeader>
               <TableBody>
                 {paginatedOffers.map((offer) => {
-                  const storeLogo = storeLogoMap[offer.storeSlug];
+                  const storeLogo = offer.storeLogo || offer.logoUrl || offer.imageUrl || offer.logo || storeLogoMap[offer.storeSlug];
                   const displayStatus = offer.displayStatus;
 
                   return (
@@ -750,226 +775,376 @@ export default function AdminOffersManager() {
         </CardContent>
       </Card>
 
-      {/* ── Coupon Add / Edit Dialog (Redesigned with Fixed Header, Scrollable Body, Sticky Footer) ── */}
+      {/* ── Coupon Add / Edit Dialog (Redesigned with Sleek Dark Theme, Cloudinary Brand Logo & Live Preview) ── */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-3xl max-h-[calc(100dvh-3rem)] flex flex-col p-0 overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white shadow-2xl">
-          {/* Modal Header - Fixed Top Bar */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200/80 dark:border-zinc-800 shrink-0 bg-zinc-50/80 dark:bg-zinc-850">
-            <div className="pr-6">
-              <DialogTitle className="text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+        <DialogContent className="max-w-2xl w-[95vw] max-h-[90vh] flex flex-col p-0 overflow-hidden rounded-2xl bg-zinc-950 border border-zinc-800 text-white shadow-2xl">
+          {/* Modal Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-900 shrink-0 pr-14">
+            <div>
+              <DialogTitle className="text-base font-bold text-white flex items-center gap-2">
                 <span>{editingOffer ? "Edit Coupon / Deal" : "Add Coupon / Deal"}</span>
                 {editingOffer && (
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     {editingOffer.code || editingOffer.type || "Offer"}
                   </span>
                 )}
               </DialogTitle>
-              <DialogDescription className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                {editingOffer ? "Update discount parameters, store link, and promotion status." : "Create a new coupon code or discount deal in the database catalog."}
+              <DialogDescription className="text-xs text-zinc-400 mt-0.5">
+                {editingOffer ? "Update discount parameters, brand assets, and merchandising status." : "Create a new coupon code or discount deal with brand logo & live preview."}
               </DialogDescription>
             </div>
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition cursor-pointer"
-              aria-label="Close dialog"
-            >
-              <X className="h-4 w-4" />
-            </button>
           </div>
 
           {/* Form with Scrollable Body and Sticky Footer */}
           <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
             {/* Scrollable Form Body */}
-            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold md:col-span-2">
-                  Title
-                  <Input name="title" value={form.title} onChange={handleChange} placeholder="20% off premium supplements" className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white" required />
-                </label>
-                <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold md:col-span-2">
-                  Description
-                  <textarea
-                    name="description"
-                    rows={3}
-                    value={form.description}
-                    onChange={handleChange}
-                    className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-xs text-zinc-900 dark:text-white outline-none transition placeholder:text-zinc-400 focus:border-emerald-600"
-                    placeholder="Short description for the offer."
-                  />
-                </label>
-                <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold">
-                  Type
-                  <select
-                    name="type"
-                    value={form.type}
-                    onChange={handleChange}
-                    className="h-10 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 text-xs text-zinc-900 dark:text-white outline-none focus:border-emerald-600 cursor-pointer"
-                  >
-                    <option>Coupon</option>
-                    <option>Deal</option>
-                  </select>
-                </label>
-                <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold">
-                  Store
-                  <select
-                    name="storeSlug"
-                    value={form.storeSlug}
-                    onChange={handleChange}
-                    className="h-10 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 text-xs text-zinc-900 dark:text-white outline-none focus:border-emerald-600 cursor-pointer"
-                  >
-                    <option value="">Select store</option>
-                    {stores.map((store) => (
-                      <option key={store.slug} value={store.slug}>
-                        {store.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold">
-                  Affiliate Link
-                  <Input
-                    name="affiliateLink"
-                    value={form.affiliateLink}
-                    onChange={handleChange}
-                    placeholder="Auto-filled from selected store, or paste custom URL"
-                    className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white text-xs"
-                  />
-                </label>
-                <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold">
-                  Expiry Date
-                  <Input name="expiryDate" type="date" value={form.expiryDate} onChange={handleChange} className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white text-xs" />
-                </label>
-                <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold">
-                  Status
-                  <select
-                    name="status"
-                    value={form.status}
-                    onChange={handleChange}
-                    className="h-10 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 text-xs text-zinc-900 dark:text-white outline-none focus:border-emerald-600 cursor-pointer"
-                  >
-                    <option>Active</option>
-                    <option>Scheduled</option>
-                    <option>Ending soon</option>
-                    <option>Expired</option>
-                  </select>
-                </label>
-                <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold">
-                  Source
-                  <select
-                    name="source"
-                    value={form.source}
-                    onChange={handleChange}
-                    className="h-10 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 text-xs text-zinc-900 dark:text-white outline-none focus:border-emerald-600 cursor-pointer"
-                  >
-                    <option>Manual</option>
-                    <option>Network</option>
-                  </select>
-                </label>
-                <label className="grid gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-semibold md:col-span-2">
-                  {form.type === "Deal" ? "Deal Code (Optional)" : "Coupon Code"}
-                  <Input
-                    name="code"
-                    value={form.code}
-                    onChange={(e) => setForm(prev => ({ ...prev, code: e.target.value.toUpperCase() }))}
-                    placeholder={form.type === "Deal" ? "Optional for direct deals" : "SAVE20"}
-                    className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white font-mono font-bold"
-                  />
-                </label>
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+              {/* Section 1: Offer & Brand Identity */}
+              <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/60 p-4 space-y-4">
+                <div className="flex items-center gap-2 border-b border-zinc-800 pb-2.5">
+                  <Tag className="h-4 w-4 text-emerald-500" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-zinc-300">1. Offer & Brand Identity</span>
+                </div>
 
-                {/* ── Featured Merchandising Controls ── */}
-                <div className="md:col-span-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-3.5">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-xs font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
-                        <span>Featured Deal Merchandising</span>
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 font-semibold">
-                          /featured-deals
+                <div className="grid gap-3.5 sm:grid-cols-2">
+                  <label className="grid gap-1.5 text-xs text-zinc-300 font-semibold sm:col-span-2">
+                    <span>Title <span className="text-rose-400">*</span></span>
+                    <Input
+                      name="title"
+                      value={form.title}
+                      onChange={handleChange}
+                      placeholder="e.g. 50% Off On All Orders | Special Festive Deal"
+                      className="bg-zinc-800/90 border-zinc-700 text-white placeholder:text-zinc-500 h-9 text-xs"
+                      required
+                    />
+                  </label>
+
+                  <label className="grid gap-1.5 text-xs text-zinc-300 font-semibold">
+                    <span>Store / Brand <span className="text-rose-400">*</span></span>
+                    <select
+                      name="storeSlug"
+                      value={form.storeSlug}
+                      onChange={handleChange}
+                      className="h-9 rounded-xl border border-zinc-700 bg-zinc-800/90 px-3 text-xs text-white outline-none focus:border-emerald-500 cursor-pointer"
+                      required
+                    >
+                      <option value="">Select store / brand</option>
+                      {stores.map((store) => (
+                        <option key={store.slug} value={store.slug}>
+                          {store.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="grid gap-1.5 text-xs text-zinc-300 font-semibold">
+                    <span>Category</span>
+                    <select
+                      name="category"
+                      value={form.category}
+                      onChange={handleChange}
+                      className="h-9 rounded-xl border border-zinc-700 bg-zinc-800/90 px-3 text-xs text-white outline-none focus:border-emerald-500 cursor-pointer"
+                    >
+                      {CATEGORY_OPTIONS.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  {/* Brand Logo URL with Live Preview & Cloudinary Support */}
+                  <div className="sm:col-span-2 rounded-xl border border-zinc-800 bg-zinc-950/60 p-3.5 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <ImageIcon className="h-4 w-4 text-emerald-400" />
+                        <span className="text-xs font-bold text-zinc-200">Brand Logo URL (Cloudinary / Direct Image Link)</span>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          Cloudinary Supported
                         </span>
-                      </h4>
-                      <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                        Control promotion to the permanent global featured deals hub.
-                      </p>
+                      </div>
+                      {form.storeSlug && stores.find(s => s.slug === form.storeSlug)?.logo && form.storeLogo !== stores.find(s => s.slug === form.storeSlug)?.logo && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const s = stores.find(st => st.slug === form.storeSlug);
+                            if (s?.logo) setForm(prev => ({ ...prev, storeLogo: s.logo }));
+                          }}
+                          className="text-[11px] text-emerald-400 hover:underline font-semibold cursor-pointer"
+                        >
+                          Use Store Default Logo
+                        </button>
+                      )}
                     </div>
-                    <label className="flex items-center gap-2 cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        name="isFeatured"
-                        checked={Boolean(form.isFeatured)}
-                        onChange={handleChange}
-                        className="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 accent-amber-600 cursor-pointer"
-                      />
-                      <span className="text-xs font-bold text-zinc-900 dark:text-white">
-                        Promote to Featured Deals
-                      </span>
-                    </label>
+
+                    <div className="flex items-center gap-3">
+                      {/* Live Logo Preview Box */}
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-zinc-700 bg-white p-1.5 overflow-hidden shadow-xs relative">
+                        {form.storeLogo ? (
+                          <img
+                            src={form.storeLogo}
+                            alt={form.storeName || "Brand Logo"}
+                            className="h-full w-full object-contain"
+                            onError={(e) => {
+                              // @ts-ignore
+                              e.currentTarget.style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center justify-center text-zinc-400">
+                            <ImageIcon className="h-4 w-4 text-zinc-400" />
+                            <span className="text-[9px] font-bold text-zinc-500">No Logo</span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex-1 space-y-1">
+                        <Input
+                          name="storeLogo"
+                          value={form.storeLogo}
+                          onChange={handleChange}
+                          placeholder="https://res.cloudinary.com/... or https://..."
+                          className="bg-zinc-800/90 border-zinc-700 text-white placeholder:text-zinc-500 text-xs h-9"
+                        />
+                        <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                          <span>Paste Cloudinary image URL (res.cloudinary.com/...) or public HTTPS image</span>
+                          {form.storeLogo && (
+                            <button
+                              type="button"
+                              onClick={() => setForm(prev => ({ ...prev, storeLogo: "" }))}
+                              className="text-rose-400 hover:underline text-[10px] font-semibold cursor-pointer"
+                            >
+                              Clear Logo
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  {form.isFeatured && (
-                    <div className="grid gap-3 sm:grid-cols-2 pt-2 border-t border-amber-500/20">
-                      <label className="grid gap-1 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
-                        Display Priority (1 = Top priority)
-                        <Input
-                          type="number"
-                          name="featuredPriority"
-                          value={form.featuredPriority}
-                          onChange={handleChange}
-                          min={1}
-                          max={100}
-                          className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-xs h-9"
-                        />
-                      </label>
-                      <label className="grid gap-1 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
-                        Campaign Source
-                        <select
-                          name="campaignSource"
-                          value={form.campaignSource}
-                          onChange={handleChange}
-                          className="h-9 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 text-xs text-zinc-900 dark:text-white outline-none focus:border-amber-600"
-                        >
-                          <option value="analytics_clouds">Analytics Clouds Partner Campaign</option>
-                          <option value="manual">Manual Admin Feature</option>
-                          <option value="partner">Brand Network Partner</option>
-                        </select>
-                      </label>
-                      <label className="grid gap-1 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
-                        Featured Badge
-                        <select
-                          name="badge"
-                          value={form.badge}
-                          onChange={handleChange}
-                          className="h-9 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 text-xs text-zinc-900 dark:text-white outline-none focus:border-amber-600"
-                        >
-                          <option value="Best Saving">Best Saving</option>
-                          <option value="Featured Partner">Featured Partner</option>
-                          <option value="Popular Travel Deal">Popular Travel Deal</option>
-                          <option value="Verified Offer">Verified Offer</option>
-                          <option value="India Eligible">India Eligible</option>
-                        </select>
-                      </label>
-                      <label className="grid gap-1 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
-                        Target Region
-                        <select
-                          name="targetCountry"
-                          value={form.targetCountry}
-                          onChange={handleChange}
-                          className="h-9 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 text-xs text-zinc-900 dark:text-white outline-none focus:border-amber-600"
-                        >
-                          <option value="India Eligible">India Eligible</option>
-                          <option value="Global">Worldwide / Global</option>
-                          <option value="US Eligible">US Eligible</option>
-                        </select>
-                      </label>
-                    </div>
-                  )}
+                  <label className="grid gap-1.5 text-xs text-zinc-300 font-semibold sm:col-span-2">
+                    <span>Description</span>
+                    <textarea
+                      name="description"
+                      rows={2}
+                      value={form.description}
+                      onChange={handleChange}
+                      className="w-full rounded-xl border border-zinc-700 bg-zinc-800/90 px-3.5 py-2 text-xs text-white outline-none placeholder:text-zinc-500 focus:border-emerald-500 resize-none"
+                      placeholder="Brief summary of the offer, e.g. Valid on all products across app and web."
+                    />
+                  </label>
                 </div>
-                {error ? <p className="text-xs text-rose-600 md:col-span-2 font-medium">{error}</p> : null}
               </div>
+
+              {/* Section 2: Codes, Discount & Redemption Link */}
+              <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/60 p-4 space-y-4">
+                <div className="flex items-center gap-2 border-b border-zinc-800 pb-2.5">
+                  <Sparkles className="h-4 w-4 text-emerald-500" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-zinc-300">2. Coupon Codes & Redemption Link</span>
+                </div>
+
+                <div className="grid gap-3.5 sm:grid-cols-2">
+                  <label className="grid gap-1.5 text-xs text-zinc-300 font-semibold">
+                    <span>Offer Type</span>
+                    <select
+                      name="type"
+                      value={form.type}
+                      onChange={handleChange}
+                      className="h-9 rounded-xl border border-zinc-700 bg-zinc-800/90 px-3 text-xs text-white outline-none focus:border-emerald-500 cursor-pointer"
+                    >
+                      <option>Coupon</option>
+                      <option>Deal</option>
+                    </select>
+                  </label>
+
+                  <label className="grid gap-1.5 text-xs text-zinc-300 font-semibold">
+                    <span>{form.type === "Deal" ? "Deal Code (Optional)" : "Coupon Code"}</span>
+                    <Input
+                      name="code"
+                      value={form.code}
+                      onChange={(e) => setForm(prev => ({ ...prev, code: e.target.value.toUpperCase() }))}
+                      placeholder={form.type === "Deal" ? "Optional for direct deals" : "e.g. SAVE50"}
+                      className="bg-zinc-800/90 border-zinc-700 text-emerald-400 font-mono font-bold text-xs h-9 tracking-wider"
+                    />
+                  </label>
+
+                  <label className="grid gap-1.5 text-xs text-zinc-300 font-semibold">
+                    <span>Discount Text</span>
+                    <Input
+                      name="discount"
+                      value={form.discount}
+                      onChange={handleChange}
+                      placeholder="e.g. 50% OFF, Flat ₹200 Off"
+                      className="bg-zinc-800/90 border-zinc-700 text-white placeholder:text-zinc-500 text-xs h-9"
+                    />
+                  </label>
+
+                  <label className="grid gap-1.5 text-xs text-zinc-300 font-semibold">
+                    <span>Expiry Date</span>
+                    <Input
+                      name="expiryDate"
+                      type="date"
+                      value={form.expiryDate}
+                      onChange={handleChange}
+                      className="bg-zinc-800/90 border-zinc-700 text-white text-xs h-9"
+                    />
+                  </label>
+
+                  <label className="grid gap-1.5 text-xs text-zinc-300 font-semibold sm:col-span-2">
+                    <span>Affiliate / Merchant Deep Link</span>
+                    <Input
+                      name="affiliateLink"
+                      value={form.affiliateLink}
+                      onChange={handleChange}
+                      placeholder="https://... (auto-filled from store or custom tracking URL)"
+                      className="bg-zinc-800/90 border-zinc-700 text-white placeholder:text-zinc-500 text-xs h-9 font-mono"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* Section 3: Lifecycle & Status */}
+              <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/60 p-4 space-y-4">
+                <div className="flex items-center gap-2 border-b border-zinc-800 pb-2.5">
+                  <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-zinc-300">3. Status & Terms</span>
+                </div>
+
+                <div className="grid gap-3.5 sm:grid-cols-2">
+                  <label className="grid gap-1.5 text-xs text-zinc-300 font-semibold">
+                    <span>Status</span>
+                    <select
+                      name="status"
+                      value={form.status}
+                      onChange={handleChange}
+                      className="h-9 rounded-xl border border-zinc-700 bg-zinc-800/90 px-3 text-xs text-white outline-none focus:border-emerald-500 cursor-pointer"
+                    >
+                      <option>Active</option>
+                      <option>Scheduled</option>
+                      <option>Ending soon</option>
+                      <option>Expired</option>
+                    </select>
+                  </label>
+
+                  <label className="grid gap-1.5 text-xs text-zinc-300 font-semibold">
+                    <span>Source</span>
+                    <select
+                      name="source"
+                      value={form.source}
+                      onChange={handleChange}
+                      className="h-9 rounded-xl border border-zinc-700 bg-zinc-800/90 px-3 text-xs text-white outline-none focus:border-emerald-500 cursor-pointer"
+                    >
+                      <option>Manual</option>
+                      <option>Network</option>
+                    </select>
+                  </label>
+
+                  <label className="grid gap-1.5 text-xs text-zinc-300 font-semibold sm:col-span-2">
+                    <span>Terms & Conditions</span>
+                    <Input
+                      name="terms"
+                      value={form.terms}
+                      onChange={handleChange}
+                      placeholder="Standard merchant terms apply. Valid on app and web."
+                      className="bg-zinc-800/90 border-zinc-700 text-white placeholder:text-zinc-500 text-xs h-9"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* Section 4: Featured Merchandising Controls */}
+              <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-3.5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
+                      <span>Featured Deal Merchandising</span>
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold">
+                        /featured-deals
+                      </span>
+                    </h4>
+                    <p className="text-[11px] text-zinc-400">
+                      Promote directly to the permanent Featured Deals hub with priority ranking.
+                    </p>
+                  </div>
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      name="isFeatured"
+                      checked={Boolean(form.isFeatured)}
+                      onChange={handleChange}
+                      className="h-4 w-4 rounded border-zinc-700 accent-amber-500 cursor-pointer"
+                    />
+                    <span className="text-xs font-bold text-amber-300">
+                      Promote to Featured Deals
+                    </span>
+                  </label>
+                </div>
+
+                {form.isFeatured && (
+                  <div className="grid gap-3 sm:grid-cols-2 pt-2 border-t border-amber-500/20">
+                    <label className="grid gap-1 text-[11px] font-semibold text-zinc-300">
+                      Display Priority (1 = Top priority)
+                      <Input
+                        type="number"
+                        name="featuredPriority"
+                        value={form.featuredPriority}
+                        onChange={handleChange}
+                        min={1}
+                        max={100}
+                        className="bg-zinc-800/90 border-zinc-700 text-white text-xs h-9"
+                      />
+                    </label>
+                    <label className="grid gap-1 text-[11px] font-semibold text-zinc-300">
+                      Campaign Source
+                      <select
+                        name="campaignSource"
+                        value={form.campaignSource}
+                        onChange={handleChange}
+                        className="h-9 rounded-xl border border-zinc-700 bg-zinc-800/90 px-3 text-xs text-white outline-none focus:border-amber-500 cursor-pointer"
+                      >
+                        <option value="analytics_clouds">Analytics Clouds Partner Campaign</option>
+                        <option value="manual">Manual Admin Feature</option>
+                        <option value="partner">Brand Network Partner</option>
+                      </select>
+                    </label>
+                    <label className="grid gap-1 text-[11px] font-semibold text-zinc-300">
+                      Featured Badge
+                      <select
+                        name="badge"
+                        value={form.badge}
+                        onChange={handleChange}
+                        className="h-9 rounded-xl border border-zinc-700 bg-zinc-800/90 px-3 text-xs text-white outline-none focus:border-amber-500 cursor-pointer"
+                      >
+                        <option value="Best Saving">Best Saving</option>
+                        <option value="Featured Partner">Featured Partner</option>
+                        <option value="Popular Travel Deal">Popular Travel Deal</option>
+                        <option value="Verified Offer">Verified Offer</option>
+                        <option value="India Eligible">India Eligible</option>
+                      </select>
+                    </label>
+                    <label className="grid gap-1 text-[11px] font-semibold text-zinc-300">
+                      Target Region
+                      <select
+                        name="targetCountry"
+                        value={form.targetCountry}
+                        onChange={handleChange}
+                        className="h-9 rounded-xl border border-zinc-700 bg-zinc-800/90 px-3 text-xs text-white outline-none focus:border-amber-500 cursor-pointer"
+                      >
+                        <option value="India Eligible">India Eligible</option>
+                        <option value="Global">Worldwide / Global</option>
+                        <option value="US Eligible">US Eligible</option>
+                      </select>
+                    </label>
+                  </div>
+                )}
+              </div>
+
+              {error ? <p className="text-xs text-rose-400 font-medium">{error}</p> : null}
             </div>
 
             {/* Modal Footer - Fixed Sticky Bottom Bar */}
-            <div className="shrink-0 flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/90 dark:bg-zinc-900/90 px-6 py-3.5">
-              <div className="text-xs text-zinc-500 dark:text-zinc-400 font-medium truncate max-w-[200px]">
+            <div className="shrink-0 flex items-center justify-between border-t border-zinc-800 bg-zinc-900 px-6 py-3.5">
+              <div className="text-xs text-zinc-400 font-medium truncate max-w-[200px]">
                 {editingOffer ? `ID: ${editingOffer.id}` : "New catalog entry"}
               </div>
               <div className="flex items-center gap-3">
@@ -977,14 +1152,14 @@ export default function AdminOffersManager() {
                   type="button"
                   variant="outline"
                   onClick={() => setOpen(false)}
-                  className="dark:bg-zinc-800 dark:border-zinc-700 dark:text-white text-xs font-semibold h-9 px-4 cursor-pointer"
+                  className="bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700 text-xs font-semibold h-9 px-4 cursor-pointer"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-9 px-5 shadow-xs transition cursor-pointer"
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs h-9 px-5 shadow-xs transition cursor-pointer"
                 >
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
