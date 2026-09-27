@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import {
   Zap,
   Ticket,
@@ -73,6 +74,30 @@ export function Features() {
               </div>
             );
           })}
+        </div>
+
+        {/* Contextual Navigation Pill Bar */}
+        <div className="mt-12 rounded-2xl border border-border bg-muted/30 p-5 flex flex-wrap items-center justify-between gap-4">
+          <span className="text-sm font-semibold text-foreground">
+            Explore GoCoupon shopping tools:
+          </span>
+          <div className="flex flex-wrap items-center gap-3 text-sm">
+            <Link to="/featured-deals" className="text-primary hover:underline font-medium">
+              Featured Deals →
+            </Link>
+            <span className="text-muted-foreground">•</span>
+            <Link to="/chrome-extension" className="text-primary hover:underline font-medium">
+              Chrome Extension →
+            </Link>
+            <span className="text-muted-foreground">•</span>
+            <Link to="/submit-coupon" className="text-primary hover:underline font-medium">
+              Submit a Coupon →
+            </Link>
+            <span className="text-muted-foreground">•</span>
+            <Link to="/help" className="text-primary hover:underline font-medium">
+              Help Center →
+            </Link>
+          </div>
         </div>
       </div>
     </section>

@@ -295,7 +295,40 @@ function WelcomePage() {
             </a>
           </div>
 
-          <div className="mt-12 flex items-center justify-center gap-2 font-mono text-xs text-muted-foreground">
+          {/* Quick Contextual Links */}
+          <div className="mt-12 rounded-2xl border border-border/70 bg-card/60 p-6 backdrop-blur-xs text-center">
+            <h3 className="font-display text-sm font-semibold text-foreground mb-3">
+              Explore More Ways to Save &amp; Connect With Our Community
+            </h3>
+            <div className="flex flex-wrap items-center justify-center gap-3 text-xs">
+              <Link
+                to="/featured-deals"
+                className="rounded-full border border-border bg-background px-4 py-2 text-foreground hover:border-primary/50 transition-colors"
+              >
+                🔥 Hand-Verified Partner Deals
+              </Link>
+              <Link
+                to="/help"
+                className="rounded-full border border-border bg-background px-4 py-2 text-foreground hover:border-primary/50 transition-colors"
+              >
+                ❓ Extension Setup Help &amp; FAQs
+              </Link>
+              <Link
+                to="/submit-coupon"
+                className="rounded-full border border-border bg-background px-4 py-2 text-foreground hover:border-primary/50 transition-colors"
+              >
+                🏷️ Submit a Store Coupon
+              </Link>
+              <Link
+                to="/chrome-extension"
+                className="rounded-full border border-border bg-background px-4 py-2 text-foreground hover:border-primary/50 transition-colors"
+              >
+                ⚡ Extension Feature Tour
+              </Link>
+            </div>
+          </div>
+
+          <div className="mt-8 flex items-center justify-center gap-2 font-mono text-xs text-muted-foreground">
             <ShieldCheck className="h-4 w-4 text-emerald-500" />
             <span>100% Free • Safe &amp; Private • No Account Required</span>
           </div>

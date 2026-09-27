@@ -224,23 +224,104 @@ function TermsPage() {
               </p>
             </article>
 
-            <article id="contact-legal" className="space-y-4 border-t border-border pt-8">
+            <article id="security-manifest" className="space-y-4">
               <h2 className="font-display text-2xl font-bold text-foreground">
-                10. Contact Us Regarding Terms
+                10. Technical Sandboxing &amp; Manifest V3 Security
               </h2>
               <p className="text-base leading-relaxed text-muted-foreground">
-                If you have questions or concerns regarding these Terms of Service, please reach out to our legal
-                desk at{" "}
-                <a href={`mailto:${CONTACT_EMAIL}`} className="text-primary hover:underline">
-                  {CONTACT_EMAIL}
-                </a>{" "}
-                or via our{" "}
-                <Link to="/contact" className="text-primary hover:underline">
-                  contact form
+                GoCoupon operates in strict conformance with Google Chrome Manifest V3 guidelines. All script execution
+                is sandboxed locally within the browser client. The extension does not load remote scripts, inspect
+                passwords, intercept multi-factor authentication tokens, or capture keyboard inputs outside designated
+                retailer promo code form elements.
+              </p>
+            </article>
+
+            <article id="community-submissions" className="space-y-4">
+              <h2 className="font-display text-2xl font-bold text-foreground">
+                11. Community Deals &amp; User Submissions
+              </h2>
+              <p className="text-base leading-relaxed text-muted-foreground">
+                Users who submit promo codes or deals via our{" "}
+                <Link to="/submit-coupon" className="text-primary hover:underline font-semibold">
+                  Community Coupon Submission Portal
+                </Link>{" "}
+                grant GoCoupon a perpetual, irrevocable, royalty-free, worldwide license to verify, format, test,
+                and publish the submitted promo code to the public deals index. You warrant that submitted coupons do not
+                violate non-disclosure agreements or proprietary confidentiality obligations.
+              </p>
+            </article>
+
+            <article id="uninstallation-reversal" className="space-y-4">
+              <h2 className="font-display text-2xl font-bold text-foreground">
+                12. Discontinuation, Feedback &amp; Uninstallation
+              </h2>
+              <p className="text-base leading-relaxed text-muted-foreground">
+                You may discontinue use of GoCoupon at any time by right-clicking the extension icon in your browser toolbar
+                and selecting &ldquo;Remove from Chrome&rdquo;. To report bugs or review offboarding instructions, visit our{" "}
+                <Link to="/uninstall" className="text-primary hover:underline font-semibold">
+                  Extension Uninstall &amp; Feedback Guide
+                </Link>
+                . For setup instructions, see our{" "}
+                <Link to="/welcome" className="text-primary hover:underline font-semibold">
+                  Welcome Setup Guide
                 </Link>
                 .
               </p>
             </article>
+
+            <article id="contact-legal" className="space-y-4 border-t border-border pt-8">
+              <h2 className="font-display text-2xl font-bold text-foreground">
+                13. Legal Inquiries &amp; Customer Support
+              </h2>
+              <p className="text-base leading-relaxed text-muted-foreground">
+                If you have questions or concerns regarding these Terms of Service or affiliate operations, please reach our
+                support desk at{" "}
+                <a href={`mailto:${CONTACT_EMAIL}`} className="text-primary hover:underline font-semibold">
+                  {CONTACT_EMAIL}
+                </a>{" "}
+                or submit a ticket via our{" "}
+                <Link to="/contact" className="text-primary hover:underline font-semibold">
+                  Contact Support Page
+                </Link>
+                . Submitted inquiries can be tracked on our{" "}
+                <Link to="/thank-you" search={{ source: "contact" }} className="text-primary hover:underline font-semibold">
+                  Inquiry Confirmation Desk
+                </Link>
+                .
+              </p>
+            </article>
+          </div>
+
+          {/* Quick Legal & Support Directory Links */}
+          <div className="rounded-2xl border border-border bg-card p-6 text-center">
+            <h3 className="font-display font-bold text-base text-foreground mb-3">
+              Helpful GoCoupon Shopping &amp; Support Links
+            </h3>
+            <div className="flex flex-wrap items-center justify-center gap-3 text-xs sm:text-sm">
+              <Link to="/help" className="text-primary font-semibold hover:underline">
+                Help Center &amp; FAQs →
+              </Link>
+              <span className="text-muted-foreground">•</span>
+              <Link to="/featured-deals" className="text-primary font-semibold hover:underline">
+                Featured Deals →
+              </Link>
+              <span className="text-muted-foreground">•</span>
+              <Link to="/submit-coupon" className="text-primary font-semibold hover:underline">
+                Submit a Coupon →
+              </Link>
+              <span className="text-muted-foreground">•</span>
+              <Link to="/welcome" className="text-primary font-semibold hover:underline">
+                Welcome Guide →
+              </Link>
+              <span className="text-muted-foreground">•</span>
+              <Link to="/uninstall" className="text-primary font-semibold hover:underline">
+                Uninstall Guide →
+              </Link>
+              <span className="text-muted-foreground">•</span>
+              <Link to="/chrome-extension" className="text-primary font-semibold hover:underline">
+                Chrome Extension →
+              </Link>
+            </div>
           </div>
         </div>
       </section>

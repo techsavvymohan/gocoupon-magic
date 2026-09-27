@@ -174,11 +174,96 @@ function BlogIndex() {
     { name: "Savings Intelligence Journal", path: "/blog" },
   ]);
 
+  const featuredPost = allPosts[0];
+
+  const primaryBlogPostingSchema = featuredPost
+    ? {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        headline: featuredPost.title,
+        description: featuredPost.excerpt,
+        url: `https://gocoupon.io/blog/${featuredPost.slug}`,
+        datePublished: "2026-03-01T10:00:00Z",
+        dateModified: "2026-03-24T12:00:00Z",
+        author: {
+          "@type": "Person",
+          name: featuredPost.author || "GoCoupon Editorial Team",
+          url: "https://gocoupon.io/about",
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "GoCoupon",
+          url: "https://gocoupon.io/",
+          logo: {
+            "@type": "ImageObject",
+            url: "https://gocoupon.io/gc-logo.webp",
+          },
+        },
+        image: featuredPost.cover || "https://gocoupon.io/gc-logo.webp",
+        mainEntityOfPage: {
+          "@type": "WebPage",
+          "@id": `https://gocoupon.io/blog/${featuredPost.slug}`,
+        },
+      }
+    : null;
+
+  const blogListSchema = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "@id": "https://gocoupon.io/blog#blog",
+    name: "The Savings Intelligence Journal – goCoupon Engineering & Arbitrage Desk",
+    description:
+      "Deconstructing e-commerce pricing algorithms, coupon mechanics, 30-day price tracking graphs, and discount stacking secrets from the goCoupon research lab.",
+    url: "https://gocoupon.io/blog",
+    publisher: {
+      "@type": "Organization",
+      name: "GoCoupon",
+      url: "https://gocoupon.io/",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://gocoupon.io/gc-logo.webp",
+      },
+    },
+    blogPost: allPosts.slice(0, 6).map((post) => ({
+      "@type": "BlogPosting",
+      headline: post.title,
+      description: post.excerpt,
+      url: `https://gocoupon.io/blog/${post.slug}`,
+      datePublished: "2026-03-01T10:00:00Z",
+      dateModified: "2026-03-24T12:00:00Z",
+      author: {
+        "@type": "Person",
+        name: post.author || "GoCoupon Editorial Team",
+        url: "https://gocoupon.io/about",
+      },
+      publisher: {
+        "@type": "Organization",
+        name: "GoCoupon",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://gocoupon.io/gc-logo.webp",
+        },
+      },
+      image: post.cover || "https://gocoupon.io/gc-logo.webp",
+      mainEntityOfPage: `https://gocoupon.io/blog/${post.slug}`,
+    })),
+  };
+
   return (
     <SiteShell>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      {primaryBlogPostingSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(primaryBlogPostingSchema) }}
+        />
+      )}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogListSchema) }}
       />
 
       {/* Conceptual Telemetry Ticker */}

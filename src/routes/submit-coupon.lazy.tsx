@@ -101,6 +101,13 @@ function SubmitCouponPage() {
                   <span>Submit Another Coupon</span>
                 </button>
                 <Link
+                  to="/thank-you"
+                  search={{ source: "coupon" }}
+                  className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-5 py-2.5 text-xs sm:text-sm font-semibold text-primary hover:bg-primary/20 transition-colors"
+                >
+                  <span>Verification Status</span>
+                </Link>
+                <Link
                   to="/offers"
                   className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs sm:text-sm font-bold text-primary-foreground shadow-md hover:scale-105 transition-transform"
                 >
@@ -323,6 +330,17 @@ function SubmitCouponPage() {
               No account required to submit or use community verified deals.
             </p>
           </div>
+        </div>
+
+        {/* Contextual Guidance & SLA Links */}
+        <div className="mt-10 rounded-2xl border border-border/80 bg-muted/20 p-5 text-center text-xs text-muted-foreground">
+          <span>Need troubleshooting assistance or want to understand validation rules? Explore our </span>
+          <Link to="/help" className="text-primary font-semibold hover:underline">Help Center &amp; FAQs</Link>
+          <span>, view our </span>
+          <Link to="/featured-deals" className="text-primary font-semibold hover:underline">Handpicked Featured Deals</Link>
+          <span>, or check our </span>
+          <Link to="/thank-you" search={{ source: "coupon" }} className="text-primary font-semibold hover:underline">Submission Confirmation Policy</Link>
+          <span>.</span>
         </div>
       </div>
     </SiteShell>

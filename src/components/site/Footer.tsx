@@ -194,18 +194,35 @@ export function Footer() {
                 <ul className="mt-4 space-y-3">
                   <li>
                     <Link
-                      to="/how-it-works"
-                      className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
+                      to="/merchant-score-index"
+                      className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs flex items-center gap-1.5"
                     >
-                      Documentation
+                      <span>Merchant Reliability Index</span>
+                      <span className="rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 text-[9px] font-bold">2026</span>
                     </Link>
                   </li>
                   <li>
                     <Link
-                      to="/stores"
+                      to="/help"
                       className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
                     >
-                      Tutorials
+                      Help Center &amp; Support
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/welcome"
+                      className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
+                    >
+                      Extension Welcome Guide
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/uninstall"
+                      className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
+                    >
+                      Uninstall &amp; Feedback
                     </Link>
                   </li>
                   <li>
@@ -218,10 +235,10 @@ export function Footer() {
                   </li>
                   <li>
                     <Link
-                      to="/blog/gocoupon-vs-grabon-vs-coupondunia-comparison"
+                      to="/categories"
                       className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
                     >
-                      GoCoupon vs GrabOn
+                      Browse All Categories
                     </Link>
                   </li>
                   <li>
@@ -249,18 +266,18 @@ export function Footer() {
                   </li>
                   <li>
                     <Link
-                      to="/about"
-                      className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
-                    >
-                      Careers
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
                       to="/contact"
                       className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
                     >
                       Contact
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/thank-you"
+                      className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
+                    >
+                      Inquiry Status
                     </Link>
                   </li>
                   <li>

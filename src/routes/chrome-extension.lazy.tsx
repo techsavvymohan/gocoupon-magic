@@ -371,6 +371,24 @@ export function ChromeExtensionPage() {
               </p>
             </div>
           </div>
+
+          {/* Contextual Onboarding & Help Links */}
+          <div className="mt-10 rounded-2xl border border-border/80 bg-card p-6 flex flex-wrap items-center justify-between gap-4 text-sm">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+              <span className="font-semibold text-foreground">Helpful Extension Guides:</span>
+              <div className="flex flex-wrap items-center gap-3 text-primary">
+                <Link to="/welcome" className="hover:underline font-medium">Welcome &amp; Setup Guide →</Link>
+                <span className="text-muted-foreground">•</span>
+                <Link to="/help" className="hover:underline font-medium">Help Center &amp; Troubleshooting →</Link>
+                <span className="text-muted-foreground">•</span>
+                <Link to="/featured-deals" className="hover:underline font-medium">Featured Deals →</Link>
+                <span className="text-muted-foreground">•</span>
+                <Link to="/submit-coupon" className="hover:underline font-medium">Submit a Coupon →</Link>
+                <span className="text-muted-foreground">•</span>
+                <Link to="/uninstall" className="text-muted-foreground hover:text-foreground">Uninstall Guide</Link>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

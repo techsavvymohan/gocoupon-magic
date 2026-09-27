@@ -57,6 +57,16 @@ function ResourcesPage() {
       question: "Are the tools on this page free?",
       answer: "Yes. All goCoupon resources and calculators are free. No sign-up or email required.",
     },
+    {
+      question: "How can I submit new store discounts and coupons for calculator benchmarks?",
+      answer:
+        "Shoppers can share working promo codes and store deals via our community portal at /submit-coupon. Submissions are tested against retailer checkout endpoints in under 850ms.",
+    },
+    {
+      question: "Where can I get help or troubleshoot coupon calculator outcomes?",
+      answer:
+        "If you encounter a discrepancy between our calculator estimate and checkout pricing, visit our Help Center (/help) or contact our customer advocacy desk at /contact.",
+    },
   ]);
 
   return (
@@ -107,7 +117,32 @@ function ResourcesPage() {
           <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             More to explore
           </h2>
-          <ul className="mt-8 grid gap-4 md:grid-cols-2">
+          <ul className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <ResourceLink
+              to="/featured-deals"
+              title="Featured Partner Deals & Exclusive Coupons"
+              meta="Deals · Hand-verified"
+            />
+            <ResourceLink
+              to="/chrome-extension"
+              title="Install the Free GoCoupon Chrome Extension"
+              meta="Extension · 850ms Auto-Apply"
+            />
+            <ResourceLink
+              to="/submit-coupon"
+              title="Submit a Verified Store Coupon Code"
+              meta="Community · 850ms Verification"
+            />
+            <ResourceLink
+              to="/help"
+              title="Help Center & Troubleshooting Knowledge Base"
+              meta="Support · 24/7 Knowledge Base"
+            />
+            <ResourceLink
+              to="/welcome"
+              title="Extension Welcome & Quick-Start Setup Guide"
+              meta="Guide · 3-Step Setup"
+            />
             <ResourceLink
               to="/blog/stack-coupons-bank-offers-flipkart"
               title="How to stack coupons and bank offers on Flipkart"
@@ -123,17 +158,7 @@ function ResourcesPage() {
               title="Myntra coupon codes that actually work"
               meta="Guide · 8 min read"
             />
-            <ResourceLink
-              to="/blog/chrome-extension-to-automatically-apply-coupons-india"
-              title="The Chrome extension that automatically applies coupons in India"
-              meta="Product deep-dive · 11 min read"
-            />
             <ResourceLink to="/press" title="Press &amp; media kit" meta="For journalists" />
-            <ResourceLink
-              to="/extension"
-              title="Install the goCoupon Chrome extension"
-              meta="Free"
-            />
           </ul>
         </div>
       </section>

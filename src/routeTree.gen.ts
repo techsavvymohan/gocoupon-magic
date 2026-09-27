@@ -13,11 +13,13 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AmazonCouponsRouteImport } from './routes/amazon-coupons'
+import { Route as BoatCouponsRouteImport } from './routes/boat-coupons'
 import { Route as CashbackRewardsRouteImport } from './routes/cashback-rewards'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as ChromeExtensionRouteImport } from './routes/chrome-extension'
 import { Route as CompareRouteImport } from './routes/compare'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CromaCouponsRouteImport } from './routes/croma-coupons'
 import { Route as DealsRouteImport } from './routes/deals'
 import { Route as DisclosureRouteImport } from './routes/disclosure'
 import { Route as ExtensionRouteImport } from './routes/extension'
@@ -28,7 +30,9 @@ import { Route as HelpRouteImport } from './routes/help'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MeeshoCouponsRouteImport } from './routes/meesho-coupons'
+import { Route as MerchantScoreIndexRouteImport } from './routes/merchant-score-index'
 import { Route as MyntraCouponsRouteImport } from './routes/myntra-coupons'
+import { Route as NykaaCouponsRouteImport } from './routes/nykaa-coupons'
 import { Route as OffersRouteImport } from './routes/offers'
 import { Route as PressRouteImport } from './routes/press'
 import { Route as PricingIntelligenceRouteImport } from './routes/pricing-intelligence'
@@ -38,6 +42,7 @@ import { Route as SecurityRouteImport } from './routes/security'
 import { Route as SitemapRouteImport } from './routes/sitemap'
 import { Route as StoresRouteImport } from './routes/stores'
 import { Route as SubmitCouponRouteImport } from './routes/submit-coupon'
+import { Route as TataCliqCouponsRouteImport } from './routes/tata-cliq-coupons'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ThankYouRouteImport } from './routes/thank-you'
 import { Route as UninstallRouteImport } from './routes/uninstall'
@@ -45,6 +50,7 @@ import { Route as WatchlistRouteImport } from './routes/watchlist'
 import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
+import { Route as CategorySlugRouteImport } from './routes/category/$slug'
 import { Route as CollectionsIndexRouteImport } from './routes/collections/index'
 import { Route as CollectionsSlugRouteImport } from './routes/collections/$slug'
 import { Route as ProductProductIdRouteImport } from './routes/product/$productId'
@@ -67,6 +73,11 @@ const AdminRoute = AdminRouteImport.update({
 const AmazonCouponsRoute = AmazonCouponsRouteImport.update({
   id: '/amazon-coupons',
   path: '/amazon-coupons',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BoatCouponsRoute = BoatCouponsRouteImport.update({
+  id: '/boat-coupons',
+  path: '/boat-coupons',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CashbackRewardsRoute = CashbackRewardsRouteImport.update({
@@ -94,6 +105,11 @@ const CompareRoute = CompareRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CromaCouponsRoute = CromaCouponsRouteImport.update({
+  id: '/croma-coupons',
+  path: '/croma-coupons',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DealsRoute = DealsRouteImport.update({
@@ -148,9 +164,21 @@ const MeeshoCouponsRoute = MeeshoCouponsRouteImport.update({
   path: '/meesho-coupons',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MerchantScoreIndexRoute = MerchantScoreIndexRouteImport.update({
+  id: '/merchant-score-index',
+  path: '/merchant-score-index',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() =>
+  import('./routes/merchant-score-index.lazy').then((d) => d.Route),
+)
 const MyntraCouponsRoute = MyntraCouponsRouteImport.update({
   id: '/myntra-coupons',
   path: '/myntra-coupons',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NykaaCouponsRoute = NykaaCouponsRouteImport.update({
+  id: '/nykaa-coupons',
+  path: '/nykaa-coupons',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OffersRoute = OffersRouteImport.update({
@@ -200,6 +228,11 @@ const SubmitCouponRoute = SubmitCouponRouteImport.update({
   path: '/submit-coupon',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/submit-coupon.lazy').then((d) => d.Route))
+const TataCliqCouponsRoute = TataCliqCouponsRouteImport.update({
+  id: '/tata-cliq-coupons',
+  path: '/tata-cliq-coupons',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -235,6 +268,13 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/blog/$slug.lazy').then((d) => d.Route))
+const CategorySlugRoute = CategorySlugRouteImport.update({
+  id: '/category/$slug',
+  path: '/category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() =>
+  import('./routes/category/$slug.lazy').then((d) => d.Route),
+)
 const CollectionsIndexRoute = CollectionsIndexRouteImport.update({
   id: '/collections/',
   path: '/collections/',
@@ -262,11 +302,13 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/amazon-coupons': typeof AmazonCouponsRoute
+  '/boat-coupons': typeof BoatCouponsRoute
   '/cashback-rewards': typeof CashbackRewardsRoute
   '/categories': typeof CategoriesRoute
   '/chrome-extension': typeof ChromeExtensionRoute
   '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
+  '/croma-coupons': typeof CromaCouponsRoute
   '/deals': typeof DealsRoute
   '/disclosure': typeof DisclosureRoute
   '/extension': typeof ExtensionRoute
@@ -277,7 +319,9 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/meesho-coupons': typeof MeeshoCouponsRoute
+  '/merchant-score-index': typeof MerchantScoreIndexRoute
   '/myntra-coupons': typeof MyntraCouponsRoute
+  '/nykaa-coupons': typeof NykaaCouponsRoute
   '/offers': typeof OffersRoute
   '/press': typeof PressRoute
   '/pricing-intelligence': typeof PricingIntelligenceRoute
@@ -287,12 +331,14 @@ export interface FileRoutesByFullPath {
   '/sitemap': typeof SitemapRoute
   '/stores': typeof StoresRoute
   '/submit-coupon': typeof SubmitCouponRoute
+  '/tata-cliq-coupons': typeof TataCliqCouponsRoute
   '/terms': typeof TermsRoute
   '/thank-you': typeof ThankYouRoute
   '/uninstall': typeof UninstallRoute
   '/watchlist': typeof WatchlistRoute
   '/welcome': typeof WelcomeRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/category/$slug': typeof CategorySlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/product/$productId': typeof ProductProductIdRoute
   '/blog/': typeof BlogIndexRoute
@@ -303,11 +349,13 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/amazon-coupons': typeof AmazonCouponsRoute
+  '/boat-coupons': typeof BoatCouponsRoute
   '/cashback-rewards': typeof CashbackRewardsRoute
   '/categories': typeof CategoriesRoute
   '/chrome-extension': typeof ChromeExtensionRoute
   '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
+  '/croma-coupons': typeof CromaCouponsRoute
   '/deals': typeof DealsRoute
   '/disclosure': typeof DisclosureRoute
   '/extension': typeof ExtensionRoute
@@ -318,7 +366,9 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/meesho-coupons': typeof MeeshoCouponsRoute
+  '/merchant-score-index': typeof MerchantScoreIndexRoute
   '/myntra-coupons': typeof MyntraCouponsRoute
+  '/nykaa-coupons': typeof NykaaCouponsRoute
   '/offers': typeof OffersRoute
   '/press': typeof PressRoute
   '/pricing-intelligence': typeof PricingIntelligenceRoute
@@ -328,12 +378,14 @@ export interface FileRoutesByTo {
   '/sitemap': typeof SitemapRoute
   '/stores': typeof StoresRoute
   '/submit-coupon': typeof SubmitCouponRoute
+  '/tata-cliq-coupons': typeof TataCliqCouponsRoute
   '/terms': typeof TermsRoute
   '/thank-you': typeof ThankYouRoute
   '/uninstall': typeof UninstallRoute
   '/watchlist': typeof WatchlistRoute
   '/welcome': typeof WelcomeRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/category/$slug': typeof CategorySlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/product/$productId': typeof ProductProductIdRoute
   '/blog': typeof BlogIndexRoute
@@ -345,11 +397,13 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/amazon-coupons': typeof AmazonCouponsRoute
+  '/boat-coupons': typeof BoatCouponsRoute
   '/cashback-rewards': typeof CashbackRewardsRoute
   '/categories': typeof CategoriesRoute
   '/chrome-extension': typeof ChromeExtensionRoute
   '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
+  '/croma-coupons': typeof CromaCouponsRoute
   '/deals': typeof DealsRoute
   '/disclosure': typeof DisclosureRoute
   '/extension': typeof ExtensionRoute
@@ -360,7 +414,9 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/meesho-coupons': typeof MeeshoCouponsRoute
+  '/merchant-score-index': typeof MerchantScoreIndexRoute
   '/myntra-coupons': typeof MyntraCouponsRoute
+  '/nykaa-coupons': typeof NykaaCouponsRoute
   '/offers': typeof OffersRoute
   '/press': typeof PressRoute
   '/pricing-intelligence': typeof PricingIntelligenceRoute
@@ -370,12 +426,14 @@ export interface FileRoutesById {
   '/sitemap': typeof SitemapRoute
   '/stores': typeof StoresRoute
   '/submit-coupon': typeof SubmitCouponRoute
+  '/tata-cliq-coupons': typeof TataCliqCouponsRoute
   '/terms': typeof TermsRoute
   '/thank-you': typeof ThankYouRoute
   '/uninstall': typeof UninstallRoute
   '/watchlist': typeof WatchlistRoute
   '/welcome': typeof WelcomeRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/category/$slug': typeof CategorySlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/product/$productId': typeof ProductProductIdRoute
   '/blog/': typeof BlogIndexRoute
@@ -388,11 +446,13 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/amazon-coupons'
+    | '/boat-coupons'
     | '/cashback-rewards'
     | '/categories'
     | '/chrome-extension'
     | '/compare'
     | '/contact'
+    | '/croma-coupons'
     | '/deals'
     | '/disclosure'
     | '/extension'
@@ -403,7 +463,9 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/login'
     | '/meesho-coupons'
+    | '/merchant-score-index'
     | '/myntra-coupons'
+    | '/nykaa-coupons'
     | '/offers'
     | '/press'
     | '/pricing-intelligence'
@@ -413,12 +475,14 @@ export interface FileRouteTypes {
     | '/sitemap'
     | '/stores'
     | '/submit-coupon'
+    | '/tata-cliq-coupons'
     | '/terms'
     | '/thank-you'
     | '/uninstall'
     | '/watchlist'
     | '/welcome'
     | '/blog/$slug'
+    | '/category/$slug'
     | '/collections/$slug'
     | '/product/$productId'
     | '/blog/'
@@ -429,11 +493,13 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/amazon-coupons'
+    | '/boat-coupons'
     | '/cashback-rewards'
     | '/categories'
     | '/chrome-extension'
     | '/compare'
     | '/contact'
+    | '/croma-coupons'
     | '/deals'
     | '/disclosure'
     | '/extension'
@@ -444,7 +510,9 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/login'
     | '/meesho-coupons'
+    | '/merchant-score-index'
     | '/myntra-coupons'
+    | '/nykaa-coupons'
     | '/offers'
     | '/press'
     | '/pricing-intelligence'
@@ -454,12 +522,14 @@ export interface FileRouteTypes {
     | '/sitemap'
     | '/stores'
     | '/submit-coupon'
+    | '/tata-cliq-coupons'
     | '/terms'
     | '/thank-you'
     | '/uninstall'
     | '/watchlist'
     | '/welcome'
     | '/blog/$slug'
+    | '/category/$slug'
     | '/collections/$slug'
     | '/product/$productId'
     | '/blog'
@@ -470,11 +540,13 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/amazon-coupons'
+    | '/boat-coupons'
     | '/cashback-rewards'
     | '/categories'
     | '/chrome-extension'
     | '/compare'
     | '/contact'
+    | '/croma-coupons'
     | '/deals'
     | '/disclosure'
     | '/extension'
@@ -485,7 +557,9 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/login'
     | '/meesho-coupons'
+    | '/merchant-score-index'
     | '/myntra-coupons'
+    | '/nykaa-coupons'
     | '/offers'
     | '/press'
     | '/pricing-intelligence'
@@ -495,12 +569,14 @@ export interface FileRouteTypes {
     | '/sitemap'
     | '/stores'
     | '/submit-coupon'
+    | '/tata-cliq-coupons'
     | '/terms'
     | '/thank-you'
     | '/uninstall'
     | '/watchlist'
     | '/welcome'
     | '/blog/$slug'
+    | '/category/$slug'
     | '/collections/$slug'
     | '/product/$productId'
     | '/blog/'
@@ -512,11 +588,13 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
   AmazonCouponsRoute: typeof AmazonCouponsRoute
+  BoatCouponsRoute: typeof BoatCouponsRoute
   CashbackRewardsRoute: typeof CashbackRewardsRoute
   CategoriesRoute: typeof CategoriesRoute
   ChromeExtensionRoute: typeof ChromeExtensionRoute
   CompareRoute: typeof CompareRoute
   ContactRoute: typeof ContactRoute
+  CromaCouponsRoute: typeof CromaCouponsRoute
   DealsRoute: typeof DealsRoute
   DisclosureRoute: typeof DisclosureRoute
   ExtensionRoute: typeof ExtensionRoute
@@ -527,7 +605,9 @@ export interface RootRouteChildren {
   HowItWorksRoute: typeof HowItWorksRoute
   LoginRoute: typeof LoginRoute
   MeeshoCouponsRoute: typeof MeeshoCouponsRoute
+  MerchantScoreIndexRoute: typeof MerchantScoreIndexRoute
   MyntraCouponsRoute: typeof MyntraCouponsRoute
+  NykaaCouponsRoute: typeof NykaaCouponsRoute
   OffersRoute: typeof OffersRoute
   PressRoute: typeof PressRoute
   PricingIntelligenceRoute: typeof PricingIntelligenceRoute
@@ -537,12 +617,14 @@ export interface RootRouteChildren {
   SitemapRoute: typeof SitemapRoute
   StoresRoute: typeof StoresRoute
   SubmitCouponRoute: typeof SubmitCouponRoute
+  TataCliqCouponsRoute: typeof TataCliqCouponsRoute
   TermsRoute: typeof TermsRoute
   ThankYouRoute: typeof ThankYouRoute
   UninstallRoute: typeof UninstallRoute
   WatchlistRoute: typeof WatchlistRoute
   WelcomeRoute: typeof WelcomeRoute
   BlogSlugRoute: typeof BlogSlugRoute
+  CategorySlugRoute: typeof CategorySlugRoute
   CollectionsSlugRoute: typeof CollectionsSlugRoute
   ProductProductIdRoute: typeof ProductProductIdRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -579,6 +661,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AmazonCouponsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/boat-coupons': {
+      id: '/boat-coupons'
+      path: '/boat-coupons'
+      fullPath: '/boat-coupons'
+      preLoaderRoute: typeof BoatCouponsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cashback-rewards': {
       id: '/cashback-rewards'
       path: '/cashback-rewards'
@@ -612,6 +701,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/croma-coupons': {
+      id: '/croma-coupons'
+      path: '/croma-coupons'
+      fullPath: '/croma-coupons'
+      preLoaderRoute: typeof CromaCouponsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/deals': {
@@ -684,11 +780,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MeeshoCouponsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/merchant-score-index': {
+      id: '/merchant-score-index'
+      path: '/merchant-score-index'
+      fullPath: '/merchant-score-index'
+      preLoaderRoute: typeof MerchantScoreIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/myntra-coupons': {
       id: '/myntra-coupons'
       path: '/myntra-coupons'
       fullPath: '/myntra-coupons'
       preLoaderRoute: typeof MyntraCouponsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nykaa-coupons': {
+      id: '/nykaa-coupons'
+      path: '/nykaa-coupons'
+      fullPath: '/nykaa-coupons'
+      preLoaderRoute: typeof NykaaCouponsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/offers': {
@@ -754,6 +864,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SubmitCouponRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tata-cliq-coupons': {
+      id: '/tata-cliq-coupons'
+      path: '/tata-cliq-coupons'
+      fullPath: '/tata-cliq-coupons'
+      preLoaderRoute: typeof TataCliqCouponsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -803,6 +920,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/category/$slug': {
+      id: '/category/$slug'
+      path: '/category/$slug'
+      fullPath: '/category/$slug'
+      preLoaderRoute: typeof CategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/collections/': {
       id: '/collections/'
       path: '/collections'
@@ -832,11 +956,13 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
   AmazonCouponsRoute: AmazonCouponsRoute,
+  BoatCouponsRoute: BoatCouponsRoute,
   CashbackRewardsRoute: CashbackRewardsRoute,
   CategoriesRoute: CategoriesRoute,
   ChromeExtensionRoute: ChromeExtensionRoute,
   CompareRoute: CompareRoute,
   ContactRoute: ContactRoute,
+  CromaCouponsRoute: CromaCouponsRoute,
   DealsRoute: DealsRoute,
   DisclosureRoute: DisclosureRoute,
   ExtensionRoute: ExtensionRoute,
@@ -847,7 +973,9 @@ const rootRouteChildren: RootRouteChildren = {
   HowItWorksRoute: HowItWorksRoute,
   LoginRoute: LoginRoute,
   MeeshoCouponsRoute: MeeshoCouponsRoute,
+  MerchantScoreIndexRoute: MerchantScoreIndexRoute,
   MyntraCouponsRoute: MyntraCouponsRoute,
+  NykaaCouponsRoute: NykaaCouponsRoute,
   OffersRoute: OffersRoute,
   PressRoute: PressRoute,
   PricingIntelligenceRoute: PricingIntelligenceRoute,
@@ -857,12 +985,14 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapRoute: SitemapRoute,
   StoresRoute: StoresRoute,
   SubmitCouponRoute: SubmitCouponRoute,
+  TataCliqCouponsRoute: TataCliqCouponsRoute,
   TermsRoute: TermsRoute,
   ThankYouRoute: ThankYouRoute,
   UninstallRoute: UninstallRoute,
   WatchlistRoute: WatchlistRoute,
   WelcomeRoute: WelcomeRoute,
   BlogSlugRoute: BlogSlugRoute,
+  CategorySlugRoute: CategorySlugRoute,
   CollectionsSlugRoute: CollectionsSlugRoute,
   ProductProductIdRoute: ProductProductIdRoute,
   BlogIndexRoute: BlogIndexRoute,

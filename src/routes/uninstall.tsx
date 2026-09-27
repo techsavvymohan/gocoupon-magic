@@ -148,13 +148,36 @@ function UninstallPage() {
             )}
           </div>
 
-          <div className="mt-10 text-center">
-            <p className="text-sm text-muted-foreground">
-              Need technical support or have an account question?{" "}
-              <Link to="/contact" className="text-primary font-medium hover:underline">
-                Contact our support team
+          <div className="mt-10 rounded-2xl border border-border/70 bg-card/60 p-6 backdrop-blur-xs text-center">
+            <h3 className="font-display text-sm font-semibold text-foreground mb-3">
+              Looking for alternative ways to save without the extension?
+            </h3>
+            <div className="flex flex-wrap items-center justify-center gap-3 text-xs">
+              <Link
+                to="/featured-deals"
+                className="rounded-full border border-border bg-background px-4 py-2 text-foreground hover:border-primary/50 transition-colors"
+              >
+                🔥 Browse Featured Deals
               </Link>
-            </p>
+              <Link
+                to="/help"
+                className="rounded-full border border-border bg-background px-4 py-2 text-foreground hover:border-primary/50 transition-colors"
+              >
+                ❓ Help &amp; Troubleshooting Guide
+              </Link>
+              <Link
+                to="/welcome"
+                className="rounded-full border border-border bg-background px-4 py-2 text-foreground hover:border-primary/50 transition-colors"
+              >
+                🚀 Extension Quick Start
+              </Link>
+              <Link
+                to="/contact"
+                className="rounded-full border border-border bg-background px-4 py-2 text-primary font-medium hover:underline"
+              >
+                💬 Contact Support
+              </Link>
+            </div>
           </div>
         </div>
       </section>
