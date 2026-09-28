@@ -63,6 +63,11 @@ function auditHtmlFile(fileName) {
   const canonicalMatch = content.match(/<link\s+rel=["']canonical["']\s+href=["'](.*?)["']/i);
   assert(Boolean(canonicalMatch), `${fileName} includes rel="canonical" link`);
 
+  // H1 in Primary DOM (outside noscript)
+  const withoutNoscript = content.replace(/<noscript[\s\S]*?<\/noscript>/gi, '');
+  const h1Match = withoutNoscript.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+  assert(Boolean(h1Match), `${fileName} has visible primary <h1> tag in main DOM (outside <noscript>)`);
+
   // Schema.org Structured Data (JSON-LD)
   const hasJsonLd = content.includes('application/ld+json');
   assert(hasJsonLd, `${fileName} includes Schema.org JSON-LD structured data`);
