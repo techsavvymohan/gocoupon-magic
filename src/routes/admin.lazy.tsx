@@ -20,6 +20,7 @@ import AdminHomepageSectionsManager from "@/admin/components/AdminHomepageSectio
 import AdminUsersManager from "@/admin/components/AdminUsersManager";
 import AdminSettingsPanel from "@/admin/components/AdminSettingsPanel";
 import AdminActivityChart from "@/admin/components/AdminActivityChart";
+import AdminWebVitalsWidget from "@/admin/components/AdminWebVitalsWidget";
 import RecentActivityTable from "@/admin/components/RecentActivityTable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -592,6 +593,9 @@ function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => v
           </div>
         </div>
       </section>
+
+      {/* ── Real User Monitoring (RUM) & Core Web Vitals (GA4 + Vitals API) ── */}
+      <AdminWebVitalsWidget />
 
       {/* Activity Chart & Quick Modules */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
