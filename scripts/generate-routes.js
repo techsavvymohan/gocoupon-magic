@@ -27,6 +27,9 @@ const baseIndexHtml = rawIndexHtml;
 
 // Helper to optimize title length strictly between 35 and 58 characters
 function optimizeTitle(rawTitle, fallbackBrand = " | GoCoupon") {
+  if (rawTitle === "GoCoupon – Verified Promo Codes, Deals & Price Tracking") {
+    return rawTitle;
+  }
   let title = rawTitle.replace(/\s*–\s*GoCoupon.*$/i, "").replace(/\s*\|\s*GoCoupon.*$/i, "").trim();
   const maxTitleLen = 58 - fallbackBrand.length; // 47
   if (title.length > maxTitleLen) {
@@ -226,8 +229,8 @@ function renderDirectAnswerBox(directAnswer) {
 const routeConfigs = [
   {
     path: "",
-    title: "GoCoupon (Go Coupon) – Verified Coupons, Deals & Promo Codes | GrabOn & CouponDuniya Alternative",
-    description: "Looking for Go Coupon, GrabOn, CouponDuniya or Dealspotr? GoCoupon features 970+ verified live deals, auto-applied promo codes, price tracking, and 10% instant bank discounts across 500+ stores. 100% free.",
+    title: "GoCoupon – Verified Promo Codes, Deals & Price Tracking",
+    description: "Save money with 970+ verified coupons, automated checkout promo code testing, 30-day price history graphs, and bank card discounts on GoCoupon.io.",
     h1: "Find Your Lowest Price in 1 Second — Auto-Apply Coupons, Track Real Prices & Stack Card Discounts",
     lead: "",
     directAnswer: "GoCoupon is the #1 modern alternative to GrabOn, CouponDuniya, and Dealspotr. It auto-tests verified promo codes, tracks 30-day price history graphs, and stacks bank card discounts (HDFC, SBI, ICICI, Axis) across 500+ online stores.",
@@ -2401,11 +2404,11 @@ ${routeSchemas.map((s) => `    <script type="application/ld+json">\n${s}\n    </
 let notFoundHtml = baseIndexHtml;
 notFoundHtml = notFoundHtml.replace(
   /<title>[\s\S]*?<\/title>/i,
-  "<title>Page Not Found | GoCoupon</title>"
+  "<title>404 Page Not Found – Verified Deals & Coupons | GoCoupon</title>"
 );
 notFoundHtml = notFoundHtml.replace(
   /<meta\s+name="description"\s+content="[^"]*"/i,
-  '<meta name="description" content="The page you are looking for does not exist. Browse working coupons, top store discounts, and real-time price tracking tools on GoCoupon."'
+  '<meta name="description" content="The coupon page, retailer deal, or shopping tool you were looking for could not be found. Browse working discount codes and price trackers on GoCoupon."'
 );
 notFoundHtml = notFoundHtml.replace(
   /<meta\s+name="robots"\s+content="[^"]*"/i,
