@@ -28,6 +28,81 @@ export function startBackgroundWorkers(intervalMs: number = 15 * 60 * 1000) {
 
   console.log(`⏱️ [Worker] 24/7 Dynamic Cuelinks & Price Watcher started (interval: ${intervalMs / 1000}s)`);
 
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // STEP 0: Restore admin & featured deals from Supabase on startup
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  setTimeout(async () => {
+    try {
+      const { supabaseAdmin } = await import("../services/db.js");
+      if (supabaseAdmin) {
+        console.log("🔄 [Worker] Restoring admin & featured deals from Supabase...");
+        const { data, error } = await supabaseAdmin
+          .from("gocoupon_deals")
+          .select("*")
+          .or("source.eq.admin,is_featured.eq.true,campaign_source.eq.manual")
+          .order("featured_priority", { ascending: true });
+
+        if (error) {
+          console.warn("⚠️ [Worker] Could not restore admin deals from Supabase:", error.message);
+        } else if (data && data.length > 0) {
+          // Map snake_case DB columns → camelCase DealRecord
+          const { getLiveDeals, setLiveDeals } = await import("../../src/lib/server-data/deals-db.js");
+          const { setLiveDealsPool } = await import("../services/providers/cuelinks-client.js");
+
+          const adminDeals = data.map((d: any) => ({
+            id: d.id,
+            storeName: d.store_name,
+            storeSlug: d.store_slug,
+            storeLogo: d.store_logo,
+            title: d.title,
+            code: d.code,
+            discount: d.discount,
+            category: d.category,
+            badge: d.badge,
+            verified: d.verified,
+            verifiedDate: d.verified_date,
+            expiresIn: d.expires_in,
+            endDate: d.end_date,
+            minOrder: d.min_order,
+            terms: d.terms,
+            link: d.link,
+            usesCount: d.uses_count,
+            rating: d.rating,
+            votesCount: d.votes_count,
+            source: d.source,
+            status: d.status,
+            type: d.type,
+            isFeatured: d.is_featured,
+            featuredPriority: d.featured_priority,
+            campaignSource: d.campaign_source,
+            verificationStatus: d.verification_status,
+          }));
+
+          // Merge into the existing pool (never overwrite — only add missing)
+          const currentDeals = getLiveDeals();
+          const dealMap = new Map(currentDeals.map((d) => [String(d.id), d]));
+          let added = 0;
+          for (const d of adminDeals) {
+            if (!dealMap.has(String(d.id))) {
+              dealMap.set(String(d.id), d);
+              added++;
+            }
+          }
+          const merged = Array.from(dealMap.values());
+          setLiveDeals(merged);
+          setLiveDealsPool(merged);
+          console.log(`✅ [Worker] Restored ${adminDeals.length} admin/featured deals from Supabase (${added} newly added to memory).`);
+        } else {
+          console.log("ℹ️ [Worker] No admin/featured deals found in Supabase yet.");
+        }
+      } else {
+        console.warn("⚠️ [Worker] supabaseAdmin not available — admin deal restore skipped.");
+      }
+    } catch (err: any) {
+      console.warn("⚠️ [Worker] Admin deal restore from Supabase failed:", err?.message);
+    }
+  }, 500); // Run FIRST, 500ms after boot
+
   // Initial Cuelinks sync 2s after boot
   setTimeout(async () => {
     try {

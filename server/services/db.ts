@@ -50,13 +50,34 @@ function atomicWriteJsonSync(filePath: string, data: any): void {
 const DATABASE_URL = process.env.DATABASE_URL || "";
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || "";
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
+/**
+ * Public Supabase client (anon key) — for READ operations only.
+ */
 export const supabase: SupabaseClient | null =
   SUPABASE_URL && SUPABASE_ANON_KEY
     ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
         auth: { persistSession: false },
       })
     : null;
+
+/**
+ * Admin Supabase client (service role key) — bypasses RLS for server-side writes.
+ * NEVER expose this to the browser. Server only.
+ */
+export const supabaseAdmin: SupabaseClient | null =
+  SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
+    ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+        auth: { persistSession: false, autoRefreshToken: false },
+      })
+    : null;
+
+if (supabaseAdmin) {
+  console.log("✅ [Database] Supabase Admin client initialized (service role — bypasses RLS).");
+} else {
+  console.warn("⚠️ [Database] No SUPABASE_SERVICE_ROLE_KEY found. Admin writes to Supabase will fail.");
+}
 
 let pgPool: pg.Pool | null = null;
 let isPgConnected = false;
@@ -478,51 +499,89 @@ export const dealsDb = {
       console.warn("[Database dealsDb.upsertDeals] Disk persistence warning:", diskErr.message);
     }
 
-    // 3. PostgreSQL Cloud Database Upsert
-    if (pgPool) {
+    // 3. Supabase REST Upsert via Service Role Key (bypasses RLS — primary persistence layer)
+    if (supabaseAdmin) {
       try {
         const BATCH_SIZE = 50;
         let totalUpserted = 0;
 
         for (let i = 0; i < deals.length; i += BATCH_SIZE) {
           const batch = deals.slice(i, i + BATCH_SIZE);
+          const rows = batch.map((d) => ({
+            id: String(d.id),
+            store_name: d.storeName || "Store",
+            store_slug: d.storeSlug || (d.storeName || "store").toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+            store_logo: d.storeLogo || null,
+            title: d.title,
+            code: d.code || "",
+            discount: d.discount || "Exclusive Offer",
+            category: d.category || "General",
+            badge: d.badge || "Verified",
+            verified: d.verified ?? true,
+            verified_date: d.verifiedDate || "Verified Today",
+            expires_in: d.expiresIn || "Active",
+            end_date: d.endDate ? new Date(d.endDate).toISOString() : null,
+            min_order: d.minOrder || null,
+            terms: d.terms || null,
+            link: d.link || "https://gocoupon.io",
+            uses_count: d.usesCount || 1,
+            rating: d.rating || 4.8,
+            votes_count: d.votesCount || 12,
+            source: d.source || "cuelinks",
+            status: d.status || "active",
+            type: d.type || "coupon",
+            is_featured: Boolean(d.isFeatured),
+            featured_priority: d.featuredPriority ? Number(d.featuredPriority) : 100,
+            campaign_source: d.campaignSource || "manual",
+            verification_status: d.verificationStatus || "verified",
+          }));
+
+          const { error } = await supabaseAdmin
+            .from("gocoupon_deals")
+            .upsert(rows, {
+              onConflict: "id",
+              ignoreDuplicates: false,
+            });
+
+          if (error) {
+            console.warn("[Database dealsDb.upsertDeals] Supabase batch upsert error:", error.message);
+          } else {
+            totalUpserted += batch.length;
+          }
+        }
+        console.log(`✅ [Database] Supabase upsert complete: ${totalUpserted} deals saved to cloud DB.`);
+        return totalUpserted;
+      } catch (err: any) {
+        console.warn("[Database dealsDb.upsertDeals] Supabase REST upsert failed:", err.message);
+      }
+    } else if (pgPool) {
+      // Fallback: use pg pool only if supabaseAdmin is unavailable
+      console.warn("[Database] supabaseAdmin unavailable, falling back to pg pool.");
+      try {
+        const BATCH_SIZE = 50;
+        let totalUpserted = 0;
+        for (let i = 0; i < deals.length; i += BATCH_SIZE) {
+          const batch = deals.slice(i, i + BATCH_SIZE);
           const values: any[] = [];
           const rowPlaceholders: string[] = [];
-
           batch.forEach((d, idx) => {
             const offset = idx * 26;
             rowPlaceholders.push(`(${Array.from({ length: 26 }, (_, k) => `$${offset + k + 1}`).join(", ")})`);
-
             values.push(
-              String(d.id),
-              d.storeName || "Store",
+              String(d.id), d.storeName || "Store",
               d.storeSlug || (d.storeName || "store").toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-              d.storeLogo || null,
-              d.title,
-              d.code || "",
-              d.discount || "Exclusive Offer",
-              d.category || "General",
-              d.badge || "Verified",
-              d.verified ?? true,
-              d.verifiedDate || "Verified Today",
-              d.expiresIn || "Active",
-              d.endDate ? new Date(d.endDate) : null,
-              d.minOrder || null,
-              d.terms || null,
-              d.link || "https://gocoupon.io",
-              d.usesCount || 1,
-              d.rating || 4.8,
-              d.votesCount || 12,
-              d.source || "cuelinks",
-              d.status || "active",
-              d.type || "coupon",
-              Boolean(d.isFeatured),
+              d.storeLogo || null, d.title, d.code || "",
+              d.discount || "Exclusive Offer", d.category || "General",
+              d.badge || "Verified", d.verified ?? true,
+              d.verifiedDate || "Verified Today", d.expiresIn || "Active",
+              d.endDate ? new Date(d.endDate) : null, d.minOrder || null, d.terms || null,
+              d.link || "https://gocoupon.io", d.usesCount || 1, d.rating || 4.8,
+              d.votesCount || 12, d.source || "cuelinks", d.status || "active",
+              d.type || "coupon", Boolean(d.isFeatured),
               d.featuredPriority ? Number(d.featuredPriority) : 100,
-              d.campaignSource || "manual",
-              d.verificationStatus || "verified"
+              d.campaignSource || "manual", d.verificationStatus || "verified"
             );
           });
-
           const query = `
             INSERT INTO gocoupon_deals (
               id, store_name, store_slug, store_logo, title, code, discount, category,
@@ -531,39 +590,56 @@ export const dealsDb = {
               is_featured, featured_priority, campaign_source, verification_status
             ) VALUES ${rowPlaceholders.join(",\n")}
             ON CONFLICT (id) DO UPDATE SET
-              title = EXCLUDED.title,
-              code = EXCLUDED.code,
-              discount = EXCLUDED.discount,
-              uses_count = EXCLUDED.uses_count,
-              verified = EXCLUDED.verified,
-              is_featured = EXCLUDED.is_featured,
-              featured_priority = EXCLUDED.featured_priority,
+              title = EXCLUDED.title, code = EXCLUDED.code, discount = EXCLUDED.discount,
+              uses_count = EXCLUDED.uses_count, verified = EXCLUDED.verified,
+              is_featured = EXCLUDED.is_featured, featured_priority = EXCLUDED.featured_priority,
               campaign_source = EXCLUDED.campaign_source,
               verification_status = EXCLUDED.verification_status,
               updated_at = NOW();
           `;
-
           await queryPg(query, values);
           totalUpserted += batch.length;
         }
         return totalUpserted;
-      } catch (err: any) {
-        console.warn("[Database dealsDb.upsertDeals] PostgreSQL batch upsert failed:", err.message);
+      } catch (pgErr: any) {
+        console.warn("[Database dealsDb.upsertDeals] pg pool fallback also failed:", pgErr.message);
       }
     }
     return deals.length;
   },
 
   /**
-   * Deletes a deal by ID with dual disk & database synchronization.
+   * Deletes a deal by ID — removes from Supabase (service role) and local memory.
    */
   async deleteDeal(id: string): Promise<boolean> {
-    await queryPg("DELETE FROM gocoupon_deals WHERE id = $1", [id]);
+    // 1. Delete from Supabase via service role key (bypasses RLS)
+    if (supabaseAdmin) {
+      try {
+        const { error } = await supabaseAdmin
+          .from("gocoupon_deals")
+          .delete()
+          .eq("id", id);
+        if (error) {
+          console.warn("[Database dealsDb.deleteDeal] Supabase delete error:", error.message);
+        } else {
+          console.log(`✅ [Database] Deal ${id} deleted from Supabase.`);
+        }
+      } catch (err: any) {
+        console.warn("[Database dealsDb.deleteDeal] Supabase delete failed:", err.message);
+      }
+    } else {
+      // Fallback to pg pool
+      await queryPg("DELETE FROM gocoupon_deals WHERE id = $1", [id]).catch((e: any) =>
+        console.warn("[Database dealsDb.deleteDeal] pg pool delete failed:", e.message)
+      );
+    }
+
+    // 2. Remove from in-memory pool
     const current = getLiveDeals().filter((d) => String(d.id) !== String(id));
     setLiveDeals(current);
     setLiveDealsPool(current);
 
-    // Sync deletion to disk
+    // 3. Sync deletion to local disk cache
     try {
       const dealsPath = path.resolve(process.cwd(), "src/data/live-deals.json");
       if (fs.existsSync(dealsPath)) {
