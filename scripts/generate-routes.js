@@ -2360,17 +2360,15 @@ ${routeSchemas.map((s) => `    <script type="application/ld+json">\n${s}\n    </
     </article>
   `;
 
-  // Inject into <div id="root"> AND <noscript>
-  // Keep the sleek branded #site-loader in <div id="root"> so human visitors see a smooth loading spinner
-  // while <noscript> provides the full semantic article and keywords for search engines & AI crawlers!
+  // Inject semantic pre-rendered article & H1 directly into <div id="root"> for primary DOM discovery by SEO tools
+  // While #site-loader covers the screen smoothly until React hydrates
   const serverMarkup = `
     <div id="root">
       <div id="site-loader" aria-label="Loading"><div class="gc-loader"></div></div>
+      ${fullSemanticArticleHtml}
     </div>
     <noscript>
-      <div style="background-color: #090d16; color: #f1f5f9; padding: 24px;">
-        ${fullSemanticArticleHtml}
-      </div>
+      <style>#site-loader { display: none !important; }</style>
     </noscript>
   `;
 
