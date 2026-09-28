@@ -383,7 +383,7 @@ dealsRouter.post("/", requireAdminAuth, async (req: Request, res: Response) => {
       merchantUrl: b.merchantUrl || b.url || "",
       imageUrl: b.imageUrl || b.storeLogo || b.logoUrl || "",
       storeLogo: b.storeLogo || b.imageUrl || b.logoUrl || "",
-      endDate: b.expiryDate || b.endDate || new Date(Date.now() + 30 * 86400000).toISOString(),
+      endDate: b.expiryDate || b.endDate || new Date(Date.now() + 365 * 86400000).toISOString(),
       verified: true,
       votesCount: 1,
       rating: 4.8,
@@ -398,7 +398,7 @@ dealsRouter.post("/", requireAdminAuth, async (req: Request, res: Response) => {
     };
 
     addDealToPool(newDeal);
-    dealsDb.upsertDeals([newDeal]).catch((e) => console.warn("[Deals DB Upsert Warning]:", e.message));
+    await dealsDb.upsertDeals([newDeal]);
 
     // Auto-upsert store to STORES_DB, live-stores.json, and Supabase PostgreSQL gocoupon_stores
     if (newDeal.storeSlug && newDeal.storeName) {
@@ -415,7 +415,7 @@ dealsRouter.post("/", requireAdminAuth, async (req: Request, res: Response) => {
           discount: newDeal.discount || "Special Offer",
         },
       });
-      storesDb.upsertStore(savedStore).catch((e) =>
+      await storesDb.upsertStore(savedStore).catch((e) =>
         console.warn("[Stores DB Auto-Upsert Warning]:", e.message)
       );
       globalCache.deletePrefix("stores:").catch(() => {});
@@ -432,9 +432,9 @@ dealsRouter.post("/", requireAdminAuth, async (req: Request, res: Response) => {
  * PUT /api/deals (or /api/offers)
  * Admin offer update
  */
-dealsRouter.put("/", requireAdminAuth, async (req: Request, res: Response) => {
+const handleUpdateDeal = async (req: Request, res: Response) => {
   try {
-    const id = (req.query.id as string) || req.body?.id;
+    const id = (req.params?.id as string) || (req.query.id as string) || req.body?.id;
     if (!id) {
       res.status(400).json({ success: false, error: "Offer ID is required." });
       return;
@@ -462,7 +462,7 @@ dealsRouter.put("/", requireAdminAuth, async (req: Request, res: Response) => {
       merchantUrl: b.merchantUrl || b.url || "",
       imageUrl: b.imageUrl || b.storeLogo || b.logoUrl || "",
       storeLogo: b.storeLogo || b.imageUrl || b.logoUrl || "",
-      endDate: b.expiryDate || b.endDate,
+      endDate: b.expiryDate || b.endDate || new Date(Date.now() + 365 * 86400000).toISOString(),
       verified: true,
       source: b.source || "admin",
       status: b.status || "active",
@@ -475,7 +475,7 @@ dealsRouter.put("/", requireAdminAuth, async (req: Request, res: Response) => {
     };
 
     addDealToPool(updatedDeal);
-    dealsDb.upsertDeals([updatedDeal]).catch((e) => console.warn("[Deals DB Upsert Warning]:", e.message));
+    await dealsDb.upsertDeals([updatedDeal]);
 
     // Auto-upsert store to STORES_DB, live-stores.json, and Supabase PostgreSQL gocoupon_stores
     if (updatedDeal.storeSlug && updatedDeal.storeName) {
@@ -492,7 +492,7 @@ dealsRouter.put("/", requireAdminAuth, async (req: Request, res: Response) => {
           discount: updatedDeal.discount || "Special Offer",
         },
       });
-      storesDb.upsertStore(savedStore).catch((e) =>
+      await storesDb.upsertStore(savedStore).catch((e) =>
         console.warn("[Stores DB Auto-Upsert Warning]:", e.message)
       );
       globalCache.deletePrefix("stores:").catch(() => {});
@@ -502,28 +502,34 @@ dealsRouter.put("/", requireAdminAuth, async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }
-});
+};
+
+dealsRouter.put("/", requireAdminAuth, handleUpdateDeal);
+dealsRouter.put("/:id", requireAdminAuth, handleUpdateDeal);
 
 /**
  * DELETE /api/deals (or /api/offers)
  * Admin offer delete
  */
-dealsRouter.delete("/", requireAdminAuth, async (req: Request, res: Response) => {
+const handleDeleteDeal = async (req: Request, res: Response) => {
   try {
-    const id = (req.query.id as string) || req.body?.id;
+    const id = (req.params.id as string) || (req.query.id as string) || req.body?.id;
     if (!id) {
       res.status(400).json({ success: false, error: "Offer ID is required." });
       return;
     }
 
     deleteDealFromPool(id);
-    dealsDb.deleteDeal(id).catch((e) => console.warn("[Deals DB Delete Warning]:", e.message));
+    await dealsDb.deleteDeal(id);
     await globalCache.deletePrefix("deals:");
     res.json({ success: true, message: `Offer ${id} removed.` });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }
-});
+};
+
+dealsRouter.delete("/", requireAdminAuth, handleDeleteDeal);
+dealsRouter.delete("/:id", requireAdminAuth, handleDeleteDeal);
 
 /**
  * POST /api/deals/bulk (or /api/offers/bulk)

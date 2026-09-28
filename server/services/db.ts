@@ -16,6 +16,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import type { DealRecord, UserCouponSubmission } from "../../src/lib/server-data/deals-db.js";
 import { getLiveDeals, setLiveDeals } from "../../src/lib/server-data/deals-db.js";
+import { setLiveDealsPool } from "./providers/cuelinks-client.js";
 import { STORES_DB } from "../../src/lib/server-data/stores-db.js";
 import type { BlogPost } from "../routes/blogs.js";
 import type { PushAlertRegistration } from "../routes/alerts.js";
@@ -23,6 +24,25 @@ import type { PushAlertRegistration } from "../routes/alerts.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const DATA_DIR = path.resolve(__dirname, "../data");
+
+/**
+ * DevOps atomic file writer with temp swap and automatic backup.
+ */
+function atomicWriteJsonSync(filePath: string, data: any): void {
+  const dir = path.dirname(filePath);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  const serialized = JSON.stringify(data, null, 2);
+  const tmp = `${filePath}.tmp.${Date.now()}`;
+  try {
+    fs.writeFileSync(tmp, serialized, "utf-8");
+    fs.renameSync(tmp, filePath);
+  } catch {
+    fs.writeFileSync(filePath, serialized, "utf-8");
+    try {
+      if (fs.existsSync(tmp)) fs.unlinkSync(tmp);
+    } catch {}
+  }
+}
 
 // -----------------------------------------------------------------------------
 // Database Connection Pool Initialization
@@ -125,6 +145,26 @@ if (DATABASE_URL) {
               const cloudIds = new Set(res.rows.map((r: any) => String(r.id)));
               const merged = [...res.rows, ...current.filter((d: any) => !cloudIds.has(String(d.id)))];
               setLiveDeals(merged);
+              setLiveDealsPool(merged);
+              try {
+                const dealsPath = path.resolve(process.cwd(), "src/data/live-deals.json");
+                const snapshotData = {
+                  updatedAt: new Date().toISOString(),
+                  totalFetched: merged.length,
+                  activeCount: merged.length,
+                  expiredCount: 0,
+                  deals: merged,
+                };
+                atomicWriteJsonSync(dealsPath, snapshotData);
+                const backupPath = path.resolve(process.cwd(), "src/data/live-deals.backup.json");
+                atomicWriteJsonSync(backupPath, snapshotData);
+                const distPath = path.resolve(process.cwd(), "dist/data/live-deals.json");
+                if (fs.existsSync(path.dirname(distPath))) {
+                  atomicWriteJsonSync(distPath, snapshotData);
+                }
+              } catch (diskErr: any) {
+                console.warn("[Database] Could not write hydrated cloud deals to disk:", diskErr.message);
+              }
             }
           })
           .catch((e) => console.warn("[Database] Could not hydrate cloud deals:", e.message));
@@ -400,9 +440,45 @@ export const dealsDb = {
   async upsertDeals(deals: DealRecord[]): Promise<number> {
     if (!deals || deals.length === 0) return 0;
 
-    // Update in-memory pool immediately for instant zero-latency responses
-    setLiveDeals(deals);
+    // 1. Safe in-memory pool merge (upsert by ID, never wipe existing deals)
+    const current = getLiveDeals();
+    const dealMap = new Map(current.map((d) => [String(d.id), d]));
+    for (const d of deals) {
+      const existing = dealMap.get(String(d.id));
+      dealMap.set(String(d.id), { ...(existing || {}), ...d });
+    }
+    const merged = Array.from(dealMap.values());
+    setLiveDeals(merged);
+    setLiveDealsPool(merged);
 
+    // 2. Durable Local Disk Persistence (Single Source of Local Truth)
+    try {
+      const dealsPath = path.resolve(process.cwd(), "src/data/live-deals.json");
+      let snapshotData: any = { deals: [] };
+      if (fs.existsSync(dealsPath)) {
+        try {
+          snapshotData = JSON.parse(fs.readFileSync(dealsPath, "utf-8"));
+        } catch {}
+      }
+      snapshotData.deals = merged;
+      snapshotData.activeCount = merged.length;
+      snapshotData.updatedAt = new Date().toISOString();
+      atomicWriteJsonSync(dealsPath, snapshotData);
+
+      // Automated backup snapshot
+      const backupPath = path.resolve(process.cwd(), "src/data/live-deals.backup.json");
+      atomicWriteJsonSync(backupPath, snapshotData);
+
+      // Also mirror to dist/data/live-deals.json if dist exists
+      const distPath = path.resolve(process.cwd(), "dist/data/live-deals.json");
+      if (fs.existsSync(path.dirname(distPath))) {
+        atomicWriteJsonSync(distPath, snapshotData);
+      }
+    } catch (diskErr: any) {
+      console.warn("[Database dealsDb.upsertDeals] Disk persistence warning:", diskErr.message);
+    }
+
+    // 3. PostgreSQL Cloud Database Upsert
     if (pgPool) {
       try {
         const BATCH_SIZE = 50;
@@ -479,12 +555,38 @@ export const dealsDb = {
   },
 
   /**
-   * Deletes a deal by ID.
+   * Deletes a deal by ID with dual disk & database synchronization.
    */
   async deleteDeal(id: string): Promise<boolean> {
     await queryPg("DELETE FROM gocoupon_deals WHERE id = $1", [id]);
     const current = getLiveDeals().filter((d) => String(d.id) !== String(id));
     setLiveDeals(current);
+    setLiveDealsPool(current);
+
+    // Sync deletion to disk
+    try {
+      const dealsPath = path.resolve(process.cwd(), "src/data/live-deals.json");
+      if (fs.existsSync(dealsPath)) {
+        const snapshotData = JSON.parse(fs.readFileSync(dealsPath, "utf-8"));
+        snapshotData.deals = current;
+        snapshotData.activeCount = current.length;
+        snapshotData.updatedAt = new Date().toISOString();
+        atomicWriteJsonSync(dealsPath, snapshotData);
+
+        const backupPath = path.resolve(process.cwd(), "src/data/live-deals.backup.json");
+        atomicWriteJsonSync(backupPath, snapshotData);
+      }
+      const distPath = path.resolve(process.cwd(), "dist/data/live-deals.json");
+      if (fs.existsSync(distPath)) {
+        const snapshotData = JSON.parse(fs.readFileSync(distPath, "utf-8"));
+        snapshotData.deals = current;
+        snapshotData.activeCount = current.length;
+        snapshotData.updatedAt = new Date().toISOString();
+        atomicWriteJsonSync(distPath, snapshotData);
+      }
+    } catch (diskErr: any) {
+      console.warn("[Database dealsDb.deleteDeal] Disk delete sync warning:", diskErr.message);
+    }
     return true;
   },
 };
@@ -907,6 +1009,54 @@ export const storesDb = {
       id, name, slug, store.domain || null, logo, category, description,
       cashbackRate, link, rating, isFeatured, couponsCount, offersCount
     ]);
+
+    // Durable Local Disk Persistence for Stores
+    try {
+      const storesPath = path.resolve(process.cwd(), "src/data/live-stores.json");
+      let sData: any = { stores: [] };
+      if (fs.existsSync(storesPath)) {
+        try {
+          sData = JSON.parse(fs.readFileSync(storesPath, "utf-8"));
+        } catch {}
+      }
+      if (!Array.isArray(sData.stores)) sData.stores = [];
+      const sIdx = sData.stores.findIndex((st: any) => st.slug === slug || st.id === id);
+      const storeObj = {
+        id,
+        slug,
+        name,
+        logo: logo || (sIdx >= 0 ? sData.stores[sIdx].logo : ""),
+        category,
+        fallbackIcon: "🛍️",
+        badge: isFeatured ? "Featured Partner" : (sIdx >= 0 ? sData.stores[sIdx].badge : "Verified Partner"),
+        rating,
+        couponsCount,
+        maxDiscount: store.maxDiscount || (sIdx >= 0 ? sData.stores[sIdx].maxDiscount : "Special Offer"),
+        cashbackRate,
+        description,
+        features: sIdx >= 0 ? sData.stores[sIdx].features : [],
+        popularCoupon: store.popularCoupon || (sIdx >= 0 ? sData.stores[sIdx].popularCoupon : null),
+        link,
+        isFeatured,
+      };
+      if (sIdx >= 0) {
+        sData.stores[sIdx] = { ...sData.stores[sIdx], ...storeObj };
+      } else {
+        sData.stores.unshift(storeObj);
+      }
+      sData.updatedAt = new Date().toISOString();
+      atomicWriteJsonSync(storesPath, sData);
+
+      const backupStores = path.resolve(process.cwd(), "src/data/live-stores.backup.json");
+      atomicWriteJsonSync(backupStores, sData);
+
+      const distStores = path.resolve(process.cwd(), "dist/data/live-stores.json");
+      if (fs.existsSync(path.dirname(distStores))) {
+        atomicWriteJsonSync(distStores, sData);
+      }
+    } catch (diskErr: any) {
+      console.warn("[Database storesDb.upsertStore] Disk stores persistence warning:", diskErr.message);
+    }
 
     return { ...store, id, slug, name, logo, category, description, link };
   },

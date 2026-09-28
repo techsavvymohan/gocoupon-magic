@@ -388,6 +388,7 @@ export async function runCuelinksSync(maxPages = 0) {
             d.isFeatured ||
             d.source === "admin" ||
             d.campaignSource === "manual" ||
+            d.campaignSource === "analytics_clouds" ||
             String(d.id).startsWith("ac-") ||
             String(d.id).startsWith("offer-") ||
             String(d.id).startsWith("admin-")

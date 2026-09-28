@@ -272,12 +272,23 @@ function searxngDevPlugin() {
 
                   const persistSnapshot = () => {
                     snapshotData.deals = allDeals;
+                    snapshotData.activeCount = allDeals.length;
                     snapshotData.updatedAt = new Date().toISOString();
-                    fs.writeFileSync(dataPath, JSON.stringify(snapshotData, null, 2), "utf-8");
+                    const serialized = JSON.stringify(snapshotData, null, 2);
+                    const tmp = `${dataPath}.tmp.${Date.now()}`;
+                    try {
+                      fs.writeFileSync(tmp, serialized, "utf-8");
+                      fs.renameSync(tmp, dataPath);
+                    } catch {
+                      fs.writeFileSync(dataPath, serialized, "utf-8");
+                      try { if (fs.existsSync(tmp)) fs.unlinkSync(tmp); } catch {}
+                    }
+                    const backupPath = path.resolve(process.cwd(), "src/data/live-deals.backup.json");
+                    try { fs.writeFileSync(backupPath, serialized, "utf-8"); } catch {}
                     const distPath = path.resolve(__dirname, "dist/data/live-deals.json");
                     if (fs.existsSync(path.dirname(distPath))) {
                       try {
-                        fs.writeFileSync(distPath, JSON.stringify(snapshotData, null, 2), "utf-8");
+                        fs.writeFileSync(distPath, serialized, "utf-8");
                       } catch {}
                     }
                   };
@@ -328,10 +339,20 @@ function searxngDevPlugin() {
                         sData.stores.unshift(storeObj);
                       }
                       sData.updatedAt = new Date().toISOString();
-                      fs.writeFileSync(storesPath, JSON.stringify(sData, null, 2), "utf-8");
+                      const serializedStores = JSON.stringify(sData, null, 2);
+                      const tmpStores = `${storesPath}.tmp.${Date.now()}`;
+                      try {
+                        fs.writeFileSync(tmpStores, serializedStores, "utf-8");
+                        fs.renameSync(tmpStores, storesPath);
+                      } catch {
+                        fs.writeFileSync(storesPath, serializedStores, "utf-8");
+                        try { if (fs.existsSync(tmpStores)) fs.unlinkSync(tmpStores); } catch {}
+                      }
+                      const backupStoresPath = path.resolve(process.cwd(), "src/data/live-stores.backup.json");
+                      try { fs.writeFileSync(backupStoresPath, serializedStores, "utf-8"); } catch {}
                       const distStoresPath = path.resolve(__dirname, "dist/data/live-stores.json");
                       if (fs.existsSync(path.dirname(distStoresPath))) {
-                        try { fs.writeFileSync(distStoresPath, JSON.stringify(sData, null, 2), "utf-8"); } catch {}
+                        try { fs.writeFileSync(distStoresPath, serializedStores, "utf-8"); } catch {}
                       }
                     } catch (syncErr: any) {
                       console.warn("[Vite Deals Dev] Auto-store sync error:", syncErr?.message);
@@ -353,6 +374,8 @@ function searxngDevPlugin() {
                       campaignSource: body.campaignSource || "manual",
                       source: body.source || "admin",
                       verificationStatus: "verified",
+                      endDate: body.expiryDate || body.endDate || new Date(Date.now() + 365 * 86400000).toISOString(),
+                      expiresIn: body.expiresIn || "30 days",
                     };
                     allDeals.unshift(newDeal);
                     persistSnapshot();
@@ -379,9 +402,18 @@ function searxngDevPlugin() {
                         isFeatured: body.isFeatured === true || body.isFeatured === "true" || body.isFeatured === 1,
                         featuredPriority: body.featuredPriority ? Number(body.featuredPriority) : 10,
                         verificationStatus: "verified",
+                        endDate: body.expiryDate || body.endDate || allDeals[idx]?.endDate || new Date(Date.now() + 365 * 86400000).toISOString(),
                       };
                     } else {
-                      allDeals.unshift({ ...body, id, storeLogo, imageUrl: storeLogo, verified: true, verificationStatus: "verified" });
+                      allDeals.unshift({
+                        ...body,
+                        id,
+                        storeLogo,
+                        imageUrl: storeLogo,
+                        verified: true,
+                        verificationStatus: "verified",
+                        endDate: body.expiryDate || body.endDate || new Date(Date.now() + 365 * 86400000).toISOString(),
+                      });
                     }
                     persistSnapshot();
                     const updatedDeal = allDeals[idx >= 0 ? idx : 0];
@@ -394,8 +426,8 @@ function searxngDevPlugin() {
                   }
 
                   if (req.method === "DELETE") {
-                    const id = (urlObj.searchParams.get("id") as string) || req.url.split("/").pop();
-                    allDeals = allDeals.filter((d) => d.id !== id);
+                    const id = (urlObj.searchParams.get("id") as string) || req.url.split("/").pop()?.split("?")[0];
+                    allDeals = allDeals.filter((d) => String(d.id) !== String(id));
                     persistSnapshot();
                     res.statusCode = 200;
                     res.setHeader("Content-Type", "application/json");

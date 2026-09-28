@@ -70,6 +70,22 @@ export function setLiveDeals(deals: DealRecord[]): void {
 export function getLiveDeals(): DealRecord[] {
   const now = Date.now();
   return activeLiveDeals.filter((d) => {
+    // ADMIN & FEATURED IMMUNITY: Admin-curated deals and featured deals remain active and never vanish automatically
+    const isImmune =
+      d.isFeatured ||
+      d.source === "admin" ||
+      d.campaignSource === "manual" ||
+      d.campaignSource === "analytics_clouds" ||
+      (d.id &&
+        (String(d.id).startsWith("ac-") ||
+          String(d.id).startsWith("offer-") ||
+          String(d.id).startsWith("admin-")));
+
+    if (isImmune) {
+      return d.status !== "inactive";
+    }
+
+    if (d.status === "expired") return false;
     if (d.expiresIn === "Expired") return false;
     if (d.endDate) {
       const end = new Date(d.endDate).getTime();

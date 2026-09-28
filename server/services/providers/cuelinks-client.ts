@@ -634,10 +634,35 @@ liveDealsPool = loadInitialDealsFromDisk();
 
 /**
  * Returns whether a deal is currently valid (non-expired).
- * Deals remain active in the database as long as endDate >= now.
+ * Admin and featured deals are permanent and immune to automatic expiration.
  */
-export function isDealValid(deal: { endDate?: string; expiresIn?: string; status?: string }): boolean {
-  if (deal.status === "expired" || deal.status === "inactive") return false;
+export function isDealValid(deal: {
+  endDate?: string;
+  expiresIn?: string;
+  status?: string;
+  isFeatured?: boolean;
+  source?: string;
+  campaignSource?: string;
+  id?: string;
+}): boolean {
+  if (deal.status === "inactive") return false;
+
+  // ADMIN & FEATURED IMMUNITY: Admin deals and featured deals remain active and never vanish automatically
+  const isImmune =
+    deal.isFeatured ||
+    deal.source === "admin" ||
+    deal.campaignSource === "manual" ||
+    deal.campaignSource === "analytics_clouds" ||
+    (deal.id &&
+      (String(deal.id).startsWith("ac-") ||
+        String(deal.id).startsWith("offer-") ||
+        String(deal.id).startsWith("admin-")));
+
+  if (isImmune) {
+    return true;
+  }
+
+  if (deal.status === "expired") return false;
   if (deal.expiresIn === "Expired") return false;
   if (deal.endDate) {
     const endMs = new Date(deal.endDate).getTime();
@@ -657,11 +682,43 @@ export function getLiveDealsPool(): DealRecord[] {
 }
 
 /**
- * Ingests a new deal (e.g. from community submission or manual addition) into the live accumulated pool,
- * persisting it to disk so it stays in the database as long as it is valid.
+ * Directly updates the live deals pool and synchronizes with deals-db memory.
+ */
+export function setLiveDealsPool(deals: DealRecord[]): void {
+  liveDealsPool = [...deals];
+  setLiveDeals(deals);
+}
+
+/**
+ * Helper to write JSON files atomically with temporary file swap and backup.
+ */
+function atomicWriteDealsFile(filePath: string, payload: any): void {
+  const dir = path.dirname(filePath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  const serialized = JSON.stringify(payload, null, 2);
+  const tmpPath = `${filePath}.tmp.${Date.now()}`;
+  try {
+    fs.writeFileSync(tmpPath, serialized, "utf-8");
+    fs.renameSync(tmpPath, filePath);
+  } catch {
+    fs.writeFileSync(filePath, serialized, "utf-8");
+    try {
+      if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+    } catch {}
+  }
+}
+
+/**
+ * Ingests a new deal into the live accumulated pool,
+ * persisting it atomically to disk so it stays in the database.
  */
 export function addDealToPool(deal: DealRecord): void {
-  const pool = getLiveDealsPool();
+  if (liveDealsPool.length === 0) {
+    liveDealsPool = loadInitialDealsFromDisk();
+  }
+  const pool = [...liveDealsPool];
   const dedupKey =
     deal.id && deal.id.startsWith("cue_")
       ? deal.id
@@ -691,11 +748,15 @@ export function addDealToPool(deal: DealRecord): void {
       expiredCount: 0,
       deals: pool,
     };
-    fs.writeFileSync(srcPath, JSON.stringify(payload, null, 2), "utf-8");
+    atomicWriteDealsFile(srcPath, payload);
+
+    // Save automated backup
+    const backupPath = getProjectDataPath("src/data/live-deals.backup.json");
+    atomicWriteDealsFile(backupPath, payload);
 
     const distPath = getProjectDataPath("dist/data/live-deals.json");
     if (fs.existsSync(path.dirname(distPath))) {
-      fs.writeFileSync(distPath, JSON.stringify(payload, null, 2), "utf-8");
+      atomicWriteDealsFile(distPath, payload);
     }
   } catch (err: any) {
     console.warn("[Cuelinks Client] Could not persist added deal to disk:", err?.message);
@@ -710,7 +771,7 @@ export function deleteDealFromPool(id: string): boolean {
     liveDealsPool = loadInitialDealsFromDisk();
   }
   const beforeLen = liveDealsPool.length;
-  liveDealsPool = liveDealsPool.filter((d) => d.id !== id);
+  liveDealsPool = liveDealsPool.filter((d) => String(d.id) !== String(id));
   if (liveDealsPool.length !== beforeLen) {
     setLiveDeals(liveDealsPool);
     try {
@@ -722,10 +783,10 @@ export function deleteDealFromPool(id: string): boolean {
         expiredCount: 0,
         deals: liveDealsPool,
       };
-      fs.writeFileSync(srcPath, JSON.stringify(payload, null, 2), "utf-8");
+      atomicWriteDealsFile(srcPath, payload);
       const distPath = getProjectDataPath("dist/data/live-deals.json");
       if (fs.existsSync(path.dirname(distPath))) {
-        fs.writeFileSync(distPath, JSON.stringify(payload, null, 2), "utf-8");
+        atomicWriteDealsFile(distPath, payload);
       }
     } catch (err: any) {
       console.warn("[Cuelinks Client] Could not persist deleted deal to disk:", err?.message);
@@ -931,6 +992,13 @@ export async function syncLiveCuelinksDeals(maxPages: number = 0): Promise<{
       dealMap.set(key, {
         ...existing,
         ...d,
+        isFeatured: existing.isFeatured || d.isFeatured,
+        featuredPriority: existing.featuredPriority ?? d.featuredPriority,
+        source: existing.source === "admin" ? "admin" : (d.source || existing.source),
+        campaignSource: existing.campaignSource || d.campaignSource,
+        targetCountry: existing.targetCountry || d.targetCountry,
+        verificationStatus: existing.verificationStatus || d.verificationStatus || "verified",
+        badge: existing.source === "admin" ? (existing.badge || d.badge) : (d.badge || existing.badge),
         usesCount: Math.max(existing.usesCount || 0, d.usesCount || 0),
       });
     } else {
@@ -968,15 +1036,18 @@ export async function syncLiveCuelinksDeals(maxPages: number = 0): Promise<{
       nextSyncAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     };
 
-    // Persist to src/data/live-deals.json
+    // Persist atomically to src/data/live-deals.json and backup
     try {
       const srcPath = getProjectDataPath("src/data/live-deals.json");
-      fs.writeFileSync(srcPath, JSON.stringify(payload, null, 2), "utf-8");
+      atomicWriteDealsFile(srcPath, payload);
       console.log(`✅ [Cuelinks 24/7 Syncer] Persisted ${accumulatedDeals.length} accumulated live deals to src/data/live-deals.json`);
+
+      const backupPath = getProjectDataPath("src/data/live-deals.backup.json");
+      atomicWriteDealsFile(backupPath, payload);
 
       const distPath = getProjectDataPath("dist/data/live-deals.json");
       if (fs.existsSync(path.dirname(distPath))) {
-        fs.writeFileSync(distPath, JSON.stringify(payload, null, 2), "utf-8");
+        atomicWriteDealsFile(distPath, payload);
       }
     } catch (saveErr: any) {
       console.warn("[Cuelinks 24/7 Syncer] Could not persist to disk:", saveErr?.message);
