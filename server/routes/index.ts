@@ -43,6 +43,7 @@ import {
 } from "../services/providers/admitad-client.js";
 import { intelligenceRouter } from "./intelligence.js";
 import { redirectRouter } from "./redirect.js";
+import { rumRouter } from "./rum.js";
 import { Router as ExpressRouter } from "express";
 
 // ── Lightweight Admitad Status Router ─────────────────────────────────────────
@@ -135,6 +136,7 @@ apiRouter.use("/open-food-fact", openFoodFactRouter);
 apiRouter.use("/price-history", priceHistoryRouter);
 apiRouter.use("/v1/intelligence", intelligenceRouter);
 apiRouter.use("/intelligence", intelligenceRouter);
+apiRouter.use("/rum", rumRouter);
 apiRouter.use("/redirect", redirectRouter);
 apiRouter.use(redirectRouter);
 

@@ -1,15 +1,20 @@
 import { Outlet, Link, createRootRoute, HeadContent } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { CurrencyProvider } from "@/context/CurrencyContext";
 import { UserCardsProvider } from "@/context/UserCardsContext";
 import { I18nProvider } from "@/context/I18nContext";
 import { LoadingProvider } from "@/context/LoadingContext";
 import { GlobalLoadingBar } from "@/components/common/GlobalLoadingBar";
+import { initWebVitalsRum } from "@/lib/analytics/web-vitals-rum";
 
 function RootComponent() {
+  useEffect(() => {
+    initWebVitalsRum();
+  }, []);
+
   const [queryClient] = useState(
     () =>
       new QueryClient({

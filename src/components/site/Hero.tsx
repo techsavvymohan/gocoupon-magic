@@ -44,6 +44,21 @@ export function Hero() {
           </span>
         </h1>
 
+        {/* Festive Mega Sale 2026 Live Announcement Pill */}
+        <div className="mt-4 sm:mt-5 inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-1.5 text-xs sm:text-sm text-foreground/90 shadow-2xs backdrop-blur-xs">
+          <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-ping" />
+          <span className="font-medium">
+            <strong className="font-bold text-amber-700 dark:text-amber-400">Festive Mega-Sales 2026:</strong> Amazon Great Indian Festival &amp; Flipkart Big Billion Days verified codes live!
+          </span>
+          <Link
+            to="/featured-deals"
+            className="font-bold text-amber-700 dark:text-amber-300 hover:text-amber-800 dark:hover:text-amber-200 underline underline-offset-2 transition-colors ml-0.5 inline-flex items-center gap-0.5"
+          >
+            <span>Explore Deals</span>
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
+
         {/* Centered Store & Deal Search Box */}
         <div className="mt-6 sm:mt-8 mx-auto max-w-3xl text-left">
           <HeroStoreDealSearch />
