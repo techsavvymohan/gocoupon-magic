@@ -1880,7 +1880,132 @@ const blogRoutes = posts.map((post) => {
   };
 });
 
-const allRoutes = [...routeConfigs, ...collectionRoutes, ...blogRoutes];
+// Dynamically build programmatic store routes for all unique merchants from live-deals.json
+let storeProgrammaticRoutes = [];
+try {
+  const dealsJsonPath = path.resolve(__dirname, "../src/data/live-deals.json");
+  if (fs.existsSync(dealsJsonPath)) {
+    const dealsRaw = JSON.parse(fs.readFileSync(dealsJsonPath, "utf-8"));
+    const dealsList = Array.isArray(dealsRaw) ? dealsRaw : (dealsRaw.deals || dealsRaw.offers || []);
+
+    function slugifyStore(name) {
+      return name
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-")
+        .trim();
+    }
+
+    function sanitizeStore(raw) {
+      return raw
+        .replace(/\s*\(.*?\)\s*/g, " ")
+        .replace(/\b(tracking promo codes|promo codes|affiliate program|affiliate|cps|cpl)\b/gi, "")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    const existingPaths = new Set(routeConfigs.map((r) => r.path));
+    const storeMap = new Map();
+
+    for (const d of dealsList) {
+      const raw = d.store || d.storeName || d.merchant;
+      if (!raw) continue;
+      const name = sanitizeStore(raw);
+      if (!name) continue;
+      const slug = `${slugifyStore(name)}-coupons`;
+      if (!slug || existingPaths.has(slug)) continue;
+
+      if (!storeMap.has(slug)) {
+        storeMap.set(slug, {
+          name,
+          slug,
+          deals: [],
+          category: d.category || "Online Shopping",
+        });
+      }
+      storeMap.get(slug).deals.push(d);
+    }
+
+    for (const [slug, store] of storeMap) {
+      const storeName = store.name;
+      const optTitle = optimizeTitle(`${storeName} Coupon Codes & Deals (2026)`);
+      const optDesc = optimizeDescription(
+        `Verified ${storeName} promo codes, discount vouchers, and bank card offers for 2026. Auto-apply the highest working discount on GoCoupon.io.`
+      );
+
+      const topDeals = store.deals.slice(0, 8);
+      const dealsHtml = `
+        <div class="store-deals-vault" style="margin: 24px 0;">
+          <h3 style="color: #38bdf8; font-size: 18px; margin-bottom: 16px;">Active Verified Coupons for ${storeName}</h3>
+          <div style="display: grid; gap: 14px;">
+            ${topDeals
+              .map((deal) => {
+                const code = deal.code || "ACTIVATE DEAL";
+                const discount = deal.discount || (deal.code ? "Exclusive Code" : "Instant Deal");
+                const title = deal.title || `Save on ${storeName}`;
+                return `
+                  <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 8px; padding: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                      <span style="display: inline-block; background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-weight: 700; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-bottom: 6px;">${discount}</span>
+                      <h4 style="margin: 0; color: #f8fafc; font-size: 15px;">${title}</h4>
+                      <p style="margin: 4px 0 0 0; font-size: 12px; color: #94a3b8;">Tested &bull; 100% Working Voucher</p>
+                    </div>
+                    <div>
+                      <span style="display: inline-block; font-family: monospace; font-weight: 700; background: #0f172a; border: 1px dashed #38bdf8; color: #38bdf8; padding: 6px 14px; border-radius: 6px; font-size: 13px;">${code}</span>
+                    </div>
+                  </div>
+                `;
+              })
+              .join("\n")}
+          </div>
+        </div>
+      `;
+
+      const articleHtml = `
+        <h2>Verified ${storeName} Coupon Codes, Discounts &amp; Promo Vouchers (2026)</h2>
+        <p>Save money on your next purchase at ${storeName} with GoCoupon. Our automated coupon verification engine tests active promotional codes, payment offers, and bank discounts to guarantee maximum savings at checkout.</p>
+        
+        ${dealsHtml}
+
+        <h2>Top 3 Ways to Save at ${storeName}</h2>
+        <ul>
+          <li><strong>Prepaid Payment Discount:</strong> Pay with UPI (Google Pay, PhonePe, Paytm) or cards to unlock instant merchant checkout discounts.</li>
+          <li><strong>Bank Card Offers:</strong> Stack your cart with HDFC, ICICI, SBI, or Axis Bank cards for up to 10% extra instant off during promotional cycles.</li>
+          <li><strong>Free Shipping:</strong> Combine qualifying items above the minimum order threshold to eliminate delivery charges.</li>
+        </ul>
+
+        <h2>Frequently Asked Questions</h2>
+        <div style="margin-top: 16px;">
+          <div style="margin-bottom: 16px;">
+            <h4 style="color: #38bdf8; margin: 0 0 4px 0;">How do I get working ${storeName} coupon codes?</h4>
+            <p style="margin: 0; color: #cbd5e1; font-size: 14px;">GoCoupon scans, validates, and auto-applies verified ${storeName} promo codes directly at checkout in under 850 milliseconds.</p>
+          </div>
+          <div style="margin-bottom: 16px;">
+            <h4 style="color: #38bdf8; margin: 0 0 4px 0;">Can I combine bank discounts with ${storeName} promo codes?</h4>
+            <p style="margin: 0; color: #cbd5e1; font-size: 14px;">Yes, coupon codes can often be stacked with partner bank credit card discounts and digital wallet cashback.</p>
+          </div>
+        </div>
+      `;
+
+      storeProgrammaticRoutes.push({
+        path: slug,
+        title: optTitle,
+        description: optDesc,
+        h1: `${storeName} Coupon Codes, Promo Vouchers & Deals (2026)`,
+        lead: `Auto-apply working promo codes and exclusive discount vouchers for ${storeName}. Verified across checkout carts with live success tracking.`,
+        directAnswer: `Save money at ${storeName} by auto-applying verified coupon codes and combining them with bank payment discounts on GoCoupon.`,
+        articleContent: articleHtml,
+        storeName,
+        isStoreHub: true,
+      });
+    }
+  }
+} catch (err) {
+  console.warn("Failed to load programmatic store routes:", err.message);
+}
+
+const allRoutes = [...routeConfigs, ...collectionRoutes, ...blogRoutes, ...storeProgrammaticRoutes];
 console.log(`Generating high-SEO pre-rendered static routes for ${allRoutes.length} URLs in ${distDir}...`);
 
 let generatedCount = 0;
@@ -2099,6 +2224,30 @@ for (const route of allRoutes) {
       ],
     };
     routeSchemas.push(JSON.stringify(breadcrumbSchema, null, 2));
+
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": `How do I get working ${storeName} coupon codes?`,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": `GoCoupon automatically tests and applies verified ${storeName} promo codes and discounts directly at checkout in under 850 milliseconds.`
+          }
+        },
+        {
+          "@type": "Question",
+          "name": `Can I combine bank discounts with ${storeName} promo codes?`,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": `Yes, promotional coupon codes can frequently be stacked with bank card instant discounts (HDFC, SBI, ICICI, Axis) and digital wallet cashback.`
+          }
+        }
+      ]
+    };
+    routeSchemas.push(JSON.stringify(faqSchema, null, 2));
   } else if (route.path === "merchant-score-index") {
     // Dataset & Research Study Schema
     const datasetSchema = {

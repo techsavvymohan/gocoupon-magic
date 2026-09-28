@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as StoreSlugRouteImport } from './routes/$storeSlug'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AmazonCouponsRouteImport } from './routes/amazon-coupons'
@@ -60,6 +61,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StoreSlugRoute = StoreSlugRouteImport.update({
+  id: '/$storeSlug',
+  path: '/$storeSlug',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/$storeSlug.lazy').then((d) => d.Route))
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -299,6 +305,7 @@ const ProductProductIdRoute = ProductProductIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$storeSlug': typeof StoreSlugRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/amazon-coupons': typeof AmazonCouponsRoute
@@ -346,6 +353,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$storeSlug': typeof StoreSlugRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/amazon-coupons': typeof AmazonCouponsRoute
@@ -394,6 +402,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$storeSlug': typeof StoreSlugRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/amazon-coupons': typeof AmazonCouponsRoute
@@ -443,6 +452,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/$storeSlug'
     | '/about'
     | '/admin'
     | '/amazon-coupons'
@@ -490,6 +500,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/$storeSlug'
     | '/about'
     | '/admin'
     | '/amazon-coupons'
@@ -537,6 +548,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/$storeSlug'
     | '/about'
     | '/admin'
     | '/amazon-coupons'
@@ -585,6 +597,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  StoreSlugRoute: typeof StoreSlugRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
   AmazonCouponsRoute: typeof AmazonCouponsRoute
@@ -638,6 +651,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$storeSlug': {
+      id: '/$storeSlug'
+      path: '/$storeSlug'
+      fullPath: '/$storeSlug'
+      preLoaderRoute: typeof StoreSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -953,6 +973,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  StoreSlugRoute: StoreSlugRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
   AmazonCouponsRoute: AmazonCouponsRoute,
