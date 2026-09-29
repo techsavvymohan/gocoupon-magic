@@ -5,7 +5,7 @@
  */
 
 import { Link, useLocation } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MagneticButton } from "../MagneticButton";
 import { ThemeToggle } from "../ThemeToggle";
 import { CurrencyToggle } from "../CurrencyToggle";
@@ -14,6 +14,7 @@ import { useI18n } from "@/context/I18nContext";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { NavbarSearch } from "./NavbarSearch";
 import {
+  Search,
   Menu,
   X,
   ArrowRight,
@@ -98,7 +99,14 @@ export function Navbar() {
   const { pathname } = useLocation();
   const isOffersPage = pathname === "/offers" || pathname.startsWith("/offers");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const { t } = useI18n();
+
+  // Auto-close drawers when navigating between pages
+  useEffect(() => {
+    setMobileSearchOpen(false);
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   return (
     <>
@@ -156,6 +164,19 @@ export function Navbar() {
               <CurrencyToggle />
             </div>
 
+            {/* Mobile Search Button (Shows only on mobile screens < md) */}
+            <button
+              type="button"
+              onClick={() => {
+                setMobileSearchOpen((prev) => !prev);
+                setMobileMenuOpen(false);
+              }}
+              className="inline-flex h-10 w-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-border bg-card text-muted-foreground md:hidden hover:text-foreground hover:border-primary/40 active:scale-95 touch-manipulation transition-all shadow-2xs"
+              aria-label="Search stores, coupons and deals"
+            >
+              <Search className="h-5 w-5" aria-hidden="true" />
+            </button>
+
             <ThemeToggle />
 
             {/* Add to Chrome Button with Pulsing Beacon */}
@@ -172,7 +193,10 @@ export function Navbar() {
 
             {/* Mobile Menu Toggle Button */}
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              onClick={() => {
+                setMobileMenuOpen(!mobileMenuOpen);
+                setMobileSearchOpen(false);
+              }}
               className="inline-flex h-10 w-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-border bg-card text-muted-foreground md:hidden hover:text-foreground active:scale-95 touch-manipulation"
               aria-label="Toggle navigation menu"
               aria-expanded={mobileMenuOpen}
@@ -182,10 +206,28 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Search Bar Row (Directly accessible on mobile screens < md) */}
-        <div className="px-4 pb-2.5 md:hidden">
-          <NavbarSearch placeholder="Search 300+ stores & coupons..." />
-        </div>
+        {/* Mobile Search Expandable Tray (Hidden by default; opens only when search button is tapped) */}
+        {mobileSearchOpen && (
+          <div className="border-b border-border bg-background/95 backdrop-blur-xl px-4 py-3 md:hidden animate-fade-in shadow-lg">
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <NavbarSearch
+                  placeholder="Search 300+ stores & coupons..."
+                  autoFocus
+                  onSelect={() => setMobileSearchOpen(false)}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => setMobileSearchOpen(false)}
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-muted/60 text-muted-foreground hover:text-foreground active:scale-95 touch-manipulation"
+                aria-label="Close search"
+              >
+                <X className="h-4.5 w-4.5" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* ── TIER 2: SUB-NAVIGATION STRIP (Like GrabOn Row 2 with GoCoupon's exact options) ── */}
         <nav

@@ -13,11 +13,15 @@ import { getStoreCatalog, type StoreCatalogEntry } from "@/lib/store-catalog-hel
 interface NavbarSearchProps {
   className?: string;
   placeholder?: string;
+  autoFocus?: boolean;
+  onSelect?: () => void;
 }
 
 export function NavbarSearch({
   className = "",
   placeholder = "Search for brands, categories, coupons...",
+  autoFocus = false,
+  onSelect,
 }: NavbarSearchProps) {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -118,12 +122,19 @@ export function NavbarSearch({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen]);
 
+  useEffect(() => {
+    if (autoFocus) {
+      inputRef.current?.focus();
+    }
+  }, [autoFocus]);
+
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const cleanQ = query.trim();
     if (!cleanQ) return;
 
     setIsOpen(false);
+    onSelect?.();
 
     // If query matches a store exactly or closely, jump to that store
     const exactStore = allStores.find(
@@ -144,6 +155,7 @@ export function NavbarSearch({
 
   const handleSelectStore = (slug: string) => {
     setIsOpen(false);
+    onSelect?.();
     navigate({ to: `/${slug}` as any });
   };
 
