@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ExternalLink, MousePointerClick, TrendingUp, Search, X, ChevronLeft, ChevronRight, Image as ImageIcon, Info, Tag, ShieldCheck, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
