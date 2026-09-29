@@ -254,7 +254,7 @@ const defaultHero = {
   memberCountText: "Join 150k+ smart shoppers saving daily",
   slides: [],
   festiveBanner: {
-    enabled: true,
+    enabled: false,
     badgeTitle: "Festive Mega-Sales 2026:",
     message: "Amazon Great Indian Festival & Flipkart Big Billion Days verified codes live!",
     linkText: "Explore Deals",

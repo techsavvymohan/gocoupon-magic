@@ -21,7 +21,7 @@ export interface FestiveBannerConfig {
 }
 
 export const DEFAULT_FESTIVE_BANNER: FestiveBannerConfig = {
-  enabled: true,
+  enabled: false,
   badgeTitle: "Festive Mega-Sales 2026:",
   message: "Amazon Great Indian Festival & Flipkart Big Billion Days verified codes live!",
   linkText: "Explore Deals",
@@ -31,7 +31,7 @@ export const DEFAULT_FESTIVE_BANNER: FestiveBannerConfig = {
   expiresAt: "",
 };
 
-const STORAGE_KEY = "gocoupon_festive_banner_v1";
+const STORAGE_KEY = "gocoupon_festive_banner_v2";
 const UPDATE_EVENT = "gocoupon:festive-banner-updated";
 
 export const COLOR_SCHEME_STYLES: Record<

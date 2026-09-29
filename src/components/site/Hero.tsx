@@ -11,33 +11,9 @@ export function Hero() {
   const { banner, isActive, styles } = useFestiveBanner();
 
   return (
-    <section className="relative overflow-hidden pb-16 sm:pb-24">
-      {/* Curved Transparent Top Banner */}
-      <div className="relative w-full flex justify-center bg-transparent">
-        <picture className="w-full flex justify-center">
-          <source
-            media="(max-width: 640px)"
-            srcSet="https://res.cloudinary.com/pgzfcjir/image/upload/f_auto,q_auto,w_750/v1789583262/hero-top-banner.webp"
-          />
-          <source
-            media="(max-width: 1024px)"
-            srcSet="https://res.cloudinary.com/pgzfcjir/image/upload/f_auto,q_auto,w_1200/v1789583262/hero-top-banner.webp"
-          />
-          <img
-            src="https://res.cloudinary.com/pgzfcjir/image/upload/f_auto,q_auto,w_1600/v1789583262/hero-top-banner.webp"
-            alt="GoCoupon — Shop Smarter, Pay Less"
-            className="w-full h-auto max-h-[140px] sm:max-h-[180px] md:max-h-[220px] lg:max-h-[260px] object-contain object-top"
-            width={2048}
-            height={252}
-            loading="eager"
-            fetchPriority="high"
-            decoding="async"
-          />
-        </picture>
-      </div>
-
-      {/* Centered Hero Content & Search Box */}
-      <div className="relative mx-auto max-w-4xl px-4 sm:px-6 pt-5 sm:pt-8 text-center">
+    <section className="relative overflow-hidden pt-8 sm:pt-14 pb-16 sm:pb-24">
+      {/* Centered Hero Content */}
+      <div className="relative mx-auto max-w-4xl px-4 sm:px-6 text-center">
         {/* Main Headline */}
         <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">
           Find Working Coupons &amp; Deals in 1 Second
