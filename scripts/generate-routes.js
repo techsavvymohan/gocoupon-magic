@@ -2519,16 +2519,11 @@ ${routeSchemas.map((s) => `    <script type="application/ld+json">\n${s}\n    </
     </article>
   `;
 
-  // Inject semantic pre-rendered article & H1 directly into <div id="root"> for primary DOM discovery by SEO tools
-  // While #site-loader covers the screen smoothly until React hydrates
+  // Inject semantic pre-rendered article & H1 directly into <div id="root"> for instant display and SEO discovery
   const serverMarkup = `
     <div id="root">
-      <div id="site-loader" aria-label="Loading"><div class="gc-loader"></div></div>
       ${fullSemanticArticleHtml}
     </div>
-    <noscript>
-      <style>#site-loader { display: none !important; }</style>
-    </noscript>
   `;
 
   pageHtml = pageHtml.replace('<div id="root"></div>', serverMarkup);

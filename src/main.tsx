@@ -51,6 +51,9 @@ class RootErrorBoundary extends React.Component<
 
 const rootEl = document.getElementById("root");
 if (rootEl) {
+  const loader = document.getElementById("site-loader");
+  if (loader) loader.remove();
+
   createRoot(rootEl).render(
     <StrictMode>
       <RootErrorBoundary>
