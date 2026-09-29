@@ -71,9 +71,9 @@ export function LanguageToggle({ className = "", variant = "default" }: Language
         <div
           role="listbox"
           aria-label="Select language"
-          className={`absolute z-50 mt-2 w-52 rounded-2xl border border-border bg-card p-1.5 shadow-xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150 ${
-            isRTL ? "left-0" : "right-0"
-          }`}
+          className={`absolute z-50 w-52 rounded-2xl border border-border bg-card p-1.5 shadow-xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150 ${
+            variant === "footer" ? "bottom-full mb-2" : "top-full mt-2"
+          } ${isRTL ? "left-0" : "right-0"}`}
         >
           <div className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 border-b border-border/50 mb-1">
             <Globe className="h-3 w-3" />

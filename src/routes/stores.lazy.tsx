@@ -46,7 +46,6 @@ function StoresPage() {
 
   // ── Live API fetch — data comes from /api/stores, sorted dynamically by backend ──
   const { stores: allStores, isLoading, isError, refetch } = useStores({
-    category: selectedCategory !== "All" ? selectedCategory.toLowerCase() : undefined,
     sortBy,
     order: sortBy === "name" ? "asc" : "desc",
   });
@@ -66,7 +65,9 @@ function StoresPage() {
         store.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         store.popularCoupon.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         store.popularCoupon.code.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = selectedCategory === "All" || store.category === selectedCategory;
+      const matchesCategory =
+        selectedCategory === "All" ||
+        store.category.toLowerCase() === selectedCategory.toLowerCase();
       return matchesSearch && matchesCategory;
     });
   }, [searchQuery, selectedCategory, allStores]);

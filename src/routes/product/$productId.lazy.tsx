@@ -56,15 +56,21 @@ function ProductDetailsPage() {
       <SiteShell>
         <div className="mx-auto max-w-4xl px-4 py-24 text-center">
           <h1 className="text-3xl font-display font-bold text-foreground">Product Not Found</h1>
-          <p className="mt-3 text-sm text-muted-foreground">
-            The requested product is not in the verified catalog. Search live stores or paste a direct product link on the home page.
+          <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto">
+            The requested product is not in the verified catalog. Search live stores and coupons, or compare real-time prices across platforms.
           </p>
-          <div className="mt-6 flex justify-center">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <Link
               to="/"
               className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-xs hover:bg-primary/90"
             >
               Return to Home
+            </Link>
+            <Link
+              to="/compare"
+              className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted"
+            >
+              Compare Store Prices
             </Link>
           </div>
         </div>

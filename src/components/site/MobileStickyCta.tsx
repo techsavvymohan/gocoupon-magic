@@ -94,10 +94,10 @@ export function MobileStickyCta() {
           <button
             type="button"
             onClick={handleDismiss}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted/80 hover:text-foreground touch-manipulation"
+            className="flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted/80 hover:text-foreground touch-manipulation cursor-pointer min-h-[36px] min-w-[36px]"
             aria-label="Dismiss banner"
           >
-            <X className="h-3.5 w-3.5" aria-hidden="true" />
+            <X className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </div>

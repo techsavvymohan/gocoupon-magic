@@ -7,6 +7,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createSeoHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/offers")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    q: typeof search.q === "string" ? search.q : typeof search.search === "string" ? search.search : undefined,
+  }),
   head: () =>
     createSeoHead({
       title: "Today's Best Online Offers, Deals & Coupons – GoCoupon (Go Coupon)",

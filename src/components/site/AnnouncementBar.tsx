@@ -135,12 +135,12 @@ export function AnnouncementBar() {
           )}
         </Link>
 
-        {/* Dismiss Button */}
+        {/* Dismiss Button (accessible touch target for mobile thumb) */}
         <button
           type="button"
           onClick={handleDismiss}
           aria-label="Dismiss announcement"
-          className="ml-2.5 rounded-md p-1 text-white/70 hover:bg-white/10 hover:text-white transition-colors cursor-pointer shrink-0"
+          className="ml-1 sm:ml-2.5 -mr-1.5 flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center rounded-md text-white/70 hover:bg-white/10 hover:text-white transition-colors cursor-pointer shrink-0 touch-manipulation"
         >
           <X className="h-3.5 w-3.5" />
         </button>

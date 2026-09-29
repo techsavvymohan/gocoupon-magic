@@ -58,7 +58,7 @@ export function CookieConsent() {
         <button
           type="button"
           onClick={() => handleConsent("essential")}
-          className="rounded-lg p-1 text-muted-foreground hover:bg-muted/80 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary touch-manipulation min-h-[32px] min-w-[32px] flex items-center justify-center"
+          className="rounded-lg p-2 text-muted-foreground hover:bg-muted/80 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
           aria-label="Dismiss cookie notice with essential cookies only"
         >
           <X className="h-4 w-4" aria-hidden="true" />

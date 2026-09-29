@@ -49,23 +49,25 @@ export function Hero() {
         {/* Dynamic Festive / Seasonal Announcement Pill (Controlled via Admin Panel) */}
         {isActive && (
           <div
-            className={`mt-4 sm:mt-5 inline-flex flex-wrap items-center justify-center gap-2 rounded-full border px-4 py-1.5 text-xs sm:text-sm text-foreground/90 shadow-2xs backdrop-blur-xs transition-all ${styles.container}`}
+            className={`mt-4 sm:mt-5 inline-flex flex-wrap items-center justify-center gap-2 rounded-2xl sm:rounded-full border px-4 py-2 sm:py-1.5 text-xs sm:text-sm text-foreground/90 shadow-2xs backdrop-blur-xs transition-all max-w-full text-balance ${styles.container}`}
           >
-            {banner.showPingDot && (
-              <span className={`flex h-2 w-2 rounded-full animate-ping ${styles.dot}`} />
-            )}
-            <span className="font-medium">
+            <span className="inline-flex items-center gap-1.5 shrink-0">
+              {banner.showPingDot && (
+                <span className={`flex h-2 w-2 rounded-full animate-ping ${styles.dot}`} />
+              )}
               {banner.badgeTitle && (
-                <strong className={`font-bold mr-1 ${styles.badge}`}>
+                <strong className={`font-bold ${styles.badge}`}>
                   {banner.badgeTitle}
                 </strong>
               )}
+            </span>
+            <span className="font-medium text-center sm:text-left">
               {banner.message}
             </span>
             {banner.linkText && banner.linkUrl && (
               <Link
                 to={banner.linkUrl as any}
-                className={`font-bold underline underline-offset-2 transition-colors ml-0.5 inline-flex items-center gap-0.5 ${styles.link}`}
+                className={`font-bold underline underline-offset-2 transition-colors ml-0.5 inline-flex items-center gap-0.5 shrink-0 ${styles.link}`}
               >
                 <span>{banner.linkText}</span>
                 <ArrowRight className="h-3 w-3" />

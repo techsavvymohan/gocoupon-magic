@@ -199,14 +199,24 @@ const BANK_OFFERS_DATA: BankOffer[] = [
 ];
 
 function OffersHubPage() {
+  const routeSearch = Route.useSearch() as { q?: string } | undefined;
+  const initialQ = routeSearch?.q || "";
+
   // Navigation & Filtering State
   const [activeSidebarTab, setActiveSidebarTab] = useState<SidebarTab>("categories");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [marketRegion, setMarketRegion] = useState<"all" | "in" | "intl">("all");
   const [sortBy, setSortBy] = useState<DealSortField>("trending");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(initialQ);
   const [selectedAlphabet, setSelectedAlphabet] = useState<string>("All");
   const [selectedBrandFilter, setSelectedBrandFilter] = useState<string | null>(null);
+
+  // Sync searchQuery when URL search param changes
+  useEffect(() => {
+    if (routeSearch?.q !== undefined) {
+      setSearchQuery(routeSearch.q);
+    }
+  }, [routeSearch?.q]);
 
   // Grid Density / View Mode (4 columns, 3 columns, 2 columns, list)
   const [viewDensity, setViewDensity] = useState<"4-col" | "3-col" | "2-col" | "list">("4-col");

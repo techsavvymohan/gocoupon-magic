@@ -54,7 +54,7 @@ export function Footer() {
       </div>
 
       {/* ── 2. Floating Minimalist White Footer Card ── */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-14 sm:pb-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-28 sm:pb-20">
         <div className="rounded-[28px] sm:rounded-[36px] border border-neutral-200/90 bg-white p-8 sm:p-12 lg:p-14 shadow-[0_4px_24px_rgba(0,0,0,0.02)] dark:border-neutral-800/80 dark:bg-neutral-900/95">
           {/* Main Content: Brand Column + 3 Navigation Columns */}
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-8">

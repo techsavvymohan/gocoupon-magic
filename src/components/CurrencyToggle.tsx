@@ -72,7 +72,9 @@ export function CurrencyToggle({ className = "", variant = "default" }: Currency
         <div
           role="listbox"
           aria-label="Select currency"
-          className="absolute right-0 z-50 mt-2 w-64 rounded-2xl border border-border bg-card p-1.5 shadow-xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150"
+          className={`absolute right-0 z-50 w-64 rounded-2xl border border-border bg-card p-1.5 shadow-xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150 ${
+            variant === "footer" ? "bottom-full mb-2" : "top-full mt-2"
+          }`}
         >
           <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-border/50 mb-1">
             <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">

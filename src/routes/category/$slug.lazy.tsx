@@ -92,7 +92,7 @@ function CategorySlugPage() {
             <span>•</span>
             <div className="flex items-center gap-1.5">
               <Clock className="h-4 w-4 text-emerald-500" />
-              <span>Average Latency: <strong className="text-foreground">&lt; 850ms</strong></span>
+              <span>Auto-Apply Speed: <strong className="text-foreground">&lt; 1s</strong></span>
             </div>
             <span>•</span>
             <div className="flex items-center gap-1.5">
