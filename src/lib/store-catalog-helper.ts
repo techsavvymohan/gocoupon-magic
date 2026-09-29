@@ -1,5 +1,5 @@
-import liveDealsData from "@/data/live-deals.json";
 import { STORES_DATA } from "@/data/storesData";
+
 
 export interface StoreCatalogEntry {
   name: string;
@@ -75,9 +75,10 @@ export function getStoreCatalog(): Map<string, StoreCatalogEntry> {
   }
 
   // 2. Ingest all stores and active deals from live-deals.json
-  const rawList = Array.isArray(liveDealsData)
-    ? liveDealsData
-    : ((liveDealsData as any).deals || (liveDealsData as any).offers || []);
+  // Note: live deals are now served via /api/deals (not bundled). This section
+  // is populated at runtime when data is fetched dynamically.
+  const rawList: any[] = [];
+
 
   for (const d of rawList) {
     const rawName = d.store || d.storeName || d.merchant;

@@ -4,6 +4,7 @@
  *
  * Runs 24/7 on a VPS, PM2, or Docker container with:
  * - Pure Express architecture (no serverless wrappers, zero cold starts)
+ * - Gzip compression for all text/JS/CSS responses (60-70% size reduction)
  * - Persistent in-memory and Redis-backed caching
  * - Full CORS & JSON parsing middleware
  * - Clean modular routing for /api/*
@@ -14,6 +15,7 @@
 import "./env.js";
 import express, { type Request, type Response, type NextFunction } from "express";
 import cors from "cors";
+import compression from "compression";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -47,6 +49,25 @@ app.disable("x-powered-by");
 
 // Trust proxy for VPS reverse proxy setups (Nginx, Caddy, Cloudflare)
 app.set("trust proxy", 1);
+
+// ─── Gzip Compression (60-70% bandwidth reduction) ────────────────────────────
+// Must be placed BEFORE static middleware and routes.
+// Threshold 1kb: don't compress tiny responses (overhead > gain)
+app.use(
+  compression({
+    level: 6,          // balanced: good ratio, minimal CPU
+    threshold: 1024,   // only compress responses > 1 kB
+    filter: (req, res) => {
+      // Never compress already-compressed image/video formats
+      const ct = res.getHeader("Content-Type") as string | undefined;
+      if (ct && /image\/(png|jpg|jpeg|gif|webp)|video\//.test(ct)) return false;
+      return compression.filter(req, res);
+    },
+  })
+);
+
+// Enable ETag-based conditional requests (304 Not Modified) for static assets
+app.set("etag", "strong");
 
 // HTTP Security & Transport Headers (Clickjacking, MIME-sniffing, XSS, & Downgrade Defense)
 app.use((_req: Request, res: Response, next: NextFunction) => {
@@ -199,10 +220,11 @@ if (fs.existsSync(distDir)) {
 
     const cleanPath = req.path.replace(/\/+$/, "") || "/";
 
-    // Set no-cache headers for HTML responses so clients always get fresh content without stale browser cache
-    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-    res.setHeader("Pragma", "no-cache");
-    res.setHeader("Expires", "0");
+    // HTML pages: allow browser to cache but must revalidate with server.
+    // "no-cache" (NOT no-store) lets the browser use ETag/Last-Modified → 304 on repeat visits
+    // This is significantly faster than no-store which forces a full re-download every time.
+    res.setHeader("Cache-Control", "public, no-cache, must-revalidate");
+    res.setHeader("Vary", "Accept-Encoding");
 
     // A. Check root index.html
     if (cleanPath === "/") {

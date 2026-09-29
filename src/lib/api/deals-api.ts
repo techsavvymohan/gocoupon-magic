@@ -71,16 +71,8 @@ export interface FetchDealsOptions {
 }
 
 async function getStaticDeals(options: FetchDealsOptions = {}): Promise<DealsApiResponse> {
-  const { DEALS_DATA } = await import("@/data/dealsData");
-  const now = Date.now();
-  let filtered = DEALS_DATA.filter((d) => {
-    if (d.expiresIn === "Expired") return false;
-    if (d.endDate) {
-      const end = new Date(d.endDate).getTime();
-      if (!isNaN(end) && end < now) return false;
-    }
-    return true;
-  });
+  const { loadDealsData } = await import("@/data/dealsData");
+  let filtered = await loadDealsData();
 
   if (options.category && options.category !== "all") {
     const catLower = options.category.toLowerCase();
@@ -156,6 +148,7 @@ async function getStaticDeals(options: FetchDealsOptions = {}): Promise<DealsApi
     },
   };
 }
+
 
 /**
  * Fetches deals from /api/deals.

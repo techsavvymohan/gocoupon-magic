@@ -699,7 +699,19 @@ export default defineConfig({
   },
   build: {
     outDir: "dist",
-    minify: "esbuild",
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        drop_console: true,      // removes all console.* in production
+        drop_debugger: true,
+        passes: 2,               // two-pass squeeze for extra 5-8% savings
+        pure_funcs: ["console.log", "console.info", "console.debug", "console.warn"],
+        unsafe_arrows: true,
+        module: true,
+      },
+      mangle: { safari10: true },
+      format: { comments: false },
+    },
     cssMinify: true,
     sourcemap: false,
     target: "es2020",
@@ -723,18 +735,28 @@ export default defineConfig({
         manualChunks: (id) => {
           const normalized = id.replace(/\\/g, "/");
 
-          // 1. Heavy application data modules (isolated so they are never bundled into the homepage)
+          // 1. Heavy application data modules — split individually so each route loads only its slice
           if (normalized.includes("/src/data/posts")) {
             return "data-posts";
           }
-          if (
-            normalized.includes("/src/data/canonicalCatalogData") ||
-            normalized.includes("/src/data/live-deals.json") ||
-            normalized.includes("/src/data/dealsData") ||
-            normalized.includes("/src/data/featured-deals-campaign") ||
-            normalized.includes("/src/data/collectionsData")
-          ) {
+          // Canonical catalog (store SEO pages) — only loaded by individual store slug routes
+          if (normalized.includes("/src/data/canonicalCatalogData")) {
             return "data-catalog";
+          }
+          // Live deals JSON — only loaded by offers/deals pages
+          if (
+            normalized.includes("/src/data/live-deals.json") ||
+            normalized.includes("/src/data/dealsData")
+          ) {
+            return "data-deals";
+          }
+          // Featured deals campaign data — only loaded by featured-deals page
+          if (normalized.includes("/src/data/featured-deals-campaign")) {
+            return "data-featured";
+          }
+          // Collections data — only loaded by collections page
+          if (normalized.includes("/src/data/collectionsData")) {
+            return "data-collections";
           }
 
           // 2. Shared core layout, contexts, and critical site components

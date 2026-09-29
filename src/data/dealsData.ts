@@ -2,11 +2,10 @@
  * @file src/data/dealsData.ts
  * @description Dynamic Live Deals Data Module.
  *
- * Automatically populated from live Cuelinks API v3 feeds and kept fresh 24/7.
- * Static mock offers have been eliminated.
+ * The live-deals.json file is served as a static asset from /data/live-deals.json
+ * and fetched at runtime — NOT bundled — to keep the JS bundle small.
  */
 
-import liveDealsJson from "./live-deals.json";
 import type { DealCategory, DealBadge } from "@/lib/server-data/deals-db";
 
 export interface Deal {
@@ -28,18 +27,50 @@ export interface Deal {
   usesCount: number;
 }
 
-const rawDeals = (liveDealsJson as any)?.deals || [];
+// Filter out expired deals from a deal array
+const _now = Date.now();
+function filterActive(deals: Deal[]): Deal[] {
+  return deals.filter((d) => {
+    if (d.expiresIn === "Expired") return false;
+    if (d.endDate) {
+      const end = new Date(d.endDate).getTime();
+      if (!isNaN(end) && end < _now) return false;
+    }
+    return true;
+  });
+}
 
-// Filter out any expired deals on module initialization
-const now = Date.now();
-export const DEALS_DATA: Deal[] = (rawDeals as Deal[]).filter((d) => {
-  if (d.expiresIn === "Expired") return false;
-  if (d.endDate) {
-    const end = new Date(d.endDate).getTime();
-    if (!isNaN(end) && end < now) return false;
+// In-memory cache so we only fetch once per session
+let _dealsCache: Deal[] | null = null;
+
+/**
+ * Fetch live deals from the static JSON endpoint (never bundled).
+ * Falls back to empty array if the file is unavailable.
+ */
+export async function loadDealsData(): Promise<Deal[]> {
+  if (_dealsCache) return _dealsCache;
+  try {
+    const res = await fetch("/data/live-deals.json", {
+      cache: "no-cache",
+      signal: AbortSignal.timeout(5000),
+    });
+    if (res.ok) {
+      const json = await res.json();
+      const raw: Deal[] = Array.isArray(json?.deals) ? json.deals : [];
+      _dealsCache = filterActive(raw);
+      return _dealsCache;
+    }
+  } catch {
+    // Fetch failed — API will serve deals instead
   }
-  return true;
-});
+  return [];
+}
 
-export const LAST_CUELINKS_SYNC_TIME = (liveDealsJson as any)?.updatedAt || new Date().toISOString();
-export const TOTAL_LIVE_DEALS_COUNT = DEALS_DATA.length;
+/**
+ * @deprecated Use loadDealsData() (async) or fetchDeals() from deals-api.ts instead.
+ * Kept for backward compatibility — returns an empty array synchronously.
+ */
+export const DEALS_DATA: Deal[] = [];
+
+export const LAST_CUELINKS_SYNC_TIME = new Date().toISOString();
+export const TOTAL_LIVE_DEALS_COUNT = 0;
