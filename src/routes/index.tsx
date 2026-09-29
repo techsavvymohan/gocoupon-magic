@@ -7,7 +7,9 @@ import { couponFaqs } from "@/data/faqs";
 import { breadcrumbSchema, createSeoHead, faqSchema, organizationSchema, softwareAppSchema, websiteSchema } from "@/lib/seo";
 
 // ─── Below-fold sections lazy-loaded to reduce initial JS parse cost ───────────
-// The browser paints Hero + LogoMarquee instantly while these modules stream in.
+// The browser paints Hero + LogoMarquee instantly while these stream in.
+// Suspense fallback is null (no skeleton) because modules load near-instantly
+// from the local asset cache — visible skeleton gaps are worse than a quick pop-in.
 const Stats = lazy(() => import("@/components/site/Stats").then(m => ({ default: m.Stats })));
 const AnimatedDealsCarousel = lazy(() => import("@/components/site/AnimatedDealsCarousel").then(m => ({ default: m.AnimatedDealsCarousel })));
 const ExtensionShowcase = lazy(() => import("@/components/site/ExtensionShowcase").then(m => ({ default: m.ExtensionShowcase })));
@@ -17,11 +19,6 @@ const Features = lazy(() => import("@/components/site/Features").then(m => ({ de
 const FAQ = lazy(() => import("@/components/site/FAQ").then(m => ({ default: m.FAQ })));
 const Blog = lazy(() => import("@/components/site/Blog").then(m => ({ default: m.Blog })));
 const CTA = lazy(() => import("@/components/site/CTA").then(m => ({ default: m.CTA })));
-
-// Minimal height-preserving skeleton to prevent layout shift while sections load
-function SectionSkeleton({ height = "400px" }: { height?: string }) {
-  return <div style={{ height, contain: "content" }} aria-hidden="true" />;
-}
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -65,35 +62,37 @@ function Index() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
       />
+
       {/* ── Above fold: eagerly rendered ─────────────────────────────── */}
       <Hero />
       <LogoMarquee />
-      {/* ── Below fold: streamed in after first paint ─────────────────── */}
-      <Suspense fallback={<SectionSkeleton height="280px" />}>
+
+      {/* ── Below fold: lazy-loaded, null fallback = no gap ─────────── */}
+      <Suspense fallback={null}>
         <Stats />
       </Suspense>
-      <Suspense fallback={<SectionSkeleton height="360px" />}>
+      <Suspense fallback={null}>
         <AnimatedDealsCarousel />
       </Suspense>
-      <Suspense fallback={<SectionSkeleton height="480px" />}>
+      <Suspense fallback={null}>
         <ExtensionShowcase />
       </Suspense>
-      <Suspense fallback={<SectionSkeleton height="360px" />}>
+      <Suspense fallback={null}>
         <HowItWorks />
       </Suspense>
-      <Suspense fallback={<SectionSkeleton height="320px" />}>
+      <Suspense fallback={null}>
         <WhyUsExpenseSaviour />
       </Suspense>
-      <Suspense fallback={<SectionSkeleton height="320px" />}>
+      <Suspense fallback={null}>
         <Features />
       </Suspense>
-      <Suspense fallback={<SectionSkeleton height="400px" />}>
+      <Suspense fallback={null}>
         <FAQ />
       </Suspense>
-      <Suspense fallback={<SectionSkeleton height="360px" />}>
+      <Suspense fallback={null}>
         <Blog />
       </Suspense>
-      <Suspense fallback={<SectionSkeleton height="240px" />}>
+      <Suspense fallback={null}>
         <CTA />
       </Suspense>
     </SiteShell>

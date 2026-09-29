@@ -43,10 +43,10 @@ function DynamicStoreCouponsPage() {
   const rawName = store
     ? store.name
     : storeSlug
-        .replace(/-coupons$/, "")
-        .split("-")
-        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(" ");
+      .replace(/-coupons$/, "")
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
 
   const storeName = rawName || "Online Store";
   const category = store?.category || "Online Shopping";
@@ -72,33 +72,33 @@ function DynamicStoreCouponsPage() {
 
   const verifiedCoupons: VerifiedCoupon[] = store?.deals && store.deals.length > 0
     ? store.deals.slice(0, 15).map((d, idx) => ({
-        code: d.code || "DEALACTIVATED",
-        discount: d.discount || (d.code ? "Exclusive Code" : "Instant Deal"),
-        description: d.description || d.title,
-        minSpend: d.minSpend || "No minimum order",
-        category: d.category || category,
-        expiry: d.expiry || "Active Today",
-        isExclusive: idx === 0,
-      }))
+      code: d.code || "DEALACTIVATED",
+      discount: d.discount || (d.code ? "Exclusive Code" : "Instant Deal"),
+      description: d.description || d.title,
+      minSpend: d.minSpend || "No minimum order",
+      category: d.category || category,
+      expiry: d.expiry || "Active Today",
+      isExclusive: idx === 0,
+    }))
     : [
-        {
-          code: "SAVE20",
-          discount: "Up to 50% OFF",
-          description: `Exclusive verified discount code on ${storeName} sitewide catalog.`,
-          minSpend: "₹999",
-          category,
-          expiry: "Active Today",
-          isExclusive: true,
-        },
-        {
-          code: "PREPAID10",
-          discount: "Extra 10% Instant Off",
-          description: "Instant checkout reduction when paying via UPI or credit/debit cards.",
-          minSpend: "₹499",
-          category: "Prepaid Orders",
-          expiry: "Ongoing",
-        },
-      ];
+      {
+        code: "SAVE20",
+        discount: "Up to 50% OFF",
+        description: `Exclusive verified discount code on ${storeName} sitewide catalog.`,
+        minSpend: "₹999",
+        category,
+        expiry: "Active Today",
+        isExclusive: true,
+      },
+      {
+        code: "PREPAID10",
+        discount: "Extra 10% Instant Off",
+        description: "Instant checkout reduction when paying via UPI or credit/debit cards.",
+        minSpend: "₹499",
+        category: "Prepaid Orders",
+        expiry: "Ongoing",
+      },
+    ];
 
   const savingHacks: SavingHack[] = [
     {
