@@ -29,7 +29,7 @@ import {
   BookOpen,
   Layers,
   TrendingDown,
-  Star,
+  BadgePercent,
 } from "lucide-react";
 
 type NavLink = {
@@ -57,7 +57,7 @@ const desktopSubLinks: NavLink[] = [
     to: "/featured-deals",
     badge: "TOP",
     badgeColor: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-bold",
-    icon: Star,
+    icon: BadgePercent,
     i18nKey: "nav.featuredDeals",
   },
   {
