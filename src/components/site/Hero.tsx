@@ -5,8 +5,11 @@
 
 import { Link } from "@tanstack/react-router";
 import { ShieldCheck, ArrowRight } from "lucide-react";
+import { useFestiveBanner } from "@/lib/hero-banner";
 
 export function Hero() {
+  const { banner, isActive, styles } = useFestiveBanner();
+
   return (
     <section className="relative overflow-hidden pb-16 sm:pb-24">
       {/* Curved Transparent Top Banner */}
@@ -43,20 +46,33 @@ export function Hero() {
           </span>
         </h1>
 
-        {/* Festive Mega Sale 2026 Live Announcement Pill */}
-        <div className="mt-4 sm:mt-5 inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-1.5 text-xs sm:text-sm text-foreground/90 shadow-2xs backdrop-blur-xs">
-          <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-ping" />
-          <span className="font-medium">
-            <strong className="font-bold text-amber-700 dark:text-amber-400">Festive Mega-Sales 2026:</strong> Amazon Great Indian Festival &amp; Flipkart Big Billion Days verified codes live!
-          </span>
-          <Link
-            to="/featured-deals"
-            className="font-bold text-amber-700 dark:text-amber-300 hover:text-amber-800 dark:hover:text-amber-200 underline underline-offset-2 transition-colors ml-0.5 inline-flex items-center gap-0.5"
+        {/* Dynamic Festive / Seasonal Announcement Pill (Controlled via Admin Panel) */}
+        {isActive && (
+          <div
+            className={`mt-4 sm:mt-5 inline-flex flex-wrap items-center justify-center gap-2 rounded-full border px-4 py-1.5 text-xs sm:text-sm text-foreground/90 shadow-2xs backdrop-blur-xs transition-all ${styles.container}`}
           >
-            <span>Explore Deals</span>
-            <ArrowRight className="h-3 w-3" />
-          </Link>
-        </div>
+            {banner.showPingDot && (
+              <span className={`flex h-2 w-2 rounded-full animate-ping ${styles.dot}`} />
+            )}
+            <span className="font-medium">
+              {banner.badgeTitle && (
+                <strong className={`font-bold mr-1 ${styles.badge}`}>
+                  {banner.badgeTitle}
+                </strong>
+              )}
+              {banner.message}
+            </span>
+            {banner.linkText && banner.linkUrl && (
+              <Link
+                to={banner.linkUrl as any}
+                className={`font-bold underline underline-offset-2 transition-colors ml-0.5 inline-flex items-center gap-0.5 ${styles.link}`}
+              >
+                <span>{banner.linkText}</span>
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            )}
+          </div>
+        )}
 
         {/* Trust Callout */}
         <div className="mt-6 sm:mt-7 inline-flex items-center gap-2.5 rounded-full border border-border/80 bg-card/90 px-4 sm:px-5 py-2 text-xs sm:text-sm text-foreground/80 shadow-2xs">

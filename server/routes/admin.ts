@@ -253,6 +253,16 @@ const defaultHero = {
   searchButtonLabel: "Compare Prices",
   memberCountText: "Join 150k+ smart shoppers saving daily",
   slides: [],
+  festiveBanner: {
+    enabled: true,
+    badgeTitle: "Festive Mega-Sales 2026:",
+    message: "Amazon Great Indian Festival & Flipkart Big Billion Days verified codes live!",
+    linkText: "Explore Deals",
+    linkUrl: "/featured-deals",
+    colorScheme: "amber",
+    showPingDot: true,
+    expiresAt: "",
+  },
 };
 
 const defaultEvents = [
@@ -885,9 +895,20 @@ adminRouter.get("/hero", async (req: Request, res: Response) => {
 });
 
 adminRouter.put("/hero", requireAdminAuth, async (req: Request, res: Response) => {
-  const hero = req.body || {};
-  await settingsDb.setSetting("hero", hero);
-  res.json({ success: true, message: "Hero settings saved.", data: hero });
+  const currentHero = await settingsDb.getSetting("hero", defaultHero);
+  const heroData = req.body?.hero || req.body || {};
+  const mergedHero = {
+    ...defaultHero,
+    ...currentHero,
+    ...heroData,
+    festiveBanner: {
+      ...defaultHero.festiveBanner,
+      ...(currentHero.festiveBanner || {}),
+      ...(heroData.festiveBanner || {}),
+    },
+  };
+  await settingsDb.setSetting("hero", mergedHero);
+  res.json({ success: true, message: "Hero settings saved.", data: mergedHero });
 });
 
 adminRouter.get("/sections", async (req: Request, res: Response) => {
