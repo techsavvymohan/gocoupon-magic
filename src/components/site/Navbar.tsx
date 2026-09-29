@@ -1,6 +1,7 @@
 /**
  * @file Navbar.tsx
- * @description UI/UX Pro Max Navigation Bar with Glassmorphism & Mobile App-Like Bottom Navigation.
+ * @description GrabOn-Style Dual-Tier Navigation Bar with Glassmorphism,
+ * Integrated Instant Search, and Mobile App-Like Bottom Navigation.
  */
 
 import { Link, useLocation } from "@tanstack/react-router";
@@ -11,20 +12,23 @@ import { CurrencyToggle } from "../CurrencyToggle";
 import { LanguageToggle } from "../LanguageToggle";
 import { useI18n } from "@/context/I18nContext";
 import { AnnouncementBar } from "./AnnouncementBar";
+import { NavbarSearch } from "./NavbarSearch";
 import {
   Menu,
   X,
   ArrowRight,
   ExternalLink,
   Tag,
-  Clock,
   Download,
-  Award,
-  Bell,
   Home,
   ShoppingBag,
   Flame,
   Zap,
+  Store,
+  BookOpen,
+  Layers,
+  TrendingDown,
+  Sparkles,
 } from "lucide-react";
 
 type NavLink = {
@@ -34,20 +38,60 @@ type NavLink = {
   isExternal?: boolean;
   badge?: string;
   badgeColor?: string;
-  isAction?: boolean;
+  icon?: any;
   i18nKey?: string;
 };
 
-const desktopLinks: NavLink[] = [
-  { label: "Offers", to: "/offers", badge: "HOT", badgeColor: "bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 font-semibold", i18nKey: "nav.offers" },
-  { label: "Featured Deals", to: "/featured-deals", badge: "TOP", badgeColor: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 font-semibold", i18nKey: "nav.featuredDeals" },
-  { label: "Stores", to: "/stores", i18nKey: "nav.stores" },
-  { label: "Extension", to: "/chrome-extension", i18nKey: "nav.extension" },
-  { label: "Blog", to: "/blog", i18nKey: "nav.blog" },
+const desktopSubLinks: NavLink[] = [
+  {
+    label: "Offers",
+    to: "/offers",
+    badge: "HOT",
+    badgeColor: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 font-bold",
+    icon: Tag,
+    i18nKey: "nav.offers",
+  },
+  {
+    label: "Featured Deals",
+    to: "/featured-deals",
+    badge: "TOP",
+    badgeColor: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-bold",
+    icon: Sparkles,
+    i18nKey: "nav.featuredDeals",
+  },
+  {
+    label: "Stores",
+    to: "/stores",
+    icon: Store,
+    i18nKey: "nav.stores",
+  },
+  {
+    label: "Categories",
+    to: "/categories",
+    icon: Layers,
+    i18nKey: "nav.categories",
+  },
+  {
+    label: "Extension",
+    to: "/chrome-extension",
+    icon: Zap,
+    i18nKey: "nav.extension",
+  },
+  {
+    label: "Blog",
+    to: "/blog",
+    icon: BookOpen,
+    i18nKey: "nav.blog",
+  },
 ];
 
 const mobileLinks: NavLink[] = [
-  ...desktopLinks,
+  ...desktopSubLinks,
+  {
+    label: "Price Comparison",
+    to: "/compare",
+    icon: TrendingDown,
+  },
 ];
 
 export function Navbar() {
@@ -59,138 +103,73 @@ export function Navbar() {
   return (
     <>
       <header
-        className="sticky top-0 z-[100] w-full border-b border-border/40 shadow-[0_2px_10px_color-mix(in_srgb,var(--foreground)_4%,transparent)]"
+        className="sticky top-0 z-[100] w-full border-b border-border/40 shadow-[0_2px_12px_color-mix(in_srgb,var(--foreground)_4%,transparent)]"
         style={{
-          background: "color-mix(in srgb, var(--background) 80%, transparent)",
+          background: "color-mix(in srgb, var(--background) 85%, transparent)",
           backdropFilter: "blur(24px) saturate(160%)",
           WebkitBackdropFilter: "blur(24px) saturate(160%)",
         }}
       >
         <AnnouncementBar />
-        <nav className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-          {/* Logo */}
+
+        {/* ── TIER 1: PRIMARY ACTION ROW (Logo, GrabOn-Style Live Search, Controls) ── */}
+        <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 sm:gap-6 px-4 sm:px-6">
+          {/* Logo on Left */}
           <Link
             to="/"
-            className="group flex items-center gap-2 transition-transform duration-200 hover:scale-105"
+            className="group flex items-center gap-2 shrink-0 transition-transform duration-200 hover:scale-105"
             aria-label="GoCoupon — home"
             onClick={() => setMobileMenuOpen(false)}
           >
-            <span className="inline-flex items-center rounded-lg px-2 py-1 transition-colors">
+            <span className="inline-flex items-center rounded-lg px-1 py-1 transition-colors">
               <img
                 src="/gc-logo.webp"
                 alt="GoCoupon"
-                className="h-7 w-auto dark:hidden transition-transform group-hover:scale-105"
+                className="h-7 sm:h-8 w-auto dark:hidden transition-transform group-hover:scale-105"
                 width={59}
-                height={28}
+                height={32}
                 decoding="async"
                 fetchPriority="high"
               />
               <img
                 src="/gc-logo-dark.webp"
                 alt="GoCoupon"
-                className="hidden h-7 w-auto dark:block transition-transform group-hover:scale-105"
+                className="hidden h-7 sm:h-8 w-auto dark:block transition-transform group-hover:scale-105"
                 width={58}
-                height={28}
+                height={32}
                 decoding="async"
                 fetchPriority="high"
               />
             </span>
           </Link>
 
-          {/* Desktop Nav Links (Compact & Responsive) */}
-          <ul className="hidden items-center gap-5 lg:gap-6 md:flex">
-            {desktopLinks.map((l) => {
-              const baseClass =
-                "group relative py-1 text-xs lg:text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-foreground hover:-translate-y-0.5 flex items-center gap-1.5";
+          {/* GrabOn-Style Search Bar (Centered, Fills Space, Real-Time Autocomplete) */}
+          <div className="flex-1 max-w-md lg:max-w-xl xl:max-w-2xl hidden md:block">
+            <NavbarSearch placeholder="Search for brands, categories, coupons..." />
+          </div>
 
-              const localizedLabel = l.i18nKey ? t(l.i18nKey, l.label) : l.label;
-
-              const animatedContent = (
-                <>
-                  <span>{localizedLabel}</span>
-                  {l.badge && (
-                    <span
-                      className={`rounded-full px-1.5 py-0.2 font-mono text-[9px] font-bold ${
-                        l.badgeColor || "bg-primary/10 text-primary"
-                      }`}
-                    >
-                      {l.badge}
-                    </span>
-                  )}
-                  <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full rounded-full" />
-                </>
-              );
-
-              if (l.isAction) {
-                return (
-                  <li key={l.label}>
-                    <button
-                      type="button"
-                      data-thunderbolt-launcher
-                      onClick={() => {
-                        if (typeof (window as any).openThunderboltChat === "function") {
-                          (window as any).openThunderboltChat();
-                        } else {
-                          (window as any).Thunderbolt?.open();
-                        }
-                      }}
-                      className={baseClass}
-                    >
-                      {animatedContent}
-                    </button>
-                  </li>
-                );
-              }
-
-              if (l.isExternal && l.href) {
-                return (
-                  <li key={l.label}>
-                    <a
-                      href={l.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={baseClass}
-                    >
-                      {animatedContent}
-                    </a>
-                  </li>
-                );
-              }
-
-              return (
-                <li key={l.label}>
-                  <Link
-                    to={l.to!}
-                    className={baseClass}
-                    activeOptions={{ exact: false }}
-                    activeProps={{ className: "text-foreground font-bold" }}
-                  >
-                    {animatedContent}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-
-          {/* Right Actions */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Country flags / Currency hidden on mobile screens to save navbar space */}
-            <div className="hidden md:inline-flex items-center gap-1.5 sm:gap-2">
+          {/* Right Actions: Language, Currency, Theme, Add to Chrome */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Country / Currency toggles */}
+            <div className="hidden lg:inline-flex items-center gap-1.5 sm:gap-2">
               <LanguageToggle />
               <CurrencyToggle />
             </div>
+
             <ThemeToggle />
 
+            {/* Add to Chrome Button with Pulsing Beacon */}
             <MagneticButton
               as="a"
               href="https://chromewebstore.google.com/detail/gbmfihnboadlmmjbikajlmocjmlpehij"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden items-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 px-4 sm:px-5 py-2 text-xs font-bold text-white shadow-md transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-rose-500/25 sm:inline-flex group"
+              className="hidden items-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 px-4 sm:px-5 py-2 text-xs font-bold text-white shadow-md transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-rose-500/25 sm:inline-flex group shrink-0"
             >
               <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
-              <span>{t("nav.addToChrome", "Add to Chrome")}</span>
+              <span>{t("nav.addToChrome", "Add to Chrome — Free")}</span>
             </MagneticButton>
+
             {/* Mobile Menu Toggle Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -201,6 +180,65 @@ export function Navbar() {
               {mobileMenuOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
             </button>
           </div>
+        </div>
+
+        {/* Mobile Search Bar Row (Directly accessible on mobile screens < md) */}
+        <div className="px-4 pb-2.5 md:hidden">
+          <NavbarSearch placeholder="Search 300+ stores & coupons..." />
+        </div>
+
+        {/* ── TIER 2: SUB-NAVIGATION STRIP (Like GrabOn Row 2 with GoCoupon's exact options) ── */}
+        <nav
+          aria-label="Sub Navigation"
+          className="border-t border-border/40 bg-muted/25 dark:bg-muted/10 backdrop-blur-md"
+        >
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-3 sm:px-6 py-1 overflow-x-auto no-scrollbar">
+            <ul className="flex items-center gap-1 sm:gap-2 whitespace-nowrap py-0.5">
+              {desktopSubLinks.map((l) => {
+                const IconComponent = l.icon;
+                const localizedLabel = l.i18nKey ? t(l.i18nKey, l.label) : l.label;
+
+                return (
+                  <li key={l.label}>
+                    <Link
+                      to={l.to!}
+                      className="group relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-all duration-150"
+                      activeOptions={{ exact: false }}
+                      activeProps={{
+                        className: "text-foreground font-bold bg-card shadow-2xs border border-border/60",
+                      }}
+                    >
+                      {IconComponent && (
+                        <IconComponent className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                      )}
+                      <span>{localizedLabel}</span>
+                      {l.badge && (
+                        <span
+                          className={`rounded-full px-1.5 py-0.2 font-mono text-[9px] font-bold ${
+                            l.badgeColor || "bg-primary/10 text-primary"
+                          }`}
+                        >
+                          {l.badge}
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+
+            {/* Quick Utility Link on Right of Sub-nav: Price Comparison */}
+            <div className="hidden lg:flex items-center gap-2 pl-4 shrink-0">
+              <Link
+                to="/compare"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors py-1"
+                activeProps={{ className: "text-primary font-bold" }}
+              >
+                <TrendingDown className="h-3.5 w-3.5 text-emerald-500" />
+                <span>Compare Store Prices</span>
+              </Link>
+            </div>
+          </div>
         </nav>
 
         {/* Mobile Navigation Drawer */}
@@ -208,67 +246,8 @@ export function Navbar() {
           <div className="border-b border-border bg-background px-6 py-6 md:hidden animate-fade-in max-h-[80vh] overflow-y-auto">
             <ul className="space-y-3">
               {mobileLinks.map((l) => {
-                if (l.isAction) {
-                  return (
-                    <li key={l.label}>
-                      <button
-                        type="button"
-                        data-thunderbolt-launcher
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          if (typeof (window as any).openThunderboltChat === "function") {
-                            (window as any).openThunderboltChat();
-                          } else {
-                            (window as any).Thunderbolt?.open();
-                          }
-                        }}
-                        className="flex w-full items-center justify-between rounded-xl p-3 min-h-[44px] text-base font-semibold text-foreground hover:bg-muted touch-manipulation text-left"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span>{l.label}</span>
-                          {l.badge && (
-                            <span
-                              className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-bold ${
-                                l.badgeColor || "bg-primary/10 text-primary"
-                              }`}
-                            >
-                              {l.badge}
-                            </span>
-                          )}
-                        </div>
-                        <ArrowRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                      </button>
-                    </li>
-                  );
-                }
-
-                if (l.isExternal && l.href) {
-                  return (
-                    <li key={l.label}>
-                      <a
-                        href={l.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center justify-between rounded-xl p-3 min-h-[44px] text-base font-semibold text-foreground hover:bg-muted touch-manipulation"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span>{l.label}</span>
-                          {l.badge && (
-                            <span
-                              className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-bold ${
-                                l.badgeColor || "bg-primary/10 text-primary"
-                              }`}
-                            >
-                              {l.badge}
-                            </span>
-                          )}
-                        </div>
-                        <ExternalLink className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                      </a>
-                    </li>
-                  );
-                }
+                const IconComponent = l.icon;
+                const localizedLabel = l.i18nKey ? t(l.i18nKey, l.label) : l.label;
 
                 return (
                   <li key={l.label}>
@@ -277,8 +256,9 @@ export function Navbar() {
                       onClick={() => setMobileMenuOpen(false)}
                       className="flex items-center justify-between rounded-xl p-3 min-h-[44px] text-base font-semibold text-foreground hover:bg-muted touch-manipulation"
                     >
-                      <div className="flex items-center gap-2">
-                        <span>{l.i18nKey ? t(l.i18nKey, l.label) : l.label}</span>
+                      <div className="flex items-center gap-2.5">
+                        {IconComponent && <IconComponent className="h-4 w-4 text-primary" />}
+                        <span>{localizedLabel}</span>
                         {l.badge && (
                           <span
                             className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-bold ${
@@ -299,7 +279,7 @@ export function Navbar() {
                   href="https://chromewebstore.google.com/detail/gbmfihnboadlmmjbikajlmocjmlpehij"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 min-h-[44px] text-sm font-bold text-primary-foreground shadow-md touch-manipulation"
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-rose-500 to-amber-500 py-3.5 min-h-[44px] text-sm font-bold text-white shadow-md touch-manipulation"
                 >
                   <span>{t("nav.addToChrome", "Add to Chrome — Free")}</span>
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -350,7 +330,6 @@ export function Navbar() {
             activeProps={{ className: "text-rose-600 font-bold" }}
             aria-label="Click to find available offers and verified coupons"
           >
-            {/* Animated Attention Badge informing users to click for offers — hidden when already on /offers */}
             {!isOffersPage && (
               <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-1.5 py-0.5 text-[8.5px] font-extrabold uppercase tracking-tight bg-gradient-to-r from-amber-500 via-rose-500 to-primary text-white rounded-full shadow-md shadow-rose-500/30 pointer-events-none whitespace-nowrap animate-bounce ring-1 ring-background">
                 <Zap className="h-2 w-2 fill-current" />
