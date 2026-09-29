@@ -5,7 +5,6 @@
 
 import { Link } from "@tanstack/react-router";
 import { ShieldCheck, ArrowRight } from "lucide-react";
-import { HeroStoreDealSearch } from "./HeroStoreDealSearch";
 
 export function Hero() {
   return (
@@ -59,13 +58,8 @@ export function Hero() {
           </Link>
         </div>
 
-        {/* Centered Store & Deal Search Box */}
-        <div className="mt-6 sm:mt-8 mx-auto max-w-3xl text-left">
-          <HeroStoreDealSearch />
-        </div>
-
         {/* Trust Callout */}
-        <div className="mt-7 inline-flex items-center gap-2.5 rounded-full border border-border/80 bg-card/90 px-4 sm:px-5 py-2 text-xs sm:text-sm text-foreground/80 shadow-2xs">
+        <div className="mt-6 sm:mt-7 inline-flex items-center gap-2.5 rounded-full border border-border/80 bg-card/90 px-4 sm:px-5 py-2 text-xs sm:text-sm text-foreground/80 shadow-2xs">
           <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
             <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
           </span>
