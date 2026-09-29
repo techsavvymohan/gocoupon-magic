@@ -80,28 +80,15 @@ const FAQS = [
   },
 ];
 
+import { StoreLogo } from "@/components/common/StoreLogo";
+
 function DealBrandLogo({ brandName, logoUrl }: { brandName: string; logoUrl?: string }) {
-  const [imgError, setImgError] = useState(false);
-  const initials = brandName.slice(0, 2).toUpperCase();
-
-  if (logoUrl && !imgError) {
-    return (
-      <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl border border-border/80 bg-white p-1 sm:p-1.5 shadow-2xs group-hover:border-primary/40 transition-colors overflow-hidden">
-        <img
-          src={logoUrl}
-          alt={`${brandName} logo`}
-          className="h-full w-full object-contain"
-          onError={() => setImgError(true)}
-          loading="lazy"
-        />
-      </div>
-    );
-  }
-
   return (
-    <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-muted/40 font-display text-sm sm:text-base font-bold text-foreground group-hover:border-primary/40 transition-colors">
-      {initials}
-    </div>
+    <StoreLogo
+      storeName={brandName}
+      storeLogo={logoUrl}
+      className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl text-xs sm:text-sm shrink-0"
+    />
   );
 }
 

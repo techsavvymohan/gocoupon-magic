@@ -75,14 +75,7 @@ function extractMerchantDomain(trackingUrl?: string, storeName?: string, explici
 }
 
 function resolveStoreLogo(storeName: string, trackingUrl?: string, explicitDomain?: string): string {
-  const clean = (storeName || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-  for (const [key, logo] of Object.entries(LOCAL_STORE_LOGOS)) {
-    if (clean === key || clean.startsWith(key) || key.startsWith(clean)) {
-      return logo;
-    }
-  }
-  const domain = extractMerchantDomain(trackingUrl, storeName, explicitDomain);
-  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+  return "";
 }
 
 

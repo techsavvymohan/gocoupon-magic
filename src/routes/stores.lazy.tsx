@@ -7,6 +7,7 @@ import type { Store, StoreSortField } from "@/lib/api/stores-api";
 import { wrapAffiliateTracking } from "@/lib/services/store-registry";
 import { StoreGridSkeleton, FetchError } from "@/components/ui/DataSkeleton";
 import { useCurrency } from "@/context/CurrencyContext";
+import { StoreLogo } from "@/components/common/StoreLogo";
 import {
   Search,
   Store as StoreIcon,
@@ -126,13 +127,13 @@ function StoresPage() {
             <div className="flex items-center justify-start md:justify-center gap-3 sm:gap-4 md:gap-6 overflow-x-auto no-scrollbar py-2 px-2 -mx-3.5 sm:mx-0 snap-x snap-mandatory md:animate-storeverse-float">
               {(
                 [
-                  { name: "Amazon", logo: "/Brand logos/Amazon_logo.svg.webp", deal: "75% OFF" },
-                  { name: "Walmart", logo: "/icons/WMT-Wordmark-Small-TrueBlue-RGB.png", deal: "Rollback $20" },
-                  { name: "Flipkart", logo: "/Brand logos/flipkart.webp", deal: "Flat ₹500" },
-                  { name: "Target", logo: "/icons/target.svg", deal: "Circle 20%" },
-                  { name: "Myntra", logo: "/Brand logos/myntra.webp", deal: "Flat ₹500" },
-                  { name: "Best Buy", logo: "/icons/bestbuy.svg", deal: "Save $50" },
-                ] as { name: string; logo?: string; icon?: string; deal: string }[]
+                  { name: "Amazon", deal: "75% OFF" },
+                  { name: "Walmart", deal: "Rollback $20" },
+                  { name: "Flipkart", deal: "Flat ₹500" },
+                  { name: "Target", deal: "Circle 20%" },
+                  { name: "Myntra", deal: "Flat ₹500" },
+                  { name: "Best Buy", deal: "Save $50" },
+                ] as { name: string; deal: string }[]
               ).map((b, idx) => (
                 <div
                   key={b.name}
@@ -142,13 +143,10 @@ function StoresPage() {
                     transform: `translateZ(${(idx % 3) * 8}px)`,
                   }}
                 >
-                  <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-background border border-border/60 p-1 shadow-2xs overflow-hidden">
-                    {b.logo ? (
-                      <img src={b.logo} alt={b.name} className="h-full w-full object-contain" width={48} height={48} />
-                    ) : (
-                      <span className="text-xl sm:text-2xl">{b.icon}</span>
-                    )}
-                  </div>
+                  <StoreLogo
+                    storeName={b.name}
+                    className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl text-xs font-bold"
+                  />
                   <span className="font-display text-[11px] sm:text-xs font-bold text-foreground truncate max-w-[70px] sm:max-w-none">
                     {b.name}
                   </span>
@@ -485,22 +483,11 @@ function StoreCard({
         <div className="flex items-start justify-between gap-2.5 sm:gap-4 translate-z-20">
           <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
             {/* Elevated Logo Podium */}
-            <div className="relative flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl border border-border/80 bg-background p-2 shadow-md transition-transform duration-300 group-hover:scale-105 overflow-hidden">
-              {store.logo ? (
-                <img
-                  src={store.logo}
-                  alt={`${store.name} logo`}
-                  className="h-full w-full object-contain"
-                  loading="lazy"
-                  width={48}
-                  height={48}
-                />
-              ) : (
-                <span className="text-xl sm:text-2xl" role="img" aria-label={store.name}>
-                  {store.fallbackIcon}
-                </span>
-              )}
-            </div>
+            <StoreLogo
+              storeName={store.name}
+              storeLogo={store.logo}
+              className="h-12 w-12 sm:h-14 sm:w-14 rounded-xl sm:rounded-2xl text-xs sm:text-sm shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300"
+            />
 
             <div className="min-w-0">
               <h3 className="font-display text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors truncate">

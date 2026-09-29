@@ -12,7 +12,7 @@ export interface Store {
   slug: string;
   category: "Fashion" | "Electronics" | "Food" | "Travel" | "Beauty" | "Home" | "Recharge" | "General";
   logo?: string;
-  fallbackIcon: string;
+  fallbackIcon?: string;
   badge?: string;
   rating: number;
   couponsCount: number;

@@ -243,7 +243,6 @@ const FEATURED_DEALS_COLLECTION = [
     verificationStatus: "verified",
     lastVerifiedAt: "Today",
     terms: "Get 7% off your order at QNT Sports India using the exclusive GoCoupon code QNTGC. Shop sports nutrition products and save on your purchase.",
-    logoUrl: "https://res.cloudinary.com/pgzfcjir/image/upload/v1790246941/0x0.png",
   },
   {
     id: "ac-redbus",
@@ -320,7 +319,6 @@ const FEATURED_DEALS_COLLECTION = [
     verificationStatus: "verified",
     lastVerifiedAt: "Today",
     terms: "Get 10% off your purchase at Svastika using the exclusive GoCoupon code SVBRASS10. Shop Pooja Essentials and save on your order.",
-    logoUrl: "https://svastika.in/cdn/shop/files/Final_Logo-03.svg",
   },
   {
     id: "ac-nobero-500",
@@ -340,7 +338,6 @@ const FEATURED_DEALS_COLLECTION = [
     verificationStatus: "verified",
     lastVerifiedAt: "Today",
     terms: "Valid on orders above ₹2,199. Get ₹500 off your Nobero order using the exclusive GoCoupon code CCN500.",
-    logoUrl: "https://nobero.com/cdn/shop/files/Nobero_logo_1_2.svg",
   },
   {
     id: "ac-ezee-perfume-15",
@@ -360,7 +357,6 @@ const FEATURED_DEALS_COLLECTION = [
     verificationStatus: "verified",
     lastVerifiedAt: "Today",
     terms: "Get 15% off your Ezee Perfume order using the exclusive GoCoupon code GC15. Discover fragrances and save 15% on your purchase.",
-    logoUrl: "https://ezeperfume.com/cdn/shop/files/EZE_Logo-04.png?v=1756801514",
   },
   {
     id: "ac-pant-project-6",
@@ -380,7 +376,6 @@ const FEATURED_DEALS_COLLECTION = [
     verificationStatus: "verified",
     lastVerifiedAt: "Today",
     terms: "Get 6.3% off your purchase at The Pant Project using the exclusive GoCoupon code CZANIA100. Shop men's pants and fashion essentials while saving on your order.",
-    logoUrl: "https://pantproject.com/cdn/shop/files/Tpp_Horizontal_logo_7f559ce4-7ff9-4d8d-97fd-038eb7fa7580.svg",
   },
   {
     id: "ac-ace-blend-10",
@@ -400,7 +395,6 @@ const FEATURED_DEALS_COLLECTION = [
     verificationStatus: "verified",
     lastVerifiedAt: "Today",
     terms: "Get 10% off your Ace Blend order using the exclusive GoCoupon code GC10. Shop nutrition products and save 10% on your purchase.",
-    logoUrl: "https://aceblend.com/cdn/shop/files/ACE_BLEND_LOGO-_BLACK-01-svg.svg",
   },
   {
     id: "ac-decode-age-10",
@@ -420,7 +414,6 @@ const FEATURED_DEALS_COLLECTION = [
     verificationStatus: "verified",
     lastVerifiedAt: "Today",
     terms: "Get 10% off your Decode Age order using the exclusive GoCoupon code DEEPIKAC. Shop health and wellness products and save 10% on your purchase.",
-    logoUrl: "https://decodeage.com/cdn/shop/files/Decode-Age-Fevicon_7c1b708b-05de-40cc-b3cd-c6e355efbfee.png",
   },
   {
     id: "ac-saadaa-10",
@@ -440,7 +433,6 @@ const FEATURED_DEALS_COLLECTION = [
     verificationStatus: "verified",
     lastVerifiedAt: "Today",
     terms: "Get 10% off your Saadaa order using the exclusive GoCoupon code GC10. Shop Saadaa's fashion collection and save 10% on your purchase.",
-    logoUrl: "https://saadaa.in/cdn/shop/files/SAADAA_LOGO_96_x_17.png",
   },
 ];
 
@@ -460,9 +452,9 @@ const converted = FEATURED_DEALS_COLLECTION.map(item => ({
   link: item.affiliateUrl,
   url: item.affiliateUrl,
   merchantUrl: item.merchantUrl,
-  logoUrl: item.logoUrl || null,
-  storeLogo: item.logoUrl || null,
-  logo: item.logoUrl || null,
+  logoUrl: null,
+  storeLogo: null,
+  logo: null,
   usesCount: 150,
   source: "analytics_clouds",
   campaignSource: "analytics_clouds",

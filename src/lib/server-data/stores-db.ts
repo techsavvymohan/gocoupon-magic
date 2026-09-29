@@ -21,7 +21,7 @@ export interface StoreRecord {
   slug: string;
   category: "Fashion" | "Electronics" | "Food" | "Travel" | "Beauty" | "Home" | "Recharge" | "General";
   logo?: string;
-  fallbackIcon: string;
+  fallbackIcon?: string;
   badge?: string;
   rating: number;
   couponsCount: number;
@@ -101,7 +101,7 @@ export function upsertStoreInDb(storeInput: any): StoreRecord {
     slug,
     category,
     logo: logo || (existingIdx >= 0 ? STORES_DB[existingIdx].logo : ""),
-    fallbackIcon: "🛍️",
+    fallbackIcon: "",
     badge: storeInput.badge || (existingIdx >= 0 ? STORES_DB[existingIdx].badge : "Verified Partner"),
     rating: Number(storeInput.rating || (existingIdx >= 0 ? STORES_DB[existingIdx].rating : 4.8)),
     couponsCount: Number(

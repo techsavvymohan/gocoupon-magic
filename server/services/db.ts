@@ -1103,7 +1103,7 @@ export const storesDb = {
         name,
         logo: logo || (sIdx >= 0 ? sData.stores[sIdx].logo : ""),
         category,
-        fallbackIcon: "🛍️",
+        fallbackIcon: "",
         badge: isFeatured ? "Featured Partner" : (sIdx >= 0 ? sData.stores[sIdx].badge : "Verified Partner"),
         rating,
         couponsCount,

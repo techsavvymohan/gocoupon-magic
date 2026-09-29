@@ -6,7 +6,7 @@ export interface StoreCatalogEntry {
   slug: string;
   category: string;
   logo?: string;
-  fallbackIcon: string;
+  fallbackIcon?: string;
   badge?: string;
   rating: number;
   couponsCount: number;
@@ -52,7 +52,7 @@ export function getStoreCatalog(): Map<string, StoreCatalogEntry> {
       slug: slugKey,
       category: s.category || "General",
       logo: s.logo,
-      fallbackIcon: s.fallbackIcon || "🏷️",
+      fallbackIcon: s.fallbackIcon || "",
       badge: s.badge || "Verified Partner",
       rating: s.rating || 4.8,
       couponsCount: s.couponsCount || 10,
@@ -92,7 +92,7 @@ export function getStoreCatalog(): Map<string, StoreCatalogEntry> {
         name,
         slug: slugKey,
         category: d.category || "Online Shopping",
-        fallbackIcon: "🛍️",
+        fallbackIcon: "",
         badge: "Verified Merchant",
         rating: 4.8,
         couponsCount: 0,

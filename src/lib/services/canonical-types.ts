@@ -55,7 +55,7 @@ export interface MerchantStore {
   slug: string;
   domain: string;
   logoUrl?: string;
-  fallbackIcon: string;
+  fallbackIcon?: string;
   affiliateNetwork: "Amazon Associates" | "Impact" | "Cuelinks" | "Direct" | "EarnKaro";
   partnerTag?: string;
   cashbackRate: string;

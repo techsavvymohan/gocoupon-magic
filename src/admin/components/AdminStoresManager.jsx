@@ -361,7 +361,7 @@ export default function AdminStoresManager() {
       trustStatus: store.trustStatus || "Active",
       logoText: store.logoText || "",
       affiliateLink: store.affiliateLink || "",
-      logoImage: store.logoImage || "",
+      logoImage: store.logoImage || store.logo || "",
       contentIntroTitle: store.contentIntroTitle || "",
       contentIntroParagraph1: store.contentIntroParagraph1 || "",
       contentIntroParagraph2: store.contentIntroParagraph2 || "",
@@ -606,10 +606,10 @@ export default function AdminStoresManager() {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-2xs">
-                          {store.logoImage ? (
-                            <img src={store.logoImage} alt={store.name} className="h-6 w-6 object-contain" />
+                          {store.logoImage || store.logo ? (
+                            <img src={store.logoImage || store.logo} alt={store.name} className="h-6 w-6 object-contain" />
                           ) : (
-                            <span className="text-xs font-black text-zinc-700 dark:text-zinc-200">{store.logoText || store.name?.charAt(0) || "S"}</span>
+                            <span className="text-xs font-black text-zinc-700 dark:text-zinc-200">{store.logoText || (store.name || "S").slice(0, 2).toUpperCase()}</span>
                           )}
                         </div>
                         <span className="font-bold text-zinc-900 dark:text-white text-xs">{store.name}</span>
@@ -863,7 +863,17 @@ export default function AdminStoresManager() {
                 </div>
 
               <div className="grid gap-2 text-sm text-[var(--muted)]">
-                <span className="font-medium text-[var(--text)]">Store Logo</span>
+                <span className="font-medium text-[var(--text)]">Cloudinary / Logo Image URL</span>
+                <Input
+                  placeholder="https://res.cloudinary.com/... or paste image URL"
+                  className="rounded-lg bg-[var(--surface)] font-mono text-xs"
+                  {...register("logoImage")}
+                />
+                <span className="text-xs text-[var(--muted)]">Paste your Cloudinary image URL directly, or use the file uploader below to upload a new asset.</span>
+              </div>
+
+              <div className="grid gap-2 text-sm text-[var(--muted)]">
+                <span className="font-medium text-[var(--text)]">Upload Logo File (to Cloudinary)</span>
                 <input
                   ref={fileInputRef}
                   type="file"

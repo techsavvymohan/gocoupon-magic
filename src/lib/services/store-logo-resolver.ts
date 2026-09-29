@@ -9,30 +9,10 @@
  * 4. Deterministic branded gradient monogram avatar fallback for network/load failures
  */
 
-export const LOCAL_STORE_LOGOS: Record<string, string> = {
-  amazon: "/Brand logos/Amazon_logo.svg.webp",
-  flipkart: "/Brand logos/flipkart.webp",
-  myntra: "/Brand logos/myntra.webp",
-  croma: "/Brand logos/croma.svg",
-  reliance: "/Brand logos/reliance.svg",
-  tatacliq: "/Brand logos/Tata-cliq.webp",
-  ajio: "/Brand logos/Ajio.webp",
-  nykaa: "/Brand logos/Nykaa.webp",
-  meesho: "/Brand logos/Meesho_logo.webp",
-  firstcry: "/Brand logos/FirstCry_logo.svg.webp",
-  gonoise: "/Brand logos/gonoise.svg",
-  noise: "/Brand logos/gonoise.svg",
-  soulflower: "/Brand logos/soulflower.svg",
-  rareism: "/Brand logos/rareism.svg",
-  jaypore: "/Brand logos/jaypore.svg",
-  asaya: "/Brand logos/asaya.svg",
-  bestbuy: "/Brand logos/bestbuy.svg",
-  target: "/Brand logos/target.svg",
-};
+export const LOCAL_STORE_LOGOS: Record<string, string> = {};
 
 /**
  * Extracts the exact destination merchant root domain from a Cuelinks tracking URL.
- * Tracking URLs format: https://linksredirect.com/?pub_id=...&subid=...&url=<encoded_merchant_url>
  */
 export function extractMerchantDomain(
   trackingUrl?: string,
@@ -63,7 +43,10 @@ export function extractMerchantDomain(
 }
 
 /**
- * Resolves a 100% accurate store logo URL without mismatch.
+ * Resolves a store logo URL.
+ * If an explicit logo URL (e.g., Cloudinary link) is provided, it is returned.
+ * If no logo is provided, returns empty string so the UI renders an ultra-fast CSS monogram.
+ * External CDN / Google S2 favicon calls are intentionally disabled to maximize loading performance.
  */
 export function resolveStoreLogo(
   storeName: string,
@@ -71,27 +54,18 @@ export function resolveStoreLogo(
   explicitDomain?: string,
   existingLogo?: string
 ): string {
-  const clean = (storeName || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-
-  // 1. Check local high-res curated assets
-  for (const [key, logo] of Object.entries(LOCAL_STORE_LOGOS)) {
-    if (clean === key || clean.startsWith(key) || key.startsWith(clean)) {
-      return logo;
-    }
-  }
-
-  // 2. Check if existing logo is an already resolved valid remote or local asset
+  // Check if existing logo is an explicitly configured remote URL (e.g. Cloudinary, custom CDN) or local asset
   if (
     existingLogo &&
-    !existingLogo.toLowerCase().includes("placeholder") &&
-    (existingLogo.startsWith("/Brand logos/") || existingLogo.startsWith("https://www.google.com/s2/favicons"))
+    typeof existingLogo === "string" &&
+    existingLogo.trim() !== "" &&
+    !existingLogo.toLowerCase().includes("placeholder")
   ) {
-    return existingLogo;
+    return existingLogo.trim();
   }
 
-  // 3. Exact destination domain extraction -> Google S2 128px HD Favicon CDN
-  const domain = extractMerchantDomain(trackingUrl, storeName, explicitDomain);
-  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+  // Zero-network fallback: return empty string so StoreLogo renders instant CSS initials
+  return "";
 }
 
 /**

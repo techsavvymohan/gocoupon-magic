@@ -80,21 +80,15 @@ function extractMerchantDomain(trackingUrl?: string, storeName?: string): string
 }
 
 function resolveStoreLogo(storeName: string, trackingUrl?: string, existingLogo?: string): string {
-  const clean = (storeName || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-  for (const [key, logo] of Object.entries(LOCAL_STORE_LOGOS)) {
-    if (clean === key || clean.startsWith(key) || key.startsWith(clean)) {
-      return logo;
-    }
-  }
   if (
     existingLogo &&
-    !existingLogo.toLowerCase().includes("placeholder") &&
-    (existingLogo.startsWith("/Brand logos/") || existingLogo.startsWith("https://www.google.com/s2/favicons"))
+    typeof existingLogo === "string" &&
+    existingLogo.trim() !== "" &&
+    !existingLogo.toLowerCase().includes("placeholder")
   ) {
-    return existingLogo;
+    return existingLogo.trim();
   }
-  const domain = extractMerchantDomain(trackingUrl, storeName);
-  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+  return "";
 }
 
 export default async function handler(req: any, res: any) {
