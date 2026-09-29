@@ -40,6 +40,7 @@ import {
   Info,
   CheckCircle2,
   X,
+  Gift,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -55,6 +56,7 @@ const CATEGORY_TABS = [
   { id: "Electronics", label: "Electronics", icon: Laptop },
   { id: "Perfumes", label: "Perfumes", icon: Tag },
   { id: "Fashion", label: "Fashion", icon: Shirt },
+  { id: "Pooja Essentials", label: "Pooja Essentials", icon: Gift },
   { id: "Education", label: "Education", icon: GraduationCap },
   { id: "Beauty", label: "Beauty", icon: Tag },
 ];
@@ -174,7 +176,20 @@ function FeaturedDealsPage() {
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = { all: dealsList.length };
     for (const deal of dealsList) {
-      counts[deal.category] = (counts[deal.category] || 0) + 1;
+      const cat = deal.category;
+      counts[cat] = (counts[cat] || 0) + 1;
+      if (cat.toLowerCase().includes("nutrition") && cat !== "Nutrition") {
+        counts["Nutrition"] = (counts["Nutrition"] || 0) + 1;
+      }
+      if (cat.toLowerCase().includes("fashion") && cat !== "Fashion") {
+        counts["Fashion"] = (counts["Fashion"] || 0) + 1;
+      }
+      if (cat.toLowerCase().includes("health") && cat !== "Health") {
+        counts["Health"] = (counts["Health"] || 0) + 1;
+      }
+      if (cat.toLowerCase().includes("perfume") && cat !== "Perfumes") {
+        counts["Perfumes"] = (counts["Perfumes"] || 0) + 1;
+      }
     }
     return counts;
   }, [dealsList]);
@@ -185,7 +200,12 @@ function FeaturedDealsPage() {
       .filter((item) => {
         const matchesCat =
           selectedCategory === "all" ||
-          item.category.toLowerCase() === selectedCategory.toLowerCase();
+          item.category.toLowerCase() === selectedCategory.toLowerCase() ||
+          (selectedCategory.toLowerCase() === "nutrition" && item.category.toLowerCase().includes("nutrition")) ||
+          (selectedCategory.toLowerCase() === "fashion" && item.category.toLowerCase().includes("fashion")) ||
+          (selectedCategory.toLowerCase() === "health" && item.category.toLowerCase().includes("health")) ||
+          (selectedCategory.toLowerCase() === "perfumes" && item.category.toLowerCase().includes("perfume")) ||
+          (selectedCategory.toLowerCase() === "beauty" && (item.category.toLowerCase().includes("beauty") || item.category.toLowerCase().includes("perfume")));
         const q = searchQuery.trim().toLowerCase();
         const matchesQuery =
           !q ||
