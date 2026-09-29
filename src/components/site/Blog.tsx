@@ -43,9 +43,9 @@ const featured: FeaturedPost[] = [
 export function Blog() {
 
   return (
-    <section id="blog" className="border-t border-border px-6 py-14 sm:py-20">
+    <section id="blog" className="border-t border-border px-6 py-10 sm:py-14">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-14 flex flex-wrap items-end justify-between gap-6">
+        <div className="mb-8 sm:mb-10 flex flex-wrap items-end justify-between gap-6">
           <div>
             <div className="reveal mb-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-primary font-bold">
               <span>Why Us Only • The Expense Saviour</span>

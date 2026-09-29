@@ -179,9 +179,9 @@ export function AnimatedDealsCarousel() {
   const doubleDeals = [...deals, ...deals];
 
   return (
-    <section className="border-t border-b border-border bg-card/20 py-12 sm:py-16 overflow-hidden relative">
+    <section className="border-t border-b border-border bg-card/20 py-8 sm:py-10 overflow-hidden relative">
       {/* Header Row */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 mb-10 flex flex-wrap items-end justify-between gap-6">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 mb-6 sm:mb-8 flex flex-wrap items-end justify-between gap-6">
         <div>
           <div className="mb-2 font-mono text-[11px] uppercase tracking-[0.2em] text-primary font-bold flex items-center gap-2">
             <span className="relative flex h-2 w-2 shrink-0">

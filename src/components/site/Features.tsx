@@ -43,9 +43,9 @@ const features = [
 
 export function Features() {
   return (
-    <section id="features" className="relative px-4 sm:px-6 py-14 sm:py-20 overflow-hidden border-t border-border">
+    <section id="features" className="relative px-4 sm:px-6 py-10 sm:py-14 overflow-hidden border-t border-border">
       <div className="mx-auto max-w-7xl">
-        <div className="reveal mb-14 max-w-2xl">
+        <div className="reveal mb-8 sm:mb-10 max-w-2xl">
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">
             Real Working Coupons.
             <span className="text-primary block mt-1">Verified Every 15 Minutes.</span>

@@ -11,8 +11,8 @@ export function Stats() {
     { label: "Cost to You, Forever", to: 0, prefix: symbol, suffix: " Free" },
   ];
   return (
-    <section className="relative border-y border-border px-4 sm:px-6 py-10 sm:py-14 bg-card/20">
-      <div className="mx-auto grid max-w-7xl gap-8 grid-cols-2 md:grid-cols-4">
+    <section className="relative border-y border-border px-4 sm:px-6 py-8 sm:py-10 bg-card/20">
+      <div className="mx-auto grid max-w-7xl gap-6 sm:gap-8 grid-cols-2 md:grid-cols-4">
         {stats.map((s, i) => (
           <div key={s.label} className="reveal" style={{ transitionDelay: `${i * 0.08}s` }}>
             <div className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight text-primary">

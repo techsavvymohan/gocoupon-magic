@@ -2,8 +2,8 @@ import { couponFaqs } from "@/data/faqs";
 
 export function FAQ() {
   return (
-    <section className="relative px-6 py-14 sm:py-20 border-t border-border">
-      <div className="mx-auto grid max-w-7xl gap-16 lg:grid-cols-[1fr_1.4fr]">
+    <section className="relative px-6 py-10 sm:py-14 border-t border-border">
+      <div className="mx-auto grid max-w-7xl gap-8 sm:gap-12 lg:grid-cols-[1fr_1.4fr]">
         <div className="reveal">
           <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
             FAQ
@@ -16,7 +16,7 @@ export function FAQ() {
           {couponFaqs.map((f, i) => (
             <details
               key={f.question}
-              className="reveal group py-6"
+              className="reveal group py-4 sm:py-5"
               style={{ transitionDelay: `${i * 0.05}s` }}
             >
               <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-left text-lg font-semibold text-foreground">

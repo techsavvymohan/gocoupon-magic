@@ -35,7 +35,7 @@ function Index() {
   const faq = faqSchema(couponFaqs);
 
   return (
-    <SiteShell>
+    <SiteShell hideFooterCta={true}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(website) }}

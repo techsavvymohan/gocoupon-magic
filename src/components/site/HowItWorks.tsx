@@ -101,7 +101,7 @@ export function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="relative scroll-mt-12 border-t border-border bg-background px-4 sm:px-6 py-14 sm:py-20"
+      className="relative scroll-mt-12 border-t border-border bg-background px-4 sm:px-6 py-10 sm:py-14"
     >
       {/* Anchor alias for backwards compatibility */}
       <div id="how" className="absolute -top-12 left-0 h-0 w-0" aria-hidden="true" />
@@ -122,7 +122,7 @@ export function HowItWorks() {
         </div>
 
         {/* 4 Plain-English Pillars Grid */}
-        <div className="mt-12 sm:mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 sm:mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {SHOPPING_STEPS.map((pillar) => {
             const Icon = pillar.icon;
             return (
@@ -204,8 +204,8 @@ export function HowItWorks() {
         </div>
 
         {/* High-Intent SEO Guides (Direct Google Search Queries) */}
-        <div className="mt-16 sm:mt-20 border-t border-border/70 pt-12 sm:pt-16">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+        <div className="mt-10 sm:mt-12 border-t border-border/70 pt-8 sm:pt-10">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
             <div>
               <div className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
                 <Search className="h-3.5 w-3.5" aria-hidden="true" />

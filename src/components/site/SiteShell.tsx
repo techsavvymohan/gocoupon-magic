@@ -9,9 +9,14 @@ import { useRevealOnScroll } from "@/hooks/use-reveal";
 type SiteShellProps = {
   children: ReactNode;
   showParticles?: boolean;
+  hideFooterCta?: boolean;
 };
 
-export function SiteShell({ children, showParticles = true }: SiteShellProps) {
+export function SiteShell({
+  children,
+  showParticles = true,
+  hideFooterCta = false,
+}: SiteShellProps) {
   useRevealOnScroll();
 
   useEffect(() => {
@@ -45,7 +50,7 @@ export function SiteShell({ children, showParticles = true }: SiteShellProps) {
       {/* Main content layer positioned above background particles (z-10) */}
       <div className="relative z-10 overflow-x-clip" style={{ overflowX: "clip" }}>
         <main>{children}</main>
-        <Footer />
+        <Footer hideCtaBanner={hideFooterCta} />
       </div>
 
       {/* Conversion & Compliance Floating Elements */}

@@ -3,7 +3,7 @@ import { useI18n } from "@/context/I18nContext";
 import { LanguageToggle } from "../LanguageToggle";
 import { CurrencyToggle } from "../CurrencyToggle";
 
-export function Footer() {
+export function Footer({ hideCtaBanner = false }: { hideCtaBanner?: boolean } = {}) {
   const { t } = useI18n();
 
   const handleOpenCookiePreferences = () => {
@@ -13,48 +13,50 @@ export function Footer() {
 
   return (
     <footer className="w-full bg-[#fbfbfb] dark:bg-[#070709] transition-colors">
-      {/* ── 1. Curved Dark Hero Banner with Top Ambient Spotlight ── */}
-      <div className="relative overflow-hidden rounded-b-[36px] sm:rounded-b-[44px] md:rounded-b-[52px] bg-[#09090b] text-white px-6 py-20 sm:py-28 lg:py-32 text-center shadow-xl">
-        {/* Ambient Top Spotlight Light Cone */}
-        <div
-          className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-[340px] w-[500px] sm:w-[750px] lg:w-[950px] rounded-full opacity-70"
-          style={{
-            background:
-              "radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.08) 45%, transparent 75%)",
-          }}
-          aria-hidden="true"
-        />
+      {/* ── 1. Curved Dark Hero Banner with Top Ambient Spotlight (hidden when page has dedicated CTA like homepage) ── */}
+      {!hideCtaBanner && (
+        <div className="relative overflow-hidden rounded-b-[36px] sm:rounded-b-[44px] md:rounded-b-[52px] bg-[#09090b] text-white px-6 py-14 sm:py-20 text-center shadow-xl">
+          {/* Ambient Top Spotlight Light Cone */}
+          <div
+            className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-[340px] w-[500px] sm:w-[750px] lg:w-[950px] rounded-full opacity-70"
+            style={{
+              background:
+                "radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.08) 45%, transparent 75%)",
+            }}
+            aria-hidden="true"
+          />
 
-        <div className="relative mx-auto max-w-2xl z-10">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white text-balance">
-            Ready to save on every purchase?
-          </h2>
-          <p className="mt-4 text-sm sm:text-base text-neutral-400 max-w-lg mx-auto leading-relaxed text-balance font-normal">
-            Join thousands of smart shoppers who are finding verified coupons and best prices in minutes.
-          </p>
-          <div className="mt-8 flex items-center justify-center">
-            <Link
-              to="/chrome-extension"
-              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-white px-6 py-2.5 text-sm font-semibold text-neutral-900 shadow-sm transition-all duration-200 hover:bg-neutral-100 hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black cursor-pointer"
-            >
-              <img
-                src="/icons/icon.svg"
-                onError={(e) => {
-                  e.currentTarget.src = "/icons/icon_128.png";
-                }}
-                alt="GoCoupon"
-                className="h-4 w-4 object-contain"
-                width={16}
-                height={16}
-              />
-              <span>Start for free</span>
-            </Link>
+          <div className="relative mx-auto max-w-2xl z-10">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white text-balance">
+              Ready to save on every purchase?
+            </h2>
+            <p className="mt-3 text-sm sm:text-base text-neutral-400 max-w-lg mx-auto leading-relaxed text-balance font-normal">
+              Join thousands of smart shoppers who are finding verified coupons and best prices in minutes.
+            </p>
+            <div className="mt-6 flex items-center justify-center">
+              <Link
+                to="/chrome-extension"
+                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-white px-6 py-2.5 text-sm font-semibold text-neutral-900 shadow-sm transition-all duration-200 hover:bg-neutral-100 hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black cursor-pointer"
+              >
+                <img
+                  src="/icons/icon.svg"
+                  onError={(e) => {
+                    e.currentTarget.src = "/icons/icon_128.png";
+                  }}
+                  alt="GoCoupon"
+                  className="h-4 w-4 object-contain"
+                  width={16}
+                  height={16}
+                />
+                <span>Start for free</span>
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* ── 2. Floating Minimalist White Footer Card ── */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-28 sm:pb-20">
+      <div className={`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 ${hideCtaBanner ? "pt-6 sm:pt-10" : "pt-10 sm:pt-14"} pb-24 sm:pb-16`}>
         <div className="rounded-[28px] sm:rounded-[36px] border border-neutral-200/90 bg-white p-8 sm:p-12 lg:p-14 shadow-[0_4px_24px_rgba(0,0,0,0.02)] dark:border-neutral-800/80 dark:bg-neutral-900/95">
           {/* Main Content: Brand Column + 3 Navigation Columns */}
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-8">

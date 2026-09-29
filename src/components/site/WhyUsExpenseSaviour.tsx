@@ -103,10 +103,10 @@ export function WhyUsExpenseSaviour() {
   ];
 
   return (
-    <section className="relative overflow-hidden border-t border-border bg-card/20 px-4 sm:px-6 py-14 sm:py-20">
+    <section className="relative overflow-hidden border-t border-border bg-card/20 px-4 sm:px-6 py-10 sm:py-14">
       <div className="mx-auto max-w-7xl">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
           <h2 className="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-foreground text-balance">
             Stop Donating Money to Retail Tricks.
             <span className="text-primary block mt-1">
@@ -114,14 +114,14 @@ export function WhyUsExpenseSaviour() {
             </span>
           </h2>
 
-          <p className="mt-5 text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed text-balance">
+          <p className="mt-4 text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed text-balance">
             Other coupon apps only check one store and test broken promo codes. Passive trackers tell you to wait weeks.
             GoCoupon is the <strong>only complete 4-tier savings engine</strong> that slashes your checkout bill right now.
           </p>
         </div>
 
         {/* 4 Financial Leaks Breakdown */}
-        <div className="mb-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-8 sm:mb-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {expenseLeaks.map((item, idx) => {
             const Icon = item.icon;
             return (
