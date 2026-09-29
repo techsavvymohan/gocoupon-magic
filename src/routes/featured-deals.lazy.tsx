@@ -40,7 +40,6 @@ import {
   Info,
   CheckCircle2,
   X,
-  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 

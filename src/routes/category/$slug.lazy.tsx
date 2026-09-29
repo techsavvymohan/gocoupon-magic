@@ -12,7 +12,6 @@ import {
   Tag,
   ShieldCheck,
   ChevronRight,
-  Sparkles,
   ArrowRight,
   CreditCard,
   BookOpen,
@@ -87,7 +86,7 @@ function CategorySlugPage() {
           {/* Quick Metrics Bar */}
           <div className="mx-auto mt-8 flex flex-wrap items-center justify-center gap-6 rounded-2xl border border-border bg-card/80 p-4 text-xs font-medium text-muted-foreground backdrop-blur-xs max-w-2xl">
             <div className="flex items-center gap-1.5">
-              <Sparkles className="h-4 w-4 text-primary" />
+              <Tag className="h-4 w-4 text-primary" />
               <span>Top Discount: <strong className="text-foreground">{category.topDiscount}</strong></span>
             </div>
             <span>•</span>

@@ -16,7 +16,6 @@ import {
   TrendingDown,
   BarChart3,
   Scale,
-  Sparkles,
   Zap,
 } from "lucide-react";
 

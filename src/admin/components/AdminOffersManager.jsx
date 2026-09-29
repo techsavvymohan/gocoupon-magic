@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ExternalLink, MousePointerClick, TrendingUp, Search, X, ChevronLeft, ChevronRight, Image as ImageIcon, Sparkles, Tag, ShieldCheck } from "lucide-react";
+import { ExternalLink, MousePointerClick, TrendingUp, Search, X, ChevronLeft, ChevronRight, Image as ImageIcon, Info, Tag, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 import BulkCouponImportDialog from "./BulkCouponImportDialog";
@@ -1024,7 +1024,7 @@ export default function AdminOffersManager() {
                       </div>
 
                       <div className="flex items-start gap-2 text-[11px] text-emerald-300/90 bg-emerald-950/60 p-2.5 rounded-lg border border-emerald-900/60">
-                        <Sparkles className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+                        <Info className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
                         <span>
                           This store will auto-publish into the website&apos;s <strong>Stores Directory (/stores)</strong> with your selected <strong>Category</strong>, entered <strong>Store Name</strong>, and <strong>Cloudinary Logo URL</strong> below.
                         </span>
@@ -1124,7 +1124,7 @@ export default function AdminOffersManager() {
               {/* Section 2: Codes, Discount & Redemption Link */}
               <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/60 p-4 space-y-4">
                 <div className="flex items-center gap-2 border-b border-zinc-800 pb-2.5">
-                  <Sparkles className="h-4 w-4 text-emerald-500" />
+                  <Tag className="h-4 w-4 text-emerald-500" />
                   <span className="text-xs font-bold uppercase tracking-wider text-zinc-300">2. Coupon Codes & Redemption Link</span>
                 </div>
 

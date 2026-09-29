@@ -7,7 +7,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, Link } from "@tanstack/react-router";
-import { Search, X, Store, Tag, ArrowRight, Sparkles, ExternalLink, ShieldCheck } from "lucide-react";
+import { Search, X, Store, Tag, ArrowRight, ExternalLink, ShieldCheck } from "lucide-react";
 import { getStoreCatalog, type StoreCatalogEntry } from "@/lib/store-catalog-helper";
 
 interface NavbarSearchProps {
