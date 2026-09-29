@@ -38,6 +38,7 @@ import {
 import { recordNewSubmission, requireAdminAuth } from "./admin.js";
 import { dealsDb, submissionsDb, storesDb } from "../services/db.js";
 import { upsertStoreInDb } from "../../src/lib/server-data/stores-db.js";
+import { brandAssetsService } from "../services/brand-assets-service.js";
 
 export const dealsRouter = Router();
 
@@ -48,7 +49,11 @@ export const dealsRouter = Router();
 dealsRouter.get("/popular-brands", async (_req: Request, res: Response) => {
   try {
     const livePool = getLiveDealsPool();
-    const brands = getPopularBrandsFromPool(livePool);
+    let brands = getPopularBrandsFromPool(livePool);
+    brands = brands.map((b) => {
+      const brandLogo = brandAssetsService.getLogoUrl(b.slug || b.name);
+      return brandLogo ? { ...b, logo: brandLogo } : b;
+    });
     res.setHeader("Cache-Control", "public, max-age=300, s-maxage=600");
     res.json({
       success: true,
@@ -281,12 +286,21 @@ dealsRouter.get("/", async (req: Request, res: Response) => {
       livePool
     );
 
+    const stampedDeals = result.deals.map((deal) => {
+      const brandLogo = brandAssetsService.getLogoUrl(deal.storeSlug || deal.storeName);
+      if (brandLogo && (!deal.storeLogo || deal.storeLogo.includes("placeholder"))) {
+        return { ...deal, storeLogo: brandLogo };
+      }
+      return deal;
+    });
+
     const stats = getLiveSyncStats();
     const isUncapped = limit === 0;
     const responsePayload = {
       ...result,
-      data: result.deals,
-      count: result.deals.length,
+      deals: stampedDeals,
+      data: stampedDeals,
+      count: stampedDeals.length,
       page: isUncapped ? 1 : Math.floor(offset / limit) + 1,
       hasMore: isUncapped ? false : offset + limit < result.total,
       isDynamic: true,

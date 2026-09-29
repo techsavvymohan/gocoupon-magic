@@ -16,6 +16,7 @@ import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
 import { globalCache } from "../../src/lib/services/cache-service.js";
 import { storesDb } from "../services/db.js";
 import { requireAdminAuth } from "./admin.js";
+import { brandAssetsService } from "../services/brand-assets-service.js";
 
 export const storesRouter = Router();
 
@@ -55,10 +56,19 @@ storesRouter.get("/", async (req: Request, res: Response) => {
 
   try {
     const result = queryStores({ category, q, sortBy, order, limit, offset });
-    await globalCache.set(cacheKey, result, 60 * 1000);
+    const stampedStores = result.stores.map((s: any) => {
+      const canonicalLogo = brandAssetsService.getLogoUrl(s.slug || s.name || s.id);
+      if (canonicalLogo && (!s.logo || s.logo.includes("placeholder"))) {
+        return { ...s, logo: canonicalLogo };
+      }
+      return s;
+    });
+
+    const payload = { ...result, stores: stampedStores, data: stampedStores, cached: false };
+    await globalCache.set(cacheKey, payload, 60 * 1000);
 
     res.setHeader("Cache-Control", "public, max-age=60, s-maxage=120");
-    res.json({ ...result, data: result.stores, cached: false });
+    res.json(payload);
   } catch (err: any) {
     console.error("[Stores API Error]", err);
     res.status(500).json({

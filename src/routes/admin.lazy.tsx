@@ -12,6 +12,7 @@ import AdminTopbar from "@/admin/components/AdminTopbar";
 import AdminOffersManager from "@/admin/components/AdminOffersManager";
 import AdminSubmissionsManager from "@/admin/components/AdminSubmissionsManager";
 import AdminStoresManager from "@/admin/components/AdminStoresManager";
+import AdminBrandAssetsManager from "@/admin/components/AdminBrandAssetsManager";
 import AdminCategoriesManager from "@/admin/components/AdminCategoriesManager";
 import AdminBlogsManager from "@/admin/components/AdminBlogsManager";
 import AdminEventsManager from "@/admin/components/AdminEventsManager";
@@ -128,6 +129,7 @@ function AdminContent() {
               {activeTab === "offers" && <AdminOffersManager />}
               {activeTab === "submissions" && <AdminSubmissionsManager />}
               {activeTab === "stores" && <AdminStoresManager />}
+              {activeTab === "brand-assets" && <AdminBrandAssetsManager />}
               {activeTab === "categories" && <AdminCategoriesManager />}
               {activeTab === "blogs" && <AdminBlogsManager />}
               {activeTab === "events" && <AdminEventsManager />}
@@ -151,6 +153,8 @@ function getTabTitle(tab: string): string {
       return "Community Submitted Coupons Review Desk";
     case "stores":
       return "Stores Directory";
+    case "brand-assets":
+      return "Brand Assets & Logo Hub";
     case "categories":
       return "Shopping Categories";
     case "blogs":

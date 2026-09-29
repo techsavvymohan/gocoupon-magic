@@ -407,23 +407,36 @@ export default function AdminStoresManager() {
 
     try {
       setIsUploadingLogo(true);
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("slug", watchedSlug || slugify(watchedName || file.name));
+      const reader = new FileReader();
+      const base64Data = await new Promise((resolve, reject) => {
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
 
-      const response = await fetch("/api/uploads/store-logo", {
+      const response = await fetch("/api/admin/upload", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+          ...getAdminAuthHeaders(),
+        },
+        body: JSON.stringify({
+          image: base64Data,
+          folder: "gocoupon/brands",
+          public_id: `store_${watchedSlug || slugify(watchedName || file.name)}`,
+          tags: ["gocoupon", "store-logo", watchedSlug || "store"],
+        }),
       });
       const payload = await response.json();
 
-      if (!response.ok) {
-        throw new Error(payload.error || "Unable to upload logo.");
+      if (!response.ok || !payload.success) {
+        throw new Error(payload.error || "Unable to upload logo to Cloudinary.");
       }
 
-      setValue("logoImage", payload.data.secureUrl, { shouldDirty: true, shouldValidate: true });
+      const secureUrl = payload.data?.secure_url || payload.data?.url;
+      setValue("logoImage", secureUrl, { shouldDirty: true, shouldValidate: true });
       clearErrors("logoImage");
-      toast.success("Logo uploaded to Cloudinary.");
+      toast.success("Logo uploaded to Cloudinary successfully!");
     } catch (error) {
       setError("logoImage", { type: "manual", message: error.message });
       toast.error(error.message || "Unable to upload logo.");

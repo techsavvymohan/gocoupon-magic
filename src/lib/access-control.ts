@@ -8,6 +8,7 @@ export type PermissionKey =
   | "offers"
   | "submissions"
   | "stores"
+  | "brand-assets"
   | "categories"
   | "blogs"
   | "events"
@@ -30,6 +31,7 @@ export const PERMISSIONS: PermissionItem[] = [
   { key: "offers", label: "Offers & Coupons", href: "/admin/offers" },
   { key: "submissions", label: "Submitted Coupons", href: "/admin/submissions" },
   { key: "stores", label: "Stores Directory", href: "/admin/stores" },
+  { key: "brand-assets", label: "Brand Assets & Logos", href: "/admin/brand-assets", description: "Manage Cloudinary merchant logos & branding" },
   { key: "categories", label: "Categories", href: "/admin/categories" },
   { key: "blogs", label: "Blog & Guides", href: "/admin/blogs" },
   { key: "events", label: "Events & Festivals", href: "/admin/events" },
@@ -51,6 +53,7 @@ export const ROLE_PERMISSIONS: Record<RoleType, PermissionKey[]> = {
     "offers",
     "submissions",
     "stores",
+    "brand-assets",
     "categories",
     "blogs",
     "events",
@@ -64,13 +67,14 @@ export const ROLE_PERMISSIONS: Record<RoleType, PermissionKey[]> = {
     "offers",
     "submissions",
     "stores",
+    "brand-assets",
     "categories",
     "blogs",
     "events",
     "hero",
     "sections",
   ],
-  viewer: ["dashboard", "offers", "submissions", "stores", "categories", "blogs"],
+  viewer: ["dashboard", "offers", "submissions", "stores", "brand-assets", "categories", "blogs"],
 };
 
 export function canAccessPermission(userPermissions: string[] | undefined, permissionKey: string): boolean {

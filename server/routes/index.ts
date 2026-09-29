@@ -33,6 +33,7 @@ import {
 } from "./admin.js";
 import { blogsRouter } from "./blogs.js";
 import { uploadRouter } from "./upload.js";
+import { brandAssetsRouter } from "./brand-assets.js";
 import { openFoodFactRouter } from "../../src/open_food_fact/api-route.js";
 import { priceHistoryRouter } from "./price-history.js";
 import {
@@ -94,6 +95,7 @@ apiRouter.use("/users", adminRouter);
 apiRouter.use("/blogs", blogsRouter);
 apiRouter.use("/admin/blogs", blogsRouter);
 apiRouter.use("/admin", uploadRouter);
+apiRouter.use("/admin/brand-assets", brandAssetsRouter);
 apiRouter.use("/offers", dealsRouter);
 apiRouter.use("/homepage", adminRouter);
 

@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ExternalLink, MousePointerClick, TrendingUp, Search, X, ChevronLeft, ChevronRight, Image as ImageIcon, Info, Tag, ShieldCheck } from "lucide-react";
+import { ExternalLink, MousePointerClick, TrendingUp, Search, X, ChevronLeft, ChevronRight, Image as ImageIcon, Info, Tag, ShieldCheck, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 import BulkCouponImportDialog from "./BulkCouponImportDialog";
@@ -81,6 +80,8 @@ export default function AdminOffersManager() {
   const [selectedOfferIds, setSelectedOfferIds] = useState([]);
   const [error, setError] = useState("");
   const [isCustomStore, setIsCustomStore] = useState(false);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const logoFileInputRef = useRef(null);
   const affiliateEditedRef = useRef(false);
 
   async function loadData() {
@@ -268,6 +269,63 @@ export default function AdminOffersManager() {
     }
   }
 
+  async function handleLogoFileUpload(file) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please choose an image file (PNG, SVG, WEBP, or JPG).");
+      return;
+    }
+    if (file.size > 3 * 1024 * 1024) {
+      toast.error("Image file must be under 3MB.");
+      return;
+    }
+
+    try {
+      setIsUploadingLogo(true);
+      toast.info("Uploading brand logo to Cloudinary...");
+      const reader = new FileReader();
+      const base64Data = await new Promise((resolve, reject) => {
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const targetSlug =
+        form.storeSlug ||
+        (form.storeName || "brand")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+
+      const response = await fetch("/api/admin/upload", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAdminAuthHeaders(),
+        },
+        body: JSON.stringify({
+          image: base64Data,
+          folder: "gocoupon/brands",
+          public_id: `brand_${targetSlug}`,
+          tags: ["gocoupon", "brand-logo", targetSlug],
+        }),
+      });
+
+      const payload = await response.json();
+      if (!response.ok || !payload.success) {
+        throw new Error(payload.error || "Failed to upload logo to Cloudinary.");
+      }
+
+      const secureUrl = payload.data?.secure_url || payload.data?.url;
+      setForm((prev) => ({ ...prev, storeLogo: secureUrl }));
+      toast.success("Logo uploaded to Cloudinary successfully!");
+    } catch (err) {
+      toast.error(err.message || "Failed to upload logo.");
+    } finally {
+      setIsUploadingLogo(false);
+    }
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
     setIsSubmitting(true);
@@ -358,6 +416,23 @@ export default function AdminOffersManager() {
     }
 
     toast.success(editingOffer ? "Offer updated successfully" : "New offer created successfully");
+
+    // Automatically sync logo to Brand Registry so all other deals & store cards inherit this logo
+    if (cleanLogo && finalStoreSlug) {
+      fetch(`/api/admin/brand-assets/${encodeURIComponent(finalStoreSlug)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
+        body: JSON.stringify({
+          name: cleanStoreName,
+          domain: `${finalStoreSlug}.com`,
+          logoUrl: cleanLogo,
+          source: cleanLogo.includes("cloudinary.com") ? "cloudinary" : "manual",
+        }),
+      }).catch((assetErr) => {
+        console.warn("Could not sync brand asset from offer manager:", assetErr);
+      });
+    }
+
     await loadData();
     setOpen(false);
     setForm(initialForm);
@@ -1083,16 +1158,42 @@ export default function AdminOffersManager() {
                         )}
                       </div>
 
-                      <div className="flex-1 space-y-1">
-                        <Input
-                          name="storeLogo"
-                          value={form.storeLogo}
-                          onChange={handleChange}
-                          placeholder="https://res.cloudinary.com/... or https://..."
-                          className="bg-zinc-800/90 border-zinc-700 text-white placeholder:text-zinc-500 text-xs h-9"
+                      <div className="flex-1 space-y-1.5">
+                        <input
+                          type="file"
+                          ref={logoFileInputRef}
+                          className="hidden"
+                          accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleLogoFileUpload(file);
+                            e.target.value = "";
+                          }}
                         />
+
+                        <div className="flex items-center gap-2">
+                          <Input
+                            name="storeLogo"
+                            value={form.storeLogo}
+                            onChange={handleChange}
+                            placeholder="https://res.cloudinary.com/... or https://..."
+                            className="bg-zinc-800/90 border-zinc-700 text-white placeholder:text-zinc-500 text-xs h-9 flex-1 font-mono text-[11px]"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            disabled={isUploadingLogo}
+                            onClick={() => logoFileInputRef.current?.click()}
+                            className="h-9 px-3 text-xs font-bold border-zinc-700 bg-zinc-800 text-zinc-200 hover:text-white hover:bg-zinc-700 shrink-0"
+                          >
+                            <Upload className={`h-3.5 w-3.5 mr-1 ${isUploadingLogo ? "animate-bounce text-emerald-400" : ""}`} />
+                            {isUploadingLogo ? "Uploading..." : "Upload File"}
+                          </Button>
+                        </div>
+
                         <div className="flex items-center justify-between text-[11px] text-zinc-400">
-                          <span>Paste Cloudinary image URL (res.cloudinary.com/...) or public HTTPS image</span>
+                          <span>Paste Cloudinary URL or click Upload File (auto-saved to Cloudinary)</span>
                           {form.storeLogo && (
                             <button
                               type="button"
