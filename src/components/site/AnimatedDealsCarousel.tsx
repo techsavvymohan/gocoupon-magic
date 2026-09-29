@@ -179,7 +179,7 @@ export function AnimatedDealsCarousel() {
   const doubleDeals = [...deals, ...deals];
 
   return (
-    <section className="border-t border-b border-border bg-card/20 py-16 sm:py-20 overflow-hidden relative">
+    <section className="border-t border-b border-border bg-card/20 py-12 sm:py-16 overflow-hidden relative">
       {/* Header Row */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 mb-10 flex flex-wrap items-end justify-between gap-6">
         <div>

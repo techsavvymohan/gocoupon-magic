@@ -28,7 +28,7 @@ export function ExtensionShowcase() {
   };
 
   return (
-    <section id="extension-showcase" className="relative border-t border-border px-4 sm:px-6 py-20 sm:py-28 overflow-hidden bg-card/20">
+    <section id="extension-showcase" className="relative border-t border-border px-4 sm:px-6 py-14 sm:py-20 overflow-hidden bg-card/20">
       <div className="mx-auto max-w-7xl">
         <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
           {/* Copy Column (7 cols) */}

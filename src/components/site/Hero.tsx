@@ -11,7 +11,7 @@ export function Hero() {
   const { banner, isActive, styles } = useFestiveBanner();
 
   return (
-    <section className="relative overflow-hidden pt-8 sm:pt-14 pb-16 sm:pb-24">
+    <section className="relative overflow-hidden pt-8 sm:pt-12 pb-10 sm:pb-14">
       {/* Centered Hero Content */}
       <div className="relative mx-auto max-w-4xl px-4 sm:px-6 text-center">
         {/* Main Headline */}

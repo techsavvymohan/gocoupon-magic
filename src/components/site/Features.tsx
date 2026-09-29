@@ -43,7 +43,7 @@ const features = [
 
 export function Features() {
   return (
-    <section id="features" className="relative px-4 sm:px-6 py-20 sm:py-28 overflow-hidden border-t border-border">
+    <section id="features" className="relative px-4 sm:px-6 py-14 sm:py-20 overflow-hidden border-t border-border">
       <div className="mx-auto max-w-7xl">
         <div className="reveal mb-14 max-w-2xl">
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">

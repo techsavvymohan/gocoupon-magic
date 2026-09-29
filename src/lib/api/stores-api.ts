@@ -70,16 +70,73 @@ export async function fetchStores(options: FetchStoresOptions = {}): Promise<Sto
 
   const url = `/api/stores${params.size > 0 ? `?${params.toString()}` : ""}`;
 
-  const res = await fetch(url, {
-    signal: AbortSignal.timeout(8000),
-    headers: { Accept: "application/json" },
-  });
-
-  if (!res.ok) {
-    throw new Error(`/api/stores returned ${res.status}: ${res.statusText}`);
+  function normalizeStore(s: any): Store {
+    return {
+      ...s,
+      rating: typeof s.rating === "number" ? s.rating : parseFloat(String(s.rating)) || 4.8,
+      couponsCount: Number(s.couponsCount) || 0,
+      category: s.category || "General",
+      link: s.link || (s.slug ? `/${s.slug}` : "/stores"),
+      popularCoupon: s.popularCoupon || {
+        code: "DEALACTIVATED",
+        description: s.description || "Verified store discount",
+        discount: s.maxDiscount || "Verified Deal",
+      },
+    };
   }
 
-  return res.json() as Promise<StoresApiResponse>;
+  try {
+    const res = await fetch(url, {
+      signal: AbortSignal.timeout(8000),
+      headers: { Accept: "application/json" },
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.stores)) {
+        return {
+          ...data,
+          stores: data.stores.map(normalizeStore),
+        };
+      }
+    }
+  } catch (err) {
+    console.warn("[Stores API Client] Failed to fetch /api/stores, falling back to static data:", err);
+  }
+
+  // Fallback to static STORES_DATA
+  const { STORES_DATA } = await import("@/data/storesData");
+  let list = STORES_DATA.map(normalizeStore);
+
+  if (options.category && options.category !== "All") {
+    list = list.filter((s) => s.category.toLowerCase() === options.category!.toLowerCase());
+  }
+  if (options.q) {
+    const qLower = options.q.toLowerCase().trim();
+    list = list.filter(
+      (s) =>
+        s.name.toLowerCase().includes(qLower) ||
+        s.description.toLowerCase().includes(qLower) ||
+        s.popularCoupon.code.toLowerCase().includes(qLower)
+    );
+  }
+
+  const limit = options.limit || 200;
+  const offset = options.offset || 0;
+  const paginated = list.slice(offset, offset + limit);
+
+  return {
+    stores: paginated,
+    total: list.length,
+    count: paginated.length,
+    cached: true,
+    meta: {
+      category: options.category || "All",
+      q: options.q || null,
+      limit,
+      offset,
+    },
+  };
 }
 
 /**

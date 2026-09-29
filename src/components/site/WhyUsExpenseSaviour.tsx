@@ -103,7 +103,7 @@ export function WhyUsExpenseSaviour() {
   ];
 
   return (
-    <section className="relative overflow-hidden border-t border-border bg-card/20 px-4 sm:px-6 py-20 sm:py-28">
+    <section className="relative overflow-hidden border-t border-border bg-card/20 px-4 sm:px-6 py-14 sm:py-20">
       <div className="mx-auto max-w-7xl">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">

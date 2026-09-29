@@ -1,24 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { lazy, Suspense } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { Hero } from "@/components/site/Hero";
 import { LogoMarquee } from "@/components/site/LogoMarquee";
+import { Stats } from "@/components/site/Stats";
+import { AnimatedDealsCarousel } from "@/components/site/AnimatedDealsCarousel";
+import { ExtensionShowcase } from "@/components/site/ExtensionShowcase";
+import { HowItWorks } from "@/components/site/HowItWorks";
+import { WhyUsExpenseSaviour } from "@/components/site/WhyUsExpenseSaviour";
+import { Features } from "@/components/site/Features";
+import { FAQ } from "@/components/site/FAQ";
+import { Blog } from "@/components/site/Blog";
+import { CTA } from "@/components/site/CTA";
 import { couponFaqs } from "@/data/faqs";
 import { breadcrumbSchema, createSeoHead, faqSchema, organizationSchema, softwareAppSchema, websiteSchema } from "@/lib/seo";
-
-// ─── Below-fold sections lazy-loaded to reduce initial JS parse cost ───────────
-// The browser paints Hero + LogoMarquee instantly while these stream in.
-// Suspense fallback is null (no skeleton) because modules load near-instantly
-// from the local asset cache — visible skeleton gaps are worse than a quick pop-in.
-const Stats = lazy(() => import("@/components/site/Stats").then(m => ({ default: m.Stats })));
-const AnimatedDealsCarousel = lazy(() => import("@/components/site/AnimatedDealsCarousel").then(m => ({ default: m.AnimatedDealsCarousel })));
-const ExtensionShowcase = lazy(() => import("@/components/site/ExtensionShowcase").then(m => ({ default: m.ExtensionShowcase })));
-const HowItWorks = lazy(() => import("@/components/site/HowItWorks").then(m => ({ default: m.HowItWorks })));
-const WhyUsExpenseSaviour = lazy(() => import("@/components/site/WhyUsExpenseSaviour").then(m => ({ default: m.WhyUsExpenseSaviour })));
-const Features = lazy(() => import("@/components/site/Features").then(m => ({ default: m.Features })));
-const FAQ = lazy(() => import("@/components/site/FAQ").then(m => ({ default: m.FAQ })));
-const Blog = lazy(() => import("@/components/site/Blog").then(m => ({ default: m.Blog })));
-const CTA = lazy(() => import("@/components/site/CTA").then(m => ({ default: m.CTA })));
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -63,38 +57,18 @@ function Index() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
       />
 
-      {/* ── Above fold: eagerly rendered ─────────────────────────────── */}
+      {/* ── Cohesive, seamless homepage sections without gaping or layout shifts ── */}
       <Hero />
       <LogoMarquee />
-
-      {/* ── Below fold: lazy-loaded, null fallback = no gap ─────────── */}
-      <Suspense fallback={null}>
-        <Stats />
-      </Suspense>
-      <Suspense fallback={null}>
-        <AnimatedDealsCarousel />
-      </Suspense>
-      <Suspense fallback={null}>
-        <ExtensionShowcase />
-      </Suspense>
-      <Suspense fallback={null}>
-        <HowItWorks />
-      </Suspense>
-      <Suspense fallback={null}>
-        <WhyUsExpenseSaviour />
-      </Suspense>
-      <Suspense fallback={null}>
-        <Features />
-      </Suspense>
-      <Suspense fallback={null}>
-        <FAQ />
-      </Suspense>
-      <Suspense fallback={null}>
-        <Blog />
-      </Suspense>
-      <Suspense fallback={null}>
-        <CTA />
-      </Suspense>
+      <Stats />
+      <AnimatedDealsCarousel />
+      <ExtensionShowcase />
+      <HowItWorks />
+      <WhyUsExpenseSaviour />
+      <Features />
+      <FAQ />
+      <Blog />
+      <CTA />
     </SiteShell>
   );
 }

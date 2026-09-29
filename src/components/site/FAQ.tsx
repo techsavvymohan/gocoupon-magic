@@ -2,7 +2,7 @@ import { couponFaqs } from "@/data/faqs";
 
 export function FAQ() {
   return (
-    <section className="relative px-6 py-32">
+    <section className="relative px-6 py-14 sm:py-20 border-t border-border">
       <div className="mx-auto grid max-w-7xl gap-16 lg:grid-cols-[1fr_1.4fr]">
         <div className="reveal">
           <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">

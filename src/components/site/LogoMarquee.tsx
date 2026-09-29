@@ -11,7 +11,7 @@ const stores = [
 
 export function LogoMarquee() {
   return (
-    <section className="relative overflow-hidden border-y border-border py-10">
+    <section className="relative overflow-hidden border-y border-border py-6 sm:py-8">
       <div className="reveal mx-auto mb-6 max-w-7xl px-6">
         <p className="text-center font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
           Works on the stores you actually shop at

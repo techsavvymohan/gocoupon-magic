@@ -54,21 +54,26 @@ function StoresPage() {
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = { All: allStores.length };
     allStores.forEach((s) => {
-      counts[s.category] = (counts[s.category] || 0) + 1;
+      const cat = s?.category || "General";
+      counts[cat] = (counts[cat] || 0) + 1;
     });
     return counts;
   }, [allStores]);
 
   const filteredStores = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
     return allStores.filter((store) => {
-      const matchesSearch =
-        store.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        store.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        store.popularCoupon.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        store.popularCoupon.code.toLowerCase().includes(searchQuery.toLowerCase());
+      if (!store) return false;
+      const nameMatch = (store.name || "").toLowerCase().includes(q);
+      const descMatch = (store.description || "").toLowerCase().includes(q);
+      const couponDescMatch = (store.popularCoupon?.description || "").toLowerCase().includes(q);
+      const couponCodeMatch = (store.popularCoupon?.code || "").toLowerCase().includes(q);
+      const matchesSearch = !q || nameMatch || descMatch || couponDescMatch || couponCodeMatch;
+
+      const storeCat = (store.category || "General").toLowerCase();
       const matchesCategory =
         selectedCategory === "All" ||
-        store.category.toLowerCase() === selectedCategory.toLowerCase();
+        storeCat === selectedCategory.toLowerCase();
       return matchesSearch && matchesCategory;
     });
   }, [searchQuery, selectedCategory, allStores]);
@@ -76,6 +81,7 @@ function StoresPage() {
   const handleCopy = (code: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!code) return;
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
     toast.success(`Coupon code ${code} copied!`);
@@ -328,11 +334,10 @@ function StoresPage() {
             <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {filteredStores.map((store) => (
                 <StoreCard
-
                   key={store.id}
                   store={store}
                   onCopy={handleCopy}
-                  isCopied={copiedCode === store.popularCoupon.code}
+                  isCopied={Boolean(store.popularCoupon?.code && copiedCode === store.popularCoupon.code)}
                   formatPriceString={formatPriceString}
                 />
               ))}
@@ -470,8 +475,15 @@ function StoreCard({
   formatPriceString: (str: string) => string;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const formattedDiscount = formatPriceString(store.popularCoupon.discount);
-  const formattedDescription = formatPriceString(store.popularCoupon.description);
+  const couponCode = store.popularCoupon?.code || "DEALACTIVATED";
+  const couponDiscount = store.popularCoupon?.discount || store.maxDiscount || "Verified Deal";
+  const couponDesc = store.popularCoupon?.description || store.description || "Click to redeem verified store discount";
+  const formattedDiscount = formatPriceString(couponDiscount);
+  const formattedDescription = formatPriceString(couponDesc);
+
+  const ratingNum = typeof store.rating === "number" ? store.rating : parseFloat(String(store.rating)) || 4.8;
+  const storeLink = store.link || (store.slug ? `/${store.slug}` : "/stores");
+  const couponsCount = store.couponsCount ?? 0;
 
   const CardContent = (
     <div
@@ -484,7 +496,7 @@ function StoreCard({
           <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
             {/* Elevated Logo Podium */}
             <StoreLogo
-              storeName={store.name}
+              storeName={store.name || "Store"}
               storeLogo={store.logo}
               className="h-12 w-12 sm:h-14 sm:w-14 rounded-xl sm:rounded-2xl text-xs sm:text-sm shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300"
             />
@@ -494,11 +506,11 @@ function StoreCard({
                 {store.name}
               </h3>
               <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-muted-foreground mt-0.5">
-                <span className="font-mono text-[10px] sm:text-[11px] font-semibold">{store.category}</span>
+                <span className="font-mono text-[10px] sm:text-[11px] font-semibold">{store.category || "General"}</span>
                 <span>•</span>
                 <span className="inline-flex items-center gap-0.5 text-amber-500 font-bold font-mono text-[10px] sm:text-[11px]">
                   <Star className="h-3 w-3 fill-current" />
-                  {store.rating.toFixed(1)}
+                  {ratingNum.toFixed(1)}
                 </span>
               </div>
             </div>
@@ -514,7 +526,7 @@ function StoreCard({
 
         {/* Description Snippet */}
         <p className="mt-3 sm:mt-4 text-xs leading-relaxed text-muted-foreground line-clamp-2 translate-z-10">
-          {store.description}
+          {store.description || "Verified promotional vouchers and auto-applied discounts."}
         </p>
 
         {/* Holographic Perforated Coupon Ticket */}
@@ -527,7 +539,7 @@ function StoreCard({
               <div className="flex items-center gap-1.5 flex-wrap sm:flex-nowrap">
                 <Tag className="h-3.5 w-3.5 text-primary shrink-0" />
                 <span className="font-mono text-xs font-black text-foreground truncate tracking-wide">
-                  {store.popularCoupon.code}
+                  {couponCode}
                 </span>
                 <span className="rounded-md bg-primary/15 border border-primary/20 px-1.5 py-0.2 sm:px-2 sm:py-0.5 text-[9px] sm:text-[10px] font-mono font-bold text-primary shrink-0">
                   {formattedDiscount}
@@ -541,14 +553,14 @@ function StoreCard({
             {/* 1-Click Tactile Copy Button */}
             <button
               type="button"
-              onClick={(e) => onCopy(store.popularCoupon.code, e)}
+              onClick={(e) => onCopy(couponCode, e)}
               className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl px-3 py-2 min-h-[38px] min-w-[68px] text-xs font-bold transition-all duration-200 touch-manipulation active:scale-95 ${
                 isCopied
                   ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/25"
                   : "border border-primary/40 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground hover:shadow-xs shadow-2xs"
               }`}
               title="Copy Coupon Code"
-              aria-label={`Copy coupon code ${store.popularCoupon.code}`}
+              aria-label={`Copy coupon code ${couponCode}`}
             >
               {isCopied ? (
                 <>
@@ -570,7 +582,7 @@ function StoreCard({
       <div className="mt-4 sm:mt-5 flex items-center justify-between border-t border-border/80 pt-3 sm:pt-4 text-xs font-medium translate-z-10">
         <span className="inline-flex items-center gap-1 font-mono text-muted-foreground text-[10px] sm:text-[11px]">
           <ShieldCheck className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-          <span>{store.couponsCount} active coupons</span>
+          <span>{couponsCount} active coupons</span>
         </span>
 
         <div className="inline-flex items-center gap-1 text-xs font-bold text-primary min-h-[36px] group-hover:underline">
@@ -587,7 +599,7 @@ function StoreCard({
 
   if (store.isInternalRoute) {
     return (
-      <Link to={store.link} className="block h-full">
+      <Link to={storeLink} className="block h-full">
         {CardContent}
       </Link>
     );
@@ -595,7 +607,7 @@ function StoreCard({
 
   return (
     <a
-      href={wrapAffiliateTracking(store.link, "gocoupon_stores_directory")}
+      href={wrapAffiliateTracking(storeLink, "gocoupon_stores_directory")}
       target="_blank"
       rel="noopener noreferrer nofollow"
       className="block h-full"

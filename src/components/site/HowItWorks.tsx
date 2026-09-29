@@ -101,7 +101,7 @@ export function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="relative scroll-mt-12 border-t border-border bg-background px-4 sm:px-6 py-20 sm:py-28"
+      className="relative scroll-mt-12 border-t border-border bg-background px-4 sm:px-6 py-14 sm:py-20"
     >
       {/* Anchor alias for backwards compatibility */}
       <div id="how" className="absolute -top-12 left-0 h-0 w-0" aria-hidden="true" />

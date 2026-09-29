@@ -3,7 +3,7 @@ import { ArrowRight, Star } from "lucide-react";
 
 export function CTA() {
   return (
-    <section id="cta" className="relative px-4 sm:px-6 py-20 sm:py-28 border-t border-border">
+    <section id="cta" className="relative px-4 sm:px-6 py-14 sm:py-20 border-t border-border">
       <div className="reveal relative mx-auto max-w-4xl rounded-2xl border border-border bg-card p-8 sm:p-16 text-center shadow-xs">
         <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">
           Put Real Money Back
