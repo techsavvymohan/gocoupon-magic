@@ -285,7 +285,14 @@ const routeConfigs = [
         <li><strong>Nasher Miles:</strong> Extra 7% OFF luxury trolley luggage &amp; bags with coupon code <code>CLINK07</code>.</li>
         <li><strong>Sarkar Perfumes:</strong> 10% OFF pure attars &amp; oud fragrances with coupon code <code>SARKAR10</code>.</li>
         <li><strong>The Formal Club:</strong> 10% OFF premium tailored men's formal shirts with coupon code <code>TFCFORMAL</code>.</li>
-        <li><strong>QNT Sports India:</strong> 10% OFF sports nutrition &amp; whey supplements with coupon code <code>QNTSAVE</code>.</li>
+        <li><strong>QNT Sports India:</strong> 7% OFF sports nutrition &amp; whey supplements with coupon code <code>QNTGC</code>.</li>
+        <li><strong>Svastika:</strong> 10% OFF sacred pooja essentials, brass idols &amp; festive decor with coupon code <code>SVBRASS10</code>.</li>
+        <li><strong>Nobero:</strong> ₹500 OFF travel wear &amp; everyday fashion on orders above ₹2,199 with coupon code <code>CCN500</code>.</li>
+        <li><strong>Ezee Perfume:</strong> 15% OFF luxury long-lasting EDP perfumes with coupon code <code>GC15</code>.</li>
+        <li><strong>The Pant Project:</strong> 6.3% OFF custom-tailored pants &amp; menswear with coupon code <code>CZANIA100</code>.</li>
+        <li><strong>Ace Blend:</strong> 10% OFF 100% natural plant protein smoothies &amp; superfoods with coupon code <code>GC10</code>.</li>
+        <li><strong>Decode Age:</strong> 10% OFF longevity science, NMN &amp; health tests with coupon code <code>DEEPIKAC</code>.</li>
+        <li><strong>Saadaa:</strong> 10% OFF minimalist organic cotton apparel &amp; casual wear with coupon code <code>GC10</code>.</li>
         <li><strong>RedBus:</strong> Verified ticket booking discounts on intercity buses with code <code>REDBUSAC</code>.</li>
         <li><strong>Nakpro Nutrition:</strong> Lab-tested pure protein concentrates &amp; isolates with code <code>NAKPROFIT</code>.</li>
         <li><strong>Oliveboard:</strong> Test prep series for banking, SSC &amp; competitive exams with code <code>OBMAGIC</code>.</li>
