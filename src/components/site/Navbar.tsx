@@ -41,6 +41,7 @@ type NavLink = {
   badgeColor?: string;
   icon?: any;
   i18nKey?: string;
+  hideOnMobileHeader?: boolean;
 };
 
 const desktopSubLinks: NavLink[] = [
@@ -51,6 +52,7 @@ const desktopSubLinks: NavLink[] = [
     badgeColor: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 font-bold",
     icon: Tag,
     i18nKey: "nav.offers",
+    hideOnMobileHeader: true,
   },
   {
     label: "Featured Deals",
@@ -59,12 +61,14 @@ const desktopSubLinks: NavLink[] = [
     badgeColor: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-bold",
     icon: Sparkles,
     i18nKey: "nav.featuredDeals",
+    hideOnMobileHeader: true,
   },
   {
     label: "Stores",
     to: "/stores",
     icon: Store,
     i18nKey: "nav.stores",
+    hideOnMobileHeader: true,
   },
   {
     label: "Categories",
@@ -241,7 +245,7 @@ export function Navbar() {
                 const localizedLabel = l.i18nKey ? t(l.i18nKey, l.label) : l.label;
 
                 return (
-                  <li key={l.label}>
+                  <li key={l.label} className={l.hideOnMobileHeader ? "hidden md:block" : ""}>
                     <Link
                       to={l.to!}
                       className="group relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-all duration-150"
