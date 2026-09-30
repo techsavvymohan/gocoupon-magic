@@ -197,19 +197,19 @@ export function GrabOnHero() {
 
   return (
     <section
-      className="relative bg-slate-50 dark:bg-background pt-5 pb-8 border-b border-border/60"
+      className="relative bg-slate-50/70 dark:bg-background/80 pt-4 sm:pt-6 pb-6 sm:pb-8 border-b border-border/60"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        {/* Main Grid: 8 Cols Left (Hero Banner), 4 Cols Right (Side Card) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6">
+        {/* Main Grid: Full width on mobile/tablet (1 focused card), 8+4 cols on desktop */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 items-stretch">
           
-          {/* ── Left / Center Main Banner (8 cols) with Embla Smooth Slide ── */}
-          <div className="lg:col-span-8 flex flex-col justify-between">
+          {/* ── Main Banner (Full width on mobile, 8 cols on desktop) with Embla Smooth Slide ── */}
+          <div className="w-full lg:col-span-8 flex flex-col justify-between">
             {/* Embla Viewport with Floating Controls */}
             <div className="relative group/hero">
-              <div className="overflow-hidden rounded-2xl shadow-xl" ref={emblaMainRef}>
+              <div className="overflow-hidden rounded-2xl shadow-xl bg-slate-950" ref={emblaMainRef}>
                 <div className="flex touch-pan-y">
                   {mainDeals.map((deal, idx) => {
                     const theme = BRAND_THEMES[deal.brandSlug] || {
@@ -225,7 +225,7 @@ export function GrabOnHero() {
                         className="flex-[0_0_100%] min-w-0"
                       >
                         <div
-                          className={`relative overflow-hidden bg-gradient-to-br ${theme.bg} p-6 sm:p-8 text-white min-h-[340px] sm:min-h-[360px] flex flex-col justify-between border border-white/10 transition-colors duration-500`}
+                          className={`relative overflow-hidden bg-gradient-to-br ${theme.bg} p-4 sm:p-7 text-white min-h-[300px] sm:min-h-[350px] flex flex-col justify-between border border-white/10 transition-colors duration-500`}
                         >
                           {/* Background Glow & Pattern */}
                           <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-white/5 blur-3xl pointer-events-none" />
@@ -238,20 +238,20 @@ export function GrabOnHero() {
                           </div>
 
                           {/* Top Banner Header: Brand + Verified Tag */}
-                          <div className="relative z-10 flex items-center justify-between gap-3">
-                            <div className="flex items-center gap-3">
-                              <div className="bg-white p-2 rounded-xl shadow-md shrink-0 transition-transform duration-300 hover:scale-105">
+                          <div className="relative z-10 flex items-center justify-between gap-2 sm:gap-3">
+                            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                              <div className="bg-white p-1.5 sm:p-2 rounded-xl shadow-md shrink-0 transition-transform duration-300 hover:scale-105">
                                 <StoreLogo
                                   storeName={deal.brandName}
                                   storeLogo={deal.logoUrl}
-                                  className="h-9 w-9 sm:h-11 sm:w-11"
+                                  className="h-8 w-8 sm:h-10 sm:w-10"
                                 />
                               </div>
-                              <div>
-                                <h3 className="font-display font-bold text-lg sm:text-xl text-white tracking-tight">
+                              <div className="min-w-0">
+                                <h3 className="font-display font-bold text-base sm:text-xl text-white tracking-tight truncate">
                                   {deal.brandName}
                                 </h3>
-                                <p className="text-xs text-white/70 font-medium">
+                                <p className="text-[11px] sm:text-xs text-white/70 font-medium truncate">
                                   {deal.category} • India Eligible
                                 </p>
                               </div>
@@ -259,40 +259,41 @@ export function GrabOnHero() {
 
                             {/* Badge with gentle pulse */}
                             <div
-                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border backdrop-blur-xs transition-all ${theme.badge}`}
+                              className={`inline-flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold border backdrop-blur-xs shrink-0 transition-all ${theme.badge}`}
                             >
-                              <ShieldCheck className="w-3.5 h-3.5" />
-                              <span>{deal.badge || "Verified Partner Deal"}</span>
+                              <ShieldCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                              <span>{deal.badge || "Verified Deal"}</span>
                             </div>
                           </div>
 
                           {/* Center Offer Title & Huge Discount */}
-                          <div className="relative z-10 my-4">
-                            <span className="inline-block text-xs font-bold uppercase tracking-widest text-white/80 mb-1">
-                              Exclusive Featured Promotion
-                            </span>
-                            <div className="flex flex-wrap items-baseline gap-3">
-                              <span className={`font-display text-3xl sm:text-5xl font-extrabold tracking-tight ${theme.accent}`}>
+                          <div className="relative z-10 my-3 sm:my-4">
+                            <div className="inline-flex items-center gap-1 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-white/80 mb-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                              <span>Featured Promotion</span>
+                            </div>
+                            <div className="flex flex-wrap items-baseline gap-2 sm:gap-3">
+                              <span className={`font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight ${theme.accent}`}>
                                 {deal.discountText}
                               </span>
-                              <span className="text-base sm:text-xl font-medium text-white/90">
+                              <span className="text-sm sm:text-lg font-medium text-white/95 line-clamp-1 sm:line-clamp-2">
                                 {deal.subTitle}
                               </span>
                             </div>
-                            <p className="mt-2 text-xs sm:text-sm text-white/80 max-w-xl line-clamp-2 leading-relaxed">
+                            <p className="mt-1.5 sm:mt-2 text-[11px] sm:text-xs text-white/75 max-w-xl line-clamp-1 sm:line-clamp-2 leading-relaxed">
                               {deal.terms || "Tested and verified coupon code ready for instant checkout redemption."}
                             </p>
                           </div>
 
                           {/* Bottom Actions: Coupon Code Copy + Get Deal CTA */}
-                          <div className="relative z-10 flex flex-wrap items-center gap-3 pt-2">
+                          <div className="relative z-10 flex flex-wrap items-center gap-2 sm:gap-3 pt-2">
                             {deal.couponCode ? (
                               <button
                                 type="button"
                                 onClick={() => handleCopy(deal.couponCode, deal.brandName)}
-                                className="inline-flex items-center gap-2 rounded-xl bg-white text-slate-900 px-4 py-2.5 text-xs sm:text-sm font-bold shadow-md hover:bg-slate-100 hover:scale-105 active:scale-95 transition-all group"
+                                className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl bg-white text-slate-900 px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold shadow-md hover:bg-slate-100 active:scale-95 transition-all group cursor-pointer"
                               >
-                                <Tag className="w-4 h-4 text-primary" />
+                                <Tag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
                                 <span className="font-mono tracking-wider">{deal.couponCode}</span>
                                 {copiedCode === deal.couponCode ? (
                                   <span className="inline-flex items-center gap-1 text-emerald-600 font-bold ml-1 animate-bounce">
@@ -300,7 +301,7 @@ export function GrabOnHero() {
                                   </span>
                                 ) : (
                                   <span className="inline-flex items-center gap-1 text-slate-500 font-medium ml-1">
-                                    <Copy className="w-3.5 h-3.5" /> Copy
+                                    <Copy className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Copy
                                   </span>
                                 )}
                               </button>
@@ -310,7 +311,7 @@ export function GrabOnHero() {
                               href={deal.affiliateUrl || deal.merchantUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 text-xs sm:text-sm font-bold shadow-md shadow-primary/20 transition-all hover:scale-105 active:scale-95"
+                              className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-bold shadow-md shadow-primary/20 transition-all hover:scale-105 active:scale-95"
                             >
                               <span>Redeem Deal</span>
                               <ExternalLink className="w-3.5 h-3.5" />
@@ -318,9 +319,9 @@ export function GrabOnHero() {
 
                             <Link
                               to="/featured-deals"
-                              className="inline-flex items-center gap-1 text-xs text-white/80 hover:text-white underline underline-offset-4 ml-auto font-medium transition-colors"
+                              className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-white/80 hover:text-white underline underline-offset-4 ml-auto font-medium transition-colors"
                             >
-                              <span>View all featured</span>
+                              <span>All Deals</span>
                               <ArrowRight className="w-3 h-3" />
                             </Link>
                           </div>
@@ -335,23 +336,23 @@ export function GrabOnHero() {
               <button
                 type="button"
                 onClick={() => emblaMainApi?.scrollPrev()}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center border border-white/20 opacity-0 group-hover/hero:opacity-100 transition-all duration-200 hover:scale-110 active:scale-90 z-20 shadow-lg cursor-pointer"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center border border-white/20 opacity-0 group-hover/hero:opacity-100 transition-all duration-200 hover:scale-110 active:scale-90 z-20 shadow-lg cursor-pointer"
                 aria-label="Previous Deal"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
               <button
                 type="button"
                 onClick={() => emblaMainApi?.scrollNext()}
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center border border-white/20 opacity-0 group-hover/hero:opacity-100 transition-all duration-200 hover:scale-110 active:scale-90 z-20 shadow-lg cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center border border-white/20 opacity-0 group-hover/hero:opacity-100 transition-all duration-200 hover:scale-110 active:scale-90 z-20 shadow-lg cursor-pointer"
                 aria-label="Next Deal"
               >
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
 
-            {/* Merchant Switcher Tabs Strip with Animated Progress Bar (GrabOn exact design!) */}
-            <div className="mt-3 bg-white dark:bg-card rounded-xl border border-slate-200/80 dark:border-border/80 p-1.5 shadow-2xs overflow-x-auto scrollbar-none">
+            {/* Merchant Switcher Tabs Strip with Animated Progress Bar */}
+            <div className="mt-2.5 sm:mt-3 bg-white dark:bg-card rounded-xl border border-slate-200/80 dark:border-border/80 p-1 sm:p-1.5 shadow-2xs overflow-x-auto scrollbar-none">
               <div className="flex items-center gap-1 min-w-max">
                 {mainDeals.map((deal, idx) => {
                   const isActive = idx === activeMainIndex;
@@ -360,7 +361,7 @@ export function GrabOnHero() {
                       key={deal.id}
                       type="button"
                       onClick={() => handleSelectMainTab(idx)}
-                      className={`relative overflow-hidden px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex flex-col items-center gap-0.5 ${
+                      className={`relative overflow-hidden px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex flex-col items-center gap-0.5 cursor-pointer ${
                         isActive
                           ? "bg-slate-900 text-white dark:bg-primary dark:text-primary-foreground shadow-xs"
                           : "text-slate-600 dark:text-muted-foreground hover:text-slate-900 dark:hover:text-foreground hover:bg-slate-100 dark:hover:bg-muted"
@@ -385,11 +386,11 @@ export function GrabOnHero() {
             </div>
           </div>
 
-          {/* ── Right Side Spotlight Card (4 cols) with Embla Smooth Slide ── */}
-          <div className="lg:col-span-4 flex flex-col justify-between">
+          {/* ── Right Side Spotlight Card (Hidden on mobile/tablet to keep hero ultra-lean, 4 cols on desktop) ── */}
+          <div className="hidden lg:flex lg:col-span-4 flex-col justify-between">
             {/* Embla Viewport for Side Card */}
             <div className="relative group/side">
-              <div className="overflow-hidden rounded-2xl shadow-xl" ref={emblaSideRef}>
+              <div className="overflow-hidden rounded-2xl shadow-xl bg-slate-950" ref={emblaSideRef}>
                 <div className="flex touch-pan-y">
                   {SIDE_PICKS.map((pick) => (
                     <div
@@ -397,7 +398,7 @@ export function GrabOnHero() {
                       className="flex-[0_0_100%] min-w-0"
                     >
                       <div
-                        className={`relative overflow-hidden bg-gradient-to-br ${pick.bg} text-white min-h-[340px] sm:min-h-[360px] p-6 flex flex-col justify-between border border-white/10`}
+                        className={`relative overflow-hidden bg-gradient-to-br ${pick.bg} text-white min-h-[350px] p-6 flex flex-col justify-between border border-white/10`}
                       >
                         {/* Top Banner Tag */}
                         <div className="flex items-center justify-between">
@@ -413,7 +414,7 @@ export function GrabOnHero() {
                           </div>
                         </div>
 
-                        {/* Floating Center Card (GrabOn Top Picks look with 3D hover lift) */}
+                        {/* Floating Center Card */}
                         <div className="my-auto bg-white/95 dark:bg-card/95 backdrop-blur-md rounded-xl p-4 text-slate-900 dark:text-foreground shadow-lg border border-white/20 mt-4 mb-4 transition-transform duration-300 hover:scale-[1.02]">
                           <div className="flex items-baseline justify-between gap-2">
                             <span className="font-display font-extrabold text-xl sm:text-2xl text-primary">
@@ -431,7 +432,7 @@ export function GrabOnHero() {
                             <button
                               type="button"
                               onClick={() => handleCopy(pick.code, pick.storeName)}
-                              className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1 active:scale-95 transition-transform"
+                              className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1 active:scale-95 transition-transform cursor-pointer"
                             >
                               <Tag className="w-3 h-3" />
                               <span>{pick.code}</span>
@@ -503,6 +504,23 @@ export function GrabOnHero() {
             </div>
           </div>
 
+        </div>
+
+        {/* ── GoCoupon Brand Trust & Value Ribbon (Bespoke GoCoupon styling) ── */}
+        <div className="mt-4 sm:mt-6 flex items-center justify-center">
+          <div className="inline-flex items-center gap-2 sm:gap-3.5 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-white dark:bg-card border border-border/80 shadow-2xs text-[10px] sm:text-xs font-medium text-muted-foreground transition-all hover:border-primary/40">
+            <span className="flex items-center gap-1.5 font-bold text-primary">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              1,084+ Live Verified Deals
+            </span>
+            <span className="text-border">•</span>
+            <span className="hidden xs:inline">100% Tested Daily</span>
+            <span className="hidden xs:inline text-border">•</span>
+            <span className="font-semibold text-foreground">1-Click Auto-Apply Ready</span>
+          </div>
         </div>
       </div>
     </section>

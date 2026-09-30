@@ -160,11 +160,48 @@ export function GrabOnPopularStores() {
           </div>
         </div>
 
-        {/* GrabOn Layout: Left Spotlight (300px) + Right Grid (4x2) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+        {/* Mobile Spotlight: Store of the Month (Compact Horizontal Bar on < lg) */}
+        <div className="block lg:hidden mb-4">
+          <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 text-white p-3.5 border border-slate-800 shadow-md flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-11 h-11 rounded-xl bg-white p-1.5 shadow-sm shrink-0 flex items-center justify-center">
+                <StoreLogo
+                  storeName={SPOTLIGHT_STORE.name}
+                  storeLogo={SPOTLIGHT_STORE.logo}
+                  className="w-8 h-8"
+                />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold uppercase tracking-wider bg-amber-400/20 text-amber-300 px-2 py-0.2 rounded-full">
+                    <Sparkles className="w-2.5 h-2.5 fill-current" />
+                    STORE OF THE MONTH
+                  </span>
+                </div>
+                <h4 className="font-display font-bold text-sm text-white truncate mt-0.5">
+                  {SPOTLIGHT_STORE.name}
+                </h4>
+                <p className="text-[10px] text-slate-300 truncate">
+                  {SPOTLIGHT_STORE.couponCount} Coupons • {SPOTLIGHT_STORE.offerCount} Offers
+                </p>
+              </div>
+            </div>
+
+            <Link
+              to={SPOTLIGHT_STORE.routeUrl as any}
+              className="inline-flex items-center gap-1 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-1.5 text-xs font-bold shadow-xs shrink-0 active:scale-95 transition-all"
+            >
+              <span>Visit</span>
+              <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Layout: Desktop Left Spotlight (4 cols) + Right Grid (8 cols), Mobile Full Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 items-stretch">
           
-          {/* ── Left Spotlight: Store Of The Month with ambient glow ── */}
-          <div className="lg:col-span-4 flex flex-col">
+          {/* ── Left Spotlight: Store Of The Month (Desktop only) ── */}
+          <div className="hidden lg:flex lg:col-span-4 flex-col">
             <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white p-6 shadow-xl border border-slate-800 flex flex-col justify-between h-full group transition-all duration-300 hover:border-primary/50 hover:shadow-2xl">
               {/* Background ambient pulsing glow */}
               <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-primary/20 blur-3xl animate-pulse pointer-events-none" />
@@ -234,8 +271,8 @@ export function GrabOnPopularStores() {
             </div>
           </div>
 
-          {/* ── Right Embla Sliding Carousel: 4x2 Popular Stores Grid ── */}
-          <div className="lg:col-span-8 flex flex-col justify-between">
+          {/* ── Sliding Carousel: Popular Stores Grid ── */}
+          <div className="w-full lg:col-span-8 flex flex-col justify-between">
             {/* Embla Viewport */}
             <div className="overflow-hidden rounded-xl" ref={emblaRef}>
               <div className="flex touch-pan-y">
@@ -244,29 +281,29 @@ export function GrabOnPopularStores() {
                     key={`page-${pageIdx}`}
                     className="flex-[0_0_100%] min-w-0"
                   >
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3.5">
                       {page.map((store) => (
                         <Link
                           key={store.slug}
                           to={store.routeUrl as any}
-                          className="group relative flex flex-col items-center justify-between p-4 rounded-xl border border-slate-200/90 dark:border-border/80 bg-white dark:bg-card shadow-xs hover:shadow-xl hover:border-primary/60 transition-all duration-300 hover:-translate-y-1.5 text-center overflow-hidden"
+                          className="group relative flex flex-col items-center justify-between p-3 sm:p-4 rounded-xl border border-slate-200/90 dark:border-border/80 bg-white dark:bg-card shadow-2xs hover:shadow-xl hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 text-center overflow-hidden"
                         >
-                          {/* Top Coupon Count Pill with Hover Invert */}
-                          <span className="text-[11px] font-bold text-primary bg-primary/10 group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-xs px-2.5 py-0.5 rounded-full mb-2 transition-all duration-200">
+                          {/* Top Coupon Count Pill */}
+                          <span className="text-[10px] sm:text-[11px] font-bold text-primary bg-primary/10 group-hover:bg-primary group-hover:text-primary-foreground px-2 sm:px-2.5 py-0.5 rounded-full mb-1.5 sm:mb-2 transition-all duration-200">
                             {store.couponCount} Coupons
                           </span>
 
                           {/* Centered Store Logo with Smooth Zoom */}
-                          <div className="my-auto py-2 flex items-center justify-center">
+                          <div className="my-auto py-1 sm:py-2 flex items-center justify-center">
                             <StoreLogo
                               storeName={store.name}
                               storeLogo={store.logo}
-                              className="h-12 w-20 sm:h-14 sm:w-24 group-hover:scale-110 transition-transform duration-300"
+                              className="h-10 w-16 sm:h-14 sm:w-24 group-hover:scale-110 transition-transform duration-300"
                             />
                           </div>
 
                           {/* Store Name & Category */}
-                          <div className="mt-2 w-full pt-2 border-t border-slate-100 dark:border-border/60">
+                          <div className="mt-1.5 sm:mt-2 w-full pt-1.5 sm:pt-2 border-t border-slate-100 dark:border-border/60">
                             <p className="font-display text-xs sm:text-sm font-bold text-foreground group-hover:text-primary transition-colors truncate">
                               {store.name}
                             </p>
@@ -282,13 +319,30 @@ export function GrabOnPopularStores() {
               </div>
             </div>
 
+            {/* Mobile Carousel Pagination Dots */}
+            <div className="flex sm:hidden items-center justify-center gap-1.5 mt-3">
+              {STORE_PAGES.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => handleDotClick(idx)}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    idx === currentPage
+                      ? "w-5 bg-primary"
+                      : "w-1.5 bg-slate-300 dark:bg-slate-700"
+                  }`}
+                  aria-label={`Go to store slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+
             {/* Mobile View All Stores Link */}
-            <div className="mt-4 text-center sm:hidden">
+            <div className="mt-3 text-center sm:hidden">
               <Link
                 to="/stores"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-primary"
+                className="inline-flex items-center gap-1 text-xs font-bold text-primary"
               >
-                <span>View All 240+ Merchant Stores</span>
+                <span>View All 240+ Stores</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>

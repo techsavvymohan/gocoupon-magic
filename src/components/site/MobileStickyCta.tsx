@@ -58,7 +58,7 @@ export function MobileStickyCta() {
     <div
       role="complementary"
       aria-label="Quick Chrome extension install"
-      className="fixed bottom-16 left-3 right-3 z-30 md:hidden rounded-2xl border border-primary/30 bg-card/95 p-2.5 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-3 duration-200"
+      className="fixed bottom-[72px] left-3 right-3 z-30 md:hidden rounded-xl border border-primary/25 bg-card/95 p-2 shadow-xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-2 duration-200"
     >
       <div className="flex items-center justify-between gap-2.5">
         <div className="flex items-center gap-2.5 min-w-0 flex-1">

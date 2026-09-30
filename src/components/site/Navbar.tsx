@@ -372,15 +372,14 @@ export function Navbar() {
             activeProps={{ className: "text-rose-600 font-bold" }}
             aria-label="Click to find available offers and verified coupons"
           >
-            {!isOffersPage && (
-              <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-1.5 py-0.5 text-[8.5px] font-extrabold uppercase tracking-tight bg-gradient-to-r from-amber-500 via-rose-500 to-primary text-white rounded-full shadow-md shadow-rose-500/30 pointer-events-none whitespace-nowrap animate-bounce ring-1 ring-background">
-                <Zap className="h-2 w-2 fill-current" />
-                <span>Tap for Deals</span>
-              </span>
-            )}
-
             <div className="relative flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-rose-500/20 via-amber-500/20 to-primary/20 border border-rose-500/35 text-rose-600 dark:text-rose-400 shadow-xs group-hover:scale-110 transition-transform">
               <Flame className="h-4 w-4 fill-rose-500 text-rose-500 animate-pulse" aria-hidden="true" />
+              {!isOffersPage && (
+                <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500 ring-2 ring-background"></span>
+                </span>
+              )}
             </div>
             <span className="text-[10px] font-bold text-foreground group-hover:text-rose-600 transition-colors">
               {t("nav.offers", "Offers")}
