@@ -3,7 +3,7 @@
  * @description Comprehensive automated audit script for all GoCoupon VPS Express endpoints.
  */
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = process.env.TEST_BASE_URL || "http://localhost:3000";
 
 async function testEndpoint(name, path, options = {}) {
   const start = Date.now();
@@ -99,7 +99,13 @@ async function runAudit() {
     ["Coupons (Sort by Success Rate)", "/api/coupons?sortBy=successRate&order=desc&limit=5"],
     ["Coupons (By Domain 'flipkart.com')", "/api/coupons?domain=flipkart.com"],
 
-    // 6. Comparison Engine API
+    // 6. Products Catalog & Comparison Hub
+    ["Products Catalog (All)", "/api/products"],
+    ["Single Product (iPhone 15)", "/api/products/prod_apple_iphone_15"],
+    ["Homepage Sections Config", "/api/homepage/sections"],
+    ["Homepage Hero Config", "/api/homepage/hero"],
+
+    // 7. Comparison Engine API
     ["Compare (By Query)", "/api/compare?q=Sony%20WH-1000XM5"],
     ["Compare (By Product ID)", "/api/compare?productId=prod_sony_wh1000xm5"],
 

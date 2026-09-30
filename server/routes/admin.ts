@@ -381,8 +381,8 @@ adminRouter.post("/login", async (req: Request, res: Response) => {
     req.socket.remoteAddress ||
     "127.0.0.1";
 
-  // Limit admin login attempts to 30 requests per 5 minutes per IP
-  const rateCheck = apiRateLimiter.check(`admin-login:${clientIp}`, 30, 5 * 60 * 1000);
+  // Limit admin login attempts to 5 requests per 5 minutes per IP to protect against brute-force attacks
+  const rateCheck = apiRateLimiter.check(`admin-login:${clientIp}`, 5, 5 * 60 * 1000);
   if (!rateCheck.allowed) {
     res.setHeader("Retry-After", String(rateCheck.retryAfterSeconds));
     res.status(429).json({
