@@ -766,15 +766,26 @@ export function handleGetSeoFiles(req: Request, res: Response) {
 
 export function handleSaveSeoFile(req: Request, res: Response) {
   const publicDir = path.resolve(process.cwd(), "public");
-  const { fileName = "robots.txt", content = "" } = req.body || {};
-  const safeName = String(fileName).replace(/[^a-zA-Z0-9._-]/g, "");
-  const targetPath = path.join(publicDir, safeName);
+  const { fileName, content } = req.body || {};
+  const safeName = String(fileName || "").replace(/[^a-zA-Z0-9._-]/g, "");
 
+  if (!safeName) {
+    res.status(400).json({ success: false, error: "File name is required." });
+    return;
+  }
+
+  // Security: only permit technical text/xml/json/html SEO files
+  if (!/\.(txt|xml|json|html)$/i.test(safeName)) {
+    res.status(400).json({ success: false, error: "Only .txt, .xml, .json, and .html files are permitted." });
+    return;
+  }
+
+  const targetPath = path.join(publicDir, safeName);
   try {
-    fs.writeFileSync(targetPath, String(content), "utf-8");
+    fs.writeFileSync(targetPath, String(content ?? ""), "utf-8");
     res.json({ success: true, fileName: safeName, message: `Successfully updated ${safeName}.` });
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 }
 
@@ -806,76 +817,7 @@ adminRouter.post("/seo-files", requireAdminAuth, handleSaveSeoFile);
 adminRouter.put("/seo-files", requireAdminAuth, handleSaveSeoFile);
 adminRouter.delete("/seo-files", requireAdminAuth, handleDeleteSeoFile);
 
-// ---------------------------------------------------------------------------
-// 8. Admin Users Management
-// ---------------------------------------------------------------------------
-adminRouter.get("/users", requireAdminAuth, (req: Request, res: Response) => {
-  const users = loadJson(USERS_FILE, defaultUsers);
-  res.json({ success: true, data: users });
-});
-
-adminRouter.post("/users", requireAdminAuth, (req: Request, res: Response) => {
-  const { name, email, role, permissions, isActive } = req.body || {};
-  if (!email || !name) {
-    res.status(400).json({ error: "Name and email are required." });
-    return;
-  }
-
-  const users = loadJson(USERS_FILE, defaultUsers);
-  const newUser = {
-    id: `usr-${Date.now()}`,
-    name: String(name).trim(),
-    email: String(email).trim().toLowerCase(),
-    role: role || "editor",
-    permissions: Array.isArray(permissions) ? permissions : ["dashboard", "offers"],
-    isActive: isActive !== false,
-    createdAt: new Date().toISOString(),
-  };
-
-  users.push(newUser);
-  saveJson(USERS_FILE, users);
-  res.json({ success: true, data: newUser });
-});
-
-adminRouter.put("/users", requireAdminAuth, (req: Request, res: Response) => {
-  const { id, name, email, role, permissions, isActive } = req.body || {};
-  if (!id) {
-    res.status(400).json({ error: "User ID is required." });
-    return;
-  }
-
-  const users = loadJson(USERS_FILE, defaultUsers);
-  const idx = users.findIndex((u) => u.id === id);
-  if (idx === -1) {
-    res.status(404).json({ error: "User not found." });
-    return;
-  }
-
-  users[idx] = {
-    ...users[idx],
-    name: name ? String(name).trim() : users[idx].name,
-    email: email ? String(email).trim().toLowerCase() : users[idx].email,
-    role: role || users[idx].role,
-    permissions: Array.isArray(permissions) ? permissions : users[idx].permissions,
-    isActive: typeof isActive === "boolean" ? isActive : users[idx].isActive,
-  };
-
-  saveJson(USERS_FILE, users);
-  res.json({ success: true, data: users[idx] });
-});
-
-adminRouter.delete("/users", requireAdminAuth, (req: Request, res: Response) => {
-  const id = req.query.id as string;
-  if (!id) {
-    res.status(400).json({ error: "User ID is required." });
-    return;
-  }
-
-  let users = loadJson(USERS_FILE, defaultUsers);
-  users = users.filter((u) => u.id !== id);
-  saveJson(USERS_FILE, users);
-  res.json({ success: true, message: "User deleted successfully." });
-});
+// Note: Modern async database-backed users management is active above (adminUsersDb)
 
 // ---------------------------------------------------------------------------
 // 9. Hero & Homepage Sections Endpoints
@@ -943,8 +885,9 @@ export async function handleCreateEvent(req: Request, res: Response) {
 
 export async function handleUpdateEvent(req: Request, res: Response) {
   const event = req.body || {};
+  const targetId = (req.params.id as string) || (req.query.id as string) || (req.query.slug as string) || event.id || event.slug;
   const events = await settingsDb.getSetting("events", defaultEvents);
-  const idx = events.findIndex((e: any) => e.id === event.id || e.slug === event.slug);
+  const idx = events.findIndex((e: any) => e.id === targetId || e.slug === targetId || e.id === event.id || e.slug === event.slug);
   if (idx !== -1) {
     events[idx] = { ...events[idx], ...event };
     await settingsDb.setSetting("events", events);
@@ -967,6 +910,7 @@ export async function handleDeleteEvent(req: Request, res: Response) {
 adminRouter.get("/events", handleGetEvents);
 adminRouter.post("/events", requireAdminAuth, handleCreateEvent);
 adminRouter.put("/events", requireAdminAuth, handleUpdateEvent);
+adminRouter.put("/events/:id", requireAdminAuth, handleUpdateEvent);
 adminRouter.delete("/events", requireAdminAuth, handleDeleteEvent);
 adminRouter.delete("/events/:id", requireAdminAuth, handleDeleteEvent);
 

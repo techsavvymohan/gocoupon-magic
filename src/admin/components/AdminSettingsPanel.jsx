@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AdminUsersManager from "./AdminUsersManager";
 import { cn } from "@/lib/utils";
+import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 
 const initialState = {
   general: {
@@ -205,12 +206,18 @@ export default function AdminSettingsPanel() {
 
     try {
       setIsUploading(true);
-      const formData = new FormData();
-      formData.append("file", file);
+      const content = await file.text();
 
       const res = await fetch("/api/admin/seo-files", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+          ...getAdminAuthHeaders(),
+        },
+        body: JSON.stringify({
+          fileName: file.name,
+          content,
+        }),
       });
 
       const data = await res.json();
@@ -233,7 +240,10 @@ export default function AdminSettingsPanel() {
       setIsUploading(true);
       const res = await fetch("/api/admin/seo-files", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...getAdminAuthHeaders(),
+        },
         body: JSON.stringify({
           fileName: editingFile.name,
           content: fileContent,
@@ -258,6 +268,7 @@ export default function AdminSettingsPanel() {
     try {
       const res = await fetch(`/api/admin/seo-files?fileName=${encodeURIComponent(fileName)}`, {
         method: "DELETE",
+        headers: getAdminAuthHeaders(),
       });
 
       const data = await res.json();
@@ -370,7 +381,10 @@ export default function AdminSettingsPanel() {
       setSavingSection(sectionKey);
       const response = await fetch("/api/settings", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...getAdminAuthHeaders(),
+        },
         body: JSON.stringify({ [sectionKey]: settings[sectionKey] }),
       });
 

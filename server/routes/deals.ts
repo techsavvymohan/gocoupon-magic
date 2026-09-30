@@ -551,9 +551,13 @@ dealsRouter.delete("/:id", requireAdminAuth, handleDeleteDeal);
  */
 dealsRouter.post("/bulk", requireAdminAuth, async (req: Request, res: Response) => {
   try {
-    const items = req.body?.items || [];
+    let items = req.body?.items;
+    if (!items && req.body?.rows) {
+      items = typeof req.body.rows === "string" ? JSON.parse(req.body.rows) : req.body.rows;
+    }
+
     if (!Array.isArray(items) || items.length === 0) {
-      res.status(400).json({ success: false, error: "Items array is required." });
+      res.status(400).json({ success: false, error: "Items or rows array is required." });
       return;
     }
 
@@ -594,7 +598,12 @@ dealsRouter.post("/bulk", requireAdminAuth, async (req: Request, res: Response) 
     }
 
     await globalCache.deletePrefix("deals:");
-    res.json({ success: true, count: addedCount, message: `Successfully imported ${addedCount} offers.` });
+    res.json({
+      success: true,
+      count: addedCount,
+      data: { successfullyAdded: addedCount, errors: [] },
+      message: `Successfully imported ${addedCount} offers.`,
+    });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }

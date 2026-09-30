@@ -84,6 +84,7 @@ const eventsRouter = ExpressRouter();
 eventsRouter.get("/", handleGetEvents);
 eventsRouter.post("/", requireAdminAuth, handleCreateEvent);
 eventsRouter.put("/", requireAdminAuth, handleUpdateEvent);
+eventsRouter.put("/:id", requireAdminAuth, handleUpdateEvent);
 eventsRouter.delete("/", requireAdminAuth, handleDeleteEvent);
 eventsRouter.delete("/:id", requireAdminAuth, handleDeleteEvent);
 
