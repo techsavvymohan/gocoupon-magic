@@ -220,6 +220,14 @@ if (fs.existsSync(distDir)) {
 
     const cleanPath = req.path.replace(/\/+$/, "") || "/";
 
+    // Clean 301 redirect for legacy/subpath store links: /stores/:slug -> /:slug-coupons
+    if (cleanPath.startsWith("/stores/") && cleanPath.length > 8) {
+      const rawStoreSlug = cleanPath.slice(8).replace(/-coupons$/, "").trim();
+      if (rawStoreSlug) {
+        return res.redirect(301, `/${rawStoreSlug}-coupons`);
+      }
+    }
+
     // HTML pages: allow browser to cache but must revalidate with server.
     // "no-cache" (NOT no-store) lets the browser use ETag/Last-Modified → 304 on repeat visits
     // This is significantly faster than no-store which forces a full re-download every time.

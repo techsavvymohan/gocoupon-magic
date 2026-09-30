@@ -99,7 +99,7 @@ const SIDE_PICKS = [
     discount: "EXTRA ₹500 OFF",
     desc: "Trendy apparel, streetwear & footwear collections",
     code: "AJIOMANIA",
-    linkUrl: "/stores/ajio",
+    linkUrl: "/ajio-coupons",
     bg: "from-slate-900 via-blue-950 to-slate-950",
   },
   {
