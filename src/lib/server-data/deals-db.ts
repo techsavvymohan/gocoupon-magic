@@ -67,29 +67,34 @@ export function setLiveDeals(deals: DealRecord[]): void {
   activeLiveDeals = [...deals];
 }
 
+export function parseExpiryTimestamp(endDate?: string): number | null {
+  if (!endDate) return null;
+  const clean = String(endDate).trim();
+  if (!clean) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) {
+    return new Date(`${clean}T23:59:59.999Z`).getTime();
+  }
+  if (clean.endsWith("T00:00:00.000Z") || clean.endsWith("T00:00:00Z") || clean.endsWith("T00:00:00+00:00")) {
+    const datePart = clean.slice(0, 10);
+    return new Date(`${datePart}T23:59:59.999Z`).getTime();
+  }
+  const parsed = new Date(clean).getTime();
+  return isNaN(parsed) ? null : parsed;
+}
+
 export function getLiveDeals(): DealRecord[] {
   const now = Date.now();
   return activeLiveDeals.filter((d) => {
-    // ADMIN & FEATURED IMMUNITY: Admin-curated deals and featured deals remain active and never vanish automatically
-    const isImmune =
-      d.isFeatured ||
-      d.source === "admin" ||
-      d.campaignSource === "manual" ||
-      d.campaignSource === "analytics_clouds" ||
-      (d.id &&
-        (String(d.id).startsWith("ac-") ||
-          String(d.id).startsWith("offer-") ||
-          String(d.id).startsWith("admin-")));
+    if (d.status === "inactive" || d.status === "expired" || d.expiresIn === "Expired") return false;
 
-    if (isImmune) {
-      return d.status !== "inactive";
-    }
-
-    if (d.status === "expired") return false;
-    if (d.expiresIn === "Expired") return false;
-    if (d.endDate) {
-      const end = new Date(d.endDate).getTime();
-      if (!isNaN(end) && end < now) return false;
+    // Strict expiration date check with end-of-day accuracy
+    const endMs = parseExpiryTimestamp(d.endDate);
+    if (endMs !== null && endMs < now) {
+      const isAdminCustom =
+        d.source === "admin" &&
+        d.id &&
+        (String(d.id).startsWith("ac-") || String(d.id).startsWith("admin-"));
+      if (!isAdminCustom) return false;
     }
     return true;
   });
@@ -333,21 +338,6 @@ export function getPopularBrandsFromPool(customDeals?: DealRecord[]): PopularBra
  * Returns deals, optionally filtered by category, search query, badge, letter, brand, festive status, and pagination,
  * sorted by discount, trending (popularity), verified status, expiry, or store name.
  */
-export function parseExpiryTimestamp(endDate?: string): number | null {
-  if (!endDate) return null;
-  const clean = String(endDate).trim();
-  if (!clean) return null;
-  if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) {
-    return new Date(`${clean}T23:59:59.999Z`).getTime();
-  }
-  if (clean.endsWith("T00:00:00.000Z") || clean.endsWith("T00:00:00Z") || clean.endsWith("T00:00:00+00:00")) {
-    const datePart = clean.slice(0, 10);
-    return new Date(`${datePart}T23:59:59.999Z`).getTime();
-  }
-  const parsed = new Date(clean).getTime();
-  return isNaN(parsed) ? null : parsed;
-}
-
 export function queryDeals(
   options: {
     category?: string;

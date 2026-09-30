@@ -126,6 +126,21 @@ export default async function handler(req: any, res: any) {
       }
     }
 
+    function parseExpiryTimestamp(endDate?: string): number | null {
+      if (!endDate) return null;
+      const clean = String(endDate).trim();
+      if (!clean) return null;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) {
+        return new Date(`${clean}T23:59:59.999Z`).getTime();
+      }
+      if (clean.endsWith("T00:00:00.000Z") || clean.endsWith("T00:00:00Z") || clean.endsWith("T00:00:00+00:00")) {
+        const datePart = clean.slice(0, 10);
+        return new Date(`${datePart}T23:59:59.999Z`).getTime();
+      }
+      const parsed = new Date(clean).getTime();
+      return isNaN(parsed) ? null : parsed;
+    }
+
     const now = Date.now();
     const liveDeals: any[] = [];
     const seen = new Set<string>();
@@ -133,8 +148,8 @@ export default async function handler(req: any, res: any) {
     for (const o of rawOffers) {
       if (o.status && o.status !== "live" && o.status !== "active") continue;
       if (o.end_date) {
-        const end = new Date(o.end_date).getTime();
-        if (!isNaN(end) && end < now) continue;
+        const end = parseExpiryTimestamp(o.end_date);
+        if (end !== null && end < now) continue;
       }
 
       const storeName = (o.campaign_name || "Partner Store").trim();

@@ -50,6 +50,21 @@ const LOCAL_STORE_LOGOS = {
   target: "/Brand logos/target.svg",
 };
 
+export function parseExpiryTimestamp(endDate) {
+  if (!endDate) return null;
+  const clean = String(endDate).trim();
+  if (!clean) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) {
+    return new Date(`${clean}T23:59:59.999Z`).getTime();
+  }
+  if (clean.endsWith("T00:00:00.000Z") || clean.endsWith("T00:00:00Z") || clean.endsWith("T00:00:00+00:00")) {
+    const datePart = clean.slice(0, 10);
+    return new Date(`${datePart}T23:59:59.999Z`).getTime();
+  }
+  const parsed = new Date(clean).getTime();
+  return isNaN(parsed) ? null : parsed;
+}
+
 function extractMerchantDomain(trackingUrl, storeName, explicitDomain) {
   if (explicitDomain && explicitDomain.includes(".") && !explicitDomain.includes("cuelinks") && !explicitDomain.includes("linksredirect")) {
     return explicitDomain.toLowerCase().replace(/^www\./, "").replace(/^m\./, "").replace(/^shop\./, "").trim();
@@ -278,8 +293,8 @@ export async function runCuelinksSync(maxPages = 0) {
 
     // 2. Strict expiration pruning: purge if endDate is in the past
     if (o.end_date) {
-      const endMs = new Date(o.end_date).getTime();
-      if (!isNaN(endMs) && endMs < now) {
+      const endMs = parseExpiryTimestamp(o.end_date);
+      if (endMs !== null && endMs < now) {
         expiredCount++;
         continue;
       }
@@ -299,17 +314,21 @@ export async function runCuelinksSync(maxPages = 0) {
 
     let expiresIn = "Limited Time";
     if (o.end_date) {
-      const end = new Date(o.end_date).getTime();
-      const diffDays = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
-      if (diffDays <= 0) {
-        expiredCount++;
-        continue; // Expired today/earlier
-      } else if (diffDays === 1) {
-        expiresIn = "1 day left";
-      } else if (diffDays <= 60) {
-        expiresIn = `${diffDays} days left`;
-      } else {
-        expiresIn = "Active Offer";
+      const end = parseExpiryTimestamp(o.end_date);
+      if (end !== null) {
+        const diffMs = end - now;
+        if (diffMs <= 0) {
+          expiredCount++;
+          continue; // Expired
+        }
+        const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+        if (diffDays <= 1) {
+          expiresIn = "Expires today";
+        } else if (diffDays <= 60) {
+          expiresIn = `${diffDays} days left`;
+        } else {
+          expiresIn = "Active Offer";
+        }
       }
     }
 
@@ -396,8 +415,8 @@ export async function runCuelinksSync(maxPages = 0) {
             continue;
           }
           if (d.endDate) {
-            const endMs = new Date(d.endDate).getTime();
-            if (!isNaN(endMs) && endMs < now) {
+            const endMs = parseExpiryTimestamp(d.endDate);
+            if (endMs !== null && endMs < now) {
               expiredCount++;
               continue; // Prune expired
             }

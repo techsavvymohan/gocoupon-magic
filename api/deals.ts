@@ -107,16 +107,29 @@ export default async function handler(req: any, res: any) {
       snapshot = JSON.parse(fs.readFileSync(filePath, "utf-8"));
     }
 
+    function parseExpiryTimestamp(endDate?: string): number | null {
+      if (!endDate) return null;
+      const clean = String(endDate).trim();
+      if (!clean) return null;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) {
+        return new Date(`${clean}T23:59:59.999Z`).getTime();
+      }
+      if (clean.endsWith("T00:00:00.000Z") || clean.endsWith("T00:00:00Z") || clean.endsWith("T00:00:00+00:00")) {
+        const datePart = clean.slice(0, 10);
+        return new Date(`${datePart}T23:59:59.999Z`).getTime();
+      }
+      const parsed = new Date(clean).getTime();
+      return isNaN(parsed) ? null : parsed;
+    }
+
     const now = Date.now();
     let deals: DealRecord[] = Array.isArray(snapshot.deals) ? snapshot.deals : [];
 
     // Filter expired deals
     deals = deals.filter((d) => {
       if (d.expiresIn === "Expired") return false;
-      if (d.endDate) {
-        const end = new Date(d.endDate).getTime();
-        if (!isNaN(end) && end < now) return false;
-      }
+      const end = parseExpiryTimestamp(d.endDate);
+      if (end !== null && end < now) return false;
       return true;
     }).map((d) => ({
       ...d,

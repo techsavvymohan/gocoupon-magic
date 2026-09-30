@@ -7,6 +7,7 @@
  */
 
 import type { DealCategory, DealBadge } from "@/lib/server-data/deals-db";
+import { parseExpiryTimestamp } from "@/lib/api/deals-api";
 
 export interface Deal {
   id: string;
@@ -28,14 +29,12 @@ export interface Deal {
 }
 
 // Filter out expired deals from a deal array
-const _now = Date.now();
 function filterActive(deals: Deal[]): Deal[] {
+  const now = Date.now();
   return deals.filter((d) => {
     if (d.expiresIn === "Expired") return false;
-    if (d.endDate) {
-      const end = new Date(d.endDate).getTime();
-      if (!isNaN(end) && end < _now) return false;
-    }
+    const end = parseExpiryTimestamp(d.endDate);
+    if (end !== null && end < now) return false;
     return true;
   });
 }

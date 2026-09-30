@@ -79,6 +79,21 @@ export interface CuelinksConnectionStatus {
   apiVersion?: string;
 }
 
+export function parseExpiryTimestamp(endDate?: string): number | null {
+  if (!endDate) return null;
+  const clean = String(endDate).trim();
+  if (!clean) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) {
+    return new Date(`${clean}T23:59:59.999Z`).getTime();
+  }
+  if (clean.endsWith("T00:00:00.000Z") || clean.endsWith("T00:00:00Z") || clean.endsWith("T00:00:00+00:00")) {
+    const datePart = clean.slice(0, 10);
+    return new Date(`${datePart}T23:59:59.999Z`).getTime();
+  }
+  const parsed = new Date(clean).getTime();
+  return isNaN(parsed) ? null : parsed;
+}
+
 // In-memory cache for API responses
 interface CacheEntry<T> {
   data: T;
@@ -345,8 +360,8 @@ export async function fetchCuelinksCoupons(options: {
 
           // 2. Strict expiration pruning: drop expired offers
           if (o.end_date) {
-            const endMs = new Date(o.end_date).getTime();
-            if (!isNaN(endMs) && endMs < now) {
+            const endMs = parseExpiryTimestamp(o.end_date);
+            if (endMs !== null && endMs < now) {
               continue;
             }
           }
@@ -636,21 +651,6 @@ liveDealsPool = loadInitialDealsFromDisk();
  * Returns whether a deal is currently valid (non-expired).
  * Admin and featured deals are permanent and immune to automatic expiration.
  */
-export function parseExpiryTimestamp(endDate?: string): number | null {
-  if (!endDate) return null;
-  const clean = String(endDate).trim();
-  if (!clean) return null;
-  if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) {
-    return new Date(`${clean}T23:59:59.999Z`).getTime();
-  }
-  if (clean.endsWith("T00:00:00.000Z") || clean.endsWith("T00:00:00Z") || clean.endsWith("T00:00:00+00:00")) {
-    const datePart = clean.slice(0, 10);
-    return new Date(`${datePart}T23:59:59.999Z`).getTime();
-  }
-  const parsed = new Date(clean).getTime();
-  return isNaN(parsed) ? null : parsed;
-}
-
 export function isDealValid(deal: {
   endDate?: string;
   expiresIn?: string;
@@ -915,8 +915,8 @@ export async function syncLiveCuelinksDeals(maxPages: number = 0): Promise<{
 
     // 2. Strict expiration pruning
     if (o.end_date) {
-      const endMs = new Date(o.end_date).getTime();
-      if (!isNaN(endMs) && endMs < now) {
+      const endMs = parseExpiryTimestamp(o.end_date);
+      if (endMs !== null && endMs < now) {
         expiredCount++;
         continue;
       }
