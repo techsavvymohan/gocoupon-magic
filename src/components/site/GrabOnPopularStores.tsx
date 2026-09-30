@@ -75,6 +75,42 @@ const STORE_PAGES: StoreItem[][] = [
 
 export function GrabOnPopularStores() {
   const [currentPage, setCurrentPage] = useState(0);
+  const [spotlight, setSpotlight] = useState<StoreItem>(SPOTLIGHT_STORE);
+  const [spotlightBadge, setSpotlightBadge] = useState<string>("MOST POPULAR");
+  const [spotlightTitle, setSpotlightTitle] = useState<string>("Store Of The Month");
+  const [spotlightDesc, setSpotlightDesc] = useState<string>(
+    "Exclusive verified vouchers, flat discounts & cashback active right now."
+  );
+
+  useEffect(() => {
+    let active = true;
+    async function loadSections() {
+      try {
+        const res = await fetch("/api/homepage/sections");
+        if (!res.ok) return;
+        const payload = await res.json();
+        const serverSpotlight = payload?.data?.spotlightStore;
+        if (active && serverSpotlight && serverSpotlight.enabled !== false) {
+          if (serverSpotlight.storeName) {
+            setSpotlight((prev) => ({
+              ...prev,
+              name: serverSpotlight.storeName || prev.name,
+              slug: serverSpotlight.storeSlug || prev.slug,
+              logo: serverSpotlight.logo || prev.logo,
+              routeUrl: serverSpotlight.routeUrl || prev.routeUrl,
+            }));
+          }
+          if (serverSpotlight.badgeText) setSpotlightBadge(serverSpotlight.badgeText);
+          if (serverSpotlight.title) setSpotlightTitle(serverSpotlight.title);
+          if (serverSpotlight.description) setSpotlightDesc(serverSpotlight.description);
+        }
+      } catch {}
+    }
+    loadSections();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // ── Embla Carousel Instance for Stores Grid ──
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -166,8 +202,8 @@ export function GrabOnPopularStores() {
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-11 h-11 rounded-xl bg-white p-1.5 shadow-sm shrink-0 flex items-center justify-center">
                 <StoreLogo
-                  storeName={SPOTLIGHT_STORE.name}
-                  storeLogo={SPOTLIGHT_STORE.logo}
+                  storeName={spotlight.name}
+                  storeLogo={spotlight.logo}
                   className="w-8 h-8"
                 />
               </div>
@@ -175,20 +211,20 @@ export function GrabOnPopularStores() {
                 <div className="flex items-center gap-1.5">
                   <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold uppercase tracking-wider bg-amber-400/20 text-amber-300 px-2 py-0.2 rounded-full">
                     <Sparkles className="w-2.5 h-2.5 fill-current" />
-                    STORE OF THE MONTH
+                    {spotlightBadge}
                   </span>
                 </div>
                 <h4 className="font-display font-bold text-sm text-white truncate mt-0.5">
-                  {SPOTLIGHT_STORE.name}
+                  {spotlight.name}
                 </h4>
                 <p className="text-[10px] text-slate-300 truncate">
-                  {SPOTLIGHT_STORE.couponCount} Coupons • {SPOTLIGHT_STORE.offerCount} Offers
+                  {spotlight.couponCount} Coupons • {spotlight.offerCount} Offers
                 </p>
               </div>
             </div>
 
             <Link
-              to={SPOTLIGHT_STORE.routeUrl as any}
+              to={spotlight.routeUrl as any}
               className="inline-flex items-center gap-1 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-1.5 text-xs font-bold shadow-xs shrink-0 active:scale-95 transition-all"
             >
               <span>Visit</span>
@@ -211,13 +247,13 @@ export function GrabOnPopularStores() {
                 <div className="flex items-center justify-between">
                   <span className="inline-flex items-center gap-1 text-[11px] font-mono font-bold uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30 px-3 py-0.5 rounded-full shadow-2xs">
                     <Sparkles className="w-3 h-3 fill-current animate-pulse" />
-                    MOST POPULAR
+                    {spotlightBadge}
                   </span>
                   <span className="text-xs text-slate-400 font-medium">Monthly Choice</span>
                 </div>
                 
                 <h3 className="font-display font-bold text-xl sm:text-2xl text-white mt-2">
-                  Store Of The Month
+                  {spotlightTitle}
                 </h3>
               </div>
 
@@ -225,16 +261,16 @@ export function GrabOnPopularStores() {
               <div className="my-6 flex flex-col items-center justify-center">
                 <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl bg-white p-4 shadow-2xl flex items-center justify-center border border-white/20 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1">
                   <StoreLogo
-                    storeName={SPOTLIGHT_STORE.name}
-                    storeLogo={SPOTLIGHT_STORE.logo}
+                    storeName={spotlight.name}
+                    storeLogo={spotlight.logo}
                     className="w-20 h-20 sm:w-24 sm:h-24"
                   />
                 </div>
                 <h4 className="font-display font-extrabold text-lg text-white mt-3 group-hover:text-primary-foreground transition-colors">
-                  {SPOTLIGHT_STORE.name}
+                  {spotlight.name}
                 </h4>
                 <p className="text-xs text-slate-300 font-medium">
-                  {SPOTLIGHT_STORE.category}
+                  {spotlight.category}
                 </p>
               </div>
 
@@ -243,7 +279,7 @@ export function GrabOnPopularStores() {
                 <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-white/5 border border-white/10 text-center mb-4 transition-colors group-hover:border-primary/30">
                   <div>
                     <span className="font-display font-bold text-lg text-emerald-400">
-                      {SPOTLIGHT_STORE.couponCount}
+                      {spotlight.couponCount}
                     </span>
                     <p className="text-[11px] text-slate-300 uppercase tracking-wider font-medium">
                       Coupons
@@ -251,7 +287,7 @@ export function GrabOnPopularStores() {
                   </div>
                   <div>
                     <span className="font-display font-bold text-lg text-cyan-400">
-                      {SPOTLIGHT_STORE.offerCount}
+                      {spotlight.offerCount}
                     </span>
                     <p className="text-[11px] text-slate-300 uppercase tracking-wider font-medium">
                       Offers
@@ -261,7 +297,7 @@ export function GrabOnPopularStores() {
 
                 {/* Visit Store Button with Hover Shine */}
                 <Link
-                  to={SPOTLIGHT_STORE.routeUrl as any}
+                  to={spotlight.routeUrl as any}
                   className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground py-3 text-xs sm:text-sm font-bold shadow-md shadow-primary/25 transition-all hover:scale-105 active:scale-95 group/btn"
                 >
                   <span>Visit Store</span>

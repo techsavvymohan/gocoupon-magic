@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { X } from "lucide-react";
+import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 
 const initialForm = {
   title: "",
@@ -151,19 +151,26 @@ export default function AdminProductsManager() {
       setIsUploadingImage(true);
       setError("");
 
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append(
-        "slug",
-        `${form.storeSlug || "product"}-${form.title || file.name}`
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/^-+|-+$/g, "")
-      );
+      const base64Data = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
 
       const response = await fetch("/api/uploads/product-image", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+          ...getAdminAuthHeaders(),
+        },
+        body: JSON.stringify({
+          image: base64Data,
+          slug: `${form.storeSlug || "product"}-${form.title || file.name}`
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, ""),
+        }),
       });
 
       const payload = await response.json();
@@ -172,9 +179,10 @@ export default function AdminProductsManager() {
         throw new Error(payload.error || "Unable to upload product image.");
       }
 
+      const secureUrl = payload.data?.secureUrl || payload.data?.secure_url || payload.data?.url;
       setForm((current) => ({
         ...current,
-        image: payload.data.secureUrl,
+        image: secureUrl,
       }));
     } catch (uploadError) {
       setError(uploadError.message || "Unable to upload product image.");
@@ -193,7 +201,10 @@ export default function AdminProductsManager() {
 
     const response = await fetch(endpoint, {
       method,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...getAdminAuthHeaders(),
+      },
       body: JSON.stringify(form),
     });
 
@@ -216,7 +227,10 @@ export default function AdminProductsManager() {
     if (!deleteTarget) return;
 
     setIsDeleting(true);
-    const response = await fetch(`/api/products/${deleteTarget.id}`, { method: "DELETE" });
+    const response = await fetch(`/api/products/${deleteTarget.id}`, {
+      method: "DELETE",
+      headers: getAdminAuthHeaders(),
+    });
 
     if (!response.ok) {
       setIsDeleting(false);

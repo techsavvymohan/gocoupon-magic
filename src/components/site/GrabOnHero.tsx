@@ -17,6 +17,7 @@ import { Copy, Check, ExternalLink, ArrowRight, ShieldCheck, Tag, ChevronLeft, C
 import { toast } from "sonner";
 import { FEATURED_DEALS_COLLECTION, type FeaturedDealItem } from "@/data/featured-deals-campaign";
 import { StoreLogo } from "@/components/common/StoreLogo";
+import { useFestiveBanner } from "@/lib/hero-banner";
 
 // Color palettes for hero banner slides to give each brand an authentic, vibrant look
 const BRAND_THEMES: Record<string, { bg: string; accent: string; badge: string; text: string }> = {
@@ -115,6 +116,7 @@ const SIDE_PICKS = [
 ];
 
 export function GrabOnHero() {
+  const { banner: festiveBanner, isActive: isFestiveBannerActive, styles: festiveStyles } = useFestiveBanner();
   const mainDeals = useMemo(() => FEATURED_DEALS_COLLECTION.slice(0, 8), []);
 
   const [activeMainIndex, setActiveMainIndex] = useState(0);
@@ -202,6 +204,38 @@ export function GrabOnHero() {
       onMouseLeave={() => setIsPaused(false)}
     >
       <div className="max-w-7xl mx-auto px-3 sm:px-6">
+        {/* Dynamic Festive / Seasonal Announcement Pill (Controlled via Admin Panel) */}
+        {isFestiveBannerActive && (
+          <div className="mb-4 sm:mb-5 flex justify-center animate-in fade-in duration-300">
+            <div
+              className={`inline-flex flex-wrap items-center justify-center gap-2 rounded-2xl sm:rounded-full border px-4 py-2 sm:py-1.5 text-xs sm:text-sm text-foreground/90 shadow-2xs backdrop-blur-xs transition-all max-w-full text-balance ${festiveStyles.container}`}
+            >
+              <span className="inline-flex items-center gap-1.5 shrink-0">
+                {festiveBanner.showPingDot && (
+                  <span className={`flex h-2 w-2 rounded-full animate-ping ${festiveStyles.dot}`} />
+                )}
+                {festiveBanner.badgeTitle && (
+                  <strong className={`font-bold ${festiveStyles.badge}`}>
+                    {festiveBanner.badgeTitle}
+                  </strong>
+                )}
+              </span>
+              <span className="font-medium text-center sm:text-left">
+                {festiveBanner.message}
+              </span>
+              {festiveBanner.linkText && festiveBanner.linkUrl && (
+                <Link
+                  to={festiveBanner.linkUrl as any}
+                  className={`font-bold underline underline-offset-2 transition-colors ml-0.5 inline-flex items-center gap-0.5 shrink-0 ${festiveStyles.link}`}
+                >
+                  <span>{festiveBanner.linkText}</span>
+                  <ArrowRight className="h-3 w-3" />
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Main Grid: Full width on mobile/tablet (1 focused card), 8+4 cols on desktop */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 items-stretch">
           

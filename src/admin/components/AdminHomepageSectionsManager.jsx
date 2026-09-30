@@ -4,7 +4,8 @@ import { startTransition, useDeferredValue, useEffect, useMemo, useState } from 
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Trash2, Image as ImageIcon, Upload } from "lucide-react";
+import { Plus, Trash2, Image as ImageIcon, Upload, Sparkles } from "lucide-react";
+import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 
 const initialState = {
   floatingToast: {
@@ -33,6 +34,16 @@ const initialState = {
     enabled: true,
     text: "🔥 Neeman's Extra 10% Off | Vijay Sales Tech Deals | Nykaa Hot Pink Sale | Ajio Fashion Sale",
     speed: "normal",
+  },
+  spotlightStore: {
+    enabled: true,
+    storeSlug: "myntra",
+    storeName: "Myntra",
+    badgeText: "MOST POPULAR",
+    title: "Store Of The Month",
+    description: "Exclusive verified vouchers, flat discounts & cashback active right now.",
+    routeUrl: "/myntra-coupons",
+    logo: "/Brand logos/myntra.webp",
   },
   trendingStores: {
     title: "Trending Stores",
@@ -435,12 +446,20 @@ export default function AdminHomepageSectionsManager() {
     if (!file) return;
     try {
       setUploadingIndex(index);
-      const formData = new FormData();
-      formData.append("file", file);
+      const base64Data = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
 
       const response = await fetch("/api/uploads/banner-image", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+          ...getAdminAuthHeaders(),
+        },
+        body: JSON.stringify({ image: base64Data }),
       });
 
       const payload = await response.json();
@@ -448,7 +467,7 @@ export default function AdminHomepageSectionsManager() {
         throw new Error(payload.error || "Image upload failed.");
       }
 
-      const uploadedUrl = payload.data?.secureUrl;
+      const uploadedUrl = payload.data?.secureUrl || payload.data?.secure_url || payload.data?.url;
       if (uploadedUrl) {
         updateToastPromotion(index, "image", uploadedUrl);
         toast.success("Banner image uploaded successfully!");
@@ -516,7 +535,10 @@ export default function AdminHomepageSectionsManager() {
       setIsSaving(true);
       const response = await fetch("/api/homepage/sections", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...getAdminAuthHeaders(),
+        },
         body: JSON.stringify({ sections }),
       });
       const payload = await response.json();
@@ -762,6 +784,95 @@ export default function AdminHomepageSectionsManager() {
                 className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white"
               />
             </label>
+          </div>
+        </SectionCard>
+
+        {/* 1.5. SPOTLIGHT STORE OF THE MONTH (GRABON POPULAR STORES) */}
+        <SectionCard
+          title="Spotlight Store Of The Month"
+          badge="GRABON FEATURE"
+          description="Control the high-conversion featured store spotlight displayed with glowing ambient effects on the homepage."
+        >
+          <div className="space-y-4">
+            <label className="flex items-center gap-2 text-xs font-semibold text-zinc-800 dark:text-zinc-200 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={sections.spotlightStore?.enabled !== false}
+                onChange={(e) => updateSectionField("spotlightStore", "enabled", e.target.checked)}
+                className="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 accent-emerald-600 cursor-pointer"
+              />
+              Enable Store Of The Month Spotlight Card
+            </label>
+
+            <div className="grid gap-4 md:grid-cols-3">
+              <label className="grid gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+                <span className="font-semibold text-zinc-800 dark:text-zinc-200">Select Partner Store</span>
+                <select
+                  value={sections.spotlightStore?.storeSlug || "myntra"}
+                  onChange={(e) => {
+                    const slug = e.target.value;
+                    const matched = stores.find((s) => s.slug === slug);
+                    setSections((curr) => ({
+                      ...curr,
+                      spotlightStore: {
+                        ...curr.spotlightStore,
+                        storeSlug: slug,
+                        storeName: matched?.name || slug,
+                        logo: matched?.logoImage || matched?.logo || `/Brand logos/${slug}.webp`,
+                        routeUrl: `/${slug}-coupons`,
+                      },
+                    }));
+                  }}
+                  className="h-10 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 text-xs text-zinc-900 dark:text-white outline-none"
+                >
+                  {stores.map((s) => (
+                    <option key={s.slug} value={s.slug}>
+                      {s.name} ({s.slug})
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="grid gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+                <span className="font-semibold text-zinc-800 dark:text-zinc-200">Badge Text</span>
+                <Input
+                  value={sections.spotlightStore?.badgeText || "MOST POPULAR"}
+                  onChange={(e) => updateSectionField("spotlightStore", "badgeText", e.target.value)}
+                  placeholder="MOST POPULAR"
+                  className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-xs"
+                />
+              </label>
+
+              <label className="grid gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+                <span className="font-semibold text-zinc-800 dark:text-zinc-200">Card Title</span>
+                <Input
+                  value={sections.spotlightStore?.title || "Store Of The Month"}
+                  onChange={(e) => updateSectionField("spotlightStore", "title", e.target.value)}
+                  placeholder="Store Of The Month"
+                  className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-xs"
+                />
+              </label>
+
+              <label className="grid gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 md:col-span-2">
+                <span className="font-semibold text-zinc-800 dark:text-zinc-200">Tagline / Description</span>
+                <Input
+                  value={sections.spotlightStore?.description || "Exclusive verified vouchers, flat discounts & cashback active right now."}
+                  onChange={(e) => updateSectionField("spotlightStore", "description", e.target.value)}
+                  placeholder="Exclusive verified vouchers, flat discounts & cashback active right now."
+                  className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-xs"
+                />
+              </label>
+
+              <label className="grid gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+                <span className="font-semibold text-zinc-800 dark:text-zinc-200">Destination Route URL</span>
+                <Input
+                  value={sections.spotlightStore?.routeUrl || "/myntra-coupons"}
+                  onChange={(e) => updateSectionField("spotlightStore", "routeUrl", e.target.value)}
+                  placeholder="/myntra-coupons"
+                  className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-xs"
+                />
+              </label>
+            </div>
           </div>
         </SectionCard>
 

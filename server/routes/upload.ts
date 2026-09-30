@@ -54,7 +54,10 @@ uploadRouter.post("/upload", requireAdminAuth, async (req: Request, res: Respons
 
     res.json({
       success: true,
-      data: result,
+      data: {
+        ...result,
+        secureUrl: result.secure_url,
+      },
       message: "Image uploaded successfully to Cloudinary.",
     });
   } catch (error: any) {
@@ -65,3 +68,83 @@ uploadRouter.post("/upload", requireAdminAuth, async (req: Request, res: Respons
     });
   }
 });
+
+/**
+ * POST /api/uploads/banner-image or /api/admin/uploads/banner-image
+ * Dedicated endpoint for Admin Hero Manager and Homepage Sections promo banners.
+ */
+uploadRouter.post("/banner-image", requireAdminAuth, async (req: Request, res: Response) => {
+  try {
+    const { image, file } = req.body || {};
+    const imgData = image || file;
+
+    if (!imgData || typeof imgData !== "string") {
+      res.status(400).json({
+        success: false,
+        error: "Missing required 'image' field (must be base64 data URI or image URL).",
+      });
+      return;
+    }
+
+    const result = await uploadImageToCloudinary(imgData, {
+      folder: "gocoupon/banners",
+      tags: ["gocoupon", "hero-banner", "promo"],
+    });
+
+    res.json({
+      success: true,
+      data: {
+        ...result,
+        secureUrl: result.secure_url,
+      },
+      message: "Banner image uploaded successfully.",
+    });
+  } catch (error: any) {
+    console.error("[Upload API] Banner upload error:", error);
+    res.status(500).json({
+      success: false,
+      error: error?.message || "Failed to upload banner image.",
+    });
+  }
+});
+
+/**
+ * POST /api/uploads/product-image or /api/admin/uploads/product-image
+ * Dedicated endpoint for Admin Products Manager.
+ */
+uploadRouter.post("/product-image", requireAdminAuth, async (req: Request, res: Response) => {
+  try {
+    const { image, file, slug } = req.body || {};
+    const imgData = image || file;
+
+    if (!imgData || typeof imgData !== "string") {
+      res.status(400).json({
+        success: false,
+        error: "Missing required 'image' field (must be base64 data URI or image URL).",
+      });
+      return;
+    }
+
+    const result = await uploadImageToCloudinary(imgData, {
+      folder: "gocoupon/products",
+      tags: ["gocoupon", "products"],
+      public_id: slug ? `prod_${slug}` : undefined,
+    });
+
+    res.json({
+      success: true,
+      data: {
+        ...result,
+        secureUrl: result.secure_url,
+      },
+      message: "Product image uploaded successfully.",
+    });
+  } catch (error: any) {
+    console.error("[Upload API] Product image upload error:", error);
+    res.status(500).json({
+      success: false,
+      error: error?.message || "Failed to upload product image.",
+    });
+  }
+});
+

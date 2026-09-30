@@ -184,18 +184,25 @@ export default function AdminHeroManager() {
     setUploadingIndex(index);
     const toastId = toast.loading("Uploading banner image...");
     try {
-      const formData = new FormData();
-      formData.append("file", file);
+      const base64Data = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
 
       const res = await fetch("/api/uploads/banner-image", {
         method: "POST",
-        headers: getAdminAuthHeaders(),
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+          ...getAdminAuthHeaders(),
+        },
+        body: JSON.stringify({ image: base64Data }),
       });
       const payload = await res.json();
       if (!res.ok) throw new Error(payload.error || "Failed to upload image.");
 
-      const imageUrl = payload.data.secureUrl;
+      const imageUrl = payload.data?.secureUrl || payload.data?.secure_url || payload.data?.url;
       updateHeroSlide(index, "image", imageUrl);
       toast.success("Banner image uploaded successfully!", { id: toastId });
     } catch (err) {

@@ -913,11 +913,13 @@ adminRouter.put("/hero", requireAdminAuth, async (req: Request, res: Response) =
 
 adminRouter.get("/sections", async (req: Request, res: Response) => {
   const sections = await settingsDb.getSetting("sections", defaultSections);
-  res.json({ success: true, data: sections });
+  const unwrapped = sections && sections.sections ? sections.sections : (sections || defaultSections);
+  res.json({ success: true, data: unwrapped });
 });
 
 adminRouter.put("/sections", requireAdminAuth, async (req: Request, res: Response) => {
-  const sections = req.body || {};
+  const rawBody = req.body || {};
+  const sections = rawBody.sections || rawBody;
   await settingsDb.setSetting("sections", sections);
   res.json({ success: true, message: "Homepage sections saved.", data: sections });
 });
