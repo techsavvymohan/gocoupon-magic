@@ -35,8 +35,9 @@ import { Badge } from "@/components/ui/badge";
 export default function AdminBrandAssetsManager() {
   const [brands, setBrands] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isBatchFetching, setIsBatchFetching] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterTab, setFilterTab] = useState("all"); // 'all' | 'missing' | 'cloudinary' | 'local'
+  const [filterTab, setFilterTab] = useState("all"); // 'all' | 'cuelinks' | 'admitad' | 'missing' | 'cloudinary' | 'local'
   const [editingSlug, setEditingSlug] = useState(null);
   const [inputUrlMap, setInputUrlMap] = useState({});
   const [uploadingSlug, setUploadingSlug] = useState(null);
@@ -88,6 +89,8 @@ export default function AdminBrandAssetsManager() {
 
       if (!matchesSearch) return false;
 
+      if (filterTab === "cuelinks") return brand.affiliateSource === "cuelinks";
+      if (filterTab === "admitad") return brand.affiliateSource === "admitad";
       if (filterTab === "missing") return !brand.hasLogo;
       if (filterTab === "cloudinary") return brand.source === "cloudinary" || (brand.logoUrl && brand.logoUrl.includes("cloudinary.com"));
       if (filterTab === "local") return brand.source === "local";
@@ -102,9 +105,45 @@ export default function AdminBrandAssetsManager() {
     const withLogos = brands.filter((b) => b.hasLogo).length;
     const missing = total - withLogos;
     const cloudinary = brands.filter((b) => b.source === "cloudinary" || (b.logoUrl && b.logoUrl.includes("cloudinary.com"))).length;
+    const cuelinks = brands.filter((b) => b.affiliateSource === "cuelinks").length;
+    const admitad = brands.filter((b) => b.affiliateSource === "admitad").length;
     const coverage = total > 0 ? Math.round((withLogos / total) * 100) : 0;
-    return { total, withLogos, missing, cloudinary, coverage };
+    return { total, withLogos, missing, cloudinary, cuelinks, admitad, coverage };
   }, [brands]);
+
+  // Batch Auto-Fetch for Cuelinks & Admitad
+  async function handleBatchAutoFetch(source = "both") {
+    const label = source === "cuelinks" ? "Cuelinks" : (source === "admitad" ? "Admitad" : "Cuelinks & Admitad");
+    if (!window.confirm(`Auto-fetch and upload brand logos to Cloudinary for all ${label} merchants?`)) {
+      return;
+    }
+
+    try {
+      setIsBatchFetching(true);
+      toast.info(`Fetching & uploading brand logos for ${label}... Please wait.`);
+
+      const res = await fetch("/api/admin/brand-assets/batch-autofetch", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAdminAuthHeaders(),
+        },
+        body: JSON.stringify({ source, limit: 400 }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        toast.success(data.message || `Successfully processed logos for ${label}!`);
+        await fetchBrandAssets();
+      } else {
+        toast.error(data.error || "Batch auto-fetch encountered an issue.");
+      }
+    } catch (err) {
+      toast.error("Network error during batch auto-fetch.");
+    } finally {
+      setIsBatchFetching(false);
+    }
+  }
 
   // Save / Update Brand Logo from pasted URL
   async function handleSaveUrl(brand) {
@@ -316,12 +355,21 @@ export default function AdminBrandAssetsManager() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Button
+            onClick={() => handleBatchAutoFetch("both")}
+            disabled={isBatchFetching || isLoading}
+            className="rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-indigo-600 hover:from-amber-600 hover:to-indigo-700 text-white font-bold text-xs shadow-md shadow-amber-500/20"
+          >
+            <Sparkles className={`h-3.5 w-3.5 mr-1.5 ${isBatchFetching ? "animate-spin" : ""}`} />
+            {isBatchFetching ? "Auto-Fetching Affiliate Logos..." : "⚡ Auto-Fetch (Cuelinks & Admitad)"}
+          </Button>
+
           <Button
             variant="outline"
             size="sm"
             onClick={fetchBrandAssets}
-            disabled={isLoading}
+            disabled={isLoading || isBatchFetching}
             className="rounded-xl border-border font-bold text-xs"
           >
             <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isLoading ? "animate-spin" : ""}`} />
@@ -401,18 +449,40 @@ export default function AdminBrandAssetsManager() {
                 : "bg-muted text-muted-foreground hover:text-foreground"
             }`}
           >
-            All Brands ({stats.total})
+            All ({stats.total})
+          </button>
+
+          <button
+            onClick={() => setFilterTab("cuelinks")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors shrink-0 ${
+              filterTab === "cuelinks"
+                ? "bg-amber-500 text-white"
+                : "bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20"
+            }`}
+          >
+            Cuelinks ({stats.cuelinks})
+          </button>
+
+          <button
+            onClick={() => setFilterTab("admitad")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors shrink-0 ${
+              filterTab === "admitad"
+                ? "bg-indigo-600 text-white"
+                : "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20"
+            }`}
+          >
+            Admitad ({stats.admitad})
           </button>
 
           <button
             onClick={() => setFilterTab("missing")}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors shrink-0 ${
               filterTab === "missing"
-                ? "bg-amber-600 text-white"
-                : "bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20"
+                ? "bg-rose-600 text-white"
+                : "bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20"
             }`}
           >
-            Missing Logos ({stats.missing})
+            Missing ({stats.missing})
           </button>
 
           <button
@@ -500,10 +570,20 @@ export default function AdminBrandAssetsManager() {
 
                       {/* Brand Info */}
                       <td className="py-3 px-4">
-                        <div className="font-bold text-foreground flex items-center gap-1.5">
+                        <div className="font-bold text-foreground flex items-center gap-1.5 flex-wrap">
                           <span>{brand.name}</span>
+                          {brand.affiliateSource === "cuelinks" && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/20">
+                              Cuelinks
+                            </span>
+                          )}
+                          {brand.affiliateSource === "admitad" && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-500/20">
+                              Admitad
+                            </span>
+                          )}
                           {brand.dealCount > 0 && (
-                            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20">
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20">
                               {brand.dealCount} deals
                             </span>
                           )}

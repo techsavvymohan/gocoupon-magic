@@ -58,7 +58,7 @@ storesRouter.get("/", async (req: Request, res: Response) => {
     const result = queryStores({ category, q, sortBy, order, limit, offset });
     const stampedStores = result.stores.map((s: any) => {
       const canonicalLogo = brandAssetsService.getLogoUrl(s.slug || s.name || s.id);
-      if (canonicalLogo && (!s.logo || s.logo.includes("placeholder"))) {
+      if (canonicalLogo) {
         return { ...s, logo: canonicalLogo };
       }
       return s;

@@ -288,7 +288,7 @@ dealsRouter.get("/", async (req: Request, res: Response) => {
 
     const stampedDeals = result.deals.map((deal) => {
       const brandLogo = brandAssetsService.getLogoUrl(deal.storeSlug || deal.storeName);
-      if (brandLogo && (!deal.storeLogo || deal.storeLogo.includes("placeholder"))) {
+      if (brandLogo) {
         return { ...deal, storeLogo: brandLogo };
       }
       return deal;
