@@ -4,7 +4,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema } from "@/lib/seo";
 import { useDeals } from "@/hooks/use-deals";
 import { useInternationalDeals } from "@/hooks/use-international-deals";
-import { triggerLiveSync, type DealSortField, type Deal } from "@/lib/api/deals-api";
+import { triggerLiveSync, type DealSortField, type Deal, parseExpiryTimestamp } from "@/lib/api/deals-api";
 import { wrapAffiliateTracking, buildDealRedirectUrl } from "@/lib/services/store-registry";
 import { DealGridSkeleton } from "@/components/ui/DataSkeleton";
 import { StoreLogo } from "@/components/common/StoreLogo";
@@ -418,12 +418,10 @@ function OffersHubPage() {
   const filteredOffers = useMemo(() => {
     const now = Date.now();
     return allDeals.filter((deal) => {
-      // 1. Drop expired deals
+      // 1. Drop expired deals (strict end-of-day accuracy)
       if (deal.expiresIn === "Expired") return false;
-      if (deal.endDate) {
-        const end = new Date(deal.endDate).getTime();
-        if (!isNaN(end) && end < now) return false;
-      }
+      const end = parseExpiryTimestamp(deal.endDate);
+      if (end !== null && end < now) return false;
 
       // 2. Filter by Popular Brand click
       if (selectedBrandFilter) {

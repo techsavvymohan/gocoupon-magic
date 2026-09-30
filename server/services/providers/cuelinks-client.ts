@@ -636,6 +636,21 @@ liveDealsPool = loadInitialDealsFromDisk();
  * Returns whether a deal is currently valid (non-expired).
  * Admin and featured deals are permanent and immune to automatic expiration.
  */
+export function parseExpiryTimestamp(endDate?: string): number | null {
+  if (!endDate) return null;
+  const clean = String(endDate).trim();
+  if (!clean) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) {
+    return new Date(`${clean}T23:59:59.999Z`).getTime();
+  }
+  if (clean.endsWith("T00:00:00.000Z") || clean.endsWith("T00:00:00Z") || clean.endsWith("T00:00:00+00:00")) {
+    const datePart = clean.slice(0, 10);
+    return new Date(`${datePart}T23:59:59.999Z`).getTime();
+  }
+  const parsed = new Date(clean).getTime();
+  return isNaN(parsed) ? null : parsed;
+}
+
 export function isDealValid(deal: {
   endDate?: string;
   expiresIn?: string;
@@ -645,29 +660,22 @@ export function isDealValid(deal: {
   campaignSource?: string;
   id?: string;
 }): boolean {
-  if (deal.status === "inactive") return false;
-
-  // ADMIN & FEATURED IMMUNITY: Admin deals and featured deals remain active and never vanish automatically
-  const isImmune =
-    deal.isFeatured ||
-    deal.source === "admin" ||
-    deal.campaignSource === "manual" ||
-    deal.campaignSource === "analytics_clouds" ||
-    (deal.id &&
-      (String(deal.id).startsWith("ac-") ||
-        String(deal.id).startsWith("offer-") ||
-        String(deal.id).startsWith("admin-")));
-
-  if (isImmune) {
-    return true;
-  }
-
-  if (deal.status === "expired") return false;
+  if (deal.status === "inactive" || deal.status === "expired") return false;
   if (deal.expiresIn === "Expired") return false;
-  if (deal.endDate) {
-    const endMs = new Date(deal.endDate).getTime();
-    if (!isNaN(endMs) && endMs < Date.now()) return false;
+
+  // Strict expiration date check with end-of-day accuracy
+  const endMs = parseExpiryTimestamp(deal.endDate);
+  if (endMs !== null && endMs < Date.now()) {
+    // Only true custom admin-created coupons (not affiliate feeds) are exempt
+    const isAdminCustom =
+      deal.source === "admin" &&
+      deal.id &&
+      (String(deal.id).startsWith("ac-") || String(deal.id).startsWith("admin-"));
+    if (!isAdminCustom) {
+      return false; // Automatically prune expired affiliate deal
+    }
   }
+
   return true;
 }
 

@@ -333,6 +333,21 @@ export function getPopularBrandsFromPool(customDeals?: DealRecord[]): PopularBra
  * Returns deals, optionally filtered by category, search query, badge, letter, brand, festive status, and pagination,
  * sorted by discount, trending (popularity), verified status, expiry, or store name.
  */
+export function parseExpiryTimestamp(endDate?: string): number | null {
+  if (!endDate) return null;
+  const clean = String(endDate).trim();
+  if (!clean) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) {
+    return new Date(`${clean}T23:59:59.999Z`).getTime();
+  }
+  if (clean.endsWith("T00:00:00.000Z") || clean.endsWith("T00:00:00Z") || clean.endsWith("T00:00:00+00:00")) {
+    const datePart = clean.slice(0, 10);
+    return new Date(`${datePart}T23:59:59.999Z`).getTime();
+  }
+  const parsed = new Date(clean).getTime();
+  return isNaN(parsed) ? null : parsed;
+}
+
 export function queryDeals(
   options: {
     category?: string;
@@ -358,23 +373,22 @@ export function queryDeals(
   // Enforce dynamic expiry pruning so expired deals are never returned (unless admin explicitly includes expired)
   if (!options.includeExpired) {
     results = results.filter((d) => {
-      // ADMIN & FEATURED DEALS PERMANENT IMMUNITY:
-      // Featured and admin-created deals remain active and never vanish automatically
-      if (
-        d.isFeatured ||
-        (d.id && String(d.id).startsWith("ac-")) ||
-        (d.id && String(d.id).startsWith("offer-")) ||
-        (d.id && String(d.id).startsWith("admin-")) ||
-        d.source === "admin" ||
-        d.campaignSource === "manual"
-      ) {
-        return true;
+      // 1. Explicit expired status
+      if (d.status === "expired" || d.expiresIn === "Expired") return false;
+
+      // 2. Strict expiration date check with end-of-day accuracy
+      const endMs = parseExpiryTimestamp(d.endDate);
+      if (endMs !== null && endMs < now) {
+        // Only true custom admin deals without an affiliate feed can be immune
+        const isAdminCustom =
+          d.source === "admin" &&
+          d.id &&
+          (String(d.id).startsWith("ac-") || String(d.id).startsWith("admin-"));
+        if (!isAdminCustom) {
+          return false; // Expired! Auto-remove from public deals feed
+        }
       }
-      if (d.expiresIn === "Expired") return false;
-      if (d.endDate) {
-        const end = new Date(d.endDate).getTime();
-        if (!isNaN(end) && end < now) return false;
-      }
+
       return true;
     });
   }

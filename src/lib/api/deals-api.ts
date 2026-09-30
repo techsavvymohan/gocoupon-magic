@@ -30,12 +30,25 @@ export interface Deal {
   directAnswer?: string;
 }
 
+export function parseExpiryTimestamp(endDate?: string): number | null {
+  if (!endDate) return null;
+  const clean = String(endDate).trim();
+  if (!clean) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) {
+    return new Date(`${clean}T23:59:59.999Z`).getTime();
+  }
+  if (clean.endsWith("T00:00:00.000Z") || clean.endsWith("T00:00:00Z") || clean.endsWith("T00:00:00+00:00")) {
+    const datePart = clean.slice(0, 10);
+    return new Date(`${datePart}T23:59:59.999Z`).getTime();
+  }
+  const parsed = new Date(clean).getTime();
+  return isNaN(parsed) ? null : parsed;
+}
+
 export function isDealActive(deal: { endDate?: string; expiresIn?: string }): boolean {
   if (deal.expiresIn === "Expired") return false;
-  if (deal.endDate) {
-    const end = new Date(deal.endDate).getTime();
-    if (!isNaN(end) && end < Date.now()) return false;
-  }
+  const end = parseExpiryTimestamp(deal.endDate);
+  if (end !== null && end < Date.now()) return false;
   return true;
 }
 
