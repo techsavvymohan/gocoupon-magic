@@ -1,7 +1,7 @@
 import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
-import { breadcrumbSchema } from "@/lib/seo";
+import { breadcrumbSchema, itemListSchema } from "@/lib/seo";
 import { useDeals } from "@/hooks/use-deals";
 import { useInternationalDeals } from "@/hooks/use-international-deals";
 import { triggerLiveSync, type DealSortField, type Deal, parseExpiryTimestamp } from "@/lib/api/deals-api";
@@ -591,19 +591,21 @@ function OffersHubPage() {
     { name: "Brands & Offers", path: "/offers" },
   ]);
 
-  const itemListSchema = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    itemListElement: filteredOffers.slice(0, 10).map((deal, idx) => ({
-      "@type": "ListItem",
-      position: idx + 1,
-      name: deal.title,
-      description: `${deal.discount} at ${deal.storeName}${
-        deal.code && deal.code.length > 1 ? ` — use code ${deal.code}` : ` — no code needed, discount auto-applied`
-      }`,
-      url: wrapAffiliateTracking(deal.link, "gocoupon_schema_offers"),
-    })),
-  };
+  const itemListSchemaData = itemListSchema(
+    "GoCoupon Verified Deals & Discounts",
+    filteredOffers.slice(0, 10).map((deal) => {
+      const targetPath = deal.storeSlug
+        ? `/${deal.storeSlug}`
+        : `/offers?store=${encodeURIComponent(deal.storeName || "retailer")}`;
+      return {
+        name: deal.title,
+        description: `${deal.discount} at ${deal.storeName}${
+          deal.code && deal.code.length > 1 ? ` — use code ${deal.code}` : ` — no code needed, discount auto-applied`
+        }`,
+        path: targetPath,
+      };
+    })
+  );
 
   const hasActiveFilters = Boolean(
     selectedBrandFilter ||
@@ -622,7 +624,7 @@ function OffersHubPage() {
   return (
     <SiteShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchemaData) }} />
 
       {/* ───────────────────────────────────────────────────────────────────────── */}
       {/* 1. TOP QUICK NAVIGATION BAR                                              */}

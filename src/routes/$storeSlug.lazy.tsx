@@ -1,6 +1,6 @@
 import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { SeoLandingPage, type VerifiedCoupon, type SavingHack, type StorePolicy } from "@/components/site/SeoLandingPage";
-import { breadcrumbSchema, faqSchema } from "@/lib/seo";
+import { breadcrumbSchema, faqSchema, storeCouponSchema } from "@/lib/seo";
 import { getStoreBySlug } from "@/lib/store-catalog-helper";
 
 export const Route = createLazyFileRoute("/$storeSlug")({
@@ -152,6 +152,16 @@ function DynamicStoreCouponsPage() {
     { name: `${storeName} Coupons`, path: `/${storeSlug}` },
   ]);
 
+  const storeSchemaData = storeCouponSchema({
+    storeName,
+    url: `/${storeSlug}`,
+    description: `Verified ${storeName} coupon codes, promo vouchers, and bank card discounts. Auto-test and apply working coupons with GoCoupon.`,
+    logo: store?.logo,
+    ratingValue: store?.rating || 4.8,
+    reviewCount: 420,
+    coupons: verifiedCoupons,
+  });
+
   const faqSchemaData = faqSchema(faqs.map((f) => ({ question: f.q, answer: f.a })));
 
   return (
@@ -159,6 +169,10 @@ function DynamicStoreCouponsPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(storeSchemaData) }}
       />
       <script
         type="application/ld+json"

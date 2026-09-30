@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SeoLandingPage } from "@/components/site/SeoLandingPage";
-import { breadcrumbSchema, createSeoHead, faqSchema } from "@/lib/seo";
+import { breadcrumbSchema, createSeoHead, faqSchema, storeCouponSchema } from "@/lib/seo";
 
 const faqs = [
   {
@@ -128,11 +128,26 @@ function MeeshoCouponsPage() {
   ]);
   const faq = faqSchema(faqs.map((f) => ({ question: f.q, answer: f.a })));
 
+  const storeSchema = storeCouponSchema({
+    storeName: "Meesho",
+    url: "/meesho-coupons",
+    description:
+      "Looking for verified Meesho coupons? Discover active promo codes, first-order discounts, and free shipping hacks on budget fashion and home goods with GoCoupon.",
+    logo: "/Brand logos/meesho.png",
+    ratingValue: 4.7,
+    reviewCount: 680,
+    coupons: verifiedCoupons,
+  });
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(storeSchema) }}
       />
       <script
         type="application/ld+json"

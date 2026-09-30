@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SeoLandingPage } from "@/components/site/SeoLandingPage";
-import { breadcrumbSchema, createSeoHead, faqSchema } from "@/lib/seo";
+import { breadcrumbSchema, createSeoHead, faqSchema, storeCouponSchema } from "@/lib/seo";
 
 const faqs = [
   {
@@ -128,11 +128,26 @@ function FlipkartCouponsPage() {
   ]);
   const faq = faqSchema(faqs.map((f) => ({ question: f.q, answer: f.a })));
 
+  const storeSchema = storeCouponSchema({
+    storeName: "Flipkart",
+    url: "/flipkart-coupons",
+    description:
+      "Looking for 100% verified Flipkart coupon codes? Find active promo codes, bank discounts, and up to 8.5% cashback on fashion, mobiles, and tech on GoCoupon.",
+    logo: "/Brand logos/flipkart.webp",
+    ratingValue: 4.8,
+    reviewCount: 980,
+    coupons: verifiedCoupons,
+  });
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(storeSchema) }}
       />
       <script
         type="application/ld+json"

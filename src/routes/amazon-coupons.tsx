@@ -3,7 +3,7 @@ import { SeoLandingPage } from "@/components/site/SeoLandingPage";
 import { AmazonAffiliateCards } from "@/components/site/AmazonAffiliateCards";
 import { AnimatedDealsCarousel } from "@/components/site/AnimatedDealsCarousel";
 import { AffiliateDisclosure } from "@/components/affiliate/AffiliateDisclosure";
-import { breadcrumbSchema, createSeoHead, faqSchema } from "@/lib/seo";
+import { breadcrumbSchema, createSeoHead, faqSchema, storeCouponSchema } from "@/lib/seo";
 
 const faqs = [
   {
@@ -131,11 +131,26 @@ function AmazonCouponsPage() {
   ]);
   const faq = faqSchema(faqs.map((f) => ({ question: f.q, answer: f.a })));
 
+  const storeSchema = storeCouponSchema({
+    storeName: "Amazon India",
+    url: "/amazon-coupons",
+    description:
+      "Verified Amazon India promo codes, lightning deals, and bank card instant discounts. Auto-apply working coupon vouchers with GoCoupon.",
+    logo: "/Brand logos/Amazon_logo.svg.webp",
+    ratingValue: 4.9,
+    reviewCount: 1420,
+    coupons: verifiedCoupons,
+  });
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(storeSchema) }}
       />
       <script
         type="application/ld+json"

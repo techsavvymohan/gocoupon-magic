@@ -1,7 +1,7 @@
 import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useRef } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
-import { breadcrumbSchema } from "@/lib/seo";
+import { breadcrumbSchema, itemListSchema } from "@/lib/seo";
 import { useStores } from "@/hooks/use-stores";
 import type { Store, StoreSortField } from "@/lib/api/stores-api";
 import { wrapAffiliateTracking } from "@/lib/services/store-registry";
@@ -93,11 +93,24 @@ function StoresPage() {
     { name: "All Stores", path: "/stores" },
   ]);
 
+  const storeListSchemaData = itemListSchema(
+    "GoCoupon Partner Stores & Retailers",
+    allStores.slice(0, 20).map((s) => ({
+      name: s.name,
+      description: s.description || `Verified coupon codes, promo vouchers & savings hacks at ${s.name}.`,
+      path: s.slug ? `/${s.slug}` : `/stores?store=${encodeURIComponent(s.name)}`,
+    }))
+  );
+
   return (
     <SiteShell>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(storeListSchemaData) }}
       />
 
       {/* ── HERO SECTION: "The Spatial Merchant Matrix" ── */}

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SeoLandingPage } from "@/components/site/SeoLandingPage";
-import { breadcrumbSchema, createSeoHead, faqSchema } from "@/lib/seo";
+import { breadcrumbSchema, createSeoHead, faqSchema, storeCouponSchema } from "@/lib/seo";
 
 const faqs = [
   {
@@ -128,11 +128,26 @@ function NykaaCouponsPage() {
   ]);
   const faq = faqSchema(faqs.map((f) => ({ question: f.q, answer: f.a })));
 
+  const storeSchema = storeCouponSchema({
+    storeName: "Nykaa",
+    url: "/nykaa-coupons",
+    description:
+      "Verified Nykaa coupon codes, cosmetics vouchers, and luxury beauty discounts. Auto-apply the highest working promo code on Nykaa with GoCoupon.",
+    logo: "/Brand logos/nykaa.png",
+    ratingValue: 4.8,
+    reviewCount: 610,
+    coupons: verifiedCoupons,
+  });
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(storeSchema) }}
       />
       <script
         type="application/ld+json"

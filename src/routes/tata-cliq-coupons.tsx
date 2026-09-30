@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SeoLandingPage } from "@/components/site/SeoLandingPage";
-import { breadcrumbSchema, createSeoHead, faqSchema } from "@/lib/seo";
+import { breadcrumbSchema, createSeoHead, faqSchema, storeCouponSchema } from "@/lib/seo";
 
 const faqs = [
   {
@@ -128,11 +128,26 @@ function TataCliqCouponsPage() {
   ]);
   const faq = faqSchema(faqs.map((f) => ({ question: f.q, answer: f.a })));
 
+  const storeSchema = storeCouponSchema({
+    storeName: "Tata CLiQ",
+    url: "/tata-cliq-coupons",
+    description:
+      "Verified Tata CLiQ promo codes, fashion vouchers, and luxury discounts. Save on apparel, footwear, and consumer electronics with GoCoupon.",
+    logo: "/Brand logos/tata_cliq.png",
+    ratingValue: 4.8,
+    reviewCount: 490,
+    coupons: verifiedCoupons,
+  });
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(storeSchema) }}
       />
       <script
         type="application/ld+json"

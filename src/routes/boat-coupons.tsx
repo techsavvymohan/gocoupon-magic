@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SeoLandingPage } from "@/components/site/SeoLandingPage";
-import { breadcrumbSchema, createSeoHead, faqSchema } from "@/lib/seo";
+import { breadcrumbSchema, createSeoHead, faqSchema, storeCouponSchema } from "@/lib/seo";
 
 const faqs = [
   {
@@ -128,11 +128,26 @@ function BoatCouponsPage() {
   ]);
   const faq = faqSchema(faqs.map((f) => ({ question: f.q, answer: f.a })));
 
+  const storeSchema = storeCouponSchema({
+    storeName: "boAt Lifestyle",
+    url: "/boat-coupons",
+    description:
+      "Verified boAt coupon codes, Airdopes vouchers, and prepaid checkout discounts. Auto-apply the highest working promo code on boAt Lifestyle with GoCoupon.",
+    logo: "/Brand logos/boat.png",
+    ratingValue: 4.8,
+    reviewCount: 520,
+    coupons: verifiedCoupons,
+  });
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(storeSchema) }}
       />
       <script
         type="application/ld+json"

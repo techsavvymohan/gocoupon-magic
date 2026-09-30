@@ -9,7 +9,7 @@ import { createSeoHead } from "@/lib/seo";
 export const Route = createFileRoute("/product/$productId")({
   loader: async ({ params }) => {
     const { CANONICAL_PRODUCTS } = await import("@/data/canonicalCatalogData");
-    const product = CANONICAL_PRODUCTS.find((p) => p.id === params.productId);
+    const product = CANONICAL_PRODUCTS.find((p) => p.id === params.productId || p.slug === params.productId);
     return { product };
   },
   head: ({ loaderData, params }) => {

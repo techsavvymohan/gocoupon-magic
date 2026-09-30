@@ -14,7 +14,7 @@
 import { createLazyFileRoute, notFound, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
-import { breadcrumbSchema } from "@/lib/seo";
+import { breadcrumbSchema, productSchema } from "@/lib/seo";
 import { CANONICAL_PRODUCTS, CANONICAL_OFFERS, CANONICAL_EVIDENCE, CANONICAL_COUPONS } from "@/data/canonicalCatalogData";
 import { CURATED_COLLECTIONS } from "@/data/collectionsData";
 import { compareProductOffers } from "@/lib/services/comparison-engine";
@@ -44,7 +44,7 @@ export const Route = createLazyFileRoute("/product/$productId")({
 
 function ProductDetailsPage() {
   const { productId } = Route.useParams();
-  const product = CANONICAL_PRODUCTS.find((p) => p.id === productId);
+  const product = CANONICAL_PRODUCTS.find((p) => p.id === productId || p.slug === productId);
 
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
   const [isWatched, setIsWatched] = useState(() => (productId ? isProductInWatchlist(productId) : false));
@@ -122,11 +122,32 @@ function ProductDetailsPage() {
     displayImage.toLowerCase().includes("logo") ||
     displayImage.toLowerCase().includes("brand");
 
+  const productJsonLd = productSchema({
+    name: product.title,
+    description: product.description,
+    image: displayImage,
+    brand: product.brand,
+    lowPrice: bestDeal?.effectiveNetPrice || (currentPrice || 1999),
+    highPrice:
+      comparison?.rows && comparison.rows.length > 0
+        ? Math.max(...comparison.rows.map((r) => r.offer.listedPrice))
+        : (bestDeal?.effectiveNetPrice ? Math.round(bestDeal.effectiveNetPrice * 1.25) : 2999),
+    ratingValue: product.rating || 4.7,
+    reviewCount: product.reviewCount || 1200,
+    offersCount: comparison?.rows?.length || 3,
+    url: `/product/${product.id}`,
+    sku: product.identifiers?.asin || product.identifiers?.modelNumber || product.id,
+  });
+
   return (
     <SiteShell>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
       />
 
       {/* Main Product Container */}

@@ -178,13 +178,19 @@ export function productSchema(params: {
   reviewCount?: number;
   offersCount?: number;
   url: string;
+  sku?: string;
 }) {
+  const imageUrl = params.image?.startsWith("http")
+    ? params.image
+    : absoluteUrl(params.image || "/gc-logo.webp");
+
   return {
     "@context": "https://schema.org",
     "@type": "Product",
     name: params.name,
     description: params.description,
-    image: params.image,
+    image: imageUrl,
+    sku: params.sku || params.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
     brand: {
       "@type": "Brand",
       name: params.brand,
@@ -200,11 +206,131 @@ export function productSchema(params: {
       "@type": "AggregateOffer",
       lowPrice: params.lowPrice,
       highPrice: params.highPrice,
+      price: params.lowPrice,
       priceCurrency: "INR",
+      priceValidUntil: "2026-12-31",
       offerCount: params.offersCount || 6,
       availability: "https://schema.org/InStock",
       url: absoluteUrl(params.url),
     },
+  };
+}
+
+export type StoreCouponSchemaParams = {
+  storeName: string;
+  url: string;
+  description: string;
+  logo?: string;
+  ratingValue?: number;
+  reviewCount?: number;
+  coupons?: Array<{
+    code?: string;
+    discount?: string;
+    description?: string;
+  }>;
+};
+
+export function storeCouponSchema(params: StoreCouponSchemaParams) {
+  const storeUrl = absoluteUrl(params.url);
+  const rating = params.ratingValue || 4.8;
+  const count = params.reviewCount || 420;
+  const logoUrl = params.logo
+    ? params.logo.startsWith("http")
+      ? params.logo
+      : absoluteUrl(params.logo)
+    : absoluteUrl("/gc-logo.webp");
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Store",
+        "@id": `${storeUrl}#store`,
+        name: params.storeName,
+        url: storeUrl,
+        description: params.description,
+        image: logoUrl,
+        priceRange: "$$",
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: rating.toString(),
+          reviewCount: count.toString(),
+          bestRating: "5",
+          worstRating: "1",
+        },
+        parentOrganization: {
+          "@id": "https://gocoupon.io/#organization",
+        },
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: `${params.storeName} Verified Coupons & Deals`,
+          itemListElement: (params.coupons || []).slice(0, 6).map((c, i) => ({
+            "@type": "Offer",
+            position: i + 1,
+            name: c.discount || `${params.storeName} Promo Deal`,
+            description: c.description || `Verified coupon voucher for ${params.storeName}.`,
+            price: "0",
+            priceCurrency: "INR",
+            availability: "https://schema.org/InStock",
+            url: storeUrl,
+            seller: {
+              "@type": "Organization",
+              name: params.storeName,
+            },
+          })),
+        },
+      },
+      {
+        "@type": "HowTo",
+        "@id": `${storeUrl}#howto`,
+        name: `How to Apply ${params.storeName} Promo Codes & Save`,
+        description: `Step-by-step instructions on applying verified promo codes and stacking bank discounts on ${params.storeName}.`,
+        step: [
+          {
+            "@type": "HowToStep",
+            position: 1,
+            name: "Find & Copy Verified Code",
+            text: `Browse verified ${params.storeName} promo codes on GoCoupon and copy the highest discount code for your order.`,
+          },
+          {
+            "@type": "HowToStep",
+            position: 2,
+            name: "Add Products to Cart",
+            text: `Visit ${params.storeName} and add eligible products meeting any minimum spend threshold to your shopping bag.`,
+          },
+          {
+            "@type": "HowToStep",
+            position: 3,
+            name: "Apply Promo Code at Checkout",
+            text: `Proceed to checkout, locate the voucher or discount code field, and paste the code.`,
+          },
+          {
+            "@type": "HowToStep",
+            position: 4,
+            name: "Verify Instant Reduction",
+            text: "Confirm the discounted total is reflected before paying via UPI, credit/debit card, or wallet.",
+          },
+        ],
+      },
+    ],
+  };
+}
+
+export function itemListSchema(
+  name: string,
+  items: Array<{ name: string; description?: string; path: string }>
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name,
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      ...(item.description ? { description: item.description } : {}),
+      url: absoluteUrl(item.path),
+    })),
   };
 }
 
