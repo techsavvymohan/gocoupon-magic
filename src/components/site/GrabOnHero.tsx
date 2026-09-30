@@ -1,22 +1,22 @@
 /**
  * @file src/components/site/GrabOnHero.tsx
- * @description GrabOn-style Hero section for GoCoupon.io.
+ * @description GrabOn-style Hero section with full Embla sliding carousel animations.
  *
  * Implements GrabOn's exact 2-column layout and UI/UX:
- * - Left/Center (8 cols): Main Hero Banner Carousel with interactive merchant tabs
- * - Right (4 cols): Top Picks / Spotlight Card with deal teaser and store switcher
+ * - Left/Center (8 cols): Main Hero Banner Carousel with smooth Embla horizontal sliding transitions & active progress timer
+ * - Right (4 cols): Top Picks / Spotlight Card with smooth Embla sliding transition
  * - 100% Real GoCoupon Data from FEATURED_DEALS_COLLECTION (no mock / AI data)
- * - 1-Click Coupon Code Copy with Toast Notification
- * - Seamless Safe Affiliate & Store Navigation
+ * - 1-Click Coupon Code Copy with Toast Notification & Checkmark Bounce
+ * - Auto-play with hover pause and animated tab progress bar
  */
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "@tanstack/react-router";
-import { Copy, Check, ExternalLink, ArrowRight, ShieldCheck, Tag } from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
+import { Copy, Check, ExternalLink, ArrowRight, ShieldCheck, Tag, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { FEATURED_DEALS_COLLECTION, type FeaturedDealItem } from "@/data/featured-deals-campaign";
 import { StoreLogo } from "@/components/common/StoreLogo";
-import { buildDealRedirectUrl } from "@/lib/services/store-registry";
 
 // Color palettes for hero banner slides to give each brand an authentic, vibrant look
 const BRAND_THEMES: Record<string, { bg: string; accent: string; badge: string; text: string }> = {
@@ -115,34 +115,76 @@ const SIDE_PICKS = [
 ];
 
 export function GrabOnHero() {
-  // Use real Featured Deals from GoCoupon dataset
-  const mainDeals = useMemo(() => {
-    return FEATURED_DEALS_COLLECTION.slice(0, 8);
-  }, []);
+  const mainDeals = useMemo(() => FEATURED_DEALS_COLLECTION.slice(0, 8), []);
 
   const [activeMainIndex, setActiveMainIndex] = useState(0);
   const [activeSideIndex, setActiveSideIndex] = useState(0);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Auto-play carousel every 5 seconds unless hovered
+  // ── Embla Carousel Instance for Main Hero Banner ──
+  const [emblaMainRef, emblaMainApi] = useEmblaCarousel({
+    loop: true,
+    duration: 25,
+  });
+
+  // ── Embla Carousel Instance for Right Side Card ──
+  const [emblaSideRef, emblaSideApi] = useEmblaCarousel({
+    loop: true,
+    duration: 25,
+  });
+
+  // Sync main carousel select event
+  const onSelectMain = useCallback(() => {
+    if (!emblaMainApi) return;
+    setActiveMainIndex(emblaMainApi.selectedScrollSnap());
+  }, [emblaMainApi]);
+
   useEffect(() => {
-    if (isPaused || mainDeals.length <= 1) return;
+    if (!emblaMainApi) return;
+    emblaMainApi.on("select", onSelectMain);
+    emblaMainApi.on("reInit", onSelectMain);
+  }, [emblaMainApi, onSelectMain]);
+
+  // Sync side carousel select event
+  const onSelectSide = useCallback(() => {
+    if (!emblaSideApi) return;
+    setActiveSideIndex(emblaSideApi.selectedScrollSnap());
+  }, [emblaSideApi]);
+
+  useEffect(() => {
+    if (!emblaSideApi) return;
+    emblaSideApi.on("select", onSelectSide);
+    emblaSideApi.on("reInit", onSelectSide);
+  }, [emblaSideApi, onSelectSide]);
+
+  // Auto-play main banner every 5 seconds (with hover pause)
+  useEffect(() => {
+    if (isPaused || !emblaMainApi) return;
     const interval = setInterval(() => {
-      setActiveMainIndex((prev) => (prev + 1) % mainDeals.length);
+      emblaMainApi.scrollNext();
     }, 5000);
     return () => clearInterval(interval);
-  }, [isPaused, mainDeals.length]);
+  }, [isPaused, emblaMainApi]);
 
-  const currentDeal = mainDeals[activeMainIndex] || mainDeals[0];
-  const theme = BRAND_THEMES[currentDeal?.brandSlug] || {
-    bg: "from-slate-900 via-indigo-950 to-slate-950",
-    accent: "text-primary",
-    badge: "bg-primary/20 text-primary border-primary/30",
-    text: "text-slate-200",
+  // Auto-play side banner every 7 seconds
+  useEffect(() => {
+    if (isPaused || !emblaSideApi) return;
+    const interval = setInterval(() => {
+      emblaSideApi.scrollNext();
+    }, 7000);
+    return () => clearInterval(interval);
+  }, [isPaused, emblaSideApi]);
+
+  const handleSelectMainTab = (index: number) => {
+    setActiveMainIndex(index);
+    emblaMainApi?.scrollTo(index);
   };
 
-  const currentSidePick = SIDE_PICKS[activeSideIndex] || SIDE_PICKS[0];
+  const handleSelectSideTab = (index: number) => {
+    setActiveSideIndex(index);
+    emblaSideApi?.scrollTo(index);
+  };
 
   const handleCopy = (code: string, brandName: string) => {
     navigator.clipboard.writeText(code);
@@ -163,112 +205,152 @@ export function GrabOnHero() {
         {/* Main Grid: 8 Cols Left (Hero Banner), 4 Cols Right (Side Card) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
           
-          {/* ── Left / Center Main Banner (8 cols) ── */}
+          {/* ── Left / Center Main Banner (8 cols) with Embla Smooth Slide ── */}
           <div className="lg:col-span-8 flex flex-col justify-between">
-            {/* Banner Card Container */}
-            <div
-              className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${theme.bg} p-6 sm:p-8 text-white shadow-xl min-h-[340px] sm:min-h-[360px] flex flex-col justify-between transition-all duration-500 border border-white/10`}
-            >
-              {/* Background Glow & Pattern */}
-              <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-white/5 blur-3xl pointer-events-none" />
-              <div className="absolute right-8 bottom-6 opacity-10 pointer-events-none hidden sm:block">
-                <StoreLogo
-                  storeName={currentDeal.brandName}
-                  storeLogo={currentDeal.logoUrl}
-                  className="w-48 h-48 rounded-full"
-                />
-              </div>
+            {/* Embla Viewport with Floating Controls */}
+            <div className="relative group/hero">
+              <div className="overflow-hidden rounded-2xl shadow-xl" ref={emblaMainRef}>
+                <div className="flex touch-pan-y">
+                  {mainDeals.map((deal, idx) => {
+                    const theme = BRAND_THEMES[deal.brandSlug] || {
+                      bg: "from-slate-900 via-indigo-950 to-slate-950",
+                      accent: "text-primary",
+                      badge: "bg-primary/20 text-primary border-primary/30",
+                      text: "text-slate-200",
+                    };
 
-              {/* Top Banner Header: Brand + Verified Tag */}
-              <div className="relative z-10 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="bg-white p-2 rounded-xl shadow-md shrink-0">
-                    <StoreLogo
-                      storeName={currentDeal.brandName}
-                      storeLogo={currentDeal.logoUrl}
-                      className="h-9 w-9 sm:h-11 sm:w-11"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="font-display font-bold text-lg sm:text-xl text-white tracking-tight">
-                      {currentDeal.brandName}
-                    </h3>
-                    <p className="text-xs text-white/70 font-medium">
-                      {currentDeal.category} • India Eligible
-                    </p>
-                  </div>
+                    return (
+                      <div
+                        key={deal.id}
+                        className="flex-[0_0_100%] min-w-0"
+                      >
+                        <div
+                          className={`relative overflow-hidden bg-gradient-to-br ${theme.bg} p-6 sm:p-8 text-white min-h-[340px] sm:min-h-[360px] flex flex-col justify-between border border-white/10 transition-colors duration-500`}
+                        >
+                          {/* Background Glow & Pattern */}
+                          <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-white/5 blur-3xl pointer-events-none" />
+                          <div className="absolute right-8 bottom-6 opacity-10 pointer-events-none hidden sm:block">
+                            <StoreLogo
+                              storeName={deal.brandName}
+                              storeLogo={deal.logoUrl}
+                              className="w-48 h-48 rounded-full"
+                            />
+                          </div>
+
+                          {/* Top Banner Header: Brand + Verified Tag */}
+                          <div className="relative z-10 flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                              <div className="bg-white p-2 rounded-xl shadow-md shrink-0 transition-transform duration-300 hover:scale-105">
+                                <StoreLogo
+                                  storeName={deal.brandName}
+                                  storeLogo={deal.logoUrl}
+                                  className="h-9 w-9 sm:h-11 sm:w-11"
+                                />
+                              </div>
+                              <div>
+                                <h3 className="font-display font-bold text-lg sm:text-xl text-white tracking-tight">
+                                  {deal.brandName}
+                                </h3>
+                                <p className="text-xs text-white/70 font-medium">
+                                  {deal.category} • India Eligible
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Badge with gentle pulse */}
+                            <div
+                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border backdrop-blur-xs transition-all ${theme.badge}`}
+                            >
+                              <ShieldCheck className="w-3.5 h-3.5" />
+                              <span>{deal.badge || "Verified Partner Deal"}</span>
+                            </div>
+                          </div>
+
+                          {/* Center Offer Title & Huge Discount */}
+                          <div className="relative z-10 my-4">
+                            <span className="inline-block text-xs font-bold uppercase tracking-widest text-white/80 mb-1">
+                              Exclusive Featured Promotion
+                            </span>
+                            <div className="flex flex-wrap items-baseline gap-3">
+                              <span className={`font-display text-3xl sm:text-5xl font-extrabold tracking-tight ${theme.accent}`}>
+                                {deal.discountText}
+                              </span>
+                              <span className="text-base sm:text-xl font-medium text-white/90">
+                                {deal.subTitle}
+                              </span>
+                            </div>
+                            <p className="mt-2 text-xs sm:text-sm text-white/80 max-w-xl line-clamp-2 leading-relaxed">
+                              {deal.terms || "Tested and verified coupon code ready for instant checkout redemption."}
+                            </p>
+                          </div>
+
+                          {/* Bottom Actions: Coupon Code Copy + Get Deal CTA */}
+                          <div className="relative z-10 flex flex-wrap items-center gap-3 pt-2">
+                            {deal.couponCode ? (
+                              <button
+                                type="button"
+                                onClick={() => handleCopy(deal.couponCode, deal.brandName)}
+                                className="inline-flex items-center gap-2 rounded-xl bg-white text-slate-900 px-4 py-2.5 text-xs sm:text-sm font-bold shadow-md hover:bg-slate-100 hover:scale-105 active:scale-95 transition-all group"
+                              >
+                                <Tag className="w-4 h-4 text-primary" />
+                                <span className="font-mono tracking-wider">{deal.couponCode}</span>
+                                {copiedCode === deal.couponCode ? (
+                                  <span className="inline-flex items-center gap-1 text-emerald-600 font-bold ml-1 animate-bounce">
+                                    <Check className="w-3.5 h-3.5" /> Copied!
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 text-slate-500 font-medium ml-1">
+                                    <Copy className="w-3.5 h-3.5" /> Copy
+                                  </span>
+                                )}
+                              </button>
+                            ) : null}
+
+                            <a
+                              href={deal.affiliateUrl || deal.merchantUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 text-xs sm:text-sm font-bold shadow-md shadow-primary/20 transition-all hover:scale-105 active:scale-95"
+                            >
+                              <span>Redeem Deal</span>
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+
+                            <Link
+                              to="/featured-deals"
+                              className="inline-flex items-center gap-1 text-xs text-white/80 hover:text-white underline underline-offset-4 ml-auto font-medium transition-colors"
+                            >
+                              <span>View all featured</span>
+                              <ArrowRight className="w-3 h-3" />
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-
-                {/* Badge */}
-                <div
-                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border backdrop-blur-xs ${theme.badge}`}
-                >
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>{currentDeal.badge || "Verified Partner Deal"}</span>
-                </div>
               </div>
 
-              {/* Center Offer Title & Huge Discount */}
-              <div className="relative z-10 my-4">
-                <span className="inline-block text-xs font-bold uppercase tracking-widest text-white/80 mb-1">
-                  Exclusive Featured Promotion
-                </span>
-                <div className="flex flex-wrap items-baseline gap-3">
-                  <span className={`font-display text-3xl sm:text-5xl font-extrabold tracking-tight ${theme.accent}`}>
-                    {currentDeal.discountText}
-                  </span>
-                  <span className="text-base sm:text-xl font-medium text-white/90">
-                    {currentDeal.subTitle}
-                  </span>
-                </div>
-                <p className="mt-2 text-xs sm:text-sm text-white/80 max-w-xl line-clamp-2 leading-relaxed">
-                  {currentDeal.terms || "Tested and verified coupon code ready for instant checkout redemption."}
-                </p>
-              </div>
-
-              {/* Bottom Actions: Coupon Code Copy + Get Deal CTA */}
-              <div className="relative z-10 flex flex-wrap items-center gap-3 pt-2">
-                {currentDeal.couponCode ? (
-                  <button
-                    type="button"
-                    onClick={() => handleCopy(currentDeal.couponCode, currentDeal.brandName)}
-                    className="inline-flex items-center gap-2 rounded-xl bg-white text-slate-900 px-4 py-2.5 text-xs sm:text-sm font-bold shadow-md hover:bg-slate-100 active:scale-95 transition-all group"
-                  >
-                    <Tag className="w-4 h-4 text-primary" />
-                    <span className="font-mono tracking-wider">{currentDeal.couponCode}</span>
-                    {copiedCode === currentDeal.couponCode ? (
-                      <span className="inline-flex items-center gap-1 text-emerald-600 font-bold ml-1">
-                        <Check className="w-3.5 h-3.5" /> Copied!
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-slate-500 font-medium ml-1">
-                        <Copy className="w-3.5 h-3.5" /> Copy
-                      </span>
-                    )}
-                  </button>
-                ) : null}
-
-                <a
-                  href={currentDeal.affiliateUrl || currentDeal.merchantUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 text-xs sm:text-sm font-bold shadow-md shadow-primary/20 transition-all hover:scale-105 active:scale-95"
-                >
-                  <span>Redeem Deal</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-
-                <Link
-                  to="/featured-deals"
-                  className="inline-flex items-center gap-1 text-xs text-white/80 hover:text-white underline underline-offset-4 ml-auto font-medium"
-                >
-                  <span>View all featured</span>
-                  <ArrowRight className="w-3 h-3" />
-                </Link>
-              </div>
+              {/* Prev / Next Navigation Arrows (Smooth Hover Fade-In) */}
+              <button
+                type="button"
+                onClick={() => emblaMainApi?.scrollPrev()}
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center border border-white/20 opacity-0 group-hover/hero:opacity-100 transition-all duration-200 hover:scale-110 active:scale-90 z-20 shadow-lg cursor-pointer"
+                aria-label="Previous Deal"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => emblaMainApi?.scrollNext()}
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center border border-white/20 opacity-0 group-hover/hero:opacity-100 transition-all duration-200 hover:scale-110 active:scale-90 z-20 shadow-lg cursor-pointer"
+                aria-label="Next Deal"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
             </div>
 
-            {/* Merchant Switcher Tabs Strip (GrabOn exact design!) */}
+            {/* Merchant Switcher Tabs Strip with Animated Progress Bar (GrabOn exact design!) */}
             <div className="mt-3 bg-white dark:bg-card rounded-xl border border-slate-200/80 dark:border-border/80 p-1.5 shadow-2xs overflow-x-auto scrollbar-none">
               <div className="flex items-center gap-1 min-w-max">
                 {mainDeals.map((deal, idx) => {
@@ -277,17 +359,24 @@ export function GrabOnHero() {
                     <button
                       key={deal.id}
                       type="button"
-                      onClick={() => setActiveMainIndex(idx)}
-                      className={`relative px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex flex-col items-center gap-0.5 ${
+                      onClick={() => handleSelectMainTab(idx)}
+                      className={`relative overflow-hidden px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex flex-col items-center gap-0.5 ${
                         isActive
                           ? "bg-slate-900 text-white dark:bg-primary dark:text-primary-foreground shadow-xs"
                           : "text-slate-600 dark:text-muted-foreground hover:text-slate-900 dark:hover:text-foreground hover:bg-slate-100 dark:hover:bg-muted"
                       }`}
                     >
-                      <span>{deal.brandName}</span>
+                      <span className="relative z-10">{deal.brandName}</span>
                       {/* Active indicator dot */}
                       {isActive && (
-                        <span className="w-1 h-1 rounded-full bg-cyan-400 dark:bg-white animate-pulse" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 dark:bg-white animate-pulse" />
+                      )}
+                      {/* Animated Progress Timer Bar (fills over 5s) */}
+                      {isActive && !isPaused && (
+                        <span
+                          key={`prog-${activeMainIndex}`}
+                          className="absolute bottom-0 left-0 h-0.5 bg-cyan-400 dark:bg-white animate-progress-fill"
+                        />
                       )}
                     </button>
                   );
@@ -296,64 +385,96 @@ export function GrabOnHero() {
             </div>
           </div>
 
-          {/* ── Right Side Spotlight Card (4 cols) — GrabOn Top Picks Style ── */}
+          {/* ── Right Side Spotlight Card (4 cols) with Embla Smooth Slide ── */}
           <div className="lg:col-span-4 flex flex-col justify-between">
-            <div
-              className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${currentSidePick.bg} text-white shadow-xl min-h-[340px] sm:min-h-[360px] p-6 flex flex-col justify-between border border-white/10`}
-            >
-              {/* Top Banner Tag */}
-              <div className="flex items-center justify-between">
-                <span className="inline-block text-[11px] font-mono uppercase tracking-widest text-amber-400 font-bold bg-amber-400/10 px-2.5 py-0.5 rounded-full border border-amber-400/20">
-                  TOP PICK OF THE DAY
-                </span>
-                <div className="bg-white p-1.5 rounded-lg shadow-sm">
-                  <img
-                    src={currentSidePick.logo}
-                    alt={currentSidePick.storeName}
-                    className="h-6 w-auto object-contain"
-                  />
+            {/* Embla Viewport for Side Card */}
+            <div className="relative group/side">
+              <div className="overflow-hidden rounded-2xl shadow-xl" ref={emblaSideRef}>
+                <div className="flex touch-pan-y">
+                  {SIDE_PICKS.map((pick) => (
+                    <div
+                      key={pick.storeSlug}
+                      className="flex-[0_0_100%] min-w-0"
+                    >
+                      <div
+                        className={`relative overflow-hidden bg-gradient-to-br ${pick.bg} text-white min-h-[340px] sm:min-h-[360px] p-6 flex flex-col justify-between border border-white/10`}
+                      >
+                        {/* Top Banner Tag */}
+                        <div className="flex items-center justify-between">
+                          <span className="inline-block text-[11px] font-mono uppercase tracking-widest text-amber-400 font-bold bg-amber-400/10 px-2.5 py-0.5 rounded-full border border-amber-400/20">
+                            TOP PICK OF THE DAY
+                          </span>
+                          <div className="bg-white p-1.5 rounded-lg shadow-sm">
+                            <img
+                              src={pick.logo}
+                              alt={pick.storeName}
+                              className="h-6 w-auto object-contain"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Floating Center Card (GrabOn Top Picks look with 3D hover lift) */}
+                        <div className="my-auto bg-white/95 dark:bg-card/95 backdrop-blur-md rounded-xl p-4 text-slate-900 dark:text-foreground shadow-lg border border-white/20 mt-4 mb-4 transition-transform duration-300 hover:scale-[1.02]">
+                          <div className="flex items-baseline justify-between gap-2">
+                            <span className="font-display font-extrabold text-xl sm:text-2xl text-primary">
+                              {pick.discount}
+                            </span>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-md">
+                              Verified
+                            </span>
+                          </div>
+                          <p className="mt-1.5 text-xs text-slate-700 dark:text-slate-300 font-medium line-clamp-2">
+                            {pick.desc}
+                          </p>
+
+                          <div className="mt-3 pt-3 border-t border-slate-100 dark:border-border/60 flex items-center justify-between gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleCopy(pick.code, pick.storeName)}
+                              className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1 active:scale-95 transition-transform"
+                            >
+                              <Tag className="w-3 h-3" />
+                              <span>{pick.code}</span>
+                            </button>
+
+                            <Link
+                              to={pick.linkUrl as any}
+                              className="inline-flex items-center gap-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-primary dark:text-primary-foreground px-3 py-1.5 text-xs font-bold shadow-xs hover:scale-105 active:scale-95 transition-all"
+                            >
+                              <span>GRAB NOW</span>
+                              <ArrowRight className="w-3 h-3" />
+                            </Link>
+                          </div>
+                        </div>
+
+                        {/* Bottom Note */}
+                        <div className="text-[11px] text-white/70 text-center flex items-center justify-center gap-1.5">
+                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>Tested on {pick.storeName} cart</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Floating Center Card (GrabOn Top Picks look) */}
-              <div className="my-auto bg-white/95 dark:bg-card/95 backdrop-blur-md rounded-xl p-4 text-slate-900 dark:text-foreground shadow-lg border border-white/20 mt-4 mb-4">
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="font-display font-extrabold text-xl sm:text-2xl text-primary">
-                    {currentSidePick.discount}
-                  </span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-md">
-                    Verified
-                  </span>
-                </div>
-                <p className="mt-1.5 text-xs text-slate-700 dark:text-slate-300 font-medium line-clamp-2">
-                  {currentSidePick.desc}
-                </p>
-
-                <div className="mt-3 pt-3 border-t border-slate-100 dark:border-border/60 flex items-center justify-between gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleCopy(currentSidePick.code, currentSidePick.storeName)}
-                    className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1"
-                  >
-                    <Tag className="w-3 h-3" />
-                    <span>{currentSidePick.code}</span>
-                  </button>
-
-                  <Link
-                    to={currentSidePick.linkUrl as any}
-                    className="inline-flex items-center gap-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-primary dark:text-primary-foreground px-3 py-1.5 text-xs font-bold shadow-xs hover:scale-105 active:scale-95 transition-all"
-                  >
-                    <span>GRAB NOW</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </Link>
-                </div>
-              </div>
-
-              {/* Bottom Note */}
-              <div className="text-[11px] text-white/70 text-center flex items-center justify-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Tested on {currentSidePick.storeName} cart</span>
-              </div>
+              {/* Prev / Next Navigation Arrows for Side Card */}
+              <button
+                type="button"
+                onClick={() => emblaSideApi?.scrollPrev()}
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center border border-white/20 opacity-0 group-hover/side:opacity-100 transition-all duration-200 hover:scale-110 active:scale-90 z-20 shadow-lg cursor-pointer"
+                aria-label="Previous Top Pick"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => emblaSideApi?.scrollNext()}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center border border-white/20 opacity-0 group-hover/side:opacity-100 transition-all duration-200 hover:scale-110 active:scale-90 z-20 shadow-lg cursor-pointer"
+                aria-label="Next Top Pick"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
 
             {/* Side Pick Store Tabs (UBER / Udemy / Tata Cliq / Nykaa style) */}
@@ -365,7 +486,7 @@ export function GrabOnHero() {
                     <button
                       key={pick.storeName}
                       type="button"
-                      onClick={() => setActiveSideIndex(idx)}
+                      onClick={() => handleSelectSideTab(idx)}
                       className={`relative py-1.5 px-2 rounded-lg text-xs font-semibold text-center truncate transition-all duration-200 flex flex-col items-center gap-0.5 ${
                         isActive
                           ? "bg-primary text-primary-foreground shadow-xs font-bold"
@@ -374,7 +495,7 @@ export function GrabOnHero() {
                       title={pick.storeName}
                     >
                       <span className="truncate w-full">{pick.storeName}</span>
-                      {isActive && <span className="w-1 h-1 rounded-full bg-white animate-pulse" />}
+                      {isActive && <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
                     </button>
                   );
                 })}

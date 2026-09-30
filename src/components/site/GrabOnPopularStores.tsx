@@ -1,16 +1,17 @@
 /**
  * @file src/components/site/GrabOnPopularStores.tsx
- * @description GrabOn-style "Popular Stores" component for GoCoupon.
+ * @description GrabOn-style "Popular Stores" component with Embla horizontal sliding animations & card micro-effects.
  *
  * Implements GrabOn's exact layout:
- * - Left Spotlight Card: "MOST POPULAR - Store Of The Month" with store stats and direct CTA
- * - Right 4x2 Grid: 8 high-traffic store cards with coupon counters & interactive page pagination
+ * - Left Spotlight Card: "MOST POPULAR - Store Of The Month" with ambient glow and 3D hover lift
+ * - Right 4x2 Grid: Multi-page Embla sliding carousel with smooth pagination and swipe support
  * - 100% Real GoCoupon Stores & Live Verified Counts
- * - Responsive mobile & desktop navigation
+ * - Responsive mobile & desktop navigation with card hover animations
  */
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "@tanstack/react-router";
+import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight, ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
 import { StoreLogo } from "@/components/common/StoreLogo";
 
@@ -75,16 +76,26 @@ const STORE_PAGES: StoreItem[][] = [
 export function GrabOnPopularStores() {
   const [currentPage, setCurrentPage] = useState(0);
 
-  const totalPages = STORE_PAGES.length;
-  const currentStores = STORE_PAGES[currentPage] || STORE_PAGES[0];
+  // ── Embla Carousel Instance for Stores Grid ──
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    duration: 30,
+  });
 
-  const handlePrev = () => {
-    setCurrentPage((prev) => (prev > 0 ? prev - 1 : totalPages - 1));
-  };
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setCurrentPage(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
 
-  const handleNext = () => {
-    setCurrentPage((prev) => (prev < totalPages - 1 ? prev + 1 : 0));
-  };
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+  }, [emblaApi, onSelect]);
+
+  const handlePrev = () => emblaApi?.scrollPrev();
+  const handleNext = () => emblaApi?.scrollNext();
+  const handleDotClick = (idx: number) => emblaApi?.scrollTo(idx);
 
   return (
     <section className="py-10 sm:py-14 bg-slate-50 dark:bg-background border-b border-border/60">
@@ -102,29 +113,29 @@ export function GrabOnPopularStores() {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Pagination Dots */}
-            <div className="hidden sm:flex items-center gap-1.5">
+            {/* Animated Pagination Dots */}
+            <div className="hidden sm:flex items-center gap-2">
               {STORE_PAGES.map((_, idx) => (
                 <button
                   key={idx}
                   type="button"
-                  onClick={() => setCurrentPage(idx)}
-                  className={`h-2 rounded-full transition-all duration-200 ${
+                  onClick={() => handleDotClick(idx)}
+                  className={`h-2 rounded-full transition-all duration-300 ${
                     idx === currentPage
-                      ? "w-6 bg-primary"
+                      ? "w-7 bg-primary shadow-xs"
                       : "w-2 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400"
                   }`}
-                  aria-label={`Go to store page ${idx + 1}`}
+                  aria-label={`Go to store slide ${idx + 1}`}
                 />
               ))}
             </div>
 
-            {/* Prev / Next Buttons (GrabOn style) */}
+            {/* Prev / Next Buttons (GrabOn style with scale bounce) */}
             <div className="flex items-center gap-1.5">
               <button
                 type="button"
                 onClick={handlePrev}
-                className="w-8 h-8 rounded-full border border-border bg-white dark:bg-card text-foreground hover:bg-slate-100 dark:hover:bg-muted flex items-center justify-center transition-all shadow-2xs active:scale-95"
+                className="w-9 h-9 rounded-full border border-border bg-white dark:bg-card text-foreground hover:bg-slate-100 dark:hover:bg-muted hover:border-primary/50 flex items-center justify-center transition-all shadow-xs hover:scale-105 active:scale-95"
                 aria-label="Previous stores"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -132,7 +143,7 @@ export function GrabOnPopularStores() {
               <button
                 type="button"
                 onClick={handleNext}
-                className="w-8 h-8 rounded-full border border-border bg-white dark:bg-card text-foreground hover:bg-slate-100 dark:hover:bg-muted flex items-center justify-center transition-all shadow-2xs active:scale-95"
+                className="w-9 h-9 rounded-full border border-border bg-white dark:bg-card text-foreground hover:bg-slate-100 dark:hover:bg-muted hover:border-primary/50 flex items-center justify-center transition-all shadow-xs hover:scale-105 active:scale-95"
                 aria-label="Next stores"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -141,10 +152,10 @@ export function GrabOnPopularStores() {
 
             <Link
               to="/stores"
-              className="hidden md:inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline ml-2"
+              className="hidden md:inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline ml-2 group"
             >
               <span>All 240+ Stores</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
         </div>
@@ -152,17 +163,17 @@ export function GrabOnPopularStores() {
         {/* GrabOn Layout: Left Spotlight (300px) + Right Grid (4x2) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
           
-          {/* ── Left Spotlight: Store Of The Month (GrabOn gp-feat style) ── */}
+          {/* ── Left Spotlight: Store Of The Month with ambient glow ── */}
           <div className="lg:col-span-4 flex flex-col">
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white p-6 shadow-xl border border-slate-800 flex flex-col justify-between h-full group">
-              {/* Background ambient glow */}
-              <div className="absolute -top-12 -right-12 w-44 h-44 rounded-full bg-primary/20 blur-2xl pointer-events-none" />
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white p-6 shadow-xl border border-slate-800 flex flex-col justify-between h-full group transition-all duration-300 hover:border-primary/50 hover:shadow-2xl">
+              {/* Background ambient pulsing glow */}
+              <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-primary/20 blur-3xl animate-pulse pointer-events-none" />
 
               {/* Spotlight Header */}
               <div>
                 <div className="flex items-center justify-between">
-                  <span className="inline-flex items-center gap-1 text-[11px] font-mono font-bold uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30 px-3 py-0.5 rounded-full">
-                    <Sparkles className="w-3 h-3 fill-current" />
+                  <span className="inline-flex items-center gap-1 text-[11px] font-mono font-bold uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30 px-3 py-0.5 rounded-full shadow-2xs">
+                    <Sparkles className="w-3 h-3 fill-current animate-pulse" />
                     MOST POPULAR
                   </span>
                   <span className="text-xs text-slate-400 font-medium">Monthly Choice</span>
@@ -173,16 +184,16 @@ export function GrabOnPopularStores() {
                 </h3>
               </div>
 
-              {/* Big Centered Brand Logo */}
+              {/* Big Centered Brand Logo with 3D Hover Scale */}
               <div className="my-6 flex flex-col items-center justify-center">
-                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl bg-white p-4 shadow-2xl flex items-center justify-center border border-white/20 transition-transform group-hover:scale-105 duration-300">
+                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl bg-white p-4 shadow-2xl flex items-center justify-center border border-white/20 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1">
                   <StoreLogo
                     storeName={SPOTLIGHT_STORE.name}
                     storeLogo={SPOTLIGHT_STORE.logo}
                     className="w-20 h-20 sm:w-24 sm:h-24"
                   />
                 </div>
-                <h4 className="font-display font-extrabold text-lg text-white mt-3">
+                <h4 className="font-display font-extrabold text-lg text-white mt-3 group-hover:text-primary-foreground transition-colors">
                   {SPOTLIGHT_STORE.name}
                 </h4>
                 <p className="text-xs text-slate-300 font-medium">
@@ -190,9 +201,9 @@ export function GrabOnPopularStores() {
                 </p>
               </div>
 
-              {/* Store Coupon Statistics (GrabOn offers-ul style) */}
+              {/* Store Coupon Statistics */}
               <div>
-                <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-white/5 border border-white/10 text-center mb-4">
+                <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-white/5 border border-white/10 text-center mb-4 transition-colors group-hover:border-primary/30">
                   <div>
                     <span className="font-display font-bold text-lg text-emerald-400">
                       {SPOTLIGHT_STORE.couponCount}
@@ -211,52 +222,64 @@ export function GrabOnPopularStores() {
                   </div>
                 </div>
 
-                {/* Visit Store Button */}
+                {/* Visit Store Button with Hover Shine */}
                 <Link
                   to={SPOTLIGHT_STORE.routeUrl as any}
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground py-3 text-xs sm:text-sm font-bold shadow-md shadow-primary/25 transition-all hover:scale-105 active:scale-95"
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground py-3 text-xs sm:text-sm font-bold shadow-md shadow-primary/25 transition-all hover:scale-105 active:scale-95 group/btn"
                 >
                   <span>Visit Store</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
                 </Link>
               </div>
             </div>
           </div>
 
-          {/* ── Right 4x2 Grid: Popular Stores (GrabOn gp-normal style) ── */}
+          {/* ── Right Embla Sliding Carousel: 4x2 Popular Stores Grid ── */}
           <div className="lg:col-span-8 flex flex-col justify-between">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 h-full">
-              {currentStores.map((store) => (
-                <Link
-                  key={store.slug}
-                  to={store.routeUrl as any}
-                  className="group relative flex flex-col items-center justify-between p-4 rounded-xl border border-slate-200/90 dark:border-border/80 bg-white dark:bg-card shadow-xs hover:shadow-lg hover:border-primary/50 transition-all duration-200 text-center"
-                >
-                  {/* Top Coupon Count Pill (GrabOn exact design!) */}
-                  <span className="text-[11px] font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full mb-2">
-                    {store.couponCount} Coupons
-                  </span>
+            {/* Embla Viewport */}
+            <div className="overflow-hidden rounded-xl" ref={emblaRef}>
+              <div className="flex touch-pan-y">
+                {STORE_PAGES.map((page, pageIdx) => (
+                  <div
+                    key={`page-${pageIdx}`}
+                    className="flex-[0_0_100%] min-w-0"
+                  >
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                      {page.map((store) => (
+                        <Link
+                          key={store.slug}
+                          to={store.routeUrl as any}
+                          className="group relative flex flex-col items-center justify-between p-4 rounded-xl border border-slate-200/90 dark:border-border/80 bg-white dark:bg-card shadow-xs hover:shadow-xl hover:border-primary/60 transition-all duration-300 hover:-translate-y-1.5 text-center overflow-hidden"
+                        >
+                          {/* Top Coupon Count Pill with Hover Invert */}
+                          <span className="text-[11px] font-bold text-primary bg-primary/10 group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-xs px-2.5 py-0.5 rounded-full mb-2 transition-all duration-200">
+                            {store.couponCount} Coupons
+                          </span>
 
-                  {/* Centered Store Logo */}
-                  <div className="my-auto py-2 flex items-center justify-center">
-                    <StoreLogo
-                      storeName={store.name}
-                      storeLogo={store.logo}
-                      className="h-12 w-20 sm:h-14 sm:w-24 group-hover:scale-105 transition-transform"
-                    />
-                  </div>
+                          {/* Centered Store Logo with Smooth Zoom */}
+                          <div className="my-auto py-2 flex items-center justify-center">
+                            <StoreLogo
+                              storeName={store.name}
+                              storeLogo={store.logo}
+                              className="h-12 w-20 sm:h-14 sm:w-24 group-hover:scale-110 transition-transform duration-300"
+                            />
+                          </div>
 
-                  {/* Store Name & Category */}
-                  <div className="mt-2 w-full pt-2 border-t border-slate-100 dark:border-border/60">
-                    <p className="font-display text-xs sm:text-sm font-bold text-foreground group-hover:text-primary transition-colors truncate">
-                      {store.name}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground truncate">
-                      {store.category}
-                    </p>
+                          {/* Store Name & Category */}
+                          <div className="mt-2 w-full pt-2 border-t border-slate-100 dark:border-border/60">
+                            <p className="font-display text-xs sm:text-sm font-bold text-foreground group-hover:text-primary transition-colors truncate">
+                              {store.name}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground truncate">
+                              {store.category}
+                            </p>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                </Link>
-              ))}
+                ))}
+              </div>
             </div>
 
             {/* Mobile View All Stores Link */}

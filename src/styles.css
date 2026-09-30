@@ -536,10 +536,50 @@ body {
   animation: shimmer-fast 2.5s ease-in-out infinite;
 }
 
+@keyframes card-shimmer {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(250%) skewX(-20deg);
+  }
+}
+
+@utility animate-card-shimmer {
+  animation: card-shimmer 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@utility animate-progress-fill {
+  animation: progress-fill 5s linear forwards;
+}
+
+.animate-card-shimmer {
+  animation: card-shimmer 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.group:hover .group-hover\:animate-card-shimmer {
+  animation: card-shimmer 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes progress-fill {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.animate-progress-fill {
+  animation: progress-fill 5s linear forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-ambient-pulse-slow,
   .animate-radar-beacon,
-  .animate-shimmer-fast {
+  .animate-shimmer-fast,
+  .animate-card-shimmer,
+  .animate-progress-fill {
     animation: none !important;
   }
 }
