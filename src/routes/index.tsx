@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
-import { Hero } from "@/components/site/Hero";
+import { GrabOnHero } from "@/components/site/GrabOnHero";
 import { LogoMarquee } from "@/components/site/LogoMarquee";
+import { GrabOnPopularOffers } from "@/components/site/GrabOnPopularOffers";
+import { GrabOnPopularStores } from "@/components/site/GrabOnPopularStores";
 import { Stats } from "@/components/site/Stats";
 import { AnimatedDealsCarousel } from "@/components/site/AnimatedDealsCarousel";
 import { ExtensionShowcase } from "@/components/site/ExtensionShowcase";
@@ -57,11 +59,23 @@ function Index() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
       />
 
-      {/* ── Cohesive, seamless homepage sections without gaping or layout shifts ── */}
-      <Hero />
+      {/* ── 1. GrabOn-Style Hero Section (Featured Deals Carousel + Side Spotlight) ── */}
+      <GrabOnHero />
+
+      {/* ── 2. Sliding Infinite Marquee Carousel (strictly preserved) ── */}
       <LogoMarquee />
-      <Stats />
+
+      {/* ── 3. GrabOn-Style Popular Offers of the Day (Hand-Tested Real Deals) ── */}
+      <GrabOnPopularOffers />
+
+      {/* ── 4. GrabOn-Style Popular Stores (Store of the Month + Store Grid) ── */}
+      <GrabOnPopularStores />
+
+      {/* ── 5. Auto-Sliding Deals Marquee Carousel (strictly preserved) ── */}
       <AnimatedDealsCarousel />
+
+      {/* ── 6. Extension Showcase, Product Value, Features & SEO Authority ── */}
+      <Stats />
       <ExtensionShowcase />
       <HowItWorks />
       <WhyUsExpenseSaviour />
