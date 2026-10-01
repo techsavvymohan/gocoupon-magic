@@ -61,6 +61,7 @@ function RefreshIcon() {
 export default function AdminOffersManager() {
   const searchParams = useSearchParams();
   const filterFromUrl = searchParams.get("filter");
+  const queryFromUrl = searchParams.get("q") || searchParams.get("search") || "";
   const [filterTab, setFilterTab] = useState("all");
   const activeFilterTab = filterFromUrl || filterTab;
 
@@ -68,7 +69,13 @@ export default function AdminOffersManager() {
   const [stores, setStores] = useState([]);
   const [clickCounts, setClickCounts] = useState({});
   const [sortByClicks, setSortByClicks] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(queryFromUrl);
+
+  useEffect(() => {
+    if (queryFromUrl) {
+      setSearchQuery(queryFromUrl);
+    }
+  }, [queryFromUrl]);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 25;
   const [open, setOpen] = useState(false);

@@ -8,9 +8,9 @@
     "permissions": [
       "dashboard",
       "offers",
-      "submissions",
       "stores",
       "categories",
+      "products",
       "blogs",
       "events",
       "hero",
@@ -19,7 +19,8 @@
       "settings"
     ],
     "isActive": true,
-    "createdAt": "2026-09-14T19:38:00.000Z"
+    "createdAt": "2026-09-24T07:32:55.314Z",
+    "updatedAt": "2026-09-24T07:32:55.314Z"
   },
   {
     "id": "usr-mohan",
@@ -30,9 +31,9 @@
     "permissions": [
       "dashboard",
       "offers",
-      "submissions",
       "stores",
       "categories",
+      "products",
       "blogs",
       "events",
       "hero",
@@ -41,6 +42,7 @@
       "settings"
     ],
     "isActive": true,
-    "createdAt": "2026-09-14T19:38:00.000Z"
+    "createdAt": "2026-09-24T07:32:55.314Z",
+    "updatedAt": "2026-09-24T07:32:55.314Z"
   }
 ]

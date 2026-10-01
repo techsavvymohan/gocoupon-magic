@@ -69,6 +69,7 @@ function AdminContent() {
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<string>(searchParams?.tab || "dashboard");
+  const [mobileNavOpen, setMobileNavOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (searchParams?.tab) {
@@ -78,9 +79,18 @@ function AdminContent() {
 
   const handleSelectTab = (tabKey: string) => {
     setActiveTab(tabKey);
+    setMobileNavOpen(false);
     navigate({
       to: "/admin",
       search: tabKey === "dashboard" ? {} : { tab: tabKey },
+    });
+  };
+
+  const handleGlobalSearch = (query: string) => {
+    setActiveTab("offers");
+    navigate({
+      to: "/admin",
+      search: { tab: "offers", q: query },
     });
   };
 
@@ -94,7 +104,12 @@ function AdminContent() {
   return (
     <div className="flex min-h-screen flex-col lg:flex-row bg-background text-foreground transition-colors">
       {/* Fixed/Sticky Navigation Sidebar */}
-      <AdminSidebar activeTab={activeTab} onSelectTab={handleSelectTab} />
+      <AdminSidebar
+        activeTab={activeTab}
+        onSelectTab={handleSelectTab}
+        mobileOpen={mobileNavOpen}
+        onCloseMobile={() => setMobileNavOpen(false)}
+      />
 
       {/* Main Administrative Workplace Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
@@ -104,6 +119,8 @@ function AdminContent() {
             { label: "Admin", href: "/admin" },
             { label: getTabTitle(activeTab), href: `/admin?tab=${activeTab}` },
           ] as any}
+          onToggleMobileMenu={() => setMobileNavOpen((prev) => !prev)}
+          onSearch={handleGlobalSearch}
         />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
@@ -240,7 +257,10 @@ function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => v
     setIsSyncing(true);
     toast.info("Triggering 24/7 validity-based live deal sync...");
     try {
-      const res = await fetch("/api/deals/sync?pages=20", { method: "POST" });
+      const res = await fetch("/api/deals/sync?pages=20", {
+        method: "POST",
+        headers: getAdminAuthHeaders(),
+      });
       const data = await res.json();
       if (res.ok) {
         toast.success(`Sync completed! ${data.activeCount} active deals in pool.`);
