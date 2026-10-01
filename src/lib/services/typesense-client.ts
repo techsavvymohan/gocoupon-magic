@@ -48,12 +48,12 @@ export interface TypesenseSearchResult {
 const TYPESENSE_HOST =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_TYPESENSE_URL) ||
   (typeof process !== "undefined" && process.env?.TYPESENSE_URL) ||
-  "http://localhost:8108";
+  "";
 
 const TYPESENSE_API_KEY =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_TYPESENSE_API_KEY) ||
   (typeof process !== "undefined" && process.env?.TYPESENSE_API_KEY) ||
-  "xyz123_gocoupon_local_secret";
+  "";
 
 const COLLECTION_NAME = "products";
 
@@ -205,7 +205,16 @@ export async function searchLocalProducts(
     };
   }
 
-  // 2. Fallback to Typesense container if available
+  // 2. Fallback to Typesense container if explicitly configured
+  if (!TYPESENSE_HOST) {
+    return {
+      hits: [],
+      found: 0,
+      searchTimeMs: Math.round(performance.now() - startTime),
+      source: "local_memory_cache",
+    };
+  }
+
   try {
     const searchUrl = new URL(`${TYPESENSE_HOST}/collections/${COLLECTION_NAME}/documents/search`);
     searchUrl.searchParams.set("q", q);
@@ -256,6 +265,7 @@ export async function indexProductDocument(product: TypesenseProductDocument): P
   memoryProductStore.set(product.id, { ...product, updatedAt: Date.now() });
 
   // Asynchronously upsert to Typesense if available
+  if (!TYPESENSE_HOST) return;
   try {
     const upsertUrl = `${TYPESENSE_HOST}/collections/${COLLECTION_NAME}/documents?action=upsert`;
     fetch(upsertUrl, {

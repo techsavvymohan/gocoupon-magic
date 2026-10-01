@@ -98,7 +98,6 @@ const CUSTOM_INSTANCE =
   "";
 
 const DEFAULT_INSTANCES = [
-  "http://127.0.0.1:8888",
   "https://search.mectov.my.id",
   "https://etsi.me",
   "https://sx.xo.st",

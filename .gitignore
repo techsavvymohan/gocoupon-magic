@@ -37,3 +37,6 @@ docs/reference/
 .codex/
 *.backup.json
 *.tmp*
+scratch/
+coupon_audit_data/
+*.tar.gz

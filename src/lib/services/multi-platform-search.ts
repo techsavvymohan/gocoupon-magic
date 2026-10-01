@@ -686,7 +686,7 @@ export async function searchProductsAcrossPlatforms(
   const [serpRes, searxRes, compareRes] = await Promise.allSettled([
     (async () => {
       const fetchShopping = async (term: string) => {
-        const baseOrigin = typeof window !== "undefined" ? window.location.origin : "http://127.0.0.1:3000";
+        const baseOrigin = typeof window !== "undefined" ? window.location.origin : (process.env.APP_URL || "https://gocoupon.io");
         const shoppingApiUrl = `${baseOrigin}/api/shopping?q=${encodeURIComponent(term)}${
           options?.shoprs ? `&shoprs=${encodeURIComponent(options.shoprs)}` : ""
         }${options?.country ? `&gl=${encodeURIComponent(options.country)}` : ""}`;
@@ -714,7 +714,7 @@ export async function searchProductsAcrossPlatforms(
     }),
     (async () => {
       try {
-        const baseOrigin = typeof window !== "undefined" ? window.location.origin : "http://127.0.0.1:3000";
+        const baseOrigin = typeof window !== "undefined" ? window.location.origin : (process.env.APP_URL || "https://gocoupon.io");
         const compareApiUrl = `${baseOrigin}/api/compare?q=${encodeURIComponent(primarySearchTerm)}`;
         const res = await fetch(compareApiUrl, { signal: AbortSignal.timeout(6000) });
         if (!res.ok) return null;
