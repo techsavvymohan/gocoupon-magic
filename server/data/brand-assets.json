@@ -7717,5 +7717,305 @@
     "domain": "barcelo.com",
     "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058516/gocoupon/brands/brand_barcelo.ico",
     "updatedAt": "2026-10-03T20:15:18.844Z"
+  },
+  {
+    "slug": "ashford",
+    "name": "ashford",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059906/gocoupon/brands/real_brand_ashford.svg",
+    "updatedAt": "2026-10-03T20:38:30.409Z"
+  },
+  {
+    "slug": "ashampoo",
+    "name": "Ashampoo",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059909/gocoupon/brands/real_brand_ashampoo.svg",
+    "updatedAt": "2026-10-03T20:38:33.343Z"
+  },
+  {
+    "slug": "shuuemuraartofhair",
+    "name": "Shu Uemura Art of Hair",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059914/gocoupon/brands/real_brand_shuuemuraartofhair.svg",
+    "updatedAt": "2026-10-03T20:38:38.918Z"
+  },
+  {
+    "slug": "arsynlrx",
+    "name": "Arsynl RX",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059920/gocoupon/brands/real_brand_arsynlrx.svg",
+    "updatedAt": "2026-10-03T20:38:44.634Z"
+  },
+  {
+    "slug": "earmyshopcz",
+    "name": "E-armyshopcz",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059925/gocoupon/brands/real_brand_earmyshopcz.svg",
+    "updatedAt": "2026-10-03T20:38:49.826Z"
+  },
+  {
+    "slug": "arka",
+    "name": "Arka",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059929/gocoupon/brands/real_brand_arka.svg",
+    "updatedAt": "2026-10-03T20:38:53.987Z"
+  },
+  {
+    "slug": "elizabetharden",
+    "name": "Elizabeth Arden",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059933/gocoupon/brands/real_brand_elizabetharden.svg",
+    "updatedAt": "2026-10-03T20:38:56.554Z"
+  },
+  {
+    "slug": "arangrant",
+    "name": "Arangrant",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059935/gocoupon/brands/real_brand_arangrant.png",
+    "updatedAt": "2026-10-03T20:38:58.324Z"
+  },
+  {
+    "slug": "philipshomeappliances",
+    "name": "Philips Home Appliances",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059938/gocoupon/brands/real_brand_philipshomeappliances.svg",
+    "updatedAt": "2026-10-03T20:39:02.404Z"
+  },
+  {
+    "slug": "apohealthde",
+    "name": "apohealthde",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059941/gocoupon/brands/real_brand_apohealthde.jpg",
+    "updatedAt": "2026-10-03T20:39:04.076Z"
+  },
+  {
+    "slug": "apodemia",
+    "name": "APODEMIA -",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059943/gocoupon/brands/real_brand_apodemia.png",
+    "updatedAt": "2026-10-03T20:39:06.011Z"
+  },
+  {
+    "slug": "netart",
+    "name": "Netart",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059945/gocoupon/brands/real_brand_netart.png",
+    "updatedAt": "2026-10-03T20:39:07.924Z"
+  },
+  {
+    "slug": "havaianas",
+    "name": "Havaianas",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059947/gocoupon/brands/real_brand_havaianas.png",
+    "updatedAt": "2026-10-03T20:39:10.164Z"
+  },
+  {
+    "slug": "aosomcom",
+    "name": "Aosomcom",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059952/gocoupon/brands/real_brand_aosomcom.svg",
+    "updatedAt": "2026-10-03T20:39:16.093Z"
+  },
+  {
+    "slug": "aomei",
+    "name": "AOMEI",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059960/gocoupon/brands/real_brand_aomei.svg",
+    "updatedAt": "2026-10-03T20:39:24.276Z"
+  },
+  {
+    "slug": "answearsi",
+    "name": "Answearsi",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059966/gocoupon/brands/real_brand_answearsi.svg",
+    "updatedAt": "2026-10-03T20:39:29.855Z"
+  },
+  {
+    "slug": "answearhu",
+    "name": "Answearhu",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059971/gocoupon/brands/real_brand_answearhu.svg",
+    "updatedAt": "2026-10-03T20:39:35.297Z"
+  },
+  {
+    "slug": "answearhr",
+    "name": "Answearhr",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059976/gocoupon/brands/real_brand_answearhr.svg",
+    "updatedAt": "2026-10-03T20:39:40.490Z"
+  },
+  {
+    "slug": "ansi",
+    "name": "ANSI",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059979/gocoupon/brands/real_brand_ansi.png",
+    "updatedAt": "2026-10-03T20:39:42.749Z"
+  },
+  {
+    "slug": "monicaandy",
+    "name": "Monica  Andy",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059983/gocoupon/brands/real_brand_monicaandy.ico",
+    "updatedAt": "2026-10-03T20:39:46.020Z"
+  },
+  {
+    "slug": "andaseat",
+    "name": "AndaSeat",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059985/gocoupon/brands/real_brand_andaseat.png",
+    "updatedAt": "2026-10-03T20:39:47.753Z"
+  },
+  {
+    "slug": "trampolinepartsandsupply",
+    "name": "Trampoline Parts and Supply",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059986/gocoupon/brands/real_brand_trampolinepartsandsupply.png",
+    "updatedAt": "2026-10-03T20:39:49.430Z"
+  },
+  {
+    "slug": "scripcompaniesmassagechiropractorandmedicalsupply",
+    "name": "Scrip Companies - Massage Chiropractor and Medical Supply",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059991/gocoupon/brands/real_brand_scripcompaniesmassagechiroprac.svg",
+    "updatedAt": "2026-10-03T20:39:54.680Z"
+  },
+  {
+    "slug": "goldenmineandjewelryvortex",
+    "name": "Goldenmine and Jewelry Vortex",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059995/gocoupon/brands/real_brand_goldenmineandjewelryvortex.svg",
+    "updatedAt": "2026-10-03T20:39:58.823Z"
+  },
+  {
+    "slug": "amoremall",
+    "name": "Amore Mall",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059997/gocoupon/brands/real_brand_amoremall.png",
+    "updatedAt": "2026-10-03T20:40:00.441Z"
+  },
+  {
+    "slug": "amiclubwear",
+    "name": "Amiclubwear",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059999/gocoupon/brands/real_brand_amiclubwear.png",
+    "updatedAt": "2026-10-03T20:40:02.184Z"
+  },
+  {
+    "slug": "allpowers",
+    "name": "ALLPOWERS",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060001/gocoupon/brands/real_brand_allpowers.png",
+    "updatedAt": "2026-10-03T20:40:04.018Z"
+  },
+  {
+    "slug": "allegropl",
+    "name": "Allegropl",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060003/gocoupon/brands/real_brand_allegropl.png",
+    "updatedAt": "2026-10-03T20:40:06.986Z"
+  },
+  {
+    "slug": "turkishairlinesamericas",
+    "name": "Turkish Airlines-Americas",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060006/gocoupon/brands/real_brand_turkishairlinesamericas.svg",
+    "updatedAt": "2026-10-03T20:40:10.264Z"
+  },
+  {
+    "slug": "turkishairlineseu",
+    "name": "Turkish Airlines EU",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060011/gocoupon/brands/real_brand_turkishairlineseu.svg",
+    "updatedAt": "2026-10-03T20:40:15.142Z"
+  },
+  {
+    "slug": "austinair",
+    "name": "Austin Air",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060014/gocoupon/brands/real_brand_austinair.png",
+    "updatedAt": "2026-10-03T20:40:17.069Z"
+  },
+  {
+    "slug": "agatinsvetcz",
+    "name": "Agatinsvetcz",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060019/gocoupon/brands/real_brand_agatinsvetcz.svg",
+    "updatedAt": "2026-10-03T20:40:24.783Z"
+  },
+  {
+    "slug": "contactsdirect",
+    "name": "ContactsDirect",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060024/gocoupon/brands/real_brand_contactsdirect.svg",
+    "updatedAt": "2026-10-03T20:40:27.771Z"
+  },
+  {
+    "slug": "caribbean",
+    "name": "Caribbean",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060026/gocoupon/brands/real_brand_caribbean.svg",
+    "updatedAt": "2026-10-03T20:40:30.433Z"
+  },
+  {
+    "slug": "adblockultimatenet",
+    "name": "Adblockultimatenet",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060031/gocoupon/brands/real_brand_adblockultimatenet.svg",
+    "updatedAt": "2026-10-03T20:40:34.555Z"
+  },
+  {
+    "slug": "tikibrandtorchesfirepitsfuelaccessories",
+    "name": "TIKI Brand Torches Fire Pits Fuel  Accessories",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060035/gocoupon/brands/real_brand_tikibrandtorchesfirepitsfuelac.svg",
+    "updatedAt": "2026-10-03T20:40:38.994Z"
+  },
+  {
+    "slug": "mexrentacar",
+    "name": "Mex Rent a Car",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060037/gocoupon/brands/real_brand_mexrentacar.png",
+    "updatedAt": "2026-10-03T20:40:41.340Z"
+  },
+  {
+    "slug": "dreampairsbrunomarcnortiv8shoes",
+    "name": "Dream Pairs Bruno Marc  Nortiv 8 Shoes",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060042/gocoupon/brands/real_brand_dreampairsbrunomarcnortiv8shoe.svg",
+    "updatedAt": "2026-10-03T20:40:45.875Z"
+  },
+  {
+    "slug": "3ina",
+    "name": "3ina",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060044/gocoupon/brands/real_brand_3ina.png",
+    "updatedAt": "2026-10-03T20:40:47.675Z"
+  },
+  {
+    "slug": "123reg",
+    "name": "123 Reg",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060046/gocoupon/brands/real_brand_123reg.svg",
+    "updatedAt": "2026-10-03T20:40:50.675Z"
+  },
+  {
+    "slug": "sadaa",
+    "name": "Sadaa",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060049/gocoupon/brands/real_brand_sadaa.png",
+    "updatedAt": "2026-10-03T20:40:52.436Z"
+  },
+  {
+    "slug": "sarkarperfumes",
+    "name": "Sarkar Perfumes",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060051/gocoupon/brands/real_brand_sarkarperfumes.jpg",
+    "updatedAt": "2026-10-03T20:40:54.356Z"
+  },
+  {
+    "slug": "oliveboard",
+    "name": "Oliveboard",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060053/gocoupon/brands/real_brand_oliveboard.png",
+    "updatedAt": "2026-10-03T20:40:56.214Z"
+  },
+  {
+    "slug": "kleenest",
+    "name": "Kleenest",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060056/gocoupon/brands/real_brand_kleenest.ico",
+    "updatedAt": "2026-10-03T20:40:59.314Z"
+  },
+  {
+    "slug": "nakpronutrition",
+    "name": "Nakpro Nutrition",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060060/gocoupon/brands/real_brand_nakpronutrition.svg",
+    "updatedAt": "2026-10-03T20:41:03.872Z"
+  },
+  {
+    "slug": "asitisnutrition",
+    "name": "AS-IT-IS Nutrition",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060063/gocoupon/brands/real_brand_asitisnutrition.svg",
+    "updatedAt": "2026-10-03T20:41:07.158Z"
+  },
+  {
+    "slug": "testbrand",
+    "name": "Test Brand",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060066/gocoupon/brands/real_brand_testbrand.svg",
+    "updatedAt": "2026-10-03T20:41:11.007Z"
+  },
+  {
+    "slug": "newcommunitybrand",
+    "name": "New Community Brand",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060075/gocoupon/brands/real_brand_newcommunitybrand.svg",
+    "updatedAt": "2026-10-03T20:41:19.322Z"
+  },
+  {
+    "slug": "testbrandstore",
+    "name": "Test Brand Store",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060079/gocoupon/brands/real_brand_testbrandstore.png",
+    "updatedAt": "2026-10-03T20:41:21.879Z"
+  },
+  {
+    "slug": "thewalletstore",
+    "name": "The Wallet Store",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060081/gocoupon/brands/real_brand_thewalletstore.png",
+    "updatedAt": "2026-10-03T20:41:24.026Z"
   }
 ]
