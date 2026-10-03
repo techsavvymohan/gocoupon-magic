@@ -3,18 +3,14 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { ProductHero } from "@/components/site/ProductHero";
 import { CheckoutSimulator } from "@/components/site/CheckoutSimulator";
 import { LogoMarquee } from "@/components/site/LogoMarquee";
-import { D2CWedgeComparison } from "@/components/site/D2CWedgeComparison";
 import { GrabOnHero } from "@/components/site/GrabOnHero";
 import { GrabOnPopularOffers } from "@/components/site/GrabOnPopularOffers";
 import { GrabOnPopularStores } from "@/components/site/GrabOnPopularStores";
+import { D2CWedgeComparison } from "@/components/site/D2CWedgeComparison";
 import { AnimatedDealsCarousel } from "@/components/site/AnimatedDealsCarousel";
-import { ExtensionShowcase } from "@/components/site/ExtensionShowcase";
 import { SecurityTrustPledge } from "@/components/site/SecurityTrustPledge";
-import { HowItWorks } from "@/components/site/HowItWorks";
 import { WhyUsExpenseSaviour } from "@/components/site/WhyUsExpenseSaviour";
-import { Features } from "@/components/site/Features";
 import { FAQ } from "@/components/site/FAQ";
-import { Blog } from "@/components/site/Blog";
 import { CTA } from "@/components/site/CTA";
 import { couponFaqs } from "@/data/faqs";
 import {
@@ -69,52 +65,40 @@ function Index() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
       />
 
-      {/* 1. Flagship Product Hero: Sharp Wedge Positioning & Live Telemetry */}
+      {/* 1. Flagship Product Hero */}
       <ProductHero />
 
-      {/* 2. Visceral Interactive Checkout Simulator: Real ₹2,499 -> ₹1,799 in 1.4s */}
+      {/* 2. Interactive Live Checkout Simulator (1.4s Demo) */}
       <CheckoutSimulator />
 
-      {/* 3. Partner Brand Marquee: Trust & Coverage Validation */}
+      {/* 3. Partner Brand Marquee */}
       <LogoMarquee />
 
-      {/* 4. D2C Wedge Comparison: Why GoCoupon Beats Honey & Generic Scraping Blogs */}
-      <D2CWedgeComparison />
-
-      {/* 5. Featured Deals Showcase & Top Picks */}
+      {/* 4. Featured Deals Showcase & Top Picks */}
       <GrabOnHero />
 
-      {/* 6. Popular Offers of the Day: Tested Working Coupons */}
+      {/* 5. Popular Offers of the Day: Tested Working Coupons */}
       <GrabOnPopularOffers />
 
-      {/* 7. Popular Stores: Store of the Month & Directory Grid */}
+      {/* 6. Popular Stores Directory */}
       <GrabOnPopularStores />
+
+      {/* 7. D2C Wedge Comparison (Compact, High-Contrast) */}
+      <D2CWedgeComparison />
 
       {/* 8. Live Scrolling Deals Marquee */}
       <AnimatedDealsCarousel />
 
-      {/* 9. Chrome Extension Dedicated Deep-Dive */}
-      <ExtensionShowcase />
-
-      {/* 10. Security & Privacy Architecture Pledge: Manifest V3 & Zero Financial Access */}
+      {/* 9. Security & Privacy Architecture Pledge */}
       <SecurityTrustPledge />
 
-      {/* 11. How It Works Step-by-Step */}
-      <HowItWorks />
-
-      {/* 12. Expense Leak Diagnosis & Household Savings */}
+      {/* 10. Common Checkout Leaks Solved */}
       <WhyUsExpenseSaviour />
 
-      {/* 13. Platform Features */}
-      <Features />
-
-      {/* 14. Frequently Asked Questions */}
+      {/* 11. Frequently Asked Questions */}
       <FAQ />
 
-      {/* 15. Savings Editorial & Guides */}
-      <Blog />
-
-      {/* 16. Final High-Conversion Call To Action */}
+      {/* 12. Final High-Conversion Call To Action */}
       <CTA />
     </SiteShell>
   );
