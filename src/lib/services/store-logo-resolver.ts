@@ -9,7 +9,31 @@
  * 4. Deterministic branded gradient monogram avatar fallback for network/load failures
  */
 
-export const LOCAL_STORE_LOGOS: Record<string, string> = {};
+export const CLOUDINARY_STORE_LOGOS: Record<string, string> = {
+  "amazon": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057616/gocoupon/brands/brand_amazon.webp",
+  "flipkart": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057540/gocoupon/brands/brand_flipkart.webp",
+  "myntra": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057618/gocoupon/brands/brand_myntra.webp",
+  "boat": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745796/gocoupon/brands/brand_boat.jpg",
+  "croma": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057619/gocoupon/brands/brand_croma.svg",
+  "tatacliq": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057624/gocoupon/brands/brand_tatacliq.webp",
+  "ajio": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057625/gocoupon/brands/brand_ajio.webp",
+  "nykaa": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057626/gocoupon/brands/brand_nykaa.webp",
+  "meesho": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057627/gocoupon/brands/brand_meesho.webp",
+  "reliance": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057621/gocoupon/brands/brand_reliance.svg",
+  "snitch": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057648/gocoupon/brands/brand_snitch.png",
+  "swiggy": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057650/gocoupon/brands/brand_swiggy.png",
+  "zomato": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057650/gocoupon/brands/brand_zomato.ico",
+  "firstcry": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057628/gocoupon/brands/brand_firstcry.webp",
+  "noise": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057630/gocoupon/brands/brand_noise.svg",
+  "mamaearth": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057655/gocoupon/brands/brand_mamaearth.png",
+  "bewakoof": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745785/gocoupon/brands/brand_bewakoof.png",
+  "thesouledstore": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057656/gocoupon/brands/brand_thesouledstore.png",
+  "flixbus": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057657/gocoupon/brands/brand_flixbus.png",
+  "medibuddy": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745875/gocoupon/brands/brand_medibuddy.png",
+  "booking": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057658/gocoupon/brands/brand_booking.png",
+  "jbl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057660/gocoupon/brands/brand_jbl.png"
+};
+export const LOCAL_STORE_LOGOS: Record<string, string> = CLOUDINARY_STORE_LOGOS;
 
 /**
  * Extracts the exact destination merchant root domain from a Cuelinks tracking URL.
@@ -54,6 +78,15 @@ export function resolveStoreLogo(
   explicitDomain?: string,
   existingLogo?: string
 ): string {
+  // Check Cloudinary store logos static lookup
+  const clean = (storeName || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (CLOUDINARY_STORE_LOGOS[clean]) {
+    return CLOUDINARY_STORE_LOGOS[clean];
+  }
+  if (CLOUDINARY_STORE_LOGOS[`${clean}-coupons`]) {
+    return CLOUDINARY_STORE_LOGOS[`${clean}-coupons`];
+  }
+
   // Check if existing logo is an explicitly configured remote URL (e.g. Cloudinary, custom CDN) or local asset
   if (
     existingLogo &&
