@@ -94,14 +94,16 @@ dealsRouter.get("/stores", async (_req: Request, res: Response) => {
     const livePool = getLiveDealsPool();
     const stores = getAllStoresFromPool(livePool).map((s) => {
       let logo = s.logo;
-      if (!logo || !logo.includes("cloudinary.com")) {
+      if (!logo || !logo.includes("cloudinary.com") || logo.includes(".ico") || logo.includes("favicons")) {
         const brandLogo = brandAssetsService.getLogoUrl(s.slug || s.name);
-        if (brandLogo && brandLogo.includes("cloudinary.com")) {
+        if (brandLogo && brandLogo.includes("cloudinary.com") && !brandLogo.includes(".ico")) {
           logo = brandLogo;
         } else {
           const resolved = resolveStoreLogo(s.name, undefined, undefined, s.logo);
-          if (resolved && resolved.includes("cloudinary.com")) {
+          if (resolved && resolved.includes("cloudinary.com") && !resolved.includes(".ico")) {
             logo = resolved;
+          } else {
+            logo = "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745770/gocoupon/brands/brand_default.png";
           }
         }
       }
