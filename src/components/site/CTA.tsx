@@ -1,5 +1,6 @@
 import { MagneticButton } from "../MagneticButton";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight, Star, Tag } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 export function CTA() {
   return (
@@ -13,31 +14,35 @@ export function CTA() {
         </h2>
 
         <p className="mx-auto mt-4 max-w-xl text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">
-          Every time you buy without GoCoupon, you risk leaving money on the table in hidden vouchers, store price differences, and unclaimed bank discounts. Add GoCoupon in 10 seconds — free forever.
+          Every time you buy without GoCoupon, you risk leaving money on the table in hidden vouchers, store price differences, and unclaimed bank discounts.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          {/* Desktop CTA: Chrome Web Store */}
           <MagneticButton
             as="a"
             href="https://chromewebstore.google.com/detail/gbmfihnboadlmmjbikajlmocjmlpehij"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-xs transition-all hover:scale-105 active:scale-95"
+            className="hidden md:inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-xs transition-all hover:scale-105 active:scale-95"
           >
             <span>Add GoCoupon Free — Start Saving</span>
             <ArrowRight className="h-4 w-4" />
           </MagneticButton>
 
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <div className="flex items-center text-amber-400">
-              <Star className="h-3.5 w-3.5 fill-current" />
-              <Star className="h-3.5 w-3.5 fill-current" />
-              <Star className="h-3.5 w-3.5 fill-current" />
-              <Star className="h-3.5 w-3.5 fill-current" />
-              <Star className="h-3.5 w-3.5 fill-current" />
-            </div>
-            <span className="font-semibold text-foreground">4.9 / 5</span>
-            <span>(18k+ reviews)</span>
+          {/* Mobile CTA: Instant Store Search / Offers */}
+          <Link
+            to="/offers"
+            className="inline-flex md:hidden items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-xs transition-all hover:scale-105 active:scale-95"
+          >
+            <Tag className="h-4 w-4" />
+            <span>Find Working Coupons for Your Cart</span>
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-mono">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>1,390+ Active Deals Verified Today</span>
           </div>
         </div>
       </div>

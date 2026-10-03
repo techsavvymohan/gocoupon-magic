@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ProductHero } from "@/components/site/ProductHero";
+import { MobileHeroInstantFinder } from "@/components/site/MobileHeroInstantFinder";
 import { CheckoutSimulator } from "@/components/site/CheckoutSimulator";
 import { LogoMarquee } from "@/components/site/LogoMarquee";
 import { GrabOnHero } from "@/components/site/GrabOnHero";
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/")({
     createSeoHead({
       title: "GoCoupon — Verified Coupons, Promo Codes & Deals (2026) | 1-Click Auto-Apply Extension",
       description:
-        "Find verified working coupon codes, promo vouchers, and live merchant deals across 240+ online stores. Install the free GoCoupon Chrome extension to auto-apply tested discount codes at checkout.",
+        "Find verified working coupon codes, promo vouchers, and live merchant deals across 240+ online stores. Instant 1-tap coupon finder on mobile and free 1.4s auto-apply extension for desktop checkouts.",
       path: "/",
       keywords:
         "coupons, promo codes, discount codes, verified coupons, working coupons today, chrome extension auto apply coupons, coupon code extension, amazon promo codes, myntra discount coupons, swiggy coupons, booking.com hotel discount, online shopping deals india 2026, gocoupon",
@@ -65,11 +66,20 @@ function Index() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
       />
 
-      {/* 1. Flagship Product Hero */}
-      <ProductHero />
+      {/* 1. Desktop Flagship Hero */}
+      <div className="hidden md:block">
+        <ProductHero />
+      </div>
 
-      {/* 2. Interactive Live Checkout Simulator (1.4s Demo) */}
-      <CheckoutSimulator />
+      {/* 1. Mobile Instant 1-Tap Coupon Finder */}
+      <div className="block md:hidden">
+        <MobileHeroInstantFinder />
+      </div>
+
+      {/* 2. Interactive Live Checkout Simulator (Desktop Only) */}
+      <div className="hidden md:block">
+        <CheckoutSimulator />
+      </div>
 
       {/* 3. Partner Brand Marquee */}
       <LogoMarquee />

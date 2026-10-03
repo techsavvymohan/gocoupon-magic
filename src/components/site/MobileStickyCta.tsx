@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ArrowRight, X } from "lucide-react";
+import { ArrowRight, X, Tag } from "lucide-react";
 
 export function MobileStickyCta() {
   const [isVisible, setIsVisible] = useState(false);
@@ -8,7 +8,6 @@ export function MobileStickyCta() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
-    // Check if dismissed in this session
     try {
       if (sessionStorage.getItem("gocoupon_dismiss_mobile_cta") === "true") {
         setIsDismissed(true);
@@ -18,7 +17,6 @@ export function MobileStickyCta() {
     }
 
     const handleScroll = () => {
-      // Show when scrolled past 320px
       if (window.scrollY > 320 && !isDismissed) {
         setIsVisible(true);
       } else {
@@ -40,7 +38,6 @@ export function MobileStickyCta() {
     }
   };
 
-  // Suppress while cookie consent banner is active to prevent stacking on small screens
   let hasCookieConsent = true;
   try {
     hasCookieConsent = Boolean(localStorage.getItem("gocoupon_cookie_consent"));
@@ -48,8 +45,6 @@ export function MobileStickyCta() {
     hasCookieConsent = true;
   }
 
-  // Don't show on product pages (product pages already have their own dedicated deal action bar)
-  // or if dismissed or not scrolled enough or if cookie consent banner is pending
   if (isDismissed || !isVisible || !hasCookieConsent || pathname.startsWith("/product/")) {
     return null;
   }
@@ -57,37 +52,30 @@ export function MobileStickyCta() {
   return (
     <div
       role="complementary"
-      aria-label="Quick Chrome extension install"
+      aria-label="Quick mobile deal finder"
       className="fixed bottom-[72px] left-3 right-3 z-30 md:hidden rounded-xl border border-primary/25 bg-card/95 p-2 shadow-xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-2 duration-200"
     >
       <div className="flex items-center justify-between gap-2.5">
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
-          <img
-            src="/icons/icon.svg"
-            onError={(e) => {
-              e.currentTarget.src = "/icons/icon_128.png";
-            }}
-            alt="GoCoupon Extension"
-            className="h-8 w-8 shrink-0 object-contain"
-            width={32}
-            height={32}
-          />
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+            <Tag className="h-4 w-4" />
+          </div>
           <div className="min-w-0">
             <span className="block truncate text-xs font-bold text-foreground">
-              Auto-Apply Working Coupons
+              Need a Working Coupon?
             </span>
-            <span className="block truncate text-[10px] text-muted-foreground">
-              Save ₹500+ across 200+ stores
+            <span className="block truncate text-[10px] text-muted-foreground font-mono">
+              1,390+ tested codes today
             </span>
           </div>
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
           <Link
-            to="/chrome-extension"
+            to="/offers"
             className="inline-flex items-center gap-1 rounded-xl bg-primary px-3 py-2 text-xs font-bold text-primary-foreground shadow-xs active:scale-95 touch-manipulation min-h-[36px]"
           >
-            <span>Get Free</span>
+            <span>View Offers</span>
             <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
           </Link>
 

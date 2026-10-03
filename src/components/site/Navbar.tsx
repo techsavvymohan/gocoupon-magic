@@ -388,15 +388,18 @@ export function Navbar() {
             </span>
           </Link>
 
-          <Link
-            to="/chrome-extension"
-            className="flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 px-3 py-1 text-muted-foreground hover:text-foreground active:scale-95 touch-manipulation"
-            activeProps={{ className: "text-primary font-bold" }}
-            aria-label="Free Chrome Extension"
+                    <button
+            type="button"
+            onClick={() => {
+              setMobileSearchOpen(true);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            className="flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 px-3 py-1 text-muted-foreground hover:text-foreground active:scale-95 touch-manipulation cursor-pointer"
+            aria-label="Search Coupons & Stores"
           >
-            <Download className="h-4 w-4" aria-hidden="true" />
-            <span className="text-[10px] font-medium">{t("nav.extension", "Extension")}</span>
-          </Link>
+            <Search className="h-4 w-4" aria-hidden="true" />
+            <span className="text-[10px] font-medium">Search</span>
+          </button>
 
           <Link
             to="/stores"
