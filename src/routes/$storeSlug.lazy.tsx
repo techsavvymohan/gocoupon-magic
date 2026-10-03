@@ -1,4 +1,5 @@
 import { createLazyFileRoute, Link } from "@tanstack/react-router";
+import { useDeals } from "@/hooks/use-deals";
 import { SeoLandingPage, type VerifiedCoupon, type SavingHack, type StorePolicy } from "@/components/site/SeoLandingPage";
 import { breadcrumbSchema, faqSchema, storeCouponSchema } from "@/lib/seo";
 import { getStoreBySlug } from "@/lib/store-catalog-helper";
@@ -50,6 +51,7 @@ function DynamicStoreCouponsPage() {
 
   const storeName = rawName || "Online Store";
   const category = store?.category || "Online Shopping";
+  const { deals: liveDeals } = useDeals({ store: storeName, limit: 20 });
 
   const faqs = [
     {
@@ -70,26 +72,54 @@ function DynamicStoreCouponsPage() {
     },
   ];
 
-  const verifiedCoupons: VerifiedCoupon[] = store?.deals && store.deals.length > 0
+  // Dynamic Live-Sync Coupon Ingestion Engine
+  const dynamicCoupons: VerifiedCoupon[] = liveDeals && liveDeals.length > 0
+    ? liveDeals.map((d, idx) => ({
+        code: d.code || "ACTIVATEOFFER",
+        discount: d.discount || (d.code ? "Verified Code" : "Instant Deal"),
+        description: d.description || d.title,
+        minSpend: "No minimum spend",
+        category: category,
+        expiry: "Active Today",
+        isExclusive: idx === 0,
+      }))
+    : [];
+
+  const staticCoupons: VerifiedCoupon[] = store?.deals && store.deals.length > 0
     ? store.deals.slice(0, 15).map((d, idx) => ({
-      code: d.code || "DEALACTIVATED",
-      discount: d.discount || (d.code ? "Exclusive Code" : "Instant Deal"),
-      description: d.description || d.title,
-      minSpend: d.minSpend || "No minimum order",
-      category: d.category || category,
-      expiry: d.expiry || "Active Today",
-      isExclusive: idx === 0,
-    }))
+        code: d.code || "DEALACTIVATED",
+        discount: d.discount || (d.code ? "Exclusive Code" : "Instant Deal"),
+        description: d.description || d.title,
+        minSpend: d.minSpend || "No minimum order",
+        category: d.category || category,
+        expiry: d.expiry || "Active Today",
+        isExclusive: idx === 0,
+      }))
+    : [];
+
+  const seenCodes = new Set<string>();
+  const combinedCoupons: VerifiedCoupon[] = [];
+  for (const item of [...dynamicCoupons, ...staticCoupons]) {
+    const key = (item.code || "").trim().toUpperCase();
+    if (key && !seenCodes.has(key)) {
+      seenCodes.add(key);
+      combinedCoupons.push(item);
+    }
+  }
+
+  const verifiedCoupons: VerifiedCoupon[] = combinedCoupons.length > 0
+    ? combinedCoupons
     : [
-      {
-        code: "SAVE20",
-        discount: "Up to 50% OFF",
-        description: `Exclusive verified discount code on ${storeName} sitewide catalog.`,
-        minSpend: "₹499",
-        category: "Prepaid Orders",
-        expiry: "Ongoing",
-      },
-    ];
+        {
+          code: "CASHBACKACTIVE",
+          discount: "Verified Store Offer",
+          description: `Unlock automatic verified savings and cashback on ${storeName} checkout cart.`,
+          minSpend: "No minimum spend",
+          category: "Storewide",
+          expiry: "Active Today",
+          isExclusive: true,
+        },
+      ];
 
   const savingHacks: SavingHack[] = [
     {

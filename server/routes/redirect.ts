@@ -80,8 +80,15 @@ export function extractMerchantDestination(rawUrl: string): string {
  * - code: Promo / voucher code (Optional)
  * - source: Page or component source, e.g. "offers_grid" (Optional)
  */
-redirectRouter.get("/deal", async (req: Request, res: Response) => {
-  const rawUrl = String(req.query.url || "").trim();
+export async function handleDealRedirect(req: Request, res: Response) {
+  const rawUrl = String(
+    req.query.url ||
+    req.query.target ||
+    req.query.link ||
+    req.query.to ||
+    req.query.dest ||
+    ""
+  ).trim();
   const dealId = String(req.query.dealId || req.query.id || "unknown").trim();
   const title = String(req.query.title || "GoCoupon Deal").trim();
   const store = String(req.query.store || req.query.storeName || "Partner Store").trim();
@@ -148,14 +155,12 @@ redirectRouter.get("/deal", async (req: Request, res: Response) => {
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");
   res.redirect(302, targetUrl);
-});
+}
 
-/**
- * Client-Side Beacon / Redirection Tracker.
- * POST /api/deals/click
- *
- * Allows tracking coupon copy actions, modal popups, and direct redemption clicks.
- */
+redirectRouter.get("/deal", handleDealRedirect);
+redirectRouter.get("/", handleDealRedirect);
+
+
 redirectRouter.post("/deals/click", async (req: Request, res: Response) => {
   try {
     const {

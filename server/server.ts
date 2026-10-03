@@ -144,7 +144,7 @@ app.get("/api/health", (_req: Request, res: Response) => {
 
 // 2. Mount API Routes & Outbound Deal Redirection
 app.use("/api", apiRouter);
-app.use("/out", redirectRouter);
+app.use(["/out", "/redirect"], redirectRouter);
 
 // 3. Static Files & SPA Pre-rendered Serving from dist/
 if (fs.existsSync(distDir)) {

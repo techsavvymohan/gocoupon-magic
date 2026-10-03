@@ -24,6 +24,7 @@ import {
 import { toast } from "sonner";
 import { StoreLogo } from "@/components/common/StoreLogo";
 import { NavbarSearch } from "@/components/site/NavbarSearch";
+import { buildDealRedirectUrl } from "@/lib/services/store-registry";
 import { FEATURED_DEALS_COLLECTION, type FeaturedDealItem } from "@/data/featured-deals-campaign";
 
 interface QuickBrandChip {
@@ -81,7 +82,14 @@ export function MobileHeroInstantFinder() {
       discountAmount: deal.discountText,
       bankHack: getDynamicBankHack(deal.category),
       successRate: `${95 + (idx % 4)}%`,
-      directUrl: deal.merchantUrl || deal.affiliateUrl,
+      directUrl: buildDealRedirectUrl({
+        url: deal.merchantUrl || deal.affiliateUrl,
+        dealId: deal.id,
+        storeName: deal.brandName,
+        storeSlug: `${deal.brandSlug}-coupons`,
+        code: deal.couponCode,
+        source: "mobile_hero_instant",
+      }),
     }));
   }, []);
 

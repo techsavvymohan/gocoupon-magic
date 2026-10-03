@@ -18,7 +18,7 @@ export const couponsRouter = Router();
 
 couponsRouter.get("/", async (req: Request, res: Response) => {
   const store =
-    (req.query.store as string) || (req.query.domain as string) || (req.query.merchant as string);
+    (req.query.store as string) || (req.query.site as string) || (req.query.domain as string) || (req.query.merchant as string);
   const category = (req.query.category as string)?.toLowerCase();
   const sortBy = (req.query.sortBy as CouponSortField) || "successRate";
   const order = (req.query.order as SortOrder) || "desc";
