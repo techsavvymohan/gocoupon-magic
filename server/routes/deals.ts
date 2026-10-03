@@ -302,18 +302,21 @@ dealsRouter.get("/", async (req: Request, res: Response) => {
     );
 
     const stampedDeals = result.deals.map((deal: any) => {
-      if (deal.storeLogo && deal.storeLogo.includes("cloudinary.com")) {
-        return deal;
+      let logo = deal.storeLogo;
+      if (!logo || !logo.includes("cloudinary.com") || logo.includes(".ico")) {
+        const brandLogo = brandAssetsService.getLogoUrl(deal.storeSlug || deal.storeName || deal.store);
+        if (brandLogo && brandLogo.includes("cloudinary.com") && !brandLogo.includes(".ico")) {
+          logo = brandLogo;
+        } else {
+          const resolved = resolveStoreLogo(deal.storeName || deal.store, deal.link, undefined, deal.storeLogo);
+          if (resolved && resolved.includes("cloudinary.com") && !resolved.includes(".ico")) {
+            logo = resolved;
+          } else {
+            logo = "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745770/gocoupon/brands/brand_default.png";
+          }
+        }
       }
-      const brandLogo = brandAssetsService.getLogoUrl(deal.storeSlug || deal.storeName);
-      if (brandLogo && brandLogo.includes("cloudinary.com")) {
-        return { ...deal, storeLogo: brandLogo };
-      }
-      const resolved = resolveStoreLogo(deal.storeName || deal.store, deal.link, undefined, deal.storeLogo);
-      if (resolved && resolved.includes("cloudinary.com")) {
-        return { ...deal, storeLogo: resolved };
-      }
-      return deal;
+      return { ...deal, storeLogo: logo };
     });
 
     const stats = getLiveSyncStats();

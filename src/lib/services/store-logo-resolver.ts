@@ -10,6 +10,9 @@
  */
 
 export const CLOUDINARY_STORE_LOGOS: Record<string, string> = {
+  "aliexpress": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745870/gocoupon/brands/brand_aliexpress.png",
+  "aliexpressww": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745870/gocoupon/brands/brand_aliexpress.png",
+  "aliexpress-ww": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745870/gocoupon/brands/brand_aliexpress.png",
   "bytepe": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060843/gocoupon/brands/real_brand_bytepe.svg",
   "dyson": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060830/gocoupon/brands/real_brand_dyson.svg",
   "hackdaily": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060298/gocoupon/brands/real_brand_hackdaily.png",
