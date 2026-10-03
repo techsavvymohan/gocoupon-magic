@@ -1,7 +1,7 @@
 {
-  "name": "GoCoupon: Coupons, Price Comparison & Cashback",
+  "name": "GoCoupon — Verified Deals & Coupons",
   "short_name": "GoCoupon",
-  "description": "GoCoupon is the free shopping extension for working coupons, live price comparison, 90-day price history and cashback across online stores worldwide.",
+  "description": "Instant verified coupons, promo codes, and live discount alerts for 240+ top Indian online shopping stores.",
   "start_url": "/",
   "id": "/",
   "display": "standalone",

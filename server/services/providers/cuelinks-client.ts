@@ -922,6 +922,13 @@ export async function syncLiveCuelinksDeals(maxPages: number = 0): Promise<{
       }
     }
 
+    // 3. Strict stale campaign filter (purges 2024/2025 zombie campaigns)
+    const combinedText = String((o.title || '') + ' ' + (o.url || '') + ' ' + (o.tracking_url || '') + ' ' + (o.terms || '')).toLowerCase();
+    if (/\b(2024|2025|prime-day-2025|diwali-2025|new-year-2025)\b/i.test(combinedText)) {
+      expiredCount++;
+      continue;
+    }
+
     const storeName = (o.campaign_name || "Partner Store").trim();
     const storeSlug = storeName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") + "-coupons";
     const rawCode = (o.coupon_code || o.code || "").trim();

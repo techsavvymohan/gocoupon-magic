@@ -13,6 +13,7 @@
 import { Router, type Request, type Response } from "express";
 import { clicksDb } from "../services/db.js";
 import { requireAdminAuth } from "./admin.js";
+import { buildCuelinksRedirectUrl } from "../services/providers/cuelinks-client.js";
 
 export const redirectRouter = Router();
 
@@ -93,11 +94,28 @@ redirectRouter.get("/deal", async (req: Request, res: Response) => {
     return;
   }
 
-  // 1. Resolve safe, accessible destination merchant URL
-  // If Cuelinks linksredirect.com is failing / 503, extract clean merchant destination
-  const targetUrl = extractMerchantDestination(rawUrl);
+  // 1. Determine monetized affiliate redirect URL
+  let targetUrl = rawUrl;
 
-  // 2. Track click in database / disk fallback asynchronously (non-blocking)
+  // Check if link already contains active affiliate tracking
+  const isAffiliate =
+    rawUrl.includes("linksredirect.com") ||
+    rawUrl.includes("clnk.in") ||
+    rawUrl.includes("admitad.com") ||
+    rawUrl.includes("tag=") ||
+    rawUrl.includes("impact.com") ||
+    rawUrl.includes("cuelinks");
+
+  if (!isAffiliate && /^https?:\/\//i.test(rawUrl)) {
+    // Automatically wrap clean merchant URLs with Cuelinks linksredirect protocol
+    targetUrl = buildCuelinksRedirectUrl({
+      merchantUrl: rawUrl,
+      subId: source || "gocoupon_web",
+    });
+  }
+
+  // 2. Track click in database / analytics
+  const cleanMerchant = extractMerchantDestination(rawUrl);
   const clientIp =
     (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
     (req.headers["x-real-ip"] as string) ||
@@ -115,7 +133,7 @@ redirectRouter.get("/deal", async (req: Request, res: Response) => {
       storeName: store,
       storeSlug: slug,
       couponCode: code,
-      destinationUrl: targetUrl,
+      destinationUrl: cleanMerchant,
       source,
       device,
       ip: clientIp,
@@ -125,7 +143,7 @@ redirectRouter.get("/deal", async (req: Request, res: Response) => {
       console.warn("[ClickTracker] Background logging notice:", err?.message);
     });
 
-  // 3. Issue clean 302 redirect with security & no-referrer headers
+  // 3. Issue clean 302 redirect with security headers to the monetized affiliate link
   res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");

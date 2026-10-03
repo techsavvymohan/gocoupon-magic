@@ -698,6 +698,7 @@ export default defineConfig({
     exclude: ["solid-js", "svelte", "vue", "caramel-ui"],
   },
   build: {
+    chunkSizeWarningLimit: 850,
     outDir: "dist",
     minify: "terser",
     terserOptions: {
