@@ -1,3 +1,4 @@
+import { resolveStoreLogo } from "../../src/lib/services/store-logo-resolver.js";
 /**
  * @file server/routes/deals.ts
  * @description Express Router for GoCoupon Live Deals & Offers Feed.
@@ -286,10 +287,17 @@ dealsRouter.get("/", async (req: Request, res: Response) => {
       livePool
     );
 
-    const stampedDeals = result.deals.map((deal) => {
+    const stampedDeals = result.deals.map((deal: any) => {
+      if (deal.storeLogo && deal.storeLogo.includes("cloudinary.com")) {
+        return deal;
+      }
       const brandLogo = brandAssetsService.getLogoUrl(deal.storeSlug || deal.storeName);
-      if (brandLogo) {
+      if (brandLogo && brandLogo.includes("cloudinary.com")) {
         return { ...deal, storeLogo: brandLogo };
+      }
+      const resolved = resolveStoreLogo(deal.storeName || deal.store, deal.link, undefined, deal.storeLogo);
+      if (resolved && resolved.includes("cloudinary.com")) {
+        return { ...deal, storeLogo: resolved };
       }
       return deal;
     });
