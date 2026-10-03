@@ -206,6 +206,7 @@ function DynamicStoreCouponsPage() {
         primaryCtaLabel="Install Extension Free"
         primaryCtaTo="/extension"
         storeName={storeName}
+        storeLogo={store?.logo}
         eeatProof={{
           verifiedCount: `${store?.deals?.length || 10} Verified Offers`,
           successRate: "96.4%",

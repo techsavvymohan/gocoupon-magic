@@ -1,3 +1,4 @@
+import { StoreLogo } from "@/components/common/StoreLogo";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
@@ -64,6 +65,7 @@ export type SeoLandingPageProps = {
   breadcrumb: Array<{ name: string; path: string }>;
   children?: React.ReactNode;
   storeName?: string;
+  storeLogo?: string;
   eeatProof?: EeatProof;
   verifiedCoupons?: VerifiedCoupon[];
   savingHacks?: SavingHack[];
@@ -83,6 +85,7 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
     breadcrumb,
     children,
     storeName,
+    storeLogo,
     eeatProof,
     verifiedCoupons,
     savingHacks,
@@ -123,7 +126,32 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
             ))}
           </nav>
 
-          <div className="inline-flex items-center gap-2 rounded-full border border-sky-500/20 bg-sky-500/10 px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-sky-400 mb-4">
+          {storeName ? (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 mb-4">
+              <div className="h-20 w-20 sm:h-24 sm:w-24 shrink-0 rounded-2xl border border-border/80 bg-white shadow-xl p-3 flex items-center justify-center overflow-hidden">
+                <StoreLogo
+                  storeName={storeName}
+                  storeLogo={storeLogo}
+                  className="h-full w-full border-0 bg-transparent shadow-none p-0"
+                  imageClassName="h-full w-full object-contain"
+                />
+              </div>
+              <div className="flex-1">
+                <div className="inline-flex items-center gap-2 rounded-full border border-sky-500/20 bg-sky-500/10 px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-sky-400 mb-3">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+                  </span>
+                  {eyebrow}
+                </div>
+                <h1 className="max-w-4xl font-display text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+                  {title}
+                </h1>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="inline-flex items-center gap-2 rounded-full border border-sky-500/20 bg-sky-500/10 px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-sky-400 mb-4">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
@@ -134,6 +162,8 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
           <h1 className="max-w-4xl font-display text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
             {title}
           </h1>
+            </>
+          )}
           <p className="mt-5 max-w-3xl text-base text-muted-foreground sm:text-lg leading-relaxed">
             {description}
           </p>
