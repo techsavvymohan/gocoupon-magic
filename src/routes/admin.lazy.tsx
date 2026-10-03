@@ -1,9 +1,4 @@
-/**
- * @file src/routes/admin.lazy.tsx
- * @description Official Unified Administration Suite for GoCoupon.io (Code-Split Lazy View).
- */
-
-import { createLazyFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+﻿import { createLazyFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { AdminAuthProvider, useAdminAuth, getAdminAuthHeaders } from "@/context/AdminAuthContext";
 import { AdminThemeProvider } from "@/admin/components/AdminThemeProvider";
@@ -26,7 +21,13 @@ import AdminWebVitalsWidget from "@/admin/components/AdminWebVitalsWidget";
 import RecentActivityTable from "@/admin/components/RecentActivityTable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { getPermissionsForRole, canAccessPermission } from "@/lib/access-control";
+import {
+  ADMIN_SECTIONS,
+  getSectionForTab,
+  getSubTabInfo,
+  getPermissionsForRole,
+  canAccessPermission,
+} from "@/lib/access-control";
 import {
   Flame,
   Store,
@@ -48,6 +49,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export const Route = createLazyFileRoute("/admin")({
   component: AdminRootPage,
@@ -70,12 +72,36 @@ function AdminContent() {
 
   const [activeTab, setActiveTab] = useState<string>(searchParams?.tab || "dashboard");
   const [mobileNavOpen, setMobileNavOpen] = useState<boolean>(false);
+  const [pendingSubmissionsCount, setPendingSubmissionsCount] = useState<number>(0);
 
+  // Sync activeTab when query string changes
   useEffect(() => {
     if (searchParams?.tab) {
       setActiveTab(searchParams.tab);
+    } else {
+      setActiveTab("dashboard");
     }
   }, [searchParams?.tab]);
+
+  // Fetch pending submissions count
+  useEffect(() => {
+    let active = true;
+    async function loadPending() {
+      try {
+        const res = await fetch("/api/admin/submissions?status=pending", { headers: getAdminAuthHeaders() });
+        const json = await res.json();
+        if (active && json.counts?.pending !== undefined) {
+          setPendingSubmissionsCount(json.counts.pending);
+        }
+      } catch {}
+    }
+    loadPending();
+    const interval = setInterval(loadPending, 12000);
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   const handleSelectTab = (tabKey: string) => {
     setActiveTab(tabKey);
@@ -99,11 +125,32 @@ function AdminContent() {
   }
 
   const userPermissions = getPermissionsForRole(user?.role, user?.permissions);
-  const isAuthorizedForTab = activeTab === "dashboard" || canAccessPermission(userPermissions, activeTab);
+  const isAuthorizedForTab =
+    user?.role === "admin" ||
+    activeTab === "dashboard" ||
+    canAccessPermission(userPermissions, activeTab);
+
+  const activeSection = getSectionForTab(activeTab);
+  const { subTab } = getSubTabInfo(activeTab);
+
+  const breadcrumbTrail =
+    activeTab === "dashboard"
+      ? [
+          { label: "GoCoupon Admin", href: "/admin" },
+          { label: "Operations Dashboard" },
+        ]
+      : [
+          { label: "GoCoupon Admin", href: "/admin" },
+          {
+            label: activeSection.label,
+            href: `/admin?tab=${activeSection.defaultTab}`,
+          },
+          { label: subTab.label },
+        ];
 
   return (
     <div className="flex min-h-screen flex-col lg:flex-row bg-background text-foreground transition-colors">
-      {/* Fixed/Sticky Navigation Sidebar */}
+      {/* Streamlined Left Navigation Sidebar */}
       <AdminSidebar
         activeTab={activeTab}
         onSelectTab={handleSelectTab}
@@ -115,10 +162,7 @@ function AdminContent() {
       <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
         <AdminTopbar
           title={getTabTitle(activeTab)}
-          breadcrumbTrail={[
-            { label: "Admin", href: "/admin" },
-            { label: getTabTitle(activeTab), href: `/admin?tab=${activeTab}` },
-          ] as any}
+          breadcrumbTrail={breadcrumbTrail as any}
           onToggleMobileMenu={() => setMobileNavOpen((prev) => !prev)}
           onSearch={handleGlobalSearch}
         />
@@ -133,12 +177,13 @@ function AdminContent() {
                 Access Restricted
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Your account ({user?.role || "viewer"}) does not have permission to access the <span className="font-semibold text-foreground">{getTabTitle(activeTab)}</span> module.
+                Your account ({user?.role || "viewer"}) does not have permission to access the{" "}
+                <span className="font-semibold text-foreground">{subTab.label}</span> module.
               </p>
               <div className="mt-6 flex justify-center">
                 <Button
                   onClick={() => handleSelectTab("dashboard")}
-                  className="rounded-xl px-5 py-2.5 font-bold"
+                  className="rounded-xl px-5 py-2.5 font-bold cursor-pointer"
                 >
                   Return to Operations Dashboard
                 </Button>
@@ -146,19 +191,34 @@ function AdminContent() {
             </div>
           ) : (
             <>
-              {activeTab === "dashboard" && <AdminOverviewDashboard onNavigate={handleSelectTab} />}
+              {/* Sleek Segmented Sub-Navigation Bar (for multi-tab sections) */}
+              {activeTab !== "dashboard" && (
+                <AdminWorkspaceSubNav
+                  section={activeSection}
+                  activeTab={activeTab}
+                  onSelectTab={handleSelectTab}
+                  pendingCount={pendingSubmissionsCount}
+                  userPermissions={userPermissions}
+                  userRole={user?.role}
+                />
+              )}
+
+              {/* Render the Active Manager Component */}
+              {activeTab === "dashboard" && (
+                <AdminOverviewDashboard onNavigate={handleSelectTab} />
+              )}
               {activeTab === "offers" && <AdminOffersManager />}
               {activeTab === "submissions" && <AdminSubmissionsManager />}
-              {activeTab === "stores" && <AdminStoresManager />}
               {activeTab === "products" && <AdminProductsManager />}
+              {activeTab === "stores" && <AdminStoresManager />}
               {activeTab === "brand-assets" && <AdminBrandAssetsManager />}
-              {activeTab === "categories" && <AdminCategoriesManager />}
-              {activeTab === "blogs" && <AdminBlogsManager />}
-              {activeTab === "events" && <AdminEventsManager />}
               {activeTab === "hero" && <AdminHeroManager />}
               {activeTab === "sections" && <AdminHomepageSectionsManager />}
-              {activeTab === "users" && <AdminUsersManager />}
+              {activeTab === "blogs" && <AdminBlogsManager />}
+              {activeTab === "categories" && <AdminCategoriesManager />}
+              {activeTab === "events" && <AdminEventsManager />}
               {activeTab === "settings" && <AdminSettingsPanel />}
+              {activeTab === "users" && <AdminUsersManager />}
             </>
           )}
         </main>
@@ -167,18 +227,94 @@ function AdminContent() {
   );
 }
 
+/**
+ * Modern Segmented Sub-Tab Switcher
+ */
+function AdminWorkspaceSubNav({
+  section,
+  activeTab,
+  onSelectTab,
+  pendingCount,
+  userPermissions,
+  userRole,
+}: {
+  section: any;
+  activeTab: string;
+  onSelectTab: (tabKey: string) => void;
+  pendingCount: number;
+  userPermissions: string[];
+  userRole?: string;
+}) {
+  const visibleSubTabs = section.subTabs.filter((sub: any) => {
+    if (userRole === "admin") return true;
+    return canAccessPermission(userPermissions, sub.key);
+  });
+
+  if (visibleSubTabs.length <= 1) return null;
+
+  const currentSubTab =
+    section.subTabs.find((s: any) => s.key === activeTab) || visibleSubTabs[0];
+
+  return (
+    <div className="mb-6 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md p-3 sm:p-4 shadow-2xs">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        {/* Segmented Button Pills */}
+        <div className="flex flex-wrap items-center gap-1.5 p-1 bg-zinc-100 dark:bg-zinc-800/90 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60">
+          {visibleSubTabs.map((sub: any) => {
+            const isActive = activeTab === sub.key;
+            const hasPending = sub.key === "submissions" && pendingCount > 0;
+
+            return (
+              <button
+                key={sub.key}
+                type="button"
+                onClick={() => onSelectTab(sub.key)}
+                className={cn(
+                  "relative flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer",
+                  isActive
+                    ? "bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs border border-zinc-200/60 dark:border-zinc-700/80"
+                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-zinc-800/50"
+                )}
+              >
+                <span>{sub.label}</span>
+                {hasPending && (
+                  <span
+                    className={cn(
+                      "px-1.5 py-0.2 rounded-full text-[9.5px] font-black leading-none",
+                      isActive
+                        ? "bg-amber-500 text-white animate-pulse"
+                        : "bg-amber-500 text-white"
+                    )}
+                  >
+                    {pendingCount} Pending
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Helpful 1-line Workspace Description */}
+        <div className="text-xs text-zinc-500 dark:text-zinc-400 font-medium truncate max-w-md hidden md:block">
+          {currentSubTab.description}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function getTabTitle(tab: string): string {
   switch (tab) {
     case "offers":
-      return "Offers & Deals Management";
+      return "All Coupons & Deals";
     case "submissions":
-      return "Community Submitted Coupons Review Desk";
-    case "stores":
-      return "Stores Directory";
+      return "Community Submitted Coupons Review";
     case "products":
-      return "Products Catalog & Comparison Hub";
+      return "Product Deals & Price Floor";
+    case "stores":
+      return "Stores Directory & Partner Programs";
     case "brand-assets":
-      return "Brand Assets & Logo Hub";
+      return "Brand Assets & Cloudinary Logos";
     case "categories":
       return "Shopping Categories";
     case "blogs":
@@ -188,18 +324,18 @@ function getTabTitle(tab: string): string {
     case "hero":
       return "Hero Banner & Top Announcement";
     case "sections":
-      return "Homepage Layout & Showcase";
+      return "Homepage Sections & Marquee";
     case "users":
-      return "Admin Team & Roles";
+      return "Admin Team & Role Permissions";
     case "settings":
-      return "Settings & Search Console";
+      return "Platform Settings & Search Console";
     default:
       return "GoCoupon Operations Dashboard";
   }
 }
 
 /**
- * ── Overview Dashboard Component ──
+ * ðŸ“Š Operations Overview Dashboard Component
  */
 function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => void }) {
   const [stats, setStats] = useState<any>(null);
@@ -432,7 +568,7 @@ function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => v
         </div>
       </div>
 
-      {/* ── SEO Engine & Pre-rendered Static Pages / Schema.org Health Card ── */}
+      {/* SEO Engine & Pre-rendered Static Pages / Schema.org Health Card */}
       <div className="rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-950/20 p-4 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="h-9 w-9 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 grid place-items-center">
@@ -480,7 +616,7 @@ function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => v
         </div>
       </div>
 
-      {/* ── Deal Click Tracker & Conversion Analytics (Enhance Business) ── */}
+      {/* Deal Click Tracker & Conversion Analytics */}
       <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 sm:p-6 shadow-xs space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800/80 pb-5">
           <div>
@@ -673,7 +809,7 @@ function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => v
         </div>
       </section>
 
-      {/* ── Real User Monitoring (RUM) & Core Web Vitals (GA4 + Vitals API) ── */}
+      {/* Real User Monitoring (RUM) & Core Web Vitals */}
       <AdminWebVitalsWidget />
 
       {/* Activity Chart & Quick Modules */}
@@ -685,8 +821,8 @@ function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => v
         {/* Fast Action Shortcuts */}
         <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-xs flex flex-col justify-between">
           <div>
-            <h3 className="text-base font-bold text-zinc-900 dark:text-white">Management Shortcuts</h3>
-            <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 font-medium">Quickly access key GoCoupon controls</p>
+            <h3 className="text-base font-bold text-zinc-900 dark:text-white">Workspace Shortcuts</h3>
+            <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 font-medium">Direct access to primary administrative desks</p>
 
             <div className="mt-5 space-y-2.5">
               <button
@@ -703,10 +839,10 @@ function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => v
 
               <button
                 type="button"
-                onClick={() => onNavigate("blogs")}
-                className="w-full flex items-center justify-between p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-blue-500/50 bg-zinc-50/80 dark:bg-zinc-800/40 hover:bg-blue-50/50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:text-blue-700 dark:hover:text-blue-300 transition-colors text-left text-xs font-bold cursor-pointer"
+                onClick={() => onNavigate("stores")}
+                className="w-full flex items-center justify-between p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-emerald-500/50 bg-zinc-50/80 dark:bg-zinc-800/40 hover:bg-emerald-50/50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors text-left text-xs font-bold cursor-pointer"
               >
-                <span>Manage Blog Articles</span>
+                <span>Stores &amp; Brand Assets</span>
                 <ArrowRight className="h-3.5 w-3.5 text-zinc-500 dark:text-zinc-400" />
               </button>
 
@@ -715,16 +851,16 @@ function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => v
                 onClick={() => onNavigate("hero")}
                 className="w-full flex items-center justify-between p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-blue-500/50 bg-zinc-50/80 dark:bg-zinc-800/40 hover:bg-blue-50/50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:text-blue-700 dark:hover:text-blue-300 transition-colors text-left text-xs font-bold cursor-pointer"
               >
-                <span>Edit Top Announcement Bar</span>
+                <span>Homepage Hero &amp; Announcements</span>
                 <ArrowRight className="h-3.5 w-3.5 text-zinc-500 dark:text-zinc-400" />
               </button>
 
               <button
                 type="button"
-                onClick={() => onNavigate("stores")}
+                onClick={() => onNavigate("blogs")}
                 className="w-full flex items-center justify-between p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-blue-500/50 bg-zinc-50/80 dark:bg-zinc-800/40 hover:bg-blue-50/50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:text-blue-700 dark:hover:text-blue-300 transition-colors text-left text-xs font-bold cursor-pointer"
               >
-                <span>Manage Store Affiliate Links</span>
+                <span>Content &amp; Editorial Guides</span>
                 <ArrowRight className="h-3.5 w-3.5 text-zinc-500 dark:text-zinc-400" />
               </button>
 
@@ -733,7 +869,7 @@ function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => v
                 onClick={() => onNavigate("settings")}
                 className="w-full flex items-center justify-between p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-blue-500/50 bg-zinc-50/80 dark:bg-zinc-800/40 hover:bg-blue-50/50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:text-blue-700 dark:hover:text-blue-300 transition-colors text-left text-xs font-bold cursor-pointer"
               >
-                <span>SEO Tags &amp; robots.txt</span>
+                <span>SEO, Google Console &amp; Team</span>
                 <ArrowRight className="h-3.5 w-3.5 text-zinc-500 dark:text-zinc-400" />
               </button>
             </div>
@@ -762,7 +898,7 @@ function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => v
 }
 
 /**
- * ── Login Screen Component ──
+ * ðŸ”’ Login Screen Component
  */
 function AdminLoginScreen({ onLoginSuccess }: { onLoginSuccess: () => void }) {
   const { login } = useAdminAuth();
@@ -828,7 +964,7 @@ function AdminLoginScreen({ onLoginSuccess }: { onLoginSuccess: () => void }) {
               onChange={(e) => setPassword(e.target.value)}
               required
               className="bg-zinc-800/80 border-zinc-700 text-white text-xs h-10"
-              placeholder="••••••••"
+              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
             />
           </div>
 

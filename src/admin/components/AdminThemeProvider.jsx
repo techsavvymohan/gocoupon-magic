@@ -47,3 +47,5 @@ export function AdminThemeProvider({ children }) {
 export function useAdminTheme() {
   return useContext(AdminThemeContext);
 }
+
+export default AdminThemeProvider;

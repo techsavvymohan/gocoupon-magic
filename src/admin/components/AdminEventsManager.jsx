@@ -6,6 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { ConfirmModal } from "@/components/ui/AppModal";
+import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -169,7 +170,7 @@ export default function AdminEventsManager() {
     setIsDeleting(true);
 
     try {
-      const response = await fetch(`/api/events/${deleteTarget.slug}`, { method: "DELETE" });
+      const response = await fetch(`/api/events/${deleteTarget.slug}`, { method: "DELETE", headers: getAdminAuthHeaders() });
       const payload = await response.json();
 
       if (!response.ok) {

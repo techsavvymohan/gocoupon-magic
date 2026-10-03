@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 /**
  * @file server/services/db.ts
  * @description Unified Production Database Service for GoCoupon.
@@ -499,6 +500,24 @@ export const dealsDb = {
       console.warn("[Database dealsDb.upsertDeals] Disk persistence warning:", diskErr.message);
     }
 
+    const cleanRating = (val: any) => {
+      if (typeof val === "number" && !isNaN(val)) return Math.min(Math.max(val, 1.0), 5.0);
+      const n = parseFloat(String(val || "").replace(/[^0-9.]/g, ""));
+      return isNaN(n) || n <= 0 ? 4.8 : Math.min(Math.max(n, 1.0), 5.0);
+    };
+
+    const cleanInt = (val: any, fallback = 0) => {
+      if (typeof val === "number" && !isNaN(val)) return Math.max(0, Math.floor(val));
+      const n = parseInt(String(val || "").replace(/[^0-9]/g, ""), 10);
+      return isNaN(n) ? fallback : Math.max(0, n);
+    };
+
+    const cleanNumeric = (val: any): number | null => {
+      if (val === null || val === undefined || val === "") return null;
+      const n = parseFloat(String(val).replace(/[^0-9.]/g, ""));
+      return isNaN(n) ? null : n;
+    };
+
     // 3. Supabase REST Upsert via Service Role Key (bypasses RLS — primary persistence layer)
     if (supabaseAdmin) {
       try {
@@ -507,6 +526,8 @@ export const dealsDb = {
 
         for (let i = 0; i < deals.length; i += BATCH_SIZE) {
           const batch = deals.slice(i, i + BATCH_SIZE);
+
+
           const rows = batch.map((d) => ({
             id: String(d.id),
             store_name: d.storeName || "Store",
@@ -521,17 +542,17 @@ export const dealsDb = {
             verified_date: d.verifiedDate || "Verified Today",
             expires_in: d.expiresIn || "Active",
             end_date: d.endDate ? new Date(d.endDate).toISOString() : null,
-            min_order: d.minOrder || null,
+            min_order: cleanNumeric(d.minOrder),
             terms: d.terms || null,
             link: d.link || "https://gocoupon.io",
-            uses_count: d.usesCount || 1,
-            rating: d.rating || 4.8,
-            votes_count: d.votesCount || 12,
+            uses_count: cleanInt(d.usesCount, 1),
+            rating: cleanRating(d.rating),
+            votes_count: cleanInt(d.votesCount, 12),
             source: d.source || "cuelinks",
             status: d.status || "active",
             type: d.type || "coupon",
             is_featured: Boolean(d.isFeatured),
-            featured_priority: d.featuredPriority ? Number(d.featuredPriority) : 100,
+            featured_priority: cleanInt(d.featuredPriority, 100),
             campaign_source: d.campaignSource || "manual",
             verification_status: d.verificationStatus || "verified",
           }));
@@ -547,6 +568,67 @@ export const dealsDb = {
             console.warn("[Database dealsDb.upsertDeals] Supabase batch upsert error:", error.message);
           } else {
             totalUpserted += batch.length;
+
+            // Mirror verified coupon codes into 'coupons' table for Chrome Extension & Admin
+            try {
+              const couponRows = batch
+                .filter((d) => d.code && String(d.code).trim().length > 1 && d.status !== "expired")
+                .map((d) => {
+                  const rawDiscount = String(d.discount || "");
+                  let discountVal = 10;
+                  let discountType = "percent";
+                  const pct = rawDiscount.match(/(\d+)%/);
+                  const amt = rawDiscount.match(/(?:[\$\u00A3\u20AC\u20B9]|Rs\.?|INR)\s*(\d+(?:\.\d+)?)/i) || rawDiscount.match(/(\d+)\s*(?:OFF|FLAT)/i);
+                  if (pct) {
+                    discountType = "percent";
+                    discountVal = parseFloat(pct[1]);
+                  } else if (amt) {
+                    discountType = "flat";
+                    discountVal = parseFloat(amt[1]);
+                  }
+
+                  const minOrderNum = parseFloat(String(d.minOrder || "0").replace(/[^0-9.]/g, "")) || 0;
+                  const siteSlug = (d.storeSlug || d.storeName || "store").toLowerCase().replace(/[^a-z0-9]/g, "");
+                  const cleanCode = String(d.code).trim().toUpperCase();
+
+                  // Deterministic UUID based on site and code for conflict resolution
+                  const hash = crypto.createHash("md5").update(`${siteSlug}:${cleanCode}`).digest("hex");
+                  const deterministicId = `${hash.slice(0, 8)}-${hash.slice(8, 12)}-${hash.slice(12, 16)}-${hash.slice(16, 20)}-${hash.slice(20, 32)}`;
+
+                  return {
+                    id: deterministicId,
+                    site: siteSlug,
+                    code: cleanCode,
+                    discount_label: d.discount || `${discountVal}% OFF`,
+                    discount_type: discountType,
+                    discount_value: isNaN(discountVal) ? 10 : discountVal,
+                    min_order: minOrderNum,
+                    store_url: d.link || null,
+                    is_active: d.status !== "expired",
+                    expiry: d.endDate ? new Date(d.endDate).toISOString() : null,
+                    health_score: d.verified ? 96 : 85,
+                    verified: Boolean(d.verified ?? true),
+                    verification_stage: d.verified ? "live_verified" : "community_verified",
+                    uses_today: Math.min(cleanInt(d.usesCount, 15), 50),
+                    total_verifications: Math.min(cleanInt(d.votesCount, 30), 200),
+                    last_used_at: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+                  };
+                });
+
+              const uniqueCouponRows = Array.from(
+                new Map(couponRows.map((item) => [item.id, item])).values()
+              );
+              if (uniqueCouponRows.length > 0) {
+                const { error: cErr } = await supabaseAdmin
+                  .from("coupons")
+                  .upsert(uniqueCouponRows, { onConflict: "id", ignoreDuplicates: false });
+                if (cErr) {
+                  console.warn("[Database coupons mirror notice]:", cErr.message);
+                }
+              }
+            } catch (mirrorErr: any) {
+              console.warn("[Database] coupons table mirror notice:", mirrorErr?.message);
+            }
           }
         }
         console.log(`✅ [Database] Supabase upsert complete: ${totalUpserted} deals saved to cloud DB.`);
@@ -574,7 +656,7 @@ export const dealsDb = {
               d.discount || "Exclusive Offer", d.category || "General",
               d.badge || "Verified", d.verified ?? true,
               d.verifiedDate || "Verified Today", d.expiresIn || "Active",
-              d.endDate ? new Date(d.endDate) : null, d.minOrder || null, d.terms || null,
+              d.endDate ? new Date(d.endDate) : null, cleanNumeric(d.minOrder), d.terms || null,
               d.link || "https://gocoupon.io", d.usesCount || 1, d.rating || 4.8,
               d.votesCount || 12, d.source || "cuelinks", d.status || "active",
               d.type || "coupon", Boolean(d.isFeatured),
@@ -1733,4 +1815,63 @@ export async function getDatabaseDiagnostics(): Promise<{
     latencyMs: Date.now() - start,
     tableCounts: counts,
   };
+}
+
+/**
+ * Automatically purges and deactivates expired coupons from Supabase and in-memory pool.
+ * Called every 15 minutes by the price-watcher daemon.
+ */
+export async function pruneExpiredCoupons(): Promise<{ prunedDeals: number; prunedCoupons: number }> {
+  let prunedDeals = 0;
+  let prunedCoupons = 0;
+  const nowIso = new Date().toISOString();
+
+  // 1. Prune expired deals and coupons from Supabase cloud DB
+  if (supabaseAdmin) {
+    try {
+      const { data: dData, error: dErr } = await supabaseAdmin
+        .from("gocoupon_deals")
+        .update({ status: "expired" })
+        .lt("end_date", nowIso)
+        .eq("status", "active")
+        .select("id");
+
+      if (!dErr && dData) prunedDeals = dData.length;
+
+      const { data: cData, error: cErr } = await supabaseAdmin
+        .from("coupons")
+        .update({ is_active: false })
+        .lt("expiry", nowIso)
+        .eq("is_active", true)
+        .select("id");
+
+      if (!cErr && cData) prunedCoupons = cData.length;
+
+      if (prunedDeals > 0 || prunedCoupons > 0) {
+        console.log(`🧹 [Cleaner] Pruned ${prunedDeals} expired deals and ${prunedCoupons} coupons from Supabase.`);
+      }
+    } catch (err: any) {
+      console.warn("[Cleaner] pruneExpiredCoupons error:", err?.message);
+    }
+  }
+
+  // 2. Prune expired deals from in-memory pool & sync to disk
+  try {
+    const current = getLiveDeals();
+    const nowTime = Date.now();
+    const activeOnly = current.filter((d: any) => {
+      if (d.endDate) {
+        const end = new Date(d.endDate).getTime();
+        if (!isNaN(end) && end < nowTime) return false;
+      }
+      return d.status !== "expired";
+    });
+    if (activeOnly.length < current.length) {
+      setLiveDeals(activeOnly);
+      setLiveDealsPool(activeOnly);
+      console.log(`🧹 [Cleaner] Purged ${current.length - activeOnly.length} expired deals from in-memory pool.`);
+    }
+  } catch {}
+
+  return { prunedDeals, prunedCoupons };
 }

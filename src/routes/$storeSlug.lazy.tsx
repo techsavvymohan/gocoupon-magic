@@ -45,7 +45,7 @@ function DynamicStoreCouponsPage() {
     : storeSlug
       .replace(/-coupons$/, "")
       .split("-")
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .map((w: any) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(" ");
 
   const storeName = rawName || "Online Store";
@@ -85,15 +85,6 @@ function DynamicStoreCouponsPage() {
         code: "SAVE20",
         discount: "Up to 50% OFF",
         description: `Exclusive verified discount code on ${storeName} sitewide catalog.`,
-        minSpend: "₹999",
-        category,
-        expiry: "Active Today",
-        isExclusive: true,
-      },
-      {
-        code: "PREPAID10",
-        discount: "Extra 10% Instant Off",
-        description: "Instant checkout reduction when paying via UPI or credit/debit cards.",
         minSpend: "₹499",
         category: "Prepaid Orders",
         expiry: "Ongoing",

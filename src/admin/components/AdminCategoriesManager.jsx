@@ -173,7 +173,7 @@ export default function AdminCategoriesManager() {
     setIsDeleting(true);
 
     try {
-      const response = await fetch(`/api/categories/${deleteTarget.slug}`, { method: "DELETE" });
+      const response = await fetch(`/api/categories/${deleteTarget.slug}`, { method: "DELETE", headers: getAdminAuthHeaders() });
       const payload = await response.json();
 
       if (!response.ok) {

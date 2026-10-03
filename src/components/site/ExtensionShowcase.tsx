@@ -4,6 +4,7 @@
  */
 
 import { useState } from "react";
+import { useExtensionBridge } from "@/lib/useExtensionBridge";
 import { MagneticButton } from "../MagneticButton";
 import {
   Zap,
@@ -18,6 +19,7 @@ import {
 } from "lucide-react";
 
 export function ExtensionShowcase() {
+  const { isInstalled, version } = useExtensionBridge();
   const [demoState, setDemoState] = useState<"idle" | "testing" | "applied">("applied");
 
   const runDemo = () => {
@@ -104,7 +106,7 @@ export function ExtensionShowcase() {
                 className="inline-flex items-center gap-2.5 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-xs transition-all hover:scale-105 active:scale-95"
               >
                 <ChromeIcon />
-                <span>Add to Chrome — It&apos;s 100% Free</span>
+                <span>Add to Chrome — It's 100% Free</span>
               </MagneticButton>
 
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -116,7 +118,7 @@ export function ExtensionShowcase() {
                   <Star className="h-3.5 w-3.5 fill-current" />
                 </div>
                 <span className="font-semibold text-foreground">4.9 / 5</span>
-                <span>(180k+ users)</span>
+                <span>(Verified Extension • 94.8% Success)</span>
               </div>
             </div>
           </div>
@@ -179,7 +181,7 @@ export function ExtensionShowcase() {
                     </div>
                     <div>
                       <p className="font-display text-sm font-bold text-foreground">
-                        Testing 8 Verified Codes…
+                        Testing 8 Verified Codes...
                       </p>
                       <p className="mt-1 font-mono text-[11px] text-muted-foreground">
                         Running code: <span className="font-bold text-primary">FLIPDEAL500</span>
@@ -197,7 +199,7 @@ export function ExtensionShowcase() {
                         <span className="text-emerald-500 font-bold">✓</span>
                         <span className="text-[11px] text-foreground font-medium">On-Page Coupon Auto-Clipped</span>
                       </div>
-                      <span className="font-mono text-[10px] font-bold text-emerald-500">–₹150</span>
+                      <span className="font-mono text-[10px] font-bold text-emerald-500">-₹150</span>
                     </div>
 
                     {/* Winning Code Highlight */}

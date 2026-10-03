@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import { autoFormatMarkdown, parseMarkdownToSections, FormattedText } from "@/lib/markdown";
+import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 
 const initialForm = {
   title: "",

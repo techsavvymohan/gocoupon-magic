@@ -75,7 +75,8 @@ brandAssetsRouter.get("/", requireAdminAuth, async (_req: Request, res: Response
       if (!slug) continue;
 
       const detectedSource = detectAffiliateSource(store);
-      const storeDomain = store.domain || extractDomain(store.affiliateUrl || store.url, slug);
+      const sAny = store as any;
+      const storeDomain = sAny.domain || extractDomain(sAny.affiliateUrl || sAny.url || "", slug);
 
       if (!assetMap.has(slug)) {
         const logo = store.logo || "";
@@ -176,7 +177,7 @@ brandAssetsRouter.get("/", requireAdminAuth, async (_req: Request, res: Response
  */
 brandAssetsRouter.put("/:slug", requireAdminAuth, async (req: Request, res: Response) => {
   try {
-    const { slug } = req.params;
+    const slug = String(req.params.slug || "");
     const { name, domain, logoUrl, source, affiliateSource } = req.body;
 
     if (!logoUrl || typeof logoUrl !== "string" || !logoUrl.trim()) {
@@ -332,7 +333,7 @@ brandAssetsRouter.post("/batch-autofetch", requireAdminAuth, async (req: Request
  */
 brandAssetsRouter.delete("/:slug", requireAdminAuth, async (req: Request, res: Response) => {
   try {
-    const { slug } = req.params;
+    const slug = String(req.params.slug || "");
     await brandAssetsService.delete(slug);
 
     // Also clear from STORES_DB if present

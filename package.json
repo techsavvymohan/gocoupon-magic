@@ -19,7 +19,8 @@
     "test:admitad": "tsx --env-file=.env scripts/test-admitad.ts",
     "db:sync": "tsx --env-file=.env scripts/migrate-db.ts",
     "deals:featured": "node scripts/seed-featured.mjs",
-    "deals:cuelinks": "node scripts/sync-cuelinks-live.mjs"
+    "deals:cuelinks": "node scripts/sync-cuelinks-live.mjs",
+    "test:cj": "tsx --env-file=.env scripts/test-cj.ts"
   },
   "overrides": {
     "undici": ">=7.28.1"

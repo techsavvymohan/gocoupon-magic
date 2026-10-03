@@ -36,7 +36,7 @@ export function WhyUsExpenseSaviour() {
     },
     {
       capability: "Checkout Auto-Apply Speed",
-      honey: "Slow 20–30s checkout delay",
+      honey: "Slow 20-30s checkout delay",
       trackers: "No checkout extension applier",
       gocoupon: "Parallel code testing in under 2 seconds",
       highlight: true,
@@ -64,9 +64,9 @@ export function WhyUsExpenseSaviour() {
     },
     {
       capability: "Typical Annual Household Savings",
-      honey: isIndia ? "₹800 – ₹1,500 / year" : "$20 – $40 / year",
-      trackers: isIndia ? "₹1,200 – ₹2,500 / year" : "$30 – $60 / year",
-      gocoupon: isIndia ? "₹15,000 – ₹35,000+ / year" : "$300 – $600+ / year",
+      honey: isIndia ? "₹800 — ₹1,500 / year" : "$20 — $40 / year",
+      trackers: isIndia ? "₹1,200 — ₹2,500 / year" : "$30 — $60 / year",
+      gocoupon: isIndia ? "₹15,000 — ₹35,000+ / year" : "$300 — $600+ / year",
       highlight: true,
     },
   ];

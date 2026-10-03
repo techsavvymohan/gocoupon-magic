@@ -855,7 +855,7 @@ adminRouter.put("/hero", requireAdminAuth, async (req: Request, res: Response) =
 
 adminRouter.get("/sections", async (req: Request, res: Response) => {
   const sections = await settingsDb.getSetting("sections", defaultSections);
-  const unwrapped = sections && sections.sections ? sections.sections : (sections || defaultSections);
+  const unwrapped = sections && (sections as any).sections ? (sections as any).sections : (sections || defaultSections);
   res.json({ success: true, data: unwrapped });
 });
 

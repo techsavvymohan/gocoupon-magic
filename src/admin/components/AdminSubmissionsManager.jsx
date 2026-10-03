@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/ui/AppModal";
 import { X } from "lucide-react";
+import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 
 function CopyIcon({ className }) {
   return (
@@ -68,7 +69,7 @@ export default function AdminSubmissionsManager() {
   const fetchSubmissions = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/admin/submissions", { cache: "no-store" });
+      const res = await fetch("/api/admin/submissions", { headers: getAdminAuthHeaders(), cache: "no-store" });
       const json = await res.json();
       if (json.success) {
         setSubmissions(json.data || []);

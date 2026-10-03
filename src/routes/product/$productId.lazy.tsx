@@ -130,7 +130,7 @@ function ProductDetailsPage() {
     lowPrice: bestDeal?.effectiveNetPrice || (currentPrice || 1999),
     highPrice:
       comparison?.rows && comparison.rows.length > 0
-        ? Math.max(...comparison.rows.map((r) => r.offer.listedPrice))
+        ? Math.max(...comparison.rows.map((r) => r.offer.itemPrice))
         : (bestDeal?.effectiveNetPrice ? Math.round(bestDeal.effectiveNetPrice * 1.25) : 2999),
     ratingValue: product.rating || 4.7,
     reviewCount: product.reviewCount || 1200,

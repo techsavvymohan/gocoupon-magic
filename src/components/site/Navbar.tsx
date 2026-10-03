@@ -11,6 +11,7 @@ import { ThemeToggle } from "../ThemeToggle";
 import { CurrencyToggle } from "../CurrencyToggle";
 import { LanguageToggle } from "../LanguageToggle";
 import { useI18n } from "@/context/I18nContext";
+import { useExtensionBridge } from "@/lib/useExtensionBridge";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { NavbarSearch } from "./NavbarSearch";
 import {
@@ -96,6 +97,7 @@ const mobileLinks: NavLink[] = [
 ];
 
 export function Navbar() {
+  const { isInstalled } = useExtensionBridge();
   const { pathname } = useLocation();
   const isOffersPage = pathname === "/offers" || pathname.startsWith("/offers");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

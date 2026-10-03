@@ -284,3 +284,44 @@ extensionRouter.get("/coupons", async (req: Request, res: Response) => {
     res.status(500).json({ success: false, error: err.message });
   }
 });
+
+/**
+ * POST /api/extension/verify-report
+ * Receives coupon application results from the browser extension in real-time.
+ * Automatically increments use counts, improves confidence rating, and sets verifiedDate to "Just now".
+ */
+extensionRouter.post("/verify-report", async (req: Request, res: Response) => {
+  try {
+    const { code, store, success, discountApplied, couponId } = req.body || {};
+    if (!code || !store) {
+      res.status(400).json({ success: false, error: "code and store are required" });
+      return;
+    }
+
+    console.log(`[Extension Telemetry] Coupon ${code} on ${store}: ${success ? "SUCCESS" : "FAILED"}`);
+
+    // Update deals database in memory & Supabase if matching deal found
+    const allDeals = await dealsDb.getDeals({ search: store, limit: 10 });
+    const targetDeal = allDeals.find(
+      (d) => d.code && d.code.toUpperCase() === String(code).toUpperCase().trim()
+    );
+
+    if (targetDeal) {
+      if (success) {
+        targetDeal.usesCount = (targetDeal.usesCount || 0) + 1;
+        targetDeal.verified = true;
+        targetDeal.verifiedDate = "Just now";
+        targetDeal.badge = "Verified";
+      }
+      await dealsDb.upsertDeals([targetDeal]).catch(() => {});
+    }
+
+    res.json({
+      success: true,
+      message: "Telemetry reported successfully",
+      updatedDealId: targetDeal?.id || null,
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});

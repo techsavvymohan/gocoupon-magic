@@ -8,7 +8,7 @@
  */
 
 import { memoryAlertRegistrations } from "../routes/alerts.js";
-import { alertsDb, dealsDb, queryPg } from "../services/db.js";
+import { alertsDb, dealsDb, queryPg, pruneExpiredCoupons } from "../services/db.js";
 import { sendPriceDropEmail } from "../services/email.js";
 import {
   syncLiveCuelinksDeals,
@@ -17,6 +17,7 @@ import {
   getLiveDealsPool,
 } from "../services/providers/cuelinks-client.js";
 import { syncAdmitadDeals, getAdmitadConfig } from "../services/providers/admitad-client.js";
+import { syncCjDeals, getCjConfig } from "../services/providers/cj-client.js";
 
 let watcherInterval: NodeJS.Timeout | null = null;
 let admitadTickCount = 0; // Run Admitad sync every 4th Cuelinks tick (~60 min)
@@ -141,6 +142,9 @@ export function startBackgroundWorkers(intervalMs: number = 15 * 60 * 1000) {
 
   watcherInterval = setInterval(async () => {
     admitadTickCount++;
+
+    // 0. Auto-prune expired deals and coupons from Supabase & live pool
+    pruneExpiredCoupons().catch((e: any) => console.warn("[Worker] Expired pruner notice:", e?.message));
     try {
       // 1. 24/7 Continuous Cuelinks API v3 Sync: prune expired & ingest live deals
       const config = getCuelinksConfig();

@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { X } from "lucide-react";
 import { PERMISSIONS, ROLE_LABELS, ROLE_PERMISSIONS } from "@/lib/access-control";
+import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 import { cn } from "@/lib/utils";
 
 const defaultForm = {
@@ -49,7 +50,7 @@ export default function AdminUsersManager() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/admin/users", { cache: "no-store" });
+      const response = await fetch("/api/admin/users", { headers: getAdminAuthHeaders(), cache: "no-store" });
       const payload = await response.json();
 
       if (!response.ok) {
@@ -163,7 +164,7 @@ export default function AdminUsersManager() {
 
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/admin/users/${deleteTarget.id}`, { method: "DELETE" });
+      const response = await fetch(`/api/admin/users/${deleteTarget.id}`, { method: "DELETE", headers: getAdminAuthHeaders() });
       const result = await response.json();
 
       if (!response.ok) {

@@ -1,9 +1,44 @@
-import { Link, usePathname, useSession, signOut } from "@/admin/compat";
+﻿import { Link, usePathname, useSession, signOut } from "@/admin/compat";
 import Logo from "@/components/shared/Logo";
-import { PERMISSIONS, canAccessPermission, getPermissionsForRole } from "@/lib/access-control";
+import {
+  ADMIN_SECTIONS,
+  getSectionForTab,
+  canAccessPermission,
+  getPermissionsForRole,
+} from "@/lib/access-control";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
+import {
+  LayoutDashboard,
+  Tag,
+  Store,
+  BookOpen,
+  LayoutTemplate,
+  Settings,
+  ChevronRight,
+  X,
+  Sparkles,
+} from "lucide-react";
+
+function getSectionIcon(iconName, className = "h-4 w-4 shrink-0") {
+  switch (iconName) {
+    case "LayoutDashboard":
+      return <LayoutDashboard className={className} />;
+    case "Tag":
+      return <Tag className={className} />;
+    case "Store":
+      return <Store className={className} />;
+    case "BookOpen":
+      return <BookOpen className={className} />;
+    case "LayoutTemplate":
+      return <LayoutTemplate className={className} />;
+    case "Settings":
+      return <Settings className={className} />;
+    default:
+      return <Sparkles className={className} />;
+  }
+}
 
 function LogOutIcon() {
   return (
@@ -14,33 +49,40 @@ function LogOutIcon() {
 }
 
 function SidebarInner({ activeTab, onSelectTab, pendingCount, session, pathname, onCloseMobile }) {
-  const permissions = getPermissionsForRole(session?.data?.user?.role, session?.data?.user?.permissions);
-  const items = session?.data?.user?.role === "admin"
-    ? PERMISSIONS
-    : PERMISSIONS.filter((item) => canAccessPermission(permissions, item.key));
-  const userName = session?.data?.user?.name || (session?.data?.user?.email ? session.data.user.email.split("@")[0] : "Admin User");
+  const userRole = session?.data?.user?.role || "admin";
+  const userPermissions = getPermissionsForRole(userRole, session?.data?.user?.permissions);
+  const activeSection = getSectionForTab(activeTab);
+
+  // Filter sections user is permitted to see
+  const visibleSections = ADMIN_SECTIONS.filter((section) => {
+    if (userRole === "admin") return true;
+    return section.subTabs.some((sub) => canAccessPermission(userPermissions, sub.key));
+  });
+
+  const userName =
+    session?.data?.user?.name ||
+    (session?.data?.user?.email ? session.data.user.email.split("@")[0] : "Admin User");
   const userInitial = userName?.charAt(0)?.toUpperCase() || "A";
-  const userRole = session?.data?.user?.role || "Administrator";
 
   return (
     <div className="flex h-full flex-col justify-between">
-      {/* Top Header & Navigation */}
-      <div className="space-y-6">
+      {/* Top Header & Clean Navigation */}
+      <div className="space-y-5">
         <div className="pb-4 border-b border-zinc-100 dark:border-zinc-800 flex items-start justify-between">
           <div>
             <Logo />
-            <div className="mt-3 flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
-                GOCOUPON ADMIN
+            <div className="mt-2.5 flex items-center gap-2">
+              <span className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
+                ADMIN HUB
               </span>
-              <span className="text-[10px] font-semibold font-mono text-zinc-500 dark:text-zinc-400">v2.5</span>
+              <span className="text-[10px] font-semibold font-mono text-zinc-400">v3.0</span>
             </div>
           </div>
           {onCloseMobile && (
             <button
               type="button"
               onClick={onCloseMobile}
-              className="lg:hidden p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
+              className="lg:hidden p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
               aria-label="Close sidebar"
             >
               <X className="h-5 w-5" />
@@ -48,48 +90,110 @@ function SidebarInner({ activeTab, onSelectTab, pendingCount, session, pathname,
           )}
         </div>
 
-        {/* Navigation Items */}
+        {/* 6 Primary Workspaces Navigation */}
         <nav className="space-y-1.5 overflow-y-auto max-h-[calc(100vh-250px)] pr-1">
-          {items.map((item) => {
-            const isActive = activeTab ? activeTab === item.key : pathname === item.href;
-            const hasPendingBadge = item.key === "submissions" && pendingCount > 0;
+          {visibleSections.map((section) => {
+            const isSectionActive = activeSection.id === section.id;
+            const hasPendingInSubmissions = section.id === "offers" && pendingCount > 0;
+
+            // Visible sub-tabs for this section
+            const visibleSubTabs = section.subTabs.filter((sub) => {
+              if (userRole === "admin") return true;
+              return canAccessPermission(userPermissions, sub.key);
+            });
 
             return (
-              <Link
-                key={item.href}
-                href={`/admin?tab=${item.key}`}
-                onClick={(e) => {
-                  if (onSelectTab) {
-                    e.preventDefault();
-                    onSelectTab(item.key);
-                  }
-                  if (onCloseMobile) {
-                    onCloseMobile();
-                  }
-                }}
-                className={cn(
-                  "flex items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-bold transition-all duration-150 border cursor-pointer",
-                  isActive
-                    ? "bg-emerald-600 border-emerald-600 text-white shadow-xs"
-                    : "border-transparent text-zinc-700 dark:text-zinc-300 hover:border-zinc-200 dark:hover:border-zinc-700/60 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white"
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  <span>{item.label}</span>
-                  {hasPendingBadge && (
-                    <span className={`px-1.5 py-0.2 rounded-full text-[9.5px] font-black ${isActive ? "bg-white text-emerald-700" : "bg-amber-500 text-white animate-pulse"}`}>
-                      {pendingCount}
-                    </span>
+              <div key={section.id} className="space-y-1">
+                {/* Main Section Link */}
+                <Link
+                  href={`/admin?tab=${section.defaultTab}`}
+                  onClick={(e) => {
+                    if (onSelectTab) {
+                      e.preventDefault();
+                      onSelectTab(section.defaultTab);
+                    }
+                    if (onCloseMobile && section.subTabs.length <= 1) {
+                      onCloseMobile();
+                    }
+                  }}
+                  className={cn(
+                    "group flex items-center justify-between rounded-xl px-3 py-2.5 text-xs font-bold transition-all duration-150 border cursor-pointer",
+                    isSectionActive
+                      ? "bg-emerald-600 border-emerald-600 text-white shadow-xs"
+                      : "border-transparent text-zinc-700 dark:text-zinc-300 hover:border-zinc-200 dark:hover:border-zinc-700/60 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 hover:text-zinc-900 dark:hover:text-white"
                   )}
-                </div>
-                {isActive && <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />}
-              </Link>
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className={cn(isSectionActive ? "text-white" : "text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-white")}>
+                      {getSectionIcon(section.iconName)}
+                    </span>
+                    <span className="truncate">{section.label}</span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {hasPendingInSubmissions && (
+                      <span
+                        className={cn(
+                          "px-2 py-0.5 rounded-full text-[10px] font-black leading-none",
+                          isSectionActive
+                            ? "bg-white text-emerald-700 shadow-xs"
+                            : "bg-amber-500 text-white animate-pulse"
+                        )}
+                      >
+                        {pendingCount}
+                      </span>
+                    )}
+                    {isSectionActive && (
+                      <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+                    )}
+                  </div>
+                </Link>
+
+                {/* Sub-Tabs Accordion when this section is active */}
+                {isSectionActive && visibleSubTabs.length > 1 && (
+                  <div className="ml-4 pl-3 border-l-2 border-emerald-200 dark:border-emerald-800/60 space-y-0.5 py-1">
+                    {visibleSubTabs.map((sub) => {
+                      const isSubActive = activeTab === sub.key;
+                      const hasSubPending = sub.key === "submissions" && pendingCount > 0;
+
+                      return (
+                        <Link
+                          key={sub.key}
+                          href={`/admin?tab=${sub.key}`}
+                          onClick={(e) => {
+                            if (onSelectTab) {
+                              e.preventDefault();
+                              onSelectTab(sub.key);
+                            }
+                            if (onCloseMobile) {
+                              onCloseMobile();
+                            }
+                          }}
+                          className={cn(
+                            "flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[11.5px] font-semibold transition-colors cursor-pointer",
+                            isSubActive
+                              ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold"
+                              : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
+                          )}
+                        >
+                          <span className="truncate">{sub.label}</span>
+                          {hasSubPending && (
+                            <span className="ml-1 px-1.5 py-0.2 rounded-full text-[9px] font-black bg-amber-500 text-white leading-none">
+                              {pendingCount}
+                            </span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             );
           })}
         </nav>
       </div>
 
-      {/* Bottom Pinned User Profile & Logout Box */}
+      {/* Bottom Pinned User Profile & Quick Actions */}
       <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 mt-4">
         <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-800/60 p-3 shadow-2xs">
           <div className="flex items-center gap-3">
@@ -98,7 +202,9 @@ function SidebarInner({ activeTab, onSelectTab, pendingCount, session, pathname,
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-bold text-zinc-900 dark:text-white leading-tight">{userName}</p>
-              <p className="truncate text-[10.5px] font-medium capitalize text-zinc-500 dark:text-zinc-400 leading-tight mt-0.5">{userRole}</p>
+              <p className="truncate text-[10.5px] font-medium capitalize text-zinc-500 dark:text-zinc-400 leading-tight mt-0.5">
+                {userRole === "admin" ? "Super Administrator" : userRole}
+              </p>
             </div>
           </div>
 
@@ -125,7 +231,7 @@ export default function AdminSidebar({ activeTab, onSelectTab, mobileOpen, onClo
     let active = true;
     async function loadPending() {
       try {
-        const res = await fetch("/api/admin/submissions?status=pending");
+        const res = await fetch("/api/admin/submissions?status=pending", { headers: getAdminAuthHeaders() });
         const json = await res.json();
         if (active && json.counts?.pending !== undefined) {
           setPendingCount(json.counts.pending);
@@ -133,7 +239,7 @@ export default function AdminSidebar({ activeTab, onSelectTab, mobileOpen, onClo
       } catch {}
     }
     loadPending();
-    const interval = setInterval(loadPending, 10000);
+    const interval = setInterval(loadPending, 12000);
     return () => {
       active = false;
       clearInterval(interval);
@@ -143,7 +249,7 @@ export default function AdminSidebar({ activeTab, onSelectTab, mobileOpen, onClo
   return (
     <>
       {/* Desktop Sticky Sidebar */}
-      <aside className="hidden lg:block lg:sticky lg:top-0 lg:h-screen lg:w-72 lg:border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 transition-colors shrink-0 overflow-y-auto z-40 p-6">
+      <aside className="hidden lg:block lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 transition-colors shrink-0 overflow-y-auto z-40 p-5">
         <SidebarInner
           activeTab={activeTab}
           onSelectTab={onSelectTab}
@@ -160,7 +266,7 @@ export default function AdminSidebar({ activeTab, onSelectTab, mobileOpen, onClo
             className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
             onClick={onCloseMobile}
           />
-          <div className="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 z-50 shadow-2xl p-6 overflow-y-auto animate-in slide-in-from-left duration-200">
+          <div className="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 z-50 shadow-2xl p-5 overflow-y-auto animate-in slide-in-from-left duration-200">
             <SidebarInner
               activeTab={activeTab}
               onSelectTab={onSelectTab}
