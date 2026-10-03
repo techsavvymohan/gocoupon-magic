@@ -51,13 +51,13 @@
     "slug": "vijay-sales",
     "name": "Vijay Sales",
     "domain": "vijaysales.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745770/gocoupon/brands/brand_vijay-sales.jpg",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059146/gocoupon/brands/real_brand_vijaysales.png",
     "source": "cloudinary",
     "affiliateSource": "cuelinks",
     "width": 180,
     "height": 180,
     "format": "jpg",
-    "updatedAt": "2026-09-30T05:22:52.037Z"
+    "updatedAt": "2026-10-03T20:25:48.629Z"
   },
   {
     "slug": "vijay-sales-coupons",
@@ -699,13 +699,13 @@
     "slug": "bella-vita",
     "name": "Bella Vita",
     "domain": "bellavitaorganic.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745791/gocoupon/brands/brand_bella-vita.png",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059148/gocoupon/brands/real_brand_bellavita.png",
     "source": "cloudinary",
     "affiliateSource": "cuelinks",
     "width": 32,
     "height": 32,
     "format": "png",
-    "updatedAt": "2026-09-30T05:23:12.518Z"
+    "updatedAt": "2026-10-03T20:25:51.561Z"
   },
   {
     "slug": "bella-vita-coupons",
@@ -771,13 +771,13 @@
     "slug": "the-man-company",
     "name": "The Man Company",
     "domain": "themancompany.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745792/gocoupon/brands/brand_the-man-company.png",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059149/gocoupon/brands/real_brand_themancompany.png",
     "source": "cloudinary",
     "affiliateSource": "cuelinks",
     "width": 16,
     "height": 16,
     "format": "png",
-    "updatedAt": "2026-09-30T05:23:13.419Z"
+    "updatedAt": "2026-10-03T20:25:52.500Z"
   },
   {
     "slug": "the-man-company-coupons",
@@ -2451,13 +2451,13 @@
     "slug": "decathlon",
     "name": "Decathlon",
     "domain": "decathlon.in",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745815/gocoupon/brands/brand_decathlon.png",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059144/gocoupon/brands/real_brand_decathlon.svg",
     "source": "cloudinary",
     "affiliateSource": "cuelinks",
     "width": 256,
     "height": 256,
     "format": "png",
-    "updatedAt": "2026-09-30T05:23:36.322Z"
+    "updatedAt": "2026-10-03T20:25:47.405Z"
   },
   {
     "slug": "decathlon-coupons",
@@ -7491,148 +7491,148 @@
     "slug": "walmart",
     "name": "Walmart",
     "domain": "walmart.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058469/gocoupon/brands/brand_walmart.ico",
-    "updatedAt": "2026-10-03T20:14:32.336Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059097/gocoupon/brands/real_brand_walmart.svg",
+    "updatedAt": "2026-10-03T20:25:00.563Z"
   },
   {
     "slug": "ebay",
     "name": "eBay",
     "domain": "ebay.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058470/gocoupon/brands/brand_ebay.ico",
-    "updatedAt": "2026-10-03T20:14:33.289Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059100/gocoupon/brands/real_brand_ebay.svg",
+    "updatedAt": "2026-10-03T20:25:04.000Z"
   },
   {
     "slug": "nike",
     "name": "Nike",
     "domain": "nike.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058472/gocoupon/brands/brand_nike.ico",
-    "updatedAt": "2026-10-03T20:14:34.934Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059098/gocoupon/brands/real_brand_nike.svg",
+    "updatedAt": "2026-10-03T20:25:02.242Z"
   },
   {
     "slug": "sephora",
     "name": "Sephora",
     "domain": "sephora.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058473/gocoupon/brands/brand_sephora.ico",
-    "updatedAt": "2026-10-03T20:14:35.748Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059102/gocoupon/brands/real_brand_sephora.svg",
+    "updatedAt": "2026-10-03T20:25:05.721Z"
   },
   {
     "slug": "makemytrip",
     "name": "MakeMyTrip",
     "domain": "makemytrip.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058476/gocoupon/brands/brand_makemytrip.png",
-    "updatedAt": "2026-10-03T20:14:39.290Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059104/gocoupon/brands/real_brand_makemytrip.svg",
+    "updatedAt": "2026-10-03T20:25:07.335Z"
   },
   {
     "slug": "dominos",
     "name": "Domino's",
     "domain": "dominos.co.in",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058477/gocoupon/brands/brand_dominos.png",
-    "updatedAt": "2026-10-03T20:14:39.947Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059105/gocoupon/brands/real_brand_dominos.svg",
+    "updatedAt": "2026-10-03T20:25:11.443Z"
   },
   {
     "slug": "cleartrip",
     "name": "Cleartrip",
     "domain": "cleartrip.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058479/gocoupon/brands/brand_cleartrip.png",
-    "updatedAt": "2026-10-03T20:14:41.552Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059109/gocoupon/brands/real_brand_cleartrip.svg",
+    "updatedAt": "2026-10-03T20:25:13.257Z"
   },
   {
     "slug": "alibaba",
     "name": "Alibaba",
     "domain": "alibaba.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058480/gocoupon/brands/brand_alibaba.ico",
-    "updatedAt": "2026-10-03T20:14:42.492Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059111/gocoupon/brands/real_brand_alibaba.svg",
+    "updatedAt": "2026-10-03T20:25:15.618Z"
   },
   {
     "slug": "raynatours",
     "name": "Rayna Tours",
     "domain": "raynatours.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058483/gocoupon/brands/brand_raynatours.png",
-    "updatedAt": "2026-10-03T20:14:45.543Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059114/gocoupon/brands/real_brand_raynatours.png",
+    "updatedAt": "2026-10-03T20:25:16.553Z"
   },
   {
     "slug": "g-star-raw",
     "name": "G-Star RAW",
     "domain": "g-star.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058483/gocoupon/brands/brand_gstarraw.png",
-    "updatedAt": "2026-10-03T20:14:46.259Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059115/gocoupon/brands/real_brand_gstarraw.svg",
+    "updatedAt": "2026-10-03T20:25:18.463Z"
   },
   {
     "slug": "mamasandpapas",
     "name": "Mamas & Papas",
     "domain": "mamasandpapas.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058484/gocoupon/brands/brand_mamasandpapas.png",
-    "updatedAt": "2026-10-03T20:14:47.003Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059117/gocoupon/brands/real_brand_mamasandpapas.png",
+    "updatedAt": "2026-10-03T20:25:19.750Z"
   },
   {
     "slug": "svastika",
     "name": "Svastika",
     "domain": "svastika.in",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058485/gocoupon/brands/brand_svastika.png",
-    "updatedAt": "2026-10-03T20:14:47.744Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059118/gocoupon/brands/real_brand_svastika.svg",
+    "updatedAt": "2026-10-03T20:25:21.880Z"
   },
   {
     "slug": "qnt-sports",
     "name": "QNT Sports India",
     "domain": "qntsport.in",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058488/gocoupon/brands/brand_qntsports.ico",
-    "updatedAt": "2026-10-03T20:14:50.944Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059120/gocoupon/brands/real_brand_qntsports.svg",
+    "updatedAt": "2026-10-03T20:25:24.565Z"
   },
   {
     "slug": "nobero",
     "name": "Nobero",
     "domain": "nobero.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058489/gocoupon/brands/brand_nobero.png",
-    "updatedAt": "2026-10-03T20:14:51.670Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059122/gocoupon/brands/real_brand_nobero.svg",
+    "updatedAt": "2026-10-03T20:25:26.302Z"
   },
   {
     "slug": "ezee-perfume",
     "name": "Ezee Perfume",
     "domain": "ezeperfumes.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058490/gocoupon/brands/brand_ezeeperfume.png",
-    "updatedAt": "2026-10-03T20:14:53.271Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059125/gocoupon/brands/real_brand_ezeeperfume.svg",
+    "updatedAt": "2026-10-03T20:25:29.438Z"
   },
   {
     "slug": "the-pant-project",
     "name": "The Pant Project",
     "domain": "pantproject.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058491/gocoupon/brands/brand_thepantproject.png",
-    "updatedAt": "2026-10-03T20:14:54.134Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059127/gocoupon/brands/real_brand_thepantproject.svg",
+    "updatedAt": "2026-10-03T20:25:31.119Z"
   },
   {
     "slug": "ace-blend",
     "name": "Ace Blend",
     "domain": "aceblend.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058492/gocoupon/brands/brand_aceblend.png",
-    "updatedAt": "2026-10-03T20:14:54.893Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059129/gocoupon/brands/real_brand_aceblend.svg",
+    "updatedAt": "2026-10-03T20:25:33.618Z"
   },
   {
     "slug": "decode-age",
     "name": "Decode Age",
     "domain": "decodeage.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058493/gocoupon/brands/brand_decodeage.png",
-    "updatedAt": "2026-10-03T20:14:55.688Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059132/gocoupon/brands/real_brand_decodeage.png",
+    "updatedAt": "2026-10-03T20:25:35.463Z"
   },
   {
     "slug": "saadaa",
     "name": "Saadaa",
     "domain": "saadaa.in",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058494/gocoupon/brands/brand_saadaa.jpg",
-    "updatedAt": "2026-10-03T20:14:56.475Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059133/gocoupon/brands/real_brand_saadaa.png",
+    "updatedAt": "2026-10-03T20:25:36.282Z"
   },
   {
     "slug": "qatar-airways",
     "name": "Qatar Airways",
     "domain": "qatarairways.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058494/gocoupon/brands/brand_qatarairways.ico",
-    "updatedAt": "2026-10-03T20:14:57.266Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059134/gocoupon/brands/real_brand_qatarairways.svg",
+    "updatedAt": "2026-10-03T20:25:38.196Z"
   },
   {
     "slug": "air-india",
     "name": "Air India",
     "domain": "airindia.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058496/gocoupon/brands/brand_airindia.ico",
-    "updatedAt": "2026-10-03T20:14:59.218Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059136/gocoupon/brands/real_brand_airindia.svg",
+    "updatedAt": "2026-10-03T20:25:39.871Z"
   },
   {
     "slug": "stylevana",
@@ -7645,29 +7645,29 @@
     "slug": "redbus",
     "name": "RedBus",
     "domain": "redbus.in",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058499/gocoupon/brands/brand_redbus.ico",
-    "updatedAt": "2026-10-03T20:15:02.066Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059147/gocoupon/brands/real_brand_redbus.jpg",
+    "updatedAt": "2026-10-03T20:25:50.166Z"
   },
   {
     "slug": "samsung",
     "name": "Samsung",
     "domain": "samsung.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058500/gocoupon/brands/brand_samsung.png",
-    "updatedAt": "2026-10-03T20:15:02.931Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059138/gocoupon/brands/real_brand_samsung.svg",
+    "updatedAt": "2026-10-03T20:25:41.580Z"
   },
   {
     "slug": "dell",
     "name": "Dell Technologies",
     "domain": "dell.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058501/gocoupon/brands/brand_dell.ico",
-    "updatedAt": "2026-10-03T20:15:03.689Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059139/gocoupon/brands/real_brand_dell.svg",
+    "updatedAt": "2026-10-03T20:25:43.358Z"
   },
   {
     "slug": "lenovo",
     "name": "Lenovo",
     "domain": "lenovo.com",
-    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058502/gocoupon/brands/brand_lenovo.gif",
-    "updatedAt": "2026-10-03T20:15:04.607Z"
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059141/gocoupon/brands/real_brand_lenovo.svg",
+    "updatedAt": "2026-10-03T20:25:45.497Z"
   },
   {
     "slug": "ajmal-perfumes",
