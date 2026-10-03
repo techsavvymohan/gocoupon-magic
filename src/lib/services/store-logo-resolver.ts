@@ -10,6 +10,10 @@
  */
 
 export const CLOUDINARY_STORE_LOGOS: Record<string, string> = {
+  "hackdaily": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060298/gocoupon/brands/real_brand_hackdaily.png",
+  "answear": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060297/gocoupon/brands/real_brand_answear.png",
+  "brevo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060295/gocoupon/brands/real_brand_brevo.png",
+  "turkishairlines": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060293/gocoupon/brands/real_brand_turkishairlines.svg",
   "sangeethamobile": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745823/gocoupon/brands/brand_sangeetha-mobile.png",
   "allman": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745814/gocoupon/brands/brand_all-man.png",
   "worldofasaya": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745813/gocoupon/brands/brand_world-of-asaya.png",
@@ -310,6 +314,24 @@ export function resolveStoreLogo(
   }
   if (CLOUDINARY_STORE_LOGOS[`${clean}-coupons`]) {
     return CLOUDINARY_STORE_LOGOS[`${clean}-coupons`];
+  }
+
+  // Check normalized brand name without affiliate/geo/tracking suffixes
+  const normalized = (storeName || "")
+    .toLowerCase()
+    .replace(/&amp;/g, "&")
+    .replace(/\s+(affiliate|program|cj|apac|int|cz|de|us|uk|ww|india|eu|in|global|store|coupons|tracking|promo codes|many geos).*$/i, "")
+    .replace(/[^a-z0-9]/g, "");
+
+  if (normalized && CLOUDINARY_STORE_LOGOS[normalized]) {
+    return CLOUDINARY_STORE_LOGOS[normalized];
+  }
+
+  // Substring matching against known keys
+  for (const [key, url] of Object.entries(CLOUDINARY_STORE_LOGOS)) {
+    if (key.length >= 4 && (clean.startsWith(key) || clean.includes(key))) {
+      return url;
+    }
   }
 
   // Check if existing logo is an explicitly configured remote URL (e.g. Cloudinary, custom CDN) or local asset
