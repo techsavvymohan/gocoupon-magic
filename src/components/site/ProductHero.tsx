@@ -5,10 +5,12 @@
  */
 
 import { Link } from "@tanstack/react-router";
+import { useExtensionBridge } from "@/lib/useExtensionBridge";
 import { Zap, ShieldCheck, ArrowRight, Sparkles, CheckCircle2, Clock } from "lucide-react";
 import { useFestiveBanner } from "@/lib/hero-banner";
 
 export function ProductHero() {
+  const { isInstalled, version } = useExtensionBridge();
   const { banner, isActive, styles } = useFestiveBanner();
 
   return (
@@ -68,25 +70,35 @@ export function ProductHero() {
 
         {/* Action CTAs */}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3.5">
-          <a
-            href="https://chromewebstore.google.com/detail/gbmfihnboadlmmjbikajlmocjmlpehij"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex min-h-[48px] items-center gap-2.5 rounded-full bg-primary px-7 py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
-          >
-            <img
-              src="/icons/icon_48.png"
-              onError={(e) => {
-                e.currentTarget.src = "/icons/icon_128.png";
-              }}
-              alt=""
-              aria-hidden="true"
-              className="h-5 w-5 object-contain"
-              width={20}
-              height={20}
-            />
-            <span>Add to Chrome — It&apos;s 100% Free</span>
-          </a>
+          {isInstalled ? (
+            <a
+              href="#checkout-simulator"
+              className="inline-flex min-h-[48px] items-center gap-2.5 rounded-full bg-emerald-600 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+            >
+              <ShieldCheck className="h-5 w-5 text-white" />
+              <span>Extension Active (v{version || "1.2.0"}) — Test Carts</span>
+            </a>
+          ) : (
+            <a
+              href="https://chromewebstore.google.com/detail/gbmfihnboadlmmjbikajlmocjmlpehij"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-[48px] items-center gap-2.5 rounded-full bg-primary px-7 py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+            >
+              <img
+                src="/icons/icon_48.png"
+                onError={(e) => {
+                  e.currentTarget.src = "/icons/icon_128.png";
+                }}
+                alt=""
+                aria-hidden="true"
+                className="h-5 w-5 object-contain"
+                width={20}
+                height={20}
+              />
+              <span>Add to Chrome — It&apos;s 100% Free</span>
+            </a>
+          )}
 
           <a
             href="#checkout-simulator"

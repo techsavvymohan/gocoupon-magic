@@ -1,8 +1,10 @@
+import { useExtensionBridge } from "@/lib/useExtensionBridge";
 import { MagneticButton } from "../MagneticButton";
 import { ArrowRight, Star, Tag } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 export function CTA() {
+  const { isInstalled, version } = useExtensionBridge();
   return (
     <section id="cta" className="relative px-4 sm:px-6 py-10 sm:py-14 border-t border-border">
       <div className="reveal relative mx-auto max-w-4xl rounded-2xl border border-border bg-card p-6 sm:p-10 text-center shadow-xs">
@@ -19,16 +21,26 @@ export function CTA() {
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           {/* Desktop CTA: Chrome Web Store */}
-          <MagneticButton
-            as="a"
-            href="https://chromewebstore.google.com/detail/gbmfihnboadlmmjbikajlmocjmlpehij"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden md:inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-xs transition-all hover:scale-105 active:scale-95"
-          >
-            <span>Add GoCoupon Free — Start Saving</span>
-            <ArrowRight className="h-4 w-4" />
-          </MagneticButton>
+          {isInstalled ? (
+            <Link
+              to="/offers"
+              className="hidden md:inline-flex items-center gap-2 rounded-full bg-emerald-600 px-7 py-3.5 text-sm font-bold text-white shadow-xs transition-all hover:scale-105 active:scale-95"
+            >
+              <span>Extension Active (v{version || "1.2.0"}) — Browse 1,390+ Deals</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          ) : (
+            <MagneticButton
+              as="a"
+              href="https://chromewebstore.google.com/detail/gbmfihnboadlmmjbikajlmocjmlpehij"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden md:inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-xs transition-all hover:scale-105 active:scale-95"
+            >
+              <span>Add GoCoupon Free — Start Saving</span>
+              <ArrowRight className="h-4 w-4" />
+            </MagneticButton>
+          )}
 
           {/* Mobile CTA: Instant Store Search / Offers */}
           <Link
