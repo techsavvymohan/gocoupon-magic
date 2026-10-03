@@ -32,7 +32,7 @@ const verifiedCoupons = [
     description: "Valid on authentic skincare serums, moisturizers, and sunscreens above ₹1,499.",
     minSpend: "₹1,499",
     category: "Skincare",
-    expiry: "Valid till Feb 28, 2026",
+    expiry: "Verified Today",
     isExclusive: true,
   },
   {

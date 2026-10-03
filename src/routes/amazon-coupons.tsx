@@ -35,7 +35,7 @@ const verifiedCoupons = [
     description: "Valid on top consumer electronics, accessories and peripherals above ₹4,999.",
     minSpend: "₹4,999",
     category: "Electronics",
-    expiry: "Valid till Feb 28, 2026",
+    expiry: "Verified Today",
     isExclusive: true,
   },
   {

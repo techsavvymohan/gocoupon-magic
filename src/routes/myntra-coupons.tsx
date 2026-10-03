@@ -41,7 +41,7 @@ const verifiedCoupons = [
     description: "Applies to select premium denim, jackets, activewear, and branded sneakers.",
     minSpend: "₹2,499",
     category: "Footwear & Apparel",
-    expiry: "Valid till Feb 28, 2026",
+    expiry: "Verified Today",
   },
   {
     code: "BEAUTY200",

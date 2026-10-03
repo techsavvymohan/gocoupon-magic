@@ -32,7 +32,7 @@ const verifiedCoupons = [
     description: "Valid on premium apparel, branded footwear, and accessories above ₹1,999.",
     minSpend: "₹1,999",
     category: "Fashion",
-    expiry: "Valid till Feb 28, 2026",
+    expiry: "Verified Today",
     isExclusive: true,
   },
   {

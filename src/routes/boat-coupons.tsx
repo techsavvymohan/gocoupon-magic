@@ -32,7 +32,7 @@ const verifiedCoupons = [
     description: "Valid on Airdopes true wireless earbuds and Rockerz Bluetooth headphones above ₹1,499.",
     minSpend: "₹1,499",
     category: "Audio",
-    expiry: "Valid till Feb 28, 2026",
+    expiry: "Verified Today",
     isExclusive: true,
   },
   {

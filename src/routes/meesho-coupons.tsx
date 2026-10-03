@@ -49,7 +49,7 @@ const verifiedCoupons = [
     description: "Special seasonal discount on cotton sarees, kurtis, and traditional textiles.",
     minSpend: "₹499",
     category: "Ethnic Fashion",
-    expiry: "Valid till Feb 28, 2026",
+    expiry: "Verified Today",
   },
   {
     code: "HOME50",

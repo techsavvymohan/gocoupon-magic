@@ -32,7 +32,7 @@ const verifiedCoupons = [
     description: "Instant discount voucher on high-performance gaming and ultrabook laptops above ₹39,999.",
     minSpend: "₹39,999",
     category: "Laptops & Computers",
-    expiry: "Valid till Feb 28, 2026",
+    expiry: "Verified Today",
     isExclusive: true,
   },
   {

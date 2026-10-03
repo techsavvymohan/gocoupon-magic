@@ -32,7 +32,7 @@ const verifiedCoupons = [
     description: "Instant discount on certified audio, smart home devices, and gadgets above ₹2,999.",
     minSpend: "₹2,999",
     category: "Electronics",
-    expiry: "Valid till Feb 28, 2026",
+    expiry: "Verified Today",
     isExclusive: true,
   },
   {

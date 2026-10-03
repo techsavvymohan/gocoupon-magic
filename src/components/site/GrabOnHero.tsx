@@ -20,6 +20,27 @@ import { StoreLogo } from "@/components/common/StoreLogo";
 import { useFestiveBanner } from "@/lib/hero-banner";
 
 // Color palettes for hero banner slides to give each brand an authentic, vibrant look
+
+// Algorithmic palette fallback for any partner brand slug not explicitly mapped
+const FALLBACK_PALETTES = [
+  { bg: "from-blue-950 via-indigo-950 to-slate-950", accent: "text-blue-400", badge: "bg-blue-500/20 text-blue-300 border-blue-500/30", text: "text-blue-100" },
+  { bg: "from-purple-950 via-fuchsia-950 to-slate-950", accent: "text-purple-400", badge: "bg-purple-500/20 text-purple-300 border-purple-500/30", text: "text-purple-100" },
+  { bg: "from-teal-950 via-emerald-950 to-cyan-950", accent: "text-teal-400", badge: "bg-teal-500/20 text-teal-300 border-teal-500/30", text: "text-teal-100" },
+  { bg: "from-rose-950 via-pink-950 to-slate-950", accent: "text-rose-400", badge: "bg-rose-500/20 text-rose-300 border-rose-500/30", text: "text-rose-100" },
+  { bg: "from-amber-950 via-orange-950 to-stone-950", accent: "text-amber-400", badge: "bg-amber-500/20 text-amber-300 border-amber-500/30", text: "text-amber-100" },
+];
+
+function getBrandTheme(brandSlug: string) {
+  if (BRAND_THEMES[brandSlug]) return BRAND_THEMES[brandSlug];
+  let hash = 0;
+  for (let i = 0; i < brandSlug.length; i++) {
+    hash = (hash << 5) - hash + brandSlug.charCodeAt(i);
+    hash |= 0;
+  }
+  const idx = Math.abs(hash) % FALLBACK_PALETTES.length;
+  return FALLBACK_PALETTES[idx];
+}
+
 const BRAND_THEMES: Record<string, { bg: string; accent: string; badge: string; text: string }> = {
   medibuddy: {
     bg: "from-emerald-900 via-teal-900 to-cyan-950",
@@ -216,12 +237,7 @@ export function GrabOnHero() {
               <div className="overflow-hidden rounded-2xl shadow-xl bg-slate-950" ref={emblaMainRef}>
                 <div className="flex touch-pan-y">
                   {mainDeals.map((deal, idx) => {
-                    const theme = BRAND_THEMES[deal.brandSlug] || {
-                      bg: "from-slate-900 via-indigo-950 to-slate-950",
-                      accent: "text-primary",
-                      badge: "bg-primary/20 text-primary border-primary/30",
-                      text: "text-slate-200",
-                    };
+                    const theme = getBrandTheme(deal.brandSlug);
 
                     return (
                       <div
