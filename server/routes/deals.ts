@@ -92,7 +92,21 @@ dealsRouter.get("/categories", async (_req: Request, res: Response) => {
 dealsRouter.get("/stores", async (_req: Request, res: Response) => {
   try {
     const livePool = getLiveDealsPool();
-    const stores = getAllStoresFromPool(livePool);
+    const stores = getAllStoresFromPool(livePool).map((s) => {
+      let logo = s.logo;
+      if (!logo || !logo.includes("cloudinary.com")) {
+        const brandLogo = brandAssetsService.getLogoUrl(s.slug || s.name);
+        if (brandLogo && brandLogo.includes("cloudinary.com")) {
+          logo = brandLogo;
+        } else {
+          const resolved = resolveStoreLogo(s.name, undefined, undefined, s.logo);
+          if (resolved && resolved.includes("cloudinary.com")) {
+            logo = resolved;
+          }
+        }
+      }
+      return { ...s, logo };
+    });
     res.setHeader("Cache-Control", "public, max-age=300, s-maxage=600");
     res.json({
       success: true,
@@ -163,7 +177,7 @@ dealsRouter.post("/submit", async (req: Request, res: Response) => {
       id: `cue_user_${submission.id}`,
       storeName: submission.storeName,
       storeSlug: submission.storeName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") + "-coupons",
-      storeLogo: `https://www.google.com/s2/favicons?domain=${submission.storeName.toLowerCase().replace(/[^a-z0-9]/g, "")}.com&sz=128`,
+      storeLogo: resolveStoreLogo(submission.storeName, submission.url) || brandAssetsService.getLogoUrl(submission.storeName) || "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745770/gocoupon/brands/brand_default.png",
       category: (submission.category as any) || "General",
       title: submission.discount ? `${submission.discount} at ${submission.storeName}` : `Verified Offer at ${submission.storeName}`,
       code: submission.code,

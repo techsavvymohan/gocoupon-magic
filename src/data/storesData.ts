@@ -371,7 +371,7 @@ export const STORES_DATA: Store[] = [
     name: "Zomato",
     slug: "zomato-coupons",
     category: "Food",
-    logo: "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057650/gocoupon/brands/brand_zomato.ico",
+    logo: "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060829/gocoupon/brands/real_brand_zomato.svg",
     badge: "Food & Dining",
     rating: 4.7,
     couponsCount: 40,
