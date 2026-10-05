@@ -43,6 +43,7 @@ async function run() {
   console.log('--- TESTING LIVE PRODUCTION ENDPOINTS ---');
   const urls = [
     'https://gocoupon.io/',
+    'https://gocoupon.io/offers',
     'https://gocoupon.io/featured-deals',
     'https://gocoupon.io/amazon-coupons',
     'https://gocoupon.io/flipkart-coupons',
