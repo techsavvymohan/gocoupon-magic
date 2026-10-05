@@ -570,6 +570,7 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
               { name: "Tata CLiQ", path: "/tata-cliq-coupons", tag: "Up to 60% Off" },
               { name: "Nykaa", path: "/nykaa-coupons", tag: "Up to 50% Off" },
               { name: "Meesho", path: "/meesho-coupons", tag: "Flat ₹100 Off" },
+              { name: "Hostinger", path: "/hostinger-coupons", tag: "83% Off + Domain" },
             ].map((store) => (
               <Link
                 key={store.path}

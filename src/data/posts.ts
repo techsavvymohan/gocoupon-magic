@@ -1588,6 +1588,7 @@ export const posts: Post[] = [
         text: "Use code 'GOCOUPON10' or 'PREMIUM10' at checkout to unlock an extra 10% instant discount on 24-month and 48-month hosting plans. Valid on Premium Shared, Business WordPress, and Cloud Startup tiers.",
         variant: "success",
       },
+      { type: "link", items: [{ label: "👉 View All Tested Working Hostinger Coupon Codes & Hosting Deals on GoCoupon", to: "/hostinger-coupons" }] },
       { type: "h2", text: "Hostinger India Hosting Plans Compared: Which Should You Buy?" },
       {
         type: "table",

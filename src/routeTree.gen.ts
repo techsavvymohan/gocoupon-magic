@@ -28,6 +28,7 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as FeaturedDealsRouteImport } from './routes/featured-deals'
 import { Route as FlipkartCouponsRouteImport } from './routes/flipkart-coupons'
 import { Route as HelpRouteImport } from './routes/help'
+import { Route as HostingerCouponsRouteImport } from './routes/hostinger-coupons'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MeeshoCouponsRouteImport } from './routes/meesho-coupons'
@@ -153,6 +154,11 @@ const FlipkartCouponsRoute = FlipkartCouponsRouteImport.update({
 const HelpRoute = HelpRouteImport.update({
   id: '/help',
   path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HostingerCouponsRoute = HostingerCouponsRouteImport.update({
+  id: '/hostinger-coupons',
+  path: '/hostinger-coupons',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HowItWorksRoute = HowItWorksRouteImport.update({
@@ -323,6 +329,7 @@ export interface FileRoutesByFullPath {
   '/featured-deals': typeof FeaturedDealsRoute
   '/flipkart-coupons': typeof FlipkartCouponsRoute
   '/help': typeof HelpRoute
+  '/hostinger-coupons': typeof HostingerCouponsRoute
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/meesho-coupons': typeof MeeshoCouponsRoute
@@ -371,6 +378,7 @@ export interface FileRoutesByTo {
   '/featured-deals': typeof FeaturedDealsRoute
   '/flipkart-coupons': typeof FlipkartCouponsRoute
   '/help': typeof HelpRoute
+  '/hostinger-coupons': typeof HostingerCouponsRoute
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/meesho-coupons': typeof MeeshoCouponsRoute
@@ -420,6 +428,7 @@ export interface FileRoutesById {
   '/featured-deals': typeof FeaturedDealsRoute
   '/flipkart-coupons': typeof FlipkartCouponsRoute
   '/help': typeof HelpRoute
+  '/hostinger-coupons': typeof HostingerCouponsRoute
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/meesho-coupons': typeof MeeshoCouponsRoute
@@ -470,6 +479,7 @@ export interface FileRouteTypes {
     | '/featured-deals'
     | '/flipkart-coupons'
     | '/help'
+    | '/hostinger-coupons'
     | '/how-it-works'
     | '/login'
     | '/meesho-coupons'
@@ -518,6 +528,7 @@ export interface FileRouteTypes {
     | '/featured-deals'
     | '/flipkart-coupons'
     | '/help'
+    | '/hostinger-coupons'
     | '/how-it-works'
     | '/login'
     | '/meesho-coupons'
@@ -566,6 +577,7 @@ export interface FileRouteTypes {
     | '/featured-deals'
     | '/flipkart-coupons'
     | '/help'
+    | '/hostinger-coupons'
     | '/how-it-works'
     | '/login'
     | '/meesho-coupons'
@@ -615,6 +627,7 @@ export interface RootRouteChildren {
   FeaturedDealsRoute: typeof FeaturedDealsRoute
   FlipkartCouponsRoute: typeof FlipkartCouponsRoute
   HelpRoute: typeof HelpRoute
+  HostingerCouponsRoute: typeof HostingerCouponsRoute
   HowItWorksRoute: typeof HowItWorksRoute
   LoginRoute: typeof LoginRoute
   MeeshoCouponsRoute: typeof MeeshoCouponsRoute
@@ -777,6 +790,13 @@ declare module '@tanstack/react-router' {
       path: '/help'
       fullPath: '/help'
       preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hostinger-coupons': {
+      id: '/hostinger-coupons'
+      path: '/hostinger-coupons'
+      fullPath: '/hostinger-coupons'
+      preLoaderRoute: typeof HostingerCouponsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/how-it-works': {
@@ -991,6 +1011,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeaturedDealsRoute: FeaturedDealsRoute,
   FlipkartCouponsRoute: FlipkartCouponsRoute,
   HelpRoute: HelpRoute,
+  HostingerCouponsRoute: HostingerCouponsRoute,
   HowItWorksRoute: HowItWorksRoute,
   LoginRoute: LoginRoute,
   MeeshoCouponsRoute: MeeshoCouponsRoute,
