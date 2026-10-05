@@ -20,7 +20,7 @@ export function BankOfferCard({ bank }: BankOfferCardProps) {
   return (
     <article
       aria-label={`${bank.bankName} offer`}
-      className="rounded-2xl border border-border bg-card p-5 shadow-xs hover:border-primary/40 hover:shadow-md transition-all flex flex-col justify-between"
+      className="w-full min-w-0 overflow-hidden rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-xs hover:border-primary/40 hover:shadow-md transition-all flex flex-col justify-between"
     >
       <div>
         {/* Top: Bank Logo + Name & Type + Discount Badge */}
