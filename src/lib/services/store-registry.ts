@@ -120,6 +120,32 @@ export function getStoreEarnKaroLink(storeIdentifier?: string | null): string | 
   return null;
 }
 
+export function isAffiliateNetworkUrl(url?: string | null): boolean {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  return (
+    lower.includes("linksredirect.com") ||
+    lower.includes("clnk.in") ||
+    lower.includes("tkqlhce.com") ||
+    lower.includes("anrdoezrs.net") ||
+    lower.includes("dpbolvw.net") ||
+    lower.includes("jdoqocy.com") ||
+    lower.includes("kqzyfj.com") ||
+    lower.includes("emjcd.com") ||
+    lower.includes("qksrv.net") ||
+    lower.includes("cj.com") ||
+    lower.includes("admitad.com") ||
+    lower.includes("alitems.com") ||
+    lower.includes("lenmit.com") ||
+    lower.includes("mitgo.com") ||
+    lower.includes("tag=") ||
+    lower.includes("myntr.it") ||
+    lower.includes("fktr.in") ||
+    lower.includes("ajiio.in") ||
+    lower.includes("bitli.in")
+  );
+}
+
 export function buildDealRedirectUrl(options: {
   url: string;
   dealId?: string;
@@ -129,32 +155,17 @@ export function buildDealRedirectUrl(options: {
   code?: string;
   source?: string;
 }): string {
-  // Check if store has an EarnKaro affiliate link configured
-  const earnkaroLink = getStoreEarnKaroLink(options.storeSlug || options.storeName || options.url);
+  let targetUrl = options.url || "";
 
-  // Check if targetUrl is already an active affiliate link from Cuelinks, CJ, Admitad, or Amazon
-  const isAlreadyAffiliate =
-    Boolean(targetUrl) &&
-    (targetUrl.includes("linksredirect.com") ||
-      targetUrl.includes("clnk.in") ||
-      targetUrl.includes("tkqlhce.com") ||
-      targetUrl.includes("anrdoezrs.net") ||
-      targetUrl.includes("dpbolvw.net") ||
-      targetUrl.includes("jdoqocy.com") ||
-      targetUrl.includes("kqzyfj.com") ||
-      targetUrl.includes("emjcd.com") ||
-      targetUrl.includes("qksrv.net") ||
-      targetUrl.includes("admitad.com") ||
-      targetUrl.includes("alitems.com") ||
-      targetUrl.includes("tag=") ||
-      targetUrl.includes("myntr.it") ||
-      targetUrl.includes("fktr.in") ||
-      targetUrl.includes("ajiio.in") ||
-      targetUrl.includes("bitli.in"));
+  // Check if targetUrl is already an active affiliate link from CJ, Admitad, Cuelinks, EarnKaro, or Amazon
+  const isAlreadyAffiliate = isAffiliateNetworkUrl(targetUrl);
 
-  // Only assign EarnKaro fallback if NOT already an active affiliate link
-  if (earnkaroLink && !isAlreadyAffiliate) {
-    targetUrl = earnkaroLink;
+  // Check if store has an EarnKaro affiliate link configured (only fallback if NOT already an active affiliate link)
+  if (!isAlreadyAffiliate) {
+    const earnkaroLink = getStoreEarnKaroLink(options.storeSlug || options.storeName || targetUrl);
+    if (earnkaroLink) {
+      targetUrl = earnkaroLink;
+    }
   }
 
   if (!targetUrl || targetUrl.startsWith("#") || targetUrl.startsWith("javascript:")) {
@@ -188,6 +199,11 @@ export function wrapAffiliateTracking(targetUrl: string, subId = "gocoupon_web")
   // Already an internal redirect
   if (targetUrl.startsWith("/api/redirect/deal") || targetUrl.startsWith("/out")) {
     return targetUrl;
+  }
+
+  // If already an active affiliate link (CJ, Admitad, Cuelinks, EarnKaro, Amazon), preserve verbatim through tracker
+  if (isAffiliateNetworkUrl(targetUrl)) {
+    return `/api/redirect/deal?url=${encodeURIComponent(targetUrl)}&source=${encodeURIComponent(subId)}`;
   }
 
   // Check EarnKaro affiliate link first
