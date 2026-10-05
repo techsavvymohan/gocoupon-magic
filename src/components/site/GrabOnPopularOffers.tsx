@@ -24,6 +24,14 @@ import { buildDealRedirectUrl } from "@/lib/services/store-registry";
 
 // Signature programmatic CSS gradients for top partner brands (Zero graphic banner required)
 const BRAND_CARD_THEMES: Record<string, string> = {
+  ajio: "from-slate-900 via-amber-900 to-yellow-950",
+  nykaa: "from-pink-900 via-rose-900 to-fuchsia-950",
+  boat: "from-red-900 via-stone-900 to-neutral-950",
+  "tata-cliq": "from-rose-950 via-red-900 to-slate-950",
+  firstcry: "from-amber-800 via-orange-700 to-yellow-900",
+  myntra: "from-rose-900 via-pink-800 to-red-950",
+  flipkart: "from-blue-900 via-indigo-900 to-slate-950",
+  amazon: "from-amber-950 via-slate-900 to-stone-950",
   medibuddy: "from-teal-600 via-emerald-600 to-teal-800",
   flixbus: "from-lime-600 via-green-600 to-emerald-800",
   jbl: "from-orange-600 via-amber-600 to-amber-800",
@@ -32,16 +40,14 @@ const BRAND_CARD_THEMES: Record<string, string> = {
   "nasher-miles": "from-sky-600 via-blue-600 to-indigo-800",
   "sarkar-perfumes": "from-violet-600 via-purple-600 to-indigo-800",
   oliveboard: "from-cyan-600 via-blue-600 to-slate-800",
-  "tata-cliq": "from-red-600 via-rose-600 to-red-800",
-  boat: "from-red-600 via-rose-600 to-neutral-800",
 };
 
 // Deterministic fallback gradients for any newly ingested live merchant
 const FALLBACK_GRADIENTS = [
-  "from-teal-600 via-emerald-600 to-teal-800",
-  "from-lime-600 via-green-600 to-emerald-800",
-  "from-orange-600 via-amber-600 to-amber-800",
-  "from-rose-600 via-pink-600 to-purple-800",
+  "from-slate-900 via-amber-900 to-yellow-950",
+  "from-pink-900 via-rose-900 to-fuchsia-950",
+  "from-red-900 via-stone-900 to-neutral-950",
+  "from-rose-950 via-red-900 to-slate-950",
   "from-indigo-600 via-purple-600 to-blue-800",
   "from-sky-600 via-blue-600 to-cyan-800",
   "from-fuchsia-600 via-pink-600 to-rose-800",
@@ -69,20 +75,26 @@ export function GrabOnPopularOffers() {
   const { deals: liveIntlDeals } = useInternationalDeals();
 
   // Compute the 4 mostly-searched popular offers of the day.
-  // Prioritizes the top partner brands from Cuelinks, Admitad & CJ (MediBuddy, FlixBus, JBL, Pure Nutrition).
+  // Prioritizes the top partner brands from Cuelinks, Admitad & CJ (Ajio, Nykaa, boAt, Tata CLiQ).
   // Automatically pulls fresher discount codes / titles whenever live feeds revalidate!
   const popularOffers = useMemo(() => {
     const allLive = [...(liveIndiaDeals || []), ...(liveIntlDeals || [])];
 
     // Priority targets matching top mostly-searched campaigns
-    const prioritySlugs = ["medibuddy", "flixbus", "jbl", "pure-nutrition"];
+    const prioritySlugs = ["ajio", "nykaa", "boat", "tata-cliq"];
 
     return prioritySlugs.map((slug, idx) => {
       // 1. Check if live feed has an updated deal for this partner
       const liveMatch = allLive.find((d) => {
         const dSlug = (d.storeSlug || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+        const dName = (d.storeName || "").toLowerCase().replace(/[^a-z0-9]/g, "");
         const sClean = slug.replace(/[^a-z0-9]/g, "");
-        return dSlug.includes(sClean) || sClean.includes(dSlug);
+        return (
+          dSlug.includes(sClean) ||
+          sClean.includes(dSlug) ||
+          dName.includes(sClean) ||
+          sClean.includes(dName)
+        );
       });
 
       // 2. Base curated deal from FEATURED_DEALS_COLLECTION

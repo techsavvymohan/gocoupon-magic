@@ -18,6 +18,8 @@ import { toast } from "sonner";
 import { FEATURED_DEALS_COLLECTION, type FeaturedDealItem } from "@/data/featured-deals-campaign";
 import { StoreLogo } from "@/components/common/StoreLogo";
 import { useFestiveBanner } from "@/lib/hero-banner";
+import { useDeals } from "@/hooks/use-deals";
+import { useInternationalDeals } from "@/hooks/use-international-deals";
 
 // Color palettes for hero banner slides to give each brand an authentic, vibrant look
 
@@ -42,6 +44,54 @@ function getBrandTheme(brandSlug: string) {
 }
 
 const BRAND_THEMES: Record<string, { bg: string; accent: string; badge: string; text: string }> = {
+  ajio: {
+    bg: "from-slate-950 via-slate-900 to-amber-950",
+    accent: "text-amber-400",
+    badge: "bg-amber-500/20 text-amber-300 border-amber-500/30",
+    text: "text-amber-100",
+  },
+  nykaa: {
+    bg: "from-pink-950 via-rose-950 to-slate-950",
+    accent: "text-pink-400",
+    badge: "bg-pink-500/20 text-pink-300 border-pink-500/30",
+    text: "text-pink-100",
+  },
+  boat: {
+    bg: "from-red-950 via-stone-900 to-neutral-950",
+    accent: "text-red-400",
+    badge: "bg-red-500/20 text-red-300 border-red-500/30",
+    text: "text-red-100",
+  },
+  "tata-cliq": {
+    bg: "from-rose-950 via-red-950 to-stone-950",
+    accent: "text-rose-400",
+    badge: "bg-rose-500/20 text-rose-300 border-rose-500/30",
+    text: "text-rose-100",
+  },
+  firstcry: {
+    bg: "from-amber-950 via-orange-950 to-stone-950",
+    accent: "text-amber-400",
+    badge: "bg-amber-500/20 text-amber-300 border-amber-500/30",
+    text: "text-amber-100",
+  },
+  myntra: {
+    bg: "from-fuchsia-950 via-pink-950 to-rose-950",
+    accent: "text-fuchsia-400",
+    badge: "bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/30",
+    text: "text-fuchsia-100",
+  },
+  flipkart: {
+    bg: "from-blue-950 via-indigo-950 to-slate-950",
+    accent: "text-blue-400",
+    badge: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+    text: "text-blue-100",
+  },
+  amazon: {
+    bg: "from-amber-950 via-slate-900 to-stone-950",
+    accent: "text-amber-400",
+    badge: "bg-amber-500/20 text-amber-300 border-amber-500/30",
+    text: "text-amber-100",
+  },
   medibuddy: {
     bg: "from-emerald-900 via-teal-900 to-cyan-950",
     accent: "text-emerald-400",
@@ -92,23 +142,75 @@ const BRAND_THEMES: Record<string, { bg: string; accent: string; badge: string; 
   },
 };
 
-// Secondary Spotlight Stores for the Right-Side Card
+// Secondary Spotlight Stores for the Right-Side Card (Top High-Converting Brands)
 const SIDE_PICKS = [
   {
     storeName: "Tata CLiQ",
     storeSlug: "tata-cliq",
-    logo: "/Brand logos/Tata-cliq.webp",
-    discount: "FLAT ₹300 OFF",
-    desc: "Wireless earbuds, smartwatches & noise-cancelling headphones",
-    code: "BOAT300",
+    logo: "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057624/gocoupon/brands/brand_tatacliq.webp",
+    discount: "FLAT 15% OFF",
+    desc: "Instant discount on branded fashion and luxury footwear with IDBI cards",
+    code: "IDBITCF",
+    linkUrl: "/store/tata-cliq",
+    bg: "from-rose-950 via-red-950 to-stone-950",
+  },
+  {
+    storeName: "boAt Lifestyle",
+    storeSlug: "boat",
+    logo: "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057632/gocoupon/brands/brand_boat.webp",
+    discount: "UP TO 80% OFF",
+    desc: "Wireless earbuds, smartwatches and noise-cancelling headphones",
+    code: "BOATHEAD",
     linkUrl: "/boat-coupons",
-    bg: "from-red-950 via-neutral-900 to-stone-950",
+    bg: "from-red-950 via-stone-900 to-neutral-950",
+  },
+  {
+    storeName: "Ajio",
+    storeSlug: "ajio",
+    logo: "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057620/gocoupon/brands/brand_ajio.webp",
+    discount: "EXTRA 20% OFF",
+    desc: "Exclusive trendy apparel, streetwear, sneakers and accessories",
+    code: "ONLYEXCLUSIVE20",
+    linkUrl: "/store/ajio",
+    bg: "from-slate-950 via-amber-950 to-neutral-950",
   },
 ];
 
 export function GrabOnHero() {
   const { banner: festiveBanner, isActive: isFestiveBannerActive, styles: festiveStyles } = useFestiveBanner();
-  const mainDeals = useMemo(() => FEATURED_DEALS_COLLECTION.slice(0, 8), []);
+  const { deals: liveIndiaDeals } = useDeals({ limit: 40 });
+  const { deals: liveIntlDeals } = useInternationalDeals();
+
+  // Dynamically auto-update the top 8 mostly-searched deals with live Cuelinks/Admitad/CJ data!
+  const mainDeals = useMemo(() => {
+    const allLive = [...(liveIndiaDeals || []), ...(liveIntlDeals || [])];
+    const baseDeals = FEATURED_DEALS_COLLECTION.slice(0, 8);
+
+    return baseDeals.map((base) => {
+      const cleanSlug = base.brandSlug.replace(/[^a-z0-9]/g, '');
+      const liveMatch = allLive.find((d) => {
+        const dSlug = (d.storeSlug || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        const dName = (d.storeName || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        return (
+          dSlug.includes(cleanSlug) ||
+          cleanSlug.includes(dSlug) ||
+          dName.includes(cleanSlug) ||
+          cleanSlug.includes(dName)
+        );
+      });
+
+      if (!liveMatch) return base;
+
+      return {
+        ...base,
+        couponCode: liveMatch.code || base.couponCode,
+        discountText: liveMatch.discount || base.discountText,
+        subTitle: liveMatch.title || base.subTitle,
+        terms: liveMatch.terms || base.terms,
+        affiliateUrl: liveMatch.link || base.affiliateUrl,
+      };
+    });
+  }, [liveIndiaDeals, liveIntlDeals]);
 
   const [activeMainIndex, setActiveMainIndex] = useState(0);
   const [activeSideIndex, setActiveSideIndex] = useState(0);
