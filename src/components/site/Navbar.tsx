@@ -14,6 +14,7 @@ import { useI18n } from "@/context/I18nContext";
 import { useExtensionBridge } from "@/lib/useExtensionBridge";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { NavbarSearch } from "./NavbarSearch";
+import { RealtimeIndicator } from "@/components/common/RealtimeIndicator";
 import {
   Search,
   Menu,
@@ -31,11 +32,13 @@ import {
   Layers,
   TrendingDown,
   BadgePercent,
+  CreditCard,
 } from "lucide-react";
 
 type NavLink = {
   label: string;
   to?: string;
+  search?: Record<string, unknown>;
   href?: string;
   isExternal?: boolean;
   badge?: string;
@@ -60,6 +63,15 @@ const desktopSubLinks: NavLink[] = [
     badgeColor: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-bold",
     icon: BadgePercent,
     i18nKey: "nav.featuredDeals",
+  },
+  {
+    label: "Bank Cards",
+    to: "/offers",
+    search: { tab: "banks" },
+    badge: "EXTRA 5%",
+    badgeColor: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold",
+    icon: CreditCard,
+    i18nKey: "nav.bankCards",
   },
   {
     label: "Stores",
@@ -246,6 +258,7 @@ export function Navbar() {
                   <li key={l.label}>
                     <Link
                       to={l.to!}
+                      search={l.search as any}
                       className="group relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-all duration-150"
                       activeOptions={{ exact: false }}
                       activeProps={{
@@ -272,7 +285,8 @@ export function Navbar() {
             </ul>
 
             {/* Quick Utility Link on Right of Sub-nav: Price Comparison */}
-            <div className="hidden lg:flex items-center gap-2 pl-4 shrink-0">
+            <div className="hidden lg:flex items-center gap-3 pl-4 shrink-0">
+              <RealtimeIndicator />
               <Link
                 to="/compare"
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors py-1"
@@ -297,6 +311,7 @@ export function Navbar() {
                   <li key={l.label}>
                     <Link
                       to={l.to!}
+                      search={l.search as any}
                       onClick={() => setMobileMenuOpen(false)}
                       className="flex items-center justify-between rounded-xl p-3 min-h-[44px] text-base font-semibold text-foreground hover:bg-muted touch-manipulation"
                     >

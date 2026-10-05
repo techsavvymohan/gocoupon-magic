@@ -7,6 +7,80 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 function searxngDevPlugin() {
   const devMiddleware = async (req: any, res: any, next: any) => {
+    // ── GoCoupon Realtime Server-Sent Events (SSE) Dev Middleware ──
+    if (req.url?.startsWith("/api/realtime/events") || req.url?.startsWith("/api/realtime/stream")) {
+      res.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache, no-transform",
+        "Connection": "keep-alive",
+        "Access-Control-Allow-Origin": "*",
+        "X-Accel-Buffering": "no",
+      });
+
+      const welcome = {
+        type: "ping",
+        payload: { status: "connected", message: "GoCoupon Realtime Vite Dev Bus Active" },
+        timestamp: new Date().toISOString(),
+      };
+      res.write(`data: ${JSON.stringify(welcome)}\n\n`);
+
+      if (!(globalThis as any).__realtimeClients) {
+        (globalThis as any).__realtimeClients = new Set();
+        setInterval(() => {
+          const pingMsg = `data: ${JSON.stringify({ type: "ping", timestamp: new Date().toISOString() })}\n\n`;
+          for (const client of (globalThis as any).__realtimeClients) {
+            try { client.write(pingMsg); } catch { (globalThis as any).__realtimeClients.delete(client); }
+          }
+        }, 15000);
+      }
+
+      (globalThis as any).__realtimeClients.add(res);
+
+      req.on("close", () => {
+        (globalThis as any).__realtimeClients?.delete(res);
+      });
+      return;
+    }
+
+    if (req.url?.startsWith("/api/realtime/status")) {
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.end(JSON.stringify({
+        status: "online",
+        clients: (globalThis as any).__realtimeClients?.size || 0,
+        timestamp: new Date().toISOString(),
+      }));
+      return;
+    }
+
+    // ── Dedicated /api/deals/click dev handler ──
+    if (req.url?.startsWith("/api/deals/click") && req.method === "POST") {
+      const bodyChunks: any[] = [];
+      req.on("data", (chunk: any) => bodyChunks.push(chunk));
+      req.on("end", async () => {
+        try {
+          const raw = Buffer.concat(bodyChunks).toString("utf-8");
+          const body = raw ? JSON.parse(raw) : {};
+          if ((globalThis as any).__realtimeClients) {
+            const clickEvt = `data: ${JSON.stringify({ type: "deal:clicked", payload: body, timestamp: new Date().toISOString() })}\n\n`;
+            for (const client of (globalThis as any).__realtimeClients) {
+              try { client.write(clickEvt); } catch {}
+            }
+          }
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.setHeader("Access-Control-Allow-Origin", "*");
+          res.end(JSON.stringify({ success: true, ...body }));
+        } catch {
+          res.statusCode = 200;
+          res.end(JSON.stringify({ success: true }));
+        }
+      });
+      return;
+    }
+
+    
     if (req.url?.startsWith("/api/shopping")) {
       try {
         const urlObj = new URL(req.url, "http://localhost:8080");
@@ -270,6 +344,15 @@ function searxngDevPlugin() {
                   }
                   let allDeals: any[] = Array.isArray(snapshotData.deals) ? snapshotData.deals : [];
 
+                  const __broadcastViteChange = (type: string, data: any) => {
+                    if ((globalThis as any).__realtimeClients) {
+                      const msg = `data: ${JSON.stringify({ type, payload: data, timestamp: new Date().toISOString() })}\n\n`;
+                      for (const client of (globalThis as any).__realtimeClients) {
+                        try { client.write(msg); } catch {}
+                      }
+                    }
+                  };
+
                   const persistSnapshot = () => {
                     snapshotData.deals = allDeals;
                     snapshotData.activeCount = allDeals.length;
@@ -380,6 +463,7 @@ function searxngDevPlugin() {
                     allDeals.unshift(newDeal);
                     persistSnapshot();
                     autoSyncStore(newDeal);
+                    __broadcastViteChange("deal:created", newDeal);
                     res.statusCode = 201;
                     res.setHeader("Content-Type", "application/json");
                     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -417,6 +501,7 @@ function searxngDevPlugin() {
                     }
                     persistSnapshot();
                     const updatedDeal = allDeals[idx >= 0 ? idx : 0];
+                    __broadcastViteChange("deal:updated", updatedDeal);
                     autoSyncStore(updatedDeal);
                     res.statusCode = 200;
                     res.setHeader("Content-Type", "application/json");
@@ -429,6 +514,7 @@ function searxngDevPlugin() {
                     const id = (urlObj.searchParams.get("id") as string) || req.url.split("/").pop()?.split("?")[0];
                     allDeals = allDeals.filter((d) => String(d.id) !== String(id));
                     persistSnapshot();
+                    __broadcastViteChange("deal:deleted", { id });
                     res.statusCode = 200;
                     res.setHeader("Content-Type", "application/json");
                     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -514,8 +600,10 @@ function searxngDevPlugin() {
                 (d: any) =>
                   (d.title || "").toLowerCase().includes(q) ||
                   (d.storeName || "").toLowerCase().includes(q) ||
+                  (d.storeSlug || "").toLowerCase().includes(q) ||
                   (d.code || "").toLowerCase().includes(q) ||
-                  (d.discount || "").toLowerCase().includes(q)
+                  (d.discount || "").toLowerCase().includes(q) ||
+                  (d.terms || "").toLowerCase().includes(q)
               );
             }
 
@@ -555,6 +643,78 @@ function searxngDevPlugin() {
             return;
           } catch (err: any) {
             console.warn("[Vite Deals Dev] Route error:", err?.message);
+          }
+        }
+
+        // ── Dedicated International Deals API Dev/Preview Handler ──
+        if (req.url?.startsWith("/api/international-deals")) {
+          try {
+            const urlObj = new URL(req.url, "http://localhost:8080");
+            const category = (urlObj.searchParams.get("category") || "").toLowerCase().trim();
+            const q = (urlObj.searchParams.get("q") || "").toLowerCase().trim();
+            const store = (urlObj.searchParams.get("store") || "").toLowerCase().trim();
+            const sortBy = urlObj.searchParams.get("sortBy") || "trending";
+
+            const { FALLBACK_INTERNATIONAL_DEALS } = await import("./src/lib/api/international-deals-api");
+            let intlDeals = [...FALLBACK_INTERNATIONAL_DEALS];
+
+            const fs = await import("node:fs");
+            const path = await import("node:path");
+            const dataPath = path.resolve(process.cwd(), "src/data/live-deals.json");
+            if (fs.existsSync(dataPath)) {
+              try {
+                const snapshot = JSON.parse(fs.readFileSync(dataPath, "utf-8"));
+                if (Array.isArray(snapshot.deals)) {
+                  for (const d of snapshot.deals) {
+                    if (d.id && String(d.id).includes("admitad") && !intlDeals.some((id) => id.id === d.id)) {
+                      intlDeals.push(d);
+                    }
+                  }
+                }
+              } catch {}
+            }
+
+            if (category && category !== "all") {
+              intlDeals = intlDeals.filter((d) => (d.category || "").toLowerCase() === category);
+            }
+            if (store && store !== "all") {
+              intlDeals = intlDeals.filter((d) =>
+                (d.storeName || "").toLowerCase().includes(store) ||
+                (d.storeSlug || "").toLowerCase().includes(store)
+              );
+            }
+            if (q) {
+              intlDeals = intlDeals.filter((d) => {
+                const hay = `${d.title || ""} ${d.storeName || ""} ${d.storeSlug || ""} ${d.code || ""} ${d.terms || ""}`.toLowerCase();
+                return hay.includes(q);
+              });
+            }
+
+            if (sortBy === "discount") {
+              intlDeals.sort((a, b) => {
+                const da = parseInt((a.discount || "").replace(/[^0-9]/g, ""), 10) || 0;
+                const db = parseInt((b.discount || "").replace(/[^0-9]/g, ""), 10) || 0;
+                return db - da;
+              });
+            } else {
+              intlDeals.sort((a, b) => (b.usesCount || 0) - (a.usesCount || 0));
+            }
+
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.setHeader("Access-Control-Allow-Origin", "*");
+            res.end(JSON.stringify({
+              deals: intlDeals,
+              total: intlDeals.length,
+              count: intlDeals.length,
+              isDynamic: true,
+              provider: "Admitad Global API v3",
+              lastSyncedAt: new Date().toISOString(),
+              cached: false,
+            }));
+            return;
+          } catch (err: any) {
+            console.warn("[Vite Intl Deals Dev] Route error:", err?.message);
           }
         }
 

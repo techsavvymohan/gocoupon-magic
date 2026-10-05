@@ -10,10 +10,25 @@ export const Route = createLazyFileRoute("/$storeSlug")({
 
 function DynamicStoreCouponsPage() {
   const { storeSlug } = Route.useParams();
-  const store = getStoreBySlug(storeSlug);
+  const store =
+    getStoreBySlug(storeSlug) ||
+    getStoreBySlug(`${storeSlug}-coupons`) ||
+    getStoreBySlug(storeSlug.replace(/-coupons$/, ""));
 
-  // If path doesn't look like a store coupons hub, render standard 404
-  if (!store && !storeSlug.endsWith("-coupons")) {
+  const rawName = store
+    ? store.name
+    : storeSlug
+        .replace(/-coupons$/, "")
+        .split("-")
+        .map((w: any) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+
+  const storeName = rawName || "Online Store";
+  const category = store?.category || "Online Shopping";
+  const { deals: liveDeals, isLoading: isDealsLoading } = useDeals({ store: storeName, limit: 25 });
+
+  // Only render 404 if store is completely unknown AND has no deals AND does not look like a coupons hub
+  if (!store && !storeSlug.endsWith("-coupons") && (!liveDeals || liveDeals.length === 0) && !isDealsLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="max-w-md text-center">
@@ -41,18 +56,6 @@ function DynamicStoreCouponsPage() {
     );
   }
 
-  const rawName = store
-    ? store.name
-    : storeSlug
-      .replace(/-coupons$/, "")
-      .split("-")
-      .map((w: any) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(" ");
-
-  const storeName = rawName || "Online Store";
-  const category = store?.category || "Online Shopping";
-  const { deals: liveDeals } = useDeals({ store: storeName, limit: 20 });
-
   const faqs = [
     {
       q: `How do I find 100% verified working ${storeName} coupon codes?`,
@@ -77,7 +80,7 @@ function DynamicStoreCouponsPage() {
     ? liveDeals.map((d, idx) => ({
         code: d.code || "ACTIVATEOFFER",
         discount: d.discount || (d.code ? "Verified Code" : "Instant Deal"),
-        description: d.description || d.title,
+        description: (d as any).description || d.title,
         minSpend: "No minimum spend",
         category: category,
         expiry: "Active Today",
@@ -206,7 +209,9 @@ function DynamicStoreCouponsPage() {
         primaryCtaLabel="Install Extension Free"
         primaryCtaTo="/extension"
         storeName={storeName}
+        category={category}
         storeLogo={store?.logo}
+        storeUrl={(store as any)?.storeUrl || (store as any)?.link}
         eeatProof={{
           verifiedCount: `${store?.deals?.length || 10} Verified Offers`,
           successRate: "96.4%",

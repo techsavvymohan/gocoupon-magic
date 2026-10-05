@@ -7,6 +7,7 @@ import { CurrencyProvider } from "@/context/CurrencyContext";
 import { UserCardsProvider } from "@/context/UserCardsContext";
 import { I18nProvider } from "@/context/I18nContext";
 import { LoadingProvider } from "@/context/LoadingContext";
+import { RealtimeProvider } from "@/context/RealtimeContext";
 import { GlobalLoadingBar } from "@/components/common/GlobalLoadingBar";
 import { initWebVitalsRum } from "@/lib/analytics/web-vitals-rum";
 
@@ -20,8 +21,10 @@ function RootComponent() {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 1000 * 60 * 5,
-            refetchOnWindowFocus: false,
+            staleTime: 1000 * 10, // 10 seconds staleTime for ultra-fresh data
+            refetchOnWindowFocus: true, // Auto-update immediately when returning to tab
+            refetchOnReconnect: true, // Auto-update immediately on network restore
+            retry: 1,
           },
         },
       }),
@@ -29,7 +32,8 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LoadingProvider>
+      <RealtimeProvider>
+        <LoadingProvider>
         <I18nProvider>
           <CurrencyProvider>
             <UserCardsProvider>
@@ -41,6 +45,7 @@ function RootComponent() {
           </CurrencyProvider>
         </I18nProvider>
       </LoadingProvider>
+      </RealtimeProvider>
     </QueryClientProvider>
   );
 }

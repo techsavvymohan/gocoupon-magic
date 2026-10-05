@@ -9,6 +9,7 @@ import { wrapAffiliateTracking, buildDealRedirectUrl } from "@/lib/services/stor
 import { DealGridSkeleton } from "@/components/ui/DataSkeleton";
 import { StoreLogo } from "@/components/common/StoreLogo";
 import { RedeemCouponButton } from "@/components/common/RedeemCouponButton";
+import { RealtimeIndicator } from "@/components/common/RealtimeIndicator";
 import { SubmitCouponButton } from "@/components/submit_coupon";
 import {
   DealCard,
@@ -21,6 +22,8 @@ import {
   type PopularBrand,
   type BankOffer,
 } from "@/components/offers";
+import { SUPPORTED_BANK_CARDS } from "@/lib/services/bank-offers";
+import { BankLogoIcon } from "@/components/icons/BankLogos";
 import {
   Flame,
   Tag,
@@ -199,11 +202,18 @@ const BANK_OFFERS_DATA: BankOffer[] = [
 ];
 
 function OffersHubPage() {
-  const routeSearch = Route.useSearch() as { q?: string } | undefined;
+  const routeSearch = Route.useSearch() as { q?: string; tab?: string } | undefined;
   const initialQ = routeSearch?.q || "";
+  const initialTab: SidebarTab =
+    routeSearch?.tab &&
+    ["categories", "brands", "stores", "banks", "product-deals"].includes(routeSearch.tab)
+      ? (routeSearch.tab as SidebarTab)
+      : initialQ
+        ? "brands"
+        : "categories";
 
   // Navigation & Filtering State
-  const [activeSidebarTab, setActiveSidebarTab] = useState<SidebarTab>("categories");
+  const [activeSidebarTab, setActiveSidebarTab] = useState<SidebarTab>(initialTab);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [marketRegion, setMarketRegion] = useState<"all" | "in" | "intl">("all");
   const [sortBy, setSortBy] = useState<DealSortField>("trending");
@@ -211,10 +221,26 @@ function OffersHubPage() {
   const [selectedAlphabet, setSelectedAlphabet] = useState<string>("All");
   const [selectedBrandFilter, setSelectedBrandFilter] = useState<string | null>(null);
 
+  // Sync tab when URL search param changes (e.g. from navbar or external links)
+  useEffect(() => {
+    if (
+      routeSearch?.tab &&
+      ["categories", "brands", "stores", "banks", "product-deals"].includes(routeSearch.tab)
+    ) {
+      setActiveSidebarTab(routeSearch.tab as SidebarTab);
+    }
+  }, [routeSearch?.tab]);
+
   // Sync searchQuery when URL search param changes
   useEffect(() => {
     if (routeSearch?.q !== undefined) {
       setSearchQuery(routeSearch.q);
+      if (routeSearch.q.trim()) {
+        setActiveSidebarTab("brands");
+        setSelectedCategory("all");
+        setSelectedAlphabet("All");
+        setSelectedBrandFilter(null);
+      }
     }
   }, [routeSearch?.q]);
 
@@ -225,6 +251,13 @@ function OffersHubPage() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [currentNow, setCurrentNow] = useState(Date.now());
+
+  // 10-second live expiration ticker: immediately expires deals in real time
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentNow(Date.now()), 10000);
+    return () => clearInterval(timer);
+  }, []);
   const [visibleCount, setVisibleCount] = useState(36);
   const [expandedDealIds, setExpandedDealIds] = useState<Set<string>>(new Set());
 
@@ -283,10 +316,13 @@ function OffersHubPage() {
 
   // Active pool based on selected market region
   const allDeals = useMemo(() => {
+    if (searchQuery.trim()) {
+      return [...intlDeals, ...indianDeals];
+    }
     if (marketRegion === "in") return indianDeals;
     if (marketRegion === "intl") return intlDeals;
     return [...intlDeals, ...indianDeals];
-  }, [marketRegion, indianDeals, intlDeals]);
+  }, [marketRegion, indianDeals, intlDeals, searchQuery]);
 
   // Real dynamic categories computed directly from allDeals (live database pool)
   const allRealCategories = useMemo(() => {
@@ -416,7 +452,7 @@ function OffersHubPage() {
 
   // Filter deals dynamically based on all user filters
   const filteredOffers = useMemo(() => {
-    const now = Date.now();
+    const now = currentNow;
     return allDeals.filter((deal) => {
       // 1. Drop expired deals (strict end-of-day accuracy)
       if (deal.expiresIn === "Expired") return false;
@@ -466,19 +502,27 @@ function OffersHubPage() {
       // 7. Filter by Search Query
       const q = searchQuery.toLowerCase().trim();
       if (q) {
+        const title = (deal.title || "").toLowerCase();
+        const storeName = (deal.storeName || "").toLowerCase();
+        const storeSlug = (deal.storeSlug || "").toLowerCase();
+        const code = (deal.code || "").toLowerCase();
+        const discount = (deal.discount || "").toLowerCase();
+        const category = (deal.category || "").toLowerCase();
+        const terms = (deal.terms || "").toLowerCase();
         const matchesSearch =
-          deal.title.toLowerCase().includes(q) ||
-          deal.storeName.toLowerCase().includes(q) ||
-          deal.code.toLowerCase().includes(q) ||
-          deal.discount.toLowerCase().includes(q) ||
-          deal.category.toLowerCase().includes(q) ||
-          (deal.terms && deal.terms.toLowerCase().includes(q));
+          title.includes(q) ||
+          storeName.includes(q) ||
+          storeSlug.includes(q) ||
+          code.includes(q) ||
+          discount.includes(q) ||
+          category.includes(q) ||
+          terms.includes(q);
         if (!matchesSearch) return false;
       }
 
       return true;
     });
-  }, [allDeals, selectedBrandFilter, selectedAlphabet, selectedCategory, activeSidebarTab, searchQuery]);
+  }, [allDeals, selectedBrandFilter, selectedAlphabet, selectedCategory, activeSidebarTab, searchQuery, currentNow]);
 
   // Reset pagination when filter criteria change
   useEffect(() => {
@@ -748,6 +792,9 @@ function OffersHubPage() {
                 <div className="text-[11px] text-muted-foreground font-medium">Total Coupons &amp; Offers</div>
               </div>
 
+              {/* Realtime Live Sync Status */}
+              <RealtimeIndicator />
+
               {/* Sync Button */}
               <button
                 type="button"
@@ -899,24 +946,110 @@ function OffersHubPage() {
             {/* VIEW A: BANK OFFERS TAB                                           */}
             {/* ───────────────────────────────────────────────────────────────── */}
             {activeSidebarTab === "banks" && (
-              <div className="space-y-6 animate-in fade-in-50 duration-200">
-                <div className="rounded-2xl border border-border/80 bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-purple-500/10 p-6">
+              <div className="space-y-8 animate-in fade-in-50 duration-200">
+                {/* Header Banner */}
+                <div className="rounded-3xl border border-border/80 bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-purple-500/10 p-6 sm:p-8">
                   <div className="flex items-center gap-2 text-primary font-bold text-sm">
                     <Landmark className="h-5 w-5" />
-                    <span>Bank Discount Arbitrage</span>
+                    <span>Bank Discount &amp; Cashback Arbitrage</span>
                   </div>
-                  <h2 className="text-xl font-extrabold text-foreground mt-1">
-                    Instant Bank Card Offers &amp; Stacking Discounts
+                  <h2 className="text-2xl sm:text-3xl font-black text-foreground mt-1.5">
+                    Double Your Savings: Top Bank Cards &amp; Stacking Codes
                   </h2>
-                  <p className="text-xs text-muted-foreground mt-1 max-w-2xl">
-                    Save an additional 5% to 15% off by pairing these exclusive bank partner codes with existing merchant discounts at checkout.
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-2 max-w-3xl leading-relaxed">
+                    Pair these top-tier co-branded credit cards with verified brand coupon codes at checkout to unlock an extra 5% to 10% flat cashback, zero forex markup, and free memberships.
                   </p>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {BANK_OFFERS_DATA.map((bank) => (
-                    <BankOfferCard key={bank.code} bank={bank} />
-                  ))}
+                {/* 1. FEATURED HIGH-CASHBACK CARDS (INSTANT APPROVAL & WELCOME BOUNTIES) */}
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <h3 className="font-display text-lg font-bold text-foreground">
+                        Recommended Cashback &amp; Travel Credit Cards
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        Apply in 2 minutes &bull; 100% Digital KYC &bull; Stacks directly on merchant coupons
+                      </p>
+                    </div>
+                    <span className="self-start sm:self-auto text-[11px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full font-bold">
+                      ⚡ Instant 2-Min Approval
+                    </span>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {SUPPORTED_BANK_CARDS.map((card) => (
+                      <div
+                        key={card.id}
+                        className="rounded-2xl border border-border/80 bg-card p-5 shadow-xs hover:border-primary/40 hover:shadow-md transition-all flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="h-12 w-12 rounded-xl bg-white dark:bg-card border border-border/80 p-1.5 shrink-0 flex items-center justify-center shadow-xs">
+                                <BankLogoIcon cardId={card.id} className="h-8 w-8 object-contain" />
+                              </div>
+                              <div className="min-w-0">
+                                <h4 className="font-display font-bold text-sm text-foreground truncate">
+                                  {card.cardName}
+                                </h4>
+                                <div className="text-xs text-muted-foreground mt-0.5 font-medium truncate">
+                                  {card.bankName} &bull; {card.annualFee}
+                                </div>
+                              </div>
+                            </div>
+                            <span className="rounded-full bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 shrink-0 font-mono">
+                              {card.welcomeBonus.split("+")[0].trim()}
+                            </span>
+                          </div>
+
+                          <div className="mt-3.5 pt-3 border-t border-border/60">
+                            <ul className="space-y-1.5 text-xs text-muted-foreground">
+                              {card.keyPerks.slice(0, 2).map((perk, i) => (
+                                <li key={i} className="flex items-center gap-1.5">
+                                  <Check className="h-3 w-3 text-emerald-500 shrink-0 stroke-[3]" />
+                                  <span className="line-clamp-1">{perk}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between gap-2">
+                          <span className="text-[11px] text-muted-foreground font-mono">
+                            Zero CIBIL Impact
+                          </span>
+                          <a
+                            href={card.affiliateApplyUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-1.5 text-xs font-bold text-primary-foreground shadow-xs hover:bg-primary/90 transition-all cursor-pointer"
+                          >
+                            <span>Apply in 2 Mins</span>
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. BANK PROMO CODES FOR EXISTING CARDHOLDERS */}
+                <div className="pt-6 border-t border-border/70 space-y-4">
+                  <div>
+                    <h3 className="font-display text-lg font-bold text-foreground">
+                      Active Bank Partner Coupon Codes
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      Already hold these cards? Copy and apply these discount codes at checkout for instant savings.
+                    </p>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {BANK_OFFERS_DATA.map((bank) => (
+                      <BankOfferCard key={bank.code} bank={bank} />
+                    ))}
+                  </div>
                 </div>
               </div>
             )}

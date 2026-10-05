@@ -50,6 +50,7 @@ export function useDeals(options: FetchDealsOptions = {}): UseDealsResult {
     queryKey: [
       "deals",
       options.category ?? "all",
+      options.store ?? "",
       options.q ?? "",
       options.badge ?? "",
       options.sortBy ?? "trending",
@@ -58,9 +59,10 @@ export function useDeals(options: FetchDealsOptions = {}): UseDealsResult {
       options.offset ?? 0,
     ],
     queryFn: () => fetchDeals(options),
-    staleTime: 60 * 1000,
-    refetchInterval: 60 * 1000,
+    staleTime: 5 * 1000,
+    refetchInterval: 15 * 1000, // 15s automatic realtime refresh
     refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     gcTime: 15 * 60 * 1000,
     retry: 1,
     placeholderData: {

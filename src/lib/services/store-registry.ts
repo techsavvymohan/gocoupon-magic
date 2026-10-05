@@ -1,3 +1,4 @@
+import UNIFIED_STORES from "@/data/unified-stores.json";
 /**
  * @file store-registry.ts
  * @description Central Store Registry & Direct Search URL Generator with Cuelinks Affiliate Tracking.
@@ -51,6 +52,74 @@ const CUELINKS_PUB_ID =
  * Builds a smart, trackable redirect URL with deal metadata.
  * Routes through /api/redirect/deal with 100% 503-failover protection.
  */
+/**
+ * Verified Direct EarnKaro Affiliate Partnership Links.
+ * Routes traffic to monetized merchant landing pages for maximum conversion.
+ */
+export const EARNKARO_STORE_LINKS: Record<string, string> = {
+  myntra: "https://myntr.it/t6fMvnP",
+  flipkart: "https://fktr.in/xL95eGk",
+  ajio: "https://ajiio.in/5gIGQ46",
+  "dot-and-key": "https://bitli.in/Q8p6Tb5",
+  dotandkey: "https://bitli.in/Q8p6Tb5",
+  "dot-key": "https://bitli.in/Q8p6Tb5",
+  mcaffeine: "https://bitli.in/30c3jZD",
+  "m-caffeine": "https://bitli.in/30c3jZD",
+  shopsy: "https://bitli.in/X8hNAWk",
+  themancompany: "https://bitli.in/Aiq8ef4",
+  "the-man-company": "https://bitli.in/Aiq8ef4",
+  plum: "https://clnk.in/CWoK",
+  plumgoodness: "https://clnk.in/CWoK",
+  "plum-goodness": "https://clnk.in/CWoK",
+  coursera: "https://linksredirect.com/?pub_id=148920&subid=gocoupon_coursera&url=https%3A%2F%2Fwww.coursera.org%2F",
+  robinhood: "https://linksredirect.com/?pub_id=148920&subid=gocoupon_robinhood&url=https%3A%2F%2Frobinhood.com%2Fus%2Fen%2F",
+};
+
+/**
+ * Returns the EarnKaro affiliate tracking URL for a merchant if configured.
+ * Matches by name, slug, domain, or raw URL.
+ */
+export function getStoreEarnKaroLink(storeIdentifier?: string | null): string | null {
+  if (!storeIdentifier) return null;
+  const raw = storeIdentifier.toLowerCase().trim();
+
+  // If already an EarnKaro shortlink, return as-is
+  if (
+    raw.includes("myntr.it") ||
+    raw.includes("fktr.in") ||
+    raw.includes("ajiio.in") ||
+    raw.includes("bitli.in")
+  ) {
+    return storeIdentifier;
+  }
+
+  const clean = raw
+    .replace(/-coupons$/, "")
+    .replace(/^https?:\/\/(www\.)?/, "")
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .trim();
+
+  if (EARNKARO_STORE_LINKS[clean]) {
+    return EARNKARO_STORE_LINKS[clean];
+  }
+
+  if (clean.includes("myntra") || clean.includes("myntr")) return EARNKARO_STORE_LINKS.myntra;
+  if (clean.includes("flipkart") || clean.includes("fktr")) return EARNKARO_STORE_LINKS.flipkart;
+  if (clean.includes("ajio") || clean.includes("ajiio")) return EARNKARO_STORE_LINKS.ajio;
+  if (clean.includes("dot") && clean.includes("key")) return EARNKARO_STORE_LINKS["dot-and-key"];
+  if (clean.includes("mcaffeine") || clean.includes("caffeine")) return EARNKARO_STORE_LINKS.mcaffeine;
+  if (clean.includes("shopsy")) return EARNKARO_STORE_LINKS.shopsy;
+  if (clean.includes("themancompany") || (clean.includes("man") && clean.includes("company"))) {
+    return EARNKARO_STORE_LINKS.themancompany;
+  }
+  if (clean.includes("plum")) return EARNKARO_STORE_LINKS.plum;
+  if (clean.includes("coursera")) return EARNKARO_STORE_LINKS.coursera;
+  if (clean.includes("robinhood")) return EARNKARO_STORE_LINKS.robinhood;
+
+  return null;
+}
+
 export function buildDealRedirectUrl(options: {
   url: string;
   dealId?: string;
@@ -60,17 +129,33 @@ export function buildDealRedirectUrl(options: {
   code?: string;
   source?: string;
 }): string {
-  if (!options.url || options.url.startsWith("#") || options.url.startsWith("javascript:")) {
+  // Check if store has an EarnKaro affiliate link configured
+  const earnkaroLink = getStoreEarnKaroLink(options.storeSlug || options.storeName || options.url);
+
+  let targetUrl = options.url;
+  // If targetUrl is empty, placeholder, or clean merchant link, route through EarnKaro affiliate link
+  if (earnkaroLink) {
+    if (
+      !targetUrl ||
+      targetUrl === "#" ||
+      targetUrl.startsWith("javascript:") ||
+      !targetUrl.includes("linksredirect.com")
+    ) {
+      targetUrl = earnkaroLink;
+    }
+  }
+
+  if (!targetUrl || targetUrl.startsWith("#") || targetUrl.startsWith("javascript:")) {
     return "#";
   }
 
   // If already routed through our redirect
-  if (options.url.startsWith("/api/redirect/deal") || options.url.startsWith("/out")) {
-    return options.url;
+  if (targetUrl.startsWith("/api/redirect/deal") || targetUrl.startsWith("/out")) {
+    return targetUrl;
   }
 
   const params = new URLSearchParams();
-  params.set("url", options.url);
+  params.set("url", targetUrl);
   if (options.dealId) params.set("dealId", options.dealId);
   if (options.storeName) params.set("store", options.storeName);
   if (options.storeSlug) params.set("slug", options.storeSlug);
@@ -91,6 +176,12 @@ export function wrapAffiliateTracking(targetUrl: string, subId = "gocoupon_web")
   // Already an internal redirect
   if (targetUrl.startsWith("/api/redirect/deal") || targetUrl.startsWith("/out")) {
     return targetUrl;
+  }
+
+  // Check EarnKaro affiliate link first
+  const earnkaroLink = getStoreEarnKaroLink(targetUrl);
+  if (earnkaroLink) {
+    return `/api/redirect/deal?url=${encodeURIComponent(earnkaroLink)}&source=${encodeURIComponent(subId)}`;
   }
 
   let finalUrl = targetUrl;
@@ -118,6 +209,10 @@ export function wrapAffiliateTracking(targetUrl: string, subId = "gocoupon_web")
  * Generates the 1-click Instant Open URL for any store.
  */
 export function buildStoreAffiliateUrl(store: RegisteredStore, subId = "gocoupon_instant_search"): string {
+  const earnkaroLink = getStoreEarnKaroLink(store.id || store.name || store.storeUrl);
+  if (earnkaroLink) {
+    return earnkaroLink;
+  }
   if (store.id === "amazon_in") {
     return `https://www.amazon.in/?tag=${AMAZON_IN_PARTNER_TAG}`;
   }
@@ -130,6 +225,187 @@ export function buildStoreAffiliateUrl(store: RegisteredStore, subId = "gocoupon
 }
 
 export const REGISTERED_STORES: RegisteredStore[] = [
+  {
+    id: "plum-goodness",
+    name: "Plum Goodness",
+    category: "beauty",
+    region: "IN",
+    tier: 1,
+    logo: "https://www.google.com/s2/favicons?domain=plumgoodness.com&sz=128",
+    domain: "plumgoodness.com",
+    storeUrl: "https://clnk.in/CWoK",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["plum", "plum goodness", "plumgoodness", "plum beauty", "plum skincare"],
+    internalRoute: "/plum-goodness-coupons",
+    defaultCoupon: { code: "PLUMSAVE20", description: "Flat 20% off on Green Tea skincare & vegan beauty", discountPct: 0.2 },
+    cashbackRate: "Up to 15.0%",
+    cashbackPct: 0.15,
+    buildSearchUrl: () => "https://clnk.in/CWoK",
+  },
+  {
+    id: "coursera",
+    name: "Coursera",
+    category: "education",
+    region: "GLOBAL",
+    tier: 1,
+    logo: "https://www.google.com/s2/favicons?domain=coursera.org&sz=128",
+    domain: "coursera.org",
+    storeUrl: "https://linksredirect.com/?pub_id=148920&subid=gocoupon_coursera&url=https%3A%2F%2Fwww.coursera.org%2F",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["coursera", "coursera.org", "coursera plus", "online courses"],
+    internalRoute: "/coursera-coupons",
+    defaultCoupon: { code: "LEARN40", description: "Save 40% on Coursera Plus Annual Subscription", discountPct: 0.4 },
+    cashbackRate: "7.12%",
+    cashbackPct: 0.0712,
+    buildSearchUrl: () => "https://linksredirect.com/?pub_id=148920&subid=gocoupon_coursera&url=https%3A%2F%2Fwww.coursera.org%2F",
+  },
+  {
+    id: "robinhood",
+    name: "Robinhood",
+    category: "general",
+    region: "US",
+    tier: 1,
+    logo: "https://www.google.com/s2/favicons?domain=robinhood.com&sz=128",
+    domain: "robinhood.com",
+    storeUrl: "https://linksredirect.com/?pub_id=148920&subid=gocoupon_robinhood&url=https%3A%2F%2Frobinhood.com%2Fus%2Fen%2F",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["robinhood", "robinhood.com", "robinhood investing", "robinhood gold"],
+    internalRoute: "/stores",
+    defaultCoupon: { code: "FREEINVEST", description: "Up to $200 in free fractional stock on account funding", discountAmount: 200 },
+    cashbackRate: "₹4,881 per account",
+    cashbackPct: 0.08,
+    buildSearchUrl: () => "https://linksredirect.com/?pub_id=148920&subid=gocoupon_robinhood&url=https%3A%2F%2Frobinhood.com%2Fus%2Fen%2F",
+  },
+  // ─── Direct EarnKaro Verified Affiliate Merchants (Tier 1 Priority) ────
+  {
+    id: "flipkart",
+    name: "Flipkart",
+    category: "general",
+    region: "IN",
+    tier: 1,
+    logo: "/Brand logos/Flipkart.webp",
+    domain: "flipkart.com",
+    storeUrl: "https://fktr.in/xL95eGk",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["flipkart", "flipkart.com", "fk", "fktr", "flipkart plus"],
+    internalRoute: "/flipkart-coupons",
+    defaultCoupon: { code: "FKFEST2026", description: "Flat ₹500 off on orders above ₹2,999 on Electronics & Fashion", discountAmount: 500 },
+    cashbackRate: "Up to 9.0%",
+    cashbackPct: 0.09,
+    buildSearchUrl: () => "https://fktr.in/xL95eGk",
+  },
+  {
+    id: "myntra",
+    name: "Myntra",
+    category: "fashion",
+    region: "IN",
+    tier: 1,
+    logo: "/Brand logos/Myntra.webp",
+    domain: "myntra.com",
+    storeUrl: "https://myntr.it/t6fMvnP",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["myntra", "myntra.com", "myntra fashion", "myntr", "myntra insider"],
+    internalRoute: "/myntra-coupons",
+    defaultCoupon: { code: "MYNTRA200", description: "Extra ₹200 off on first purchase above ₹999", discountAmount: 200 },
+    cashbackRate: "Up to 8.5%",
+    cashbackPct: 0.085,
+    buildSearchUrl: () => "https://myntr.it/t6fMvnP",
+  },
+  {
+    id: "ajio",
+    name: "Ajio",
+    category: "fashion",
+    region: "IN",
+    tier: 1,
+    logo: "/Brand logos/Ajio.webp",
+    domain: "ajio.com",
+    storeUrl: "https://ajiio.in/5gIGQ46",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["ajio", "ajio.com", "ajio luxe", "reliance ajio", "ajiio"],
+    internalRoute: "/ajio-coupons",
+    defaultCoupon: { code: "AJIOMANIA", description: "Extra 30% off on fashion & footwear above ₹1,990", discountPct: 0.3 },
+    cashbackRate: "Up to 9.5%",
+    cashbackPct: 0.095,
+    buildSearchUrl: () => "https://ajiio.in/5gIGQ46",
+  },
+  {
+    id: "dot-and-key",
+    name: "Dot & Key",
+    category: "beauty",
+    region: "IN",
+    tier: 1,
+    logo: "https://www.google.com/s2/favicons?domain=dotandkey.com&sz=128",
+    domain: "dotandkey.com",
+    storeUrl: "https://bitli.in/Q8p6Tb5",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["dot and key", "dot & key", "dotandkey", "dotkey", "dot and key skincare"],
+    internalRoute: "/dot-and-key-coupons",
+    defaultCoupon: { code: "GLOW20", description: "Flat 20% off on sunscreens, serums & skincare", discountPct: 0.2 },
+    cashbackRate: "Up to 12.0%",
+    cashbackPct: 0.12,
+    buildSearchUrl: () => "https://bitli.in/Q8p6Tb5",
+  },
+  {
+    id: "mcaffeine",
+    name: "mCaffeine",
+    category: "beauty",
+    region: "IN",
+    tier: 1,
+    logo: "https://www.google.com/s2/favicons?domain=mcaffeine.com&sz=128",
+    domain: "mcaffeine.com",
+    storeUrl: "https://bitli.in/30c3jZD",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["mcaffeine", "m caffeine", "m-caffeine", "mcaffeine body scrub"],
+    internalRoute: "/mcaffeine-coupons",
+    defaultCoupon: { code: "CAFFEINE15", description: "Flat 15% off on coffee body scrubs & face care", discountPct: 0.15 },
+    cashbackRate: "Up to 15.0%",
+    cashbackPct: 0.15,
+    buildSearchUrl: () => "https://bitli.in/30c3jZD",
+  },
+  {
+    id: "shopsy",
+    name: "Shopsy",
+    category: "general",
+    region: "IN",
+    tier: 1,
+    logo: "https://www.google.com/s2/favicons?domain=shopsy.in&sz=128",
+    domain: "shopsy.in",
+    storeUrl: "https://bitli.in/X8hNAWk",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["shopsy", "shopsy by flipkart", "shopsy app", "shopsy online"],
+    internalRoute: "/shopsy-coupons",
+    defaultCoupon: { code: "SHOPSYNEW", description: "Budget deals starting at ₹25 + extra 10% off", discountPct: 0.1 },
+    cashbackRate: "Up to 8.0%",
+    cashbackPct: 0.08,
+    buildSearchUrl: () => "https://bitli.in/X8hNAWk",
+  },
+  {
+    id: "the-man-company",
+    name: "The Man Company",
+    category: "beauty",
+    region: "IN",
+    tier: 1,
+    logo: "https://www.google.com/s2/favicons?domain=themancompany.com&sz=128",
+    domain: "themancompany.com",
+    storeUrl: "https://bitli.in/Aiq8ef4",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["the man company", "themancompany", "man company", "tmc grooming"],
+    internalRoute: "/the-man-company-coupons",
+    defaultCoupon: { code: "GENTLEMAN20", description: "Flat 20% off on beard oils & men's grooming kits", discountPct: 0.2 },
+    cashbackRate: "Up to 14.0%",
+    cashbackPct: 0.14,
+    buildSearchUrl: () => "https://bitli.in/Aiq8ef4",
+  },
   // ─── Instant Open: Top Priority Cuelinks Merchants (Pre-Approved / Instant Track) ────
   {
     id: "tatacliq",
@@ -694,17 +970,17 @@ export const REGISTERED_STORES: RegisteredStore[] = [
   {
     id: "hostinger",
     name: "Hostinger",
-    category: "education",
+    category: "general",
     region: "GLOBAL",
     tier: 2,
-    logo: "https://www.google.com/s2/favicons?domain=hostinger.com&sz=128",
+    logo: "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060832/gocoupon/brands/real_brand_hostinger.svg",
     domain: "hostinger.in",
     storeUrl: "https://www.hostinger.in",
     isInstantOpen: false,
     status: "available",
     aliases: ["hostinger", "web hosting", "hosting", "domains"],
-    internalRoute: "/stores",
-    defaultCoupon: { code: "HOST2026", description: "Up to 75% off on Web Hosting + Free Domain", discountPct: 0.2 },
+    internalRoute: "/hostinger-coupons",
+    defaultCoupon: { code: "GLOBALHOST10", description: "Up to 75% OFF + Extra 10% Coupon + Free Domain", discountPct: 0.1 },
     cashbackRate: "Up to 25%",
     cashbackPct: 0.2,
     buildSearchUrl: (q) => wrapAffiliateTracking(`https://www.hostinger.in`),
@@ -857,6 +1133,58 @@ export function findMatchingStores(query: string, limit = 3): RegisteredStore[] 
       if (store.tier === 1) matchScore += 30;
 
       scored.push({ store, score: matchScore });
+    }
+  }
+
+  // 7. Search in UNIFIED_STORES for any partner merchants not in REGISTERED_STORES
+  const seenIds = new Set(scored.map((s) => s.store.id.toLowerCase()));
+  for (const u of UNIFIED_STORES) {
+    const baseSlug = u.slug.replace(/-coupons$/, "").toLowerCase();
+    if (seenIds.has(baseSlug)) continue;
+
+    const sName = u.name.toLowerCase();
+    const sSlug = baseSlug;
+    const sCat = (u.category || "").toLowerCase();
+
+    let matchScore = 0;
+    if (sName === q || sSlug === cleanQ) {
+      matchScore += 950;
+    } else if (sName.startsWith(q) || sSlug.startsWith(cleanQ)) {
+      matchScore += 480;
+    } else if (sName.includes(q) || sSlug.includes(cleanQ)) {
+      matchScore += 240;
+    } else if (sCat === q || sCat.includes(q)) {
+      matchScore += 90;
+    }
+
+    if (matchScore > 0) {
+      matchScore += Math.min(u.couponsCount || 1, 20);
+      scored.push({
+        score: matchScore,
+        store: {
+          id: baseSlug,
+          name: u.name,
+          category: (u.category?.toLowerCase() as any) || "general",
+          region: "GLOBAL",
+          tier: 2,
+          logo: u.logo || `https://www.google.com/s2/favicons?domain=${baseSlug}.com&sz=128`,
+          domain: `${baseSlug}.com`,
+          storeUrl: `https://${baseSlug}.com`,
+          isInstantOpen: true,
+          status: "available",
+          cashbackRate: u.cashbackRate || "Available",
+          cashbackPct: 0.05,
+          defaultCoupon: u.deals?.[0]?.code
+            ? {
+                code: u.deals[0].code,
+                description: u.deals[0].title || `Save at ${u.name}`,
+              }
+            : undefined,
+          buildSearchUrl: (searchQ: string) =>
+            `https://${baseSlug}.com/search?q=${encodeURIComponent(searchQ)}`,
+        },
+      });
+      seenIds.add(baseSlug);
     }
   }
 

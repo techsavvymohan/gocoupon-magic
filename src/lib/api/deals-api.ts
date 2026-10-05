@@ -76,6 +76,7 @@ export type DealSortField = "discount" | "trending" | "verified" | "expiry" | "s
 export interface FetchDealsOptions {
   category?: string;
   q?: string;
+  store?: string;
   badge?: DealBadge;
   sortBy?: DealSortField;
   order?: "asc" | "desc";
@@ -87,18 +88,26 @@ async function getStaticDeals(options: FetchDealsOptions = {}): Promise<DealsApi
   const { loadDealsData } = await import("@/data/dealsData");
   let filtered = await loadDealsData();
 
+  if (options.store && options.store !== "all") {
+    const sLower = options.store.toLowerCase().replace(/[^a-z0-9]/g, "");
+    filtered = filtered.filter((d) => {
+      const dStore = (d.storeName || d.storeSlug || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+      return dStore.includes(sLower) || sLower.includes(dStore);
+    });
+  }
+
   if (options.category && options.category !== "all") {
     const catLower = options.category.toLowerCase();
     filtered = filtered.filter((d) => {
-      const dCat = d.category.toLowerCase();
+      const dCat = (d.category || "").toLowerCase();
       if (options.category === "electronics") {
-        return dCat === "electronics" || d.title.toLowerCase().includes("laptop") || d.title.toLowerCase().includes("audio");
+        return dCat === "electronics" || (d.title || "").toLowerCase().includes("laptop") || (d.title || "").toLowerCase().includes("audio");
       }
       if (options.category === "audio") {
-        return dCat === "electronics" && (d.title.toLowerCase().includes("audio") || d.title.toLowerCase().includes("airdope") || d.title.toLowerCase().includes("sonic"));
+        return dCat === "electronics" && ((d.title || "").toLowerCase().includes("audio") || (d.title || "").toLowerCase().includes("airdope") || (d.title || "").toLowerCase().includes("sonic"));
       }
       if (options.category === "laptops") {
-        return dCat === "electronics" && (d.title.toLowerCase().includes("laptop") || d.title.toLowerCase().includes("thinkpad") || d.title.toLowerCase().includes("xps") || d.title.toLowerCase().includes("yoga"));
+        return dCat === "electronics" && ((d.title || "").toLowerCase().includes("laptop") || (d.title || "").toLowerCase().includes("thinkpad") || (d.title || "").toLowerCase().includes("xps") || (d.title || "").toLowerCase().includes("yoga"));
       }
       return dCat === catLower;
     });
@@ -108,9 +117,12 @@ async function getStaticDeals(options: FetchDealsOptions = {}): Promise<DealsApi
     const qLower = options.q.toLowerCase().trim();
     filtered = filtered.filter(
       (d) =>
-        d.title.toLowerCase().includes(qLower) ||
-        d.storeName.toLowerCase().includes(qLower) ||
-        d.code.toLowerCase().includes(qLower)
+        (d.title || "").toLowerCase().includes(qLower) ||
+        (d.storeName || "").toLowerCase().includes(qLower) ||
+        (d.storeSlug || "").toLowerCase().includes(qLower) ||
+        (d.code || "").toLowerCase().includes(qLower) ||
+        (d.discount || "").toLowerCase().includes(qLower) ||
+        (d.terms || "").toLowerCase().includes(qLower)
     );
   }
 
@@ -172,6 +184,7 @@ export async function fetchDeals(options: FetchDealsOptions = {}): Promise<Deals
   if (options.category && options.category !== "all") {
     params.set("category", options.category);
   }
+  if (options.store && options.store !== "all") params.set("store", options.store);
   if (options.q) params.set("q", options.q);
   if (options.badge) params.set("badge", options.badge);
   if (options.sortBy) params.set("sortBy", options.sortBy);

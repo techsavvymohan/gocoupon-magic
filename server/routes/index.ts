@@ -21,6 +21,7 @@ import { extensionRouter } from "./extension-config.js";
 import { contactRouter } from "./contact.js";
 import { cuelinksRouter } from "./cuelinks.js";
 import { internationalDealsRouter } from "./international-deals.js";
+import { realtimeRouter, broadcastRealtimeEvent } from "./realtime.js";
 import {
   adminRouter,
   handleGetSettings,
@@ -143,6 +144,7 @@ apiRouter.use("/price-history", priceHistoryRouter);
 apiRouter.use("/v1/intelligence", intelligenceRouter);
 apiRouter.use("/intelligence", intelligenceRouter);
 apiRouter.use("/rum", rumRouter);
+apiRouter.use("/realtime", realtimeRouter);
 apiRouter.use("/redirect", redirectRouter);
 apiRouter.use(redirectRouter);
 

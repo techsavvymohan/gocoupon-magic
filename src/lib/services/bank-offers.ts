@@ -34,6 +34,7 @@ export interface BankOfferRule {
   maxDiscountInr: number;
   isEmiOnly?: boolean;
   description: string;
+  validUntil?: string; // ISO date e.g. "2026-12-31" - automated expiry
 }
 
 export interface BankCardSavingsResult {
@@ -65,6 +66,49 @@ function buildCardAffiliateUrl(rawBankUrl: string, bankId: string): string {
  */
 export const SUPPORTED_BANK_CARDS: BankCardDefinition[] = [
   {
+    id: "scapia",
+    bankName: "Federal Bank / Scapia",
+    cardName: "Federal Bank Scapia Travel Credit Card",
+    shortName: "Scapia",
+    logo: "/icons/scapia.svg",
+    badgeColor: "bg-emerald-700 text-white",
+    annualFee: "Lifetime FREE (₹0 Joining & Annual Fee)",
+    cpaBountyInr: 1200,
+    welcomeBonus: "Instant 0% Forex Markup + 5,000 Scapia Coins",
+    officialApplyUrl: "https://apply.scapia.cards/landing_page",
+    affiliateApplyUrl: buildCardAffiliateUrl(
+      "https://apply.scapia.cards/landing_page",
+      "scapia"
+    ),
+    keyPerks: [
+      "Zero Forex Markup (0%) on all international spends worldwide",
+      "Unlimited Domestic Airport Lounge Access across India (on ₹5,000 monthly spend)",
+      "Up to 20% Scapia Coins on flight & hotel bookings (MakeMyTrip, Booking.com)",
+      "Lifetime FREE - Zero annual or joining fees forever",
+    ],
+    defaultCashbackPct: 0.05,
+    rules: [
+      {
+        storeIdPattern: ["booking", "makemytrip", "agoda", "klook", "easemytrip", "cleartrip", "ixigo"],
+        categoryPattern: ["travel", "flight", "hotel"],
+        minSpendInr: 2000,
+        discountType: "percent",
+        discountValue: 10,
+        maxDiscountInr: 2500,
+        description: "10% Scapia Travel Coins on flights, hotels & international stays",
+      },
+      {
+        storeIdPattern: ["amazon", "flipkart", "myntra"],
+        minSpendInr: 500,
+        discountType: "percent",
+        discountValue: 5,
+        maxDiscountInr: 3000,
+        description: "5% Scapia Coins reward on all online shopping purchases",
+      },
+    ],
+  },
+
+  {
     id: "hdfc",
     bankName: "HDFC Bank",
     cardName: "HDFC Bank Millennia / Regalia Gold",
@@ -72,12 +116,12 @@ export const SUPPORTED_BANK_CARDS: BankCardDefinition[] = [
     logo: "/icons/hdfc.svg",
     badgeColor: "bg-blue-600 text-white",
     annualFee: "₹1,000 (Waived on ₹1L spend)",
-    cpaBountyInr: 2200,
-    welcomeBonus: "Flat ₹1,000 Amazon Gift Voucher on 1st transaction",
-    officialApplyUrl: "https://www.hdfcbank.com/personal/pay/cards/credit-cards",
+    cpaBountyInr: 1829,
+    welcomeBonus: "3-Month Free Swiggy One Membership + ₹1,000 Welcome Voucher",
+    officialApplyUrl: "https://applyonline.hdfc.bank.in/cards/credit-cards.html",
     affiliateApplyUrl: buildCardAffiliateUrl(
-      "https://www.hdfcbank.com/personal/pay/cards/credit-cards",
-      "hdfc"
+      "https://applyonline.hdfc.bank.in/cards/credit-cards.html",
+      "hdfc_swiggy"
     ),
     keyPerks: [
       "5% Cashback on Amazon, Flipkart, Myntra, Swiggy & Zomato",
@@ -123,12 +167,12 @@ export const SUPPORTED_BANK_CARDS: BankCardDefinition[] = [
     logo: "/icons/sbi.svg",
     badgeColor: "bg-sky-600 text-white",
     annualFee: "₹999 (Waived on ₹2L spend)",
-    cpaBountyInr: 2000,
-    welcomeBonus: "Flat ₹500 Cashback on card activation",
-    officialApplyUrl: "https://www.sbicard.com/en/personal/credit-cards/rewards/cashback-sbi-card.page",
+    cpaBountyInr: 1890,
+    welcomeBonus: "Flat ₹500 Cashback on card dispatch & activation",
+    officialApplyUrl: "https://www.sbicard.com/sprint/cashback",
     affiliateApplyUrl: buildCardAffiliateUrl(
-      "https://www.sbicard.com/en/personal/credit-cards/rewards/cashback-sbi-card.page",
-      "sbi"
+      "https://www.sbicard.com/sprint/cashback",
+      "sbi_cashback"
     ),
     keyPerks: [
       "Flat 5% Unlimited Cashback on ALL online shopping merchants without restrictions",
@@ -207,11 +251,11 @@ export const SUPPORTED_BANK_CARDS: BankCardDefinition[] = [
     logo: "/icons/axis.svg",
     badgeColor: "bg-rose-700 text-white",
     annualFee: "₹500 (Waived on ₹3.5L spend)",
-    cpaBountyInr: 2100,
-    welcomeBonus: "₹500 Flipkart voucher + ₹600 extra cashback",
-    officialApplyUrl: "https://www.axisbank.com/retail/cards/credit-card",
+    cpaBountyInr: 1890,
+    welcomeBonus: "₹500 Flipkart voucher + up to ₹2,362 joining reward value",
+    officialApplyUrl: "https://web.axis.bank.in/DigitalChannel/WebForm/",
     affiliateApplyUrl: buildCardAffiliateUrl(
-      "https://www.axisbank.com/retail/cards/credit-card",
+      "https://web.axis.bank.in/DigitalChannel/WebForm/",
       "axis"
     ),
     keyPerks: [
@@ -348,6 +392,14 @@ export function calculateBankCardSavings(
 
   // 1. Check for specific matching instant discount rules
   for (const rule of card.rules) {
+    // Automated expiration check: if promo passed validUntil timestamp, skip automatically
+    if (rule.validUntil) {
+      const expTime = new Date(rule.validUntil).getTime();
+      if (!isNaN(expTime) && expTime < Date.now()) {
+        continue;
+      }
+    }
+
     const storeMatches = rule.storeIdPattern.some((p) => normStore.includes(p));
     if (!storeMatches) continue;
 
@@ -437,4 +489,42 @@ export function getNetPriceWithCard(
   bankCardDiscount = 0
 ): number {
   return Math.max(99, basePrice - couponSavings - platformCashback - bankCardDiscount);
+}
+
+/**
+ * Ingests live bank offers dynamically from deal feeds or API partners.
+ * Automatically assigns expiry timestamps so deals purge without manual intervention.
+ */
+export function registerLiveBankOffers(
+  offers: Array<{
+    bankNameOrId: string;
+    storePattern: string[];
+    minSpend?: number;
+    discountType: "percent" | "flat";
+    discountValue: number;
+    maxDiscount?: number;
+    description: string;
+    validUntil?: string;
+  }>
+): void {
+  for (const off of offers) {
+    const normBank = off.bankNameOrId.toLowerCase();
+    const card = SUPPORTED_BANK_CARDS.find(
+      (c) => c.id.toLowerCase() === normBank || c.bankName.toLowerCase().includes(normBank)
+    );
+    if (!card) continue;
+
+    const exists = card.rules.some((r) => r.description === off.description);
+    if (!exists) {
+      card.rules.push({
+        storeIdPattern: off.storePattern,
+        minSpendInr: off.minSpend || 0,
+        discountType: off.discountType,
+        discountValue: off.discountValue,
+        maxDiscountInr: off.maxDiscount || (off.discountType === "flat" ? off.discountValue : 5000),
+        description: off.description,
+        validUntil: off.validUntil,
+      });
+    }
+  }
 }

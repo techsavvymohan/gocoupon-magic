@@ -145,7 +145,7 @@ export const MERCHANT_SCORES: MerchantScore[] = [
     highlights: ["Zero commission supplier codes", "Free delivery verified", "New user bonus active"],
   },
   {
-    storeId: "tatacliq",
+    storeId: "tata-cliq",
     name: "Tata CLiQ",
     domain: "tatacliq.com",
     category: "Fashion & Luxury",

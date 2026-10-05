@@ -34,7 +34,10 @@ export function useInternationalDeals(
       options.sortBy ?? "trending",
     ],
     queryFn: () => fetchInternationalDeals(options),
-    staleTime: 60 * 1000,
+    staleTime: 5 * 1000,
+    refetchInterval: 15 * 1000, // 15s automatic realtime refresh
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     gcTime: 15 * 60 * 1000,
     retry: 1,
   });

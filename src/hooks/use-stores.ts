@@ -47,7 +47,10 @@ export function useStores(options: FetchStoresOptions = {}): UseStoresResult {
       options.offset ?? 0,
     ],
     queryFn: () => fetchStores(options),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 10 * 1000,
+    refetchInterval: 20 * 1000, // 20s automatic realtime refresh
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     gcTime: 30 * 60 * 1000,
     retry: 1,
     placeholderData: {

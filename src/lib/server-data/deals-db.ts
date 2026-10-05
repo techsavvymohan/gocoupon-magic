@@ -454,13 +454,15 @@ export function queryDeals(
 
   // Filter by search query
   if (options.q) {
-    const q = options.q.toLowerCase();
+    const q = options.q.toLowerCase().trim();
     results = results.filter(
       (d) =>
-        d.title.toLowerCase().includes(q) ||
-        d.storeName.toLowerCase().includes(q) ||
-        d.code.toLowerCase().includes(q) ||
-        d.discount.toLowerCase().includes(q)
+        (d.title || "").toLowerCase().includes(q) ||
+        (d.storeName || "").toLowerCase().includes(q) ||
+        (d.storeSlug || "").toLowerCase().includes(q) ||
+        (d.code || "").toLowerCase().includes(q) ||
+        (d.discount || "").toLowerCase().includes(q) ||
+        (d.terms || "").toLowerCase().includes(q)
     );
   }
 

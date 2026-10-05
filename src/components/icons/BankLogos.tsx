@@ -353,6 +353,17 @@ export function IndusIndLogo({ className = "h-4 w-4" }: BankLogoProps) {
   );
 }
 
+export function ScapiaLogo({ className = "h-4 w-4" }: BankLogoProps) {
+  return (
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} aria-label="Federal Scapia Travel Card">
+      <rect width="100" height="100" rx="18" fill="#047857" />
+      <path d="M 28 65 C 28 42 45 28 68 28 C 76 28 82 30 86 33 L 78 44 C 75 42 71 40 66 40 C 52 40 42 50 42 65 C 42 80 52 90 66 90 C 72 90 76 88 80 85 L 86 96 C 81 99 74 102 65 102 C 43 102 28 86 28 65 Z" fill="#FFFFFF" />
+      <circle cx="72" cy="65" r="10" fill="#34D399" />
+      <rect x="0.5" y="0.5" width="99" height="99" rx="17.5" stroke="#FFFFFF" strokeOpacity="0.2" strokeWidth="1" fill="none" />
+    </svg>
+  );
+}
+
 export function AllCardsLogo({ className = "h-4 w-4" }: BankLogoProps) {
   return (
     <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} aria-label="All Cards">
@@ -392,6 +403,9 @@ export function BankLogoIcon({ cardId, className = "h-4 w-4 shrink-0" }: { cardI
       return <KotakLogo className={className} />;
     case "indusind":
       return <IndusIndLogo className={className} />;
+    case "scapia":
+    case "federal":
+      return <ScapiaLogo className={className} />;
     default:
       return <AllCardsLogo className={className} />;
   }

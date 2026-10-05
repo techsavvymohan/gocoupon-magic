@@ -1,9 +1,15 @@
 import { StoreLogo } from "@/components/common/StoreLogo";
+import { getStoreEarnKaroLink, wrapAffiliateTracking } from "@/lib/services/store-registry";
+import { toast } from "sonner";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import {
   CheckCircle2,
+  ExternalLink,
+  Flame,
+  Sparkles,
+  Store,
   Copy,
   Check,
   ShieldCheck,
@@ -18,6 +24,8 @@ import {
   Headphones,
 } from "lucide-react";
 
+import { StoreCardCrossSellBanner } from "@/components/shopping/StoreCardCrossSellBanner";
+
 export type VerifiedCoupon = {
   code: string;
   discount: string;
@@ -26,6 +34,7 @@ export type VerifiedCoupon = {
   category?: string;
   expiry?: string;
   isExclusive?: boolean;
+  dealLink?: string;
 };
 
 export type SavingHack = {
@@ -66,6 +75,8 @@ export type SeoLandingPageProps = {
   children?: React.ReactNode;
   storeName?: string;
   storeLogo?: string;
+  storeUrl?: string;
+  category?: string;
   eeatProof?: EeatProof;
   verifiedCoupons?: VerifiedCoupon[];
   savingHacks?: SavingHack[];
@@ -86,6 +97,8 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
     children,
     storeName,
     storeLogo,
+    storeUrl,
+    category,
     eeatProof,
     verifiedCoupons,
     savingHacks,
@@ -93,14 +106,29 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
     relatedStores,
   } = props;
 
-  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+    const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
-  const handleCopy = (code: string) => {
+  const storeAffiliateUrl = (() => {
+    const directEarnkaro = getStoreEarnKaroLink(storeName || (breadcrumb && breadcrumb[breadcrumb.length - 1]?.path) || "");
+    if (directEarnkaro) return directEarnkaro;
+    if (storeUrl) return wrapAffiliateTracking(storeUrl, "gocoupon_store_hero");
+    const slugCandidate = (storeName || "store").toLowerCase().replace(/[^\w]/g, "");
+    return wrapAffiliateTracking(`https://${slugCandidate}.com`, "gocoupon_store_hero");
+  })();
+
+  const handleCopyCode = (code: string, targetAffiliateUrl?: string) => {
     navigator.clipboard.writeText(code).catch(() => {});
     setCopiedCode(code);
+    toast.success(`Coupon code "${code}" copied!`, {
+      description: "Opening store in a new tab with verified tracking to auto-apply.",
+    });
+    const dest = targetAffiliateUrl || storeAffiliateUrl;
+    if (dest && dest !== "#") {
+      window.open(dest, "_blank", "noopener,noreferrer");
+    }
     setTimeout(() => {
       setCopiedCode((current) => (current === code ? null : current));
-    }, 2200);
+    }, 2500);
   };
 
   return (
@@ -274,24 +302,32 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {verifiedCoupons.map((coupon, idx) => {
-                const isCopied = copiedCode === coupon.code;
+                const cleanCode = (coupon.code || "").trim();
+                const isPlaceholder = ["ACTIVATEOFFER", "DEALACTIVATED", "NO_CODE_DEAL", "ACTIVATE DEAL", "CASHBACKACTIVE"].includes(cleanCode.toUpperCase());
+                const hasRealCode = Boolean(cleanCode && !isPlaceholder && cleanCode.length > 1);
+                const isCopied = copiedCode === cleanCode;
+
+                const couponAffiliateUrl = coupon.dealLink
+                  ? (getStoreEarnKaroLink(coupon.dealLink) || getStoreEarnKaroLink(storeName) || wrapAffiliateTracking(coupon.dealLink, "gocoupon_store_deal"))
+                  : storeAffiliateUrl;
+
                 return (
                   <div
-                    key={`${coupon.code}-${idx}`}
-                    className="relative flex flex-col justify-between rounded-xl border border-border bg-card p-5 transition-all hover:border-sky-500/40 hover:shadow-lg hover:shadow-sky-500/5"
+                    key={`${cleanCode || "deal"}-${idx}`}
+                    className="relative flex flex-col justify-between rounded-2xl border border-border bg-card p-5 transition-all hover:border-sky-500/40 hover:shadow-lg hover:shadow-sky-500/5"
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-3">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-400 border border-emerald-500/20">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                           <CheckCircle2 className="h-3 w-3" /> Verified
                         </span>
                         {coupon.isExclusive && (
-                          <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-400 border border-amber-500/20">
+                          <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-500 border border-amber-500/20">
                             Exclusive
                           </span>
                         )}
                         {coupon.expiry && (
-                          <span className="text-[11px] text-muted-foreground">
+                          <span className="text-[11px] text-muted-foreground font-mono">
                             {coupon.expiry}
                           </span>
                         )}
@@ -306,31 +342,53 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
                     </div>
 
                     <div className="pt-3 border-t border-border/60">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-1.5 font-mono text-xs font-semibold bg-background px-3 py-1.5 rounded-lg border border-dashed border-border text-foreground">
-                          <Tag className="h-3 w-3 text-sky-400" />
-                          <span>{coupon.code}</span>
+                      {hasRealCode ? (
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5 font-mono text-xs font-semibold bg-background px-3 py-1.5 rounded-lg border border-dashed border-border text-foreground">
+                            <Tag className="h-3 w-3 text-sky-400" />
+                            <span>{cleanCode}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyCode(cleanCode, couponAffiliateUrl)}
+                            className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                              isCopied
+                                ? "bg-emerald-600 text-white shadow-xs"
+                                : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-2xs"
+                            }`}
+                            title="Copy code and open store"
+                          >
+                            {isCopied ? (
+                              <>
+                                <Check className="h-3.5 w-3.5" /> Copied!
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="h-3.5 w-3.5" /> Copy Code
+                              </>
+                            )}
+                          </button>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => handleCopy(coupon.code)}
-                          className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-                            isCopied
-                              ? "bg-emerald-600 text-white font-semibold"
-                              : "bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground"
-                          }`}
-                        >
-                          {isCopied ? (
-                            <>
-                              <Check className="h-3.5 w-3.5" /> Copied!
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="h-3.5 w-3.5" /> Copy Code
-                            </>
-                          )}
-                        </button>
-                      </div>
+                      ) : (
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                            <Sparkles className="h-3 w-3 shrink-0" />
+                            <span>No Code Needed</span>
+                          </div>
+                          <a
+                            href={couponAffiliateUrl}
+                            target="_blank"
+                            rel="noopener noreferrer nofollow"
+                            className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-bold bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white shadow-xs transition-all cursor-pointer"
+                            title={`Activate ${coupon.discount} at ${storeName || "store"}`}
+                          >
+                            <Flame className="h-3.5 w-3.5 fill-white shrink-0" />
+                            <span>ACTIVATE DEAL</span>
+                            <ExternalLink className="h-3 w-3 opacity-80" />
+                          </a>
+                        </div>
+                      )}
+
                       {coupon.minSpend && (
                         <div className="mt-2 text-[10px] text-muted-foreground">
                           Requirement: {coupon.minSpend}
@@ -344,6 +402,13 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
           </div>
         </section>
       )}
+
+      {/* 3.5. STORE-SPECIFIC BANK CARD ARBITRAGE (DOUBLE MONETIZATION) */}
+      <section className="border-b border-border px-4 sm:px-6 py-10 bg-muted/15">
+        <div className="mx-auto max-w-7xl">
+          <StoreCardCrossSellBanner storeName={storeName} category={category} />
+        </div>
+      </section>
 
       {/* 4. WHY SHOPPERS USE GOCOUPON */}
       <section className="border-b border-border px-6 py-16">

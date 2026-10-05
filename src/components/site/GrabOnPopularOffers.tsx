@@ -7,40 +7,126 @@
  * - Shimmer Light Sweep on hover across card banner
  * - Store Logo 3D Zoom & Tilt: scale(1.15) with smooth rotation
  * - Copy Button Click Animation: Checkmark bounce & ripple feedback
- * - 100% Real GoCoupon Data from FEATURED_DEALS_COLLECTION
+ * - 100% Programmatic Card Design: ZERO graphic banner image required!
+ *   Automatically generates vibrant CSS gradients, circular brand avatars, and badges.
+ * - Auto-Updates from live Cuelinks, Admitad & CJ deal syncs with fallback to curated high-priority partners.
  */
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { Tag, Copy, Check, ArrowRight, ShieldCheck, Flame, ExternalLink, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { FEATURED_DEALS_COLLECTION, type FeaturedDealItem } from "@/data/featured-deals-campaign";
 import { StoreLogo } from "@/components/common/StoreLogo";
+import { useDeals } from "@/hooks/use-deals";
+import { useInternationalDeals } from "@/hooks/use-international-deals";
+import { buildDealRedirectUrl } from "@/lib/services/store-registry";
 
-// Curated top 4 offers for the homepage grid
-const OFFERS_DATA: (FeaturedDealItem & { cardTheme: string })[] = [
-  {
-    ...FEATURED_DEALS_COLLECTION[0], // MediBuddy
-    cardTheme: "from-teal-600 via-emerald-600 to-teal-800",
-  },
-  {
-    ...FEATURED_DEALS_COLLECTION[1], // FlixBus
-    cardTheme: "from-lime-600 via-green-600 to-emerald-800",
-  },
-  {
-    ...FEATURED_DEALS_COLLECTION[2], // JBL
-    cardTheme: "from-orange-600 via-amber-600 to-amber-800",
-  },
-  {
-    ...FEATURED_DEALS_COLLECTION[3], // Ajmal Perfumes
-    cardTheme: "from-rose-600 via-red-600 to-pink-800",
-  },
+// Signature programmatic CSS gradients for top partner brands (Zero graphic banner required)
+const BRAND_CARD_THEMES: Record<string, string> = {
+  medibuddy: "from-teal-600 via-emerald-600 to-teal-800",
+  flixbus: "from-lime-600 via-green-600 to-emerald-800",
+  jbl: "from-orange-600 via-amber-600 to-amber-800",
+  "pure-nutrition": "from-rose-600 via-pink-600 to-purple-800",
+  "ajmal-perfumes": "from-amber-600 via-yellow-600 to-amber-800",
+  "nasher-miles": "from-sky-600 via-blue-600 to-indigo-800",
+  "sarkar-perfumes": "from-violet-600 via-purple-600 to-indigo-800",
+  oliveboard: "from-cyan-600 via-blue-600 to-slate-800",
+  "tata-cliq": "from-red-600 via-rose-600 to-red-800",
+  boat: "from-red-600 via-rose-600 to-neutral-800",
+};
+
+// Deterministic fallback gradients for any newly ingested live merchant
+const FALLBACK_GRADIENTS = [
+  "from-teal-600 via-emerald-600 to-teal-800",
+  "from-lime-600 via-green-600 to-emerald-800",
+  "from-orange-600 via-amber-600 to-amber-800",
+  "from-rose-600 via-pink-600 to-purple-800",
+  "from-indigo-600 via-purple-600 to-blue-800",
+  "from-sky-600 via-blue-600 to-cyan-800",
+  "from-fuchsia-600 via-pink-600 to-rose-800",
 ];
+
+function getCardThemeForBrand(brandSlug: string): string {
+  const norm = (brandSlug || "").toLowerCase().replace(/[^a-z0-9-]/g, "");
+  if (BRAND_CARD_THEMES[norm]) return BRAND_CARD_THEMES[norm];
+  for (const key of Object.keys(BRAND_CARD_THEMES)) {
+    if (norm.includes(key)) return BRAND_CARD_THEMES[key];
+  }
+  let hash = 0;
+  for (let i = 0; i < norm.length; i++) {
+    hash = (hash << 5) - hash + norm.charCodeAt(i);
+    hash |= 0;
+  }
+  return FALLBACK_GRADIENTS[Math.abs(hash) % FALLBACK_GRADIENTS.length];
+}
 
 export function GrabOnPopularOffers() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
-  const handleCopy = (code: string, brandName: string) => {
+  // Live deals hooks from Cuelinks, Admitad & CJ APIs for dynamic auto-updates
+  const { deals: liveIndiaDeals } = useDeals({ limit: 40 });
+  const { deals: liveIntlDeals } = useInternationalDeals();
+
+  // Compute the 4 mostly-searched popular offers of the day.
+  // Prioritizes the top partner brands from Cuelinks, Admitad & CJ (MediBuddy, FlixBus, JBL, Pure Nutrition).
+  // Automatically pulls fresher discount codes / titles whenever live feeds revalidate!
+  const popularOffers = useMemo(() => {
+    const allLive = [...(liveIndiaDeals || []), ...(liveIntlDeals || [])];
+
+    // Priority targets matching top mostly-searched campaigns
+    const prioritySlugs = ["medibuddy", "flixbus", "jbl", "pure-nutrition"];
+
+    return prioritySlugs.map((slug, idx) => {
+      // 1. Check if live feed has an updated deal for this partner
+      const liveMatch = allLive.find((d) => {
+        const dSlug = (d.storeSlug || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+        const sClean = slug.replace(/[^a-z0-9]/g, "");
+        return dSlug.includes(sClean) || sClean.includes(dSlug);
+      });
+
+      // 2. Base curated deal from FEATURED_DEALS_COLLECTION
+      const base =
+        FEATURED_DEALS_COLLECTION.find((f) => f.brandSlug === slug) ||
+        FEATURED_DEALS_COLLECTION[idx];
+
+      const discountText = liveMatch?.discount || base.discountText;
+      const couponCode = liveMatch?.code || base.couponCode;
+      const subTitle = liveMatch?.title || base.subTitle;
+      const terms = liveMatch?.terms || base.terms;
+      const rawUrl = liveMatch?.link || base.affiliateUrl || base.merchantUrl;
+      const logoUrl = liveMatch?.storeLogo || base.logoUrl;
+
+      // Wrap with smart affiliate tracking (pub_id=148920 / EarnKaro)
+      const redirectUrl = buildDealRedirectUrl({
+        url: rawUrl,
+        dealId: liveMatch?.id || base.id,
+        storeName: base.brandName,
+        storeSlug: base.brandSlug,
+        code: couponCode,
+        title: subTitle,
+        source: "popular_offers_today",
+      });
+
+      return {
+        id: liveMatch?.id || base.id,
+        brandName: base.brandName,
+        brandSlug: base.brandSlug,
+        category: base.category,
+        couponCode,
+        discountText,
+        subTitle,
+        merchantUrl: base.merchantUrl,
+        affiliateUrl: redirectUrl,
+        badge: base.badge || "Verified Offer",
+        cardTheme: getCardThemeForBrand(base.brandSlug),
+        terms,
+        logoUrl,
+      };
+    });
+  }, [liveIndiaDeals, liveIntlDeals]);
+
+  const handleCopy = (code: string, brandName: string, redirectUrl: string) => {
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
     toast.success(`Coupon code ${code} copied!`, {
@@ -77,9 +163,9 @@ export function GrabOnPopularOffers() {
           </Link>
         </div>
 
-        {/* 2-Column Mobile Grid, 4-Column Desktop Grid */}
+        {/* 2-Column Mobile Grid, 4-Column Desktop Grid — 100% Programmatic CSS (Zero Graphic Banner Required) */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-5">
-          {OFFERS_DATA.map((deal) => {
+          {popularOffers.map((deal) => {
             const isCopied = copiedCode === deal.couponCode;
 
             return (
@@ -90,9 +176,11 @@ export function GrabOnPopularOffers() {
                 {/* Diagonal Shimmer Reflection on Card Hover */}
                 <div className="absolute inset-0 -translate-x-full group-hover:animate-card-shimmer bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none z-20" />
 
-                {/* Top Half: Gradient Banner + Floating Store Logo */}
+                {/* Top Half: Dynamic Programmatic CSS Gradient Header + Floating Store Logo */}
                 <div>
-                  <div className={`relative h-14 sm:h-28 w-full bg-gradient-to-r ${deal.cardTheme} p-2 sm:p-4 flex items-start justify-between overflow-hidden`}>
+                  <div
+                    className={`relative h-14 sm:h-28 w-full bg-gradient-to-r ${deal.cardTheme} p-2 sm:p-4 flex items-start justify-between overflow-hidden`}
+                  >
                     <span className="text-[10px] sm:text-[11px] font-bold text-white/95 bg-black/30 backdrop-blur-xs px-2 py-0.5 rounded-md sm:rounded-full border border-white/20 shadow-xs">
                       {deal.discountText}
                     </span>
@@ -101,13 +189,13 @@ export function GrabOnPopularOffers() {
                     </span>
                   </div>
 
-                  {/* Circular Floating Store Logo with Zoom */}
+                  {/* Circular Floating Store Logo with 3D Zoom */}
                   <div className="-mt-5 sm:-mt-8 flex justify-center relative z-10">
                     <div className="w-11 h-11 sm:w-16 sm:h-16 rounded-full bg-white dark:bg-card p-1 sm:p-2 shadow-md border border-slate-100 dark:border-border flex items-center justify-center transition-all duration-300 group-hover:scale-110">
                       <StoreLogo
                         storeName={deal.brandName}
                         storeLogo={deal.logoUrl}
-                        className="w-7 h-7 sm:w-11 sm:h-11"
+                        className="w-7 h-7 sm:w-11 sm:h-11 rounded-full"
                       />
                     </div>
                   </div>
@@ -115,7 +203,7 @@ export function GrabOnPopularOffers() {
                   {/* Card Content with typography transitions */}
                   <div className="p-2.5 sm:p-5 pt-1.5 sm:pt-3 text-center flex flex-col items-center">
                     <span className="text-[9px] sm:text-[11px] font-bold tracking-wider uppercase text-primary mb-0.5 sm:mb-1 truncate max-w-full">
-                      {deal.badge || "GOCOUPON EXCLUSIVE"}
+                      {deal.badge}
                     </span>
 
                     <h3 className="font-display font-bold text-xs sm:text-base text-foreground line-clamp-2 min-h-[32px] sm:min-h-[44px] transition-colors group-hover:text-primary">
@@ -128,13 +216,13 @@ export function GrabOnPopularOffers() {
                   </div>
                 </div>
 
-                {/* Bottom Card Action Footer */}
+                {/* Bottom Card Action Footer: Copy Button + Direct Affiliate Launch */}
                 <div className="p-2 sm:p-4 pt-0">
                   <div className="pt-2 sm:pt-3 border-t border-slate-100 dark:border-border/60 flex items-center gap-1.5 sm:gap-2">
                     {/* Copy Code Button with Bounce Effect */}
                     <button
                       type="button"
-                      onClick={() => handleCopy(deal.couponCode, deal.brandName)}
+                      onClick={() => handleCopy(deal.couponCode, deal.brandName, deal.affiliateUrl)}
                       className={`flex-1 inline-flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 sm:py-2 px-1.5 sm:px-3 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all duration-200 border active:scale-95 cursor-pointer min-w-0 ${
                         isCopied
                           ? "bg-emerald-500 text-white border-emerald-500 shadow-xs"
@@ -156,9 +244,9 @@ export function GrabOnPopularOffers() {
                       )}
                     </button>
 
-                    {/* Direct Visit CTA */}
+                    {/* Direct Outbound Visit CTA (Monetized via Cuelinks/EarnKaro) */}
                     <a
-                      href={deal.affiliateUrl || deal.merchantUrl}
+                      href={deal.affiliateUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center justify-center p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold shadow-xs hover:scale-105 active:scale-90 transition-all shrink-0"

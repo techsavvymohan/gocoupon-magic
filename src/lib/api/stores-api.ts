@@ -104,9 +104,16 @@ export async function fetchStores(options: FetchStoresOptions = {}): Promise<Sto
     console.warn("[Stores API Client] Failed to fetch /api/stores, falling back to static data:", err);
   }
 
-  // Fallback to static STORES_DATA
-  const { STORES_DATA } = await import("@/data/storesData");
-  let list = STORES_DATA.map(normalizeStore);
+  // Fallback to unified stores catalog (all 384 merchants) or static STORES_DATA
+  let baseList: any[] = [];
+  try {
+    const unified = await import("@/data/unified-stores.json");
+    baseList = Array.isArray(unified.default) ? unified.default : (unified as any);
+  } catch {
+    const { STORES_DATA } = await import("@/data/storesData");
+    baseList = STORES_DATA;
+  }
+  let list = baseList.map(normalizeStore);
 
   if (options.category && options.category !== "All") {
     list = list.filter((s) => s.category.toLowerCase() === options.category!.toLowerCase());

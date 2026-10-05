@@ -19,7 +19,7 @@ export interface StoreRecord {
   id: string;
   name: string;
   slug: string;
-  category: "Fashion" | "Electronics" | "Food" | "Travel" | "Beauty" | "Home" | "Recharge" | "General";
+  category: "Fashion" | "Electronics" | "Food" | "Travel" | "Beauty" | "Home" | "Recharge" | "General" | "Education";
   logo?: string;
   fallbackIcon?: string;
   badge?: string;
@@ -52,6 +52,50 @@ export interface StoreRecord {
 // ---------------------------------------------------------------------------
 
 export const STORES_DB: StoreRecord[] = [...STORES_DATA];
+
+// Hydrate all 384 partner stores from src/data/unified-stores.json if present
+try {
+  const unifiedStoresPath = path.resolve(process.cwd(), "src/data/unified-stores.json");
+  if (fs.existsSync(unifiedStoresPath)) {
+    const rawList = JSON.parse(fs.readFileSync(unifiedStoresPath, "utf-8"));
+    if (Array.isArray(rawList)) {
+      for (const u of rawList) {
+        const baseSlug = u.slug.replace(/-coupons$/, "").toLowerCase();
+        const existingIdx = STORES_DB.findIndex(
+          (item) => item.slug?.toLowerCase() === u.slug?.toLowerCase() ||
+                    item.slug?.toLowerCase() === baseSlug ||
+                    item.id?.toLowerCase() === u.id?.toLowerCase()
+        );
+        if (existingIdx === -1) {
+          STORES_DB.push({
+            id: u.id || baseSlug,
+            name: u.name,
+            slug: u.slug,
+            category: u.category || "General",
+            logo: u.logo || "",
+            fallbackIcon: u.fallbackIcon || "🛍️",
+            badge: u.badge || "Verified Partner",
+            rating: u.rating || 4.8,
+            couponsCount: u.couponsCount || u.deals?.length || 1,
+            maxDiscount: u.maxDiscount || "Special Offer",
+            cashbackRate: u.cashbackRate || "Available",
+            description: u.description || `Verified promo codes and vouchers for ${u.name}.`,
+            features: u.features || ["Verified Codes", "Tested Today", "Instant Apply"],
+            popularCoupon: u.popularCoupon || {
+              code: u.deals?.[0]?.code || "DEALACTIVATED",
+              description: u.deals?.[0]?.title || `Exclusive ${u.name} discount offer`,
+              discount: u.maxDiscount || "Verified Deal",
+            },
+            link: `/${u.slug}`,
+            isInternalRoute: true,
+          });
+        }
+      }
+    }
+  }
+} catch {
+  // Silent fallback
+}
 
 // Hydrate live custom stores from src/data/live-stores.json if present
 try {

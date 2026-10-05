@@ -23,6 +23,7 @@ import { useCurrency } from "@/context/CurrencyContext";
 import { useUserCards } from "@/context/UserCardsContext";
 import { BankOfferBadge } from "@/components/shopping/BankOfferBadge";
 import { CardApplicationModal } from "@/components/shopping/CardApplicationModal";
+import { BankCardSelectorBar } from "@/components/shopping/BankCardSelectorBar";
 import { SUPPORTED_BANK_CARDS, type BankCardDefinition } from "@/lib/services/bank-offers";
 import { wrapAffiliateTracking } from "@/lib/services/store-registry";
 import { US_CREDIT_CARDS } from "@/lib/services/international-market";
@@ -367,10 +368,13 @@ export function ComparePage() {
     };
   }, [activeSearchParam, activeShoprs, startLoading, retryCount]);
 
-  const handleCopy = (code: string) => {
+  const handleCopy = (code: string, targetUrl?: string) => {
     navigator.clipboard.writeText(code).catch(() => {});
     setCopiedCode(code);
-    toast.success(`Copied coupon: ${code}`);
+    toast.success(`Copied coupon: ${code}! Opening store...`);
+    if (targetUrl && targetUrl !== "#") {
+      window.open(targetUrl, "_blank", "noopener,noreferrer");
+    }
     setTimeout(() => setCopiedCode(null), 2500);
   };
 
@@ -1085,6 +1089,11 @@ export function ComparePage() {
               </div>
             )}
 
+            {/* Bank Card & Financing Arbitrage Selector Bar */}
+            <div className="pt-1 pb-1">
+              <BankCardSelectorBar />
+            </div>
+
             {/* Main 2-Column E-Commerce Layout: Sidebar Filters + Products Grid */}
             <div className="flex items-start gap-8 pt-2">
               {/* Left Sidebar (Desktop) */}
@@ -1639,7 +1648,7 @@ export function ComparePage() {
                                 {offer.couponCode && (
                                   <button
                                     type="button"
-                                    onClick={() => handleCopy(offer.couponCode!)}
+                                    onClick={() => handleCopy(offer.couponCode!, wrapAffiliateTracking(offer.affiliateUrl || selectedProduct.directUrl, "gocoupon_compare_code"))}
                                     className="inline-flex items-center gap-1 rounded-lg border border-border/80 bg-background px-2 py-1 text-[10px] font-mono font-bold text-primary hover:border-primary transition-colors cursor-pointer"
                                   >
                                     {copiedCode === offer.couponCode ? (

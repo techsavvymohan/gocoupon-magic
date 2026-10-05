@@ -1,3 +1,4 @@
+import { broadcastRealtimeEvent } from "./realtime.js";
 import { resolveStoreLogo } from "../../src/lib/services/store-logo-resolver.js";
 /**
  * @file server/routes/deals.ts
@@ -42,6 +43,37 @@ import { upsertStoreInDb } from "../../src/lib/server-data/stores-db.js";
 import { brandAssetsService } from "../services/brand-assets-service.js";
 
 export const dealsRouter = Router();
+
+/**
+ * POST /api/deals/click
+ * Realtime click tracker for deals and coupon copies.
+ * Increments live usesCount and broadcasts to all connected clients.
+ */
+dealsRouter.post("/click", async (req: Request, res: Response) => {
+  try {
+    const { dealId, storeName, couponCode, source } = req.body || {};
+    const livePool = getLiveDealsPool();
+    const targetDeal = livePool.find((d) => d.id === dealId);
+    let newUsesCount = 100;
+    if (targetDeal) {
+      targetDeal.usesCount = (targetDeal.usesCount || 0) + 1;
+      newUsesCount = targetDeal.usesCount;
+    }
+
+    broadcastRealtimeEvent("deal:clicked", {
+      dealId,
+      storeName,
+      couponCode,
+      usesCount: newUsesCount,
+      source: source || "web_click",
+    });
+
+    res.json({ success: true, dealId, usesCount: newUsesCount });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 
 /**
  * GET /api/deals/popular-brands
@@ -197,6 +229,7 @@ dealsRouter.post("/submit", async (req: Request, res: Response) => {
       type: "coupon",
     };
     addDealToPool(newDeal);
+    broadcastRealtimeEvent("deal:submitted", { storeName: submission.storeName, code: submission.code, title: newDeal.title });
     dealsDb.upsertDeals([newDeal]).catch((e) => console.warn("[Deals DB Upsert Warning]:", e.message));
     await globalCache.deletePrefix("deals:");
 
@@ -357,6 +390,7 @@ async function handleSync(req: Request, res: Response) {
   try {
     const pages = parseInt(req.query.pages as string, 10) || 0;
     const result = await syncLiveCuelinksDeals(pages);
+    broadcastRealtimeEvent("sync:completed", { updatedAt: result.updatedAt, activeCount: result.activeCount });
     await globalCache.deletePrefix("deals:");
     // Sync to PostgreSQL cloud database in background
     dealsDb

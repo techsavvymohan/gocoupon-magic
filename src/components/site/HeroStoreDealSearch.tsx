@@ -130,7 +130,22 @@ export function HeroStoreDealSearch() {
     const timer = setTimeout(async () => {
       try {
         const res = await fetchDeals({ q: trimmed, limit: 4 });
-        setMatchingDeals(res.deals || []);
+        let deals = res.deals || [];
+        if (deals.length < 3) {
+          try {
+            const { fetchInternationalDeals } = await import("@/lib/api/international-deals-api");
+            const intlRes = await fetchInternationalDeals({ q: trimmed });
+            if (intlRes.deals && intlRes.deals.length > 0) {
+              const existingIds = new Set(deals.map((d) => d.id));
+              for (const d of intlRes.deals) {
+                if (!existingIds.has(d.id)) {
+                  deals.push(d);
+                }
+              }
+            }
+          } catch {}
+        }
+        setMatchingDeals(deals.slice(0, 4));
       } catch {
         setMatchingDeals([]);
       } finally {
@@ -192,13 +207,18 @@ export function HeroStoreDealSearch() {
     if (!trimmed) return;
 
     setIsFocused(false);
-    // If exact single store found, navigate to store
+    // If exact single store found, navigate to that store
     if (matchingStores.length === 1 && matchingStores[0].name.toLowerCase() === trimmed.toLowerCase()) {
-      navigate({ to: "/stores" });
+      const store = matchingStores[0];
+      const targetSlug = store.internalRoute || `/${store.id}-coupons`;
+      navigate({ to: targetSlug as any });
       return;
     }
-    // Otherwise open offers page with search query
-    navigate({ to: "/offers" });
+    // Otherwise open offers page with search query parameter
+    navigate({
+      to: "/offers" as any,
+      search: { q: trimmed } as any,
+    });
   };
 
   // Quick pill selection

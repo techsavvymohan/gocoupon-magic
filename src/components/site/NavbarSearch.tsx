@@ -2,13 +2,15 @@
  * @file NavbarSearch.tsx
  * @description GrabOn-Style Live Search Bar for GoCoupon Header Navigation.
  * Provides instant real-time store, coupon, and category autocomplete with
- * keyboard navigation, brand logos, and 1-click discovery.
+ * live API integration, keyboard navigation, brand logos, and 1-click discovery.
  */
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useNavigate, Link } from "@tanstack/react-router";
-import { Search, X, Store, Tag, ArrowRight, ExternalLink, ShieldCheck } from "lucide-react";
+import { Search, X, Store, Tag, ArrowRight, ExternalLink, ShieldCheck, Copy, Check } from "lucide-react";
 import { getStoreCatalog, type StoreCatalogEntry } from "@/lib/store-catalog-helper";
+import { fetchDeals, type Deal } from "@/lib/api/deals-api";
+import { toast } from "sonner";
 
 interface NavbarSearchProps {
   className?: string;
@@ -25,7 +27,17 @@ export function NavbarSearch({
 }: NavbarSearchProps) {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [apiDeals, setApiDeals] = useState<Array<{
+    id: string;
+    storeName: string;
+    storeSlug: string;
+    title: string;
+    code?: string;
+    discount?: string;
+  }>>([]);
+  const [isSearchingApi, setIsSearchingApi] = useState(false);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -40,39 +52,96 @@ export function NavbarSearch({
     }
   }, []);
 
-  // Filtered matching results
+  // Debounced API search across 1,500+ live deals
+  useEffect(() => {
+    const trimmed = query.trim().toLowerCase();
+    if (trimmed.length < 2) {
+      setApiDeals([]);
+      setIsSearchingApi(false);
+      return;
+    }
+
+    setIsSearchingApi(true);
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetchDeals({ q: trimmed, limit: 5 });
+        let deals = (res.deals || []).map((d) => ({
+          id: d.id,
+          storeName: d.storeName,
+          storeSlug: d.storeSlug || d.storeName.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+          title: d.title,
+          code: d.code,
+          discount: d.discount,
+        }));
+
+        // If fewer than 2 results, also check international deals
+        if (deals.length < 3) {
+          try {
+            const { fetchInternationalDeals } = await import("@/lib/api/international-deals-api");
+            const intlRes = await fetchInternationalDeals({ q: trimmed });
+            if (intlRes.deals && intlRes.deals.length > 0) {
+              const existingIds = new Set(deals.map((d) => d.id));
+              for (const d of intlRes.deals) {
+                if (!existingIds.has(d.id)) {
+                  deals.push({
+                    id: d.id,
+                    storeName: d.storeName,
+                    storeSlug: d.storeSlug || d.storeName.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+                    title: d.title,
+                    code: d.code,
+                    discount: d.discount,
+                  });
+                }
+              }
+            }
+          } catch {}
+        }
+
+        setApiDeals(deals.slice(0, 5));
+      } catch {
+        setApiDeals([]);
+      } finally {
+        setIsSearchingApi(false);
+      }
+    }, 120);
+
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  // Combined matching stores and deals
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return { stores: [], deals: [], hasMore: false };
 
-    // 1. Match stores
+    // 1. Match stores from catalog
     const matchedStores = allStores
       .filter((s) => {
         const name = s.name.toLowerCase();
         const cat = s.category.toLowerCase();
-        return name.includes(q) || cat.includes(q);
+        const slug = s.slug.toLowerCase();
+        return name.includes(q) || cat.includes(q) || slug.includes(q);
       })
       .slice(0, 5);
 
-    // 2. Match specific deals/coupons
-    const matchedDeals: Array<{
+    // 2. Match deals from catalog stores + API live deals
+    const dealMap = new Map<string, {
       id: string;
       storeName: string;
       storeSlug: string;
       title: string;
       code?: string;
       discount?: string;
-    }> = [];
+    }>();
 
+    // Catalog deals
     for (const s of allStores) {
-      if (matchedDeals.length >= 4) break;
       for (const d of s.deals) {
-        if (matchedDeals.length >= 4) break;
         const title = (d.title || "").toLowerCase();
         const code = (d.code || "").toLowerCase();
-        if (title.includes(q) || code.includes(q)) {
-          matchedDeals.push({
-            id: d.id,
+        const storeName = s.name.toLowerCase();
+        if (title.includes(q) || code.includes(q) || storeName.includes(q)) {
+          dealMap.set(d.id || code || title, {
+            id: d.id || `${s.slug}-${code}`,
             storeName: s.name,
             storeSlug: s.slug,
             title: d.title,
@@ -83,13 +152,22 @@ export function NavbarSearch({
       }
     }
 
+    // Merge live API deals
+    for (const d of apiDeals) {
+      if (!dealMap.has(d.id) && !dealMap.has(d.code || d.title)) {
+        dealMap.set(d.id, d);
+      }
+    }
+
+    const matchedDeals = Array.from(dealMap.values()).slice(0, 5);
     const totalMatches = matchedStores.length + matchedDeals.length;
+
     return {
       stores: matchedStores,
       deals: matchedDeals,
       hasMore: totalMatches > 0,
     };
-  }, [query, allStores]);
+  }, [query, allStores, apiDeals]);
 
   // Click outside to close
   useEffect(() => {
@@ -137,8 +215,12 @@ export function NavbarSearch({
     onSelect?.();
 
     // If query matches a store exactly or closely, jump to that store
+    const cleanLower = cleanQ.toLowerCase();
     const exactStore = allStores.find(
-      (s) => s.name.toLowerCase() === cleanQ.toLowerCase() || s.slug.replace(/-coupons$/, "") === cleanQ.toLowerCase()
+      (s) =>
+        s.name.toLowerCase() === cleanLower ||
+        s.slug.replace(/-coupons$/, "").toLowerCase() === cleanLower ||
+        s.slug.toLowerCase() === cleanLower
     );
 
     if (exactStore) {
@@ -156,7 +238,17 @@ export function NavbarSearch({
   const handleSelectStore = (slug: string) => {
     setIsOpen(false);
     onSelect?.();
-    navigate({ to: `/${slug}` as any });
+    const cleanSlug = slug.startsWith("/") ? slug.slice(1) : slug;
+    navigate({ to: `/${cleanSlug}` as any });
+  };
+
+  const handleCopyCode = (e: React.MouseEvent, code: string, storeSlug: string) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(code).catch(() => {});
+    setCopiedCode(code);
+    toast.success(`Coupon code "${code}" copied to clipboard!`);
+    setTimeout(() => setCopiedCode(null), 3000);
+    handleSelectStore(storeSlug);
   };
 
   const hasResults = results.stores.length > 0 || results.deals.length > 0;
@@ -177,7 +269,6 @@ export function NavbarSearch({
           onChange={(e) => {
             setQuery(e.target.value);
             setIsOpen(true);
-            setSelectedIndex(-1);
           }}
           onFocus={() => {
             if (query.trim()) setIsOpen(true);
@@ -278,9 +369,8 @@ export function NavbarSearch({
               </div>
 
               {results.deals.map((deal) => (
-                <button
+                <div
                   key={deal.id}
-                  type="button"
                   onClick={() => handleSelectStore(deal.storeSlug)}
                   className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-muted/70 transition-colors text-left group cursor-pointer gap-3"
                 >
@@ -300,22 +390,41 @@ export function NavbarSearch({
                     </p>
                   </div>
 
-                  {deal.code && (
-                    <span className="shrink-0 rounded-lg border border-dashed border-primary/40 bg-primary/5 px-2 py-1 font-mono text-[11px] font-black text-primary">
-                      {deal.code}
+                  {deal.code ? (
+                    <button
+                      type="button"
+                      onClick={(e) => handleCopyCode(e, deal.code!, deal.storeSlug)}
+                      className="shrink-0 flex items-center gap-1 rounded-lg border border-dashed border-primary/40 bg-primary/5 hover:bg-primary/15 px-2 py-1 font-mono text-[11px] font-black text-primary transition-colors cursor-pointer"
+                      title="Click to copy coupon code"
+                    >
+                      {copiedCode === deal.code ? (
+                        <>
+                          <Check className="h-3 w-3 text-emerald-500" />
+                          <span className="text-emerald-500">COPIED</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-3 w-3" />
+                          <span>{deal.code}</span>
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <span className="shrink-0 rounded-lg bg-muted px-2 py-1 text-[10px] font-bold text-muted-foreground">
+                      Activate Deal
                     </span>
                   )}
-                </button>
+                </div>
               ))}
             </div>
           )}
 
           {/* No results fallback */}
-          {!hasResults && (
+          {!hasResults && !isSearchingApi && (
             <div className="py-6 px-4 text-center">
               <p className="text-xs font-semibold text-foreground">No direct matches for &ldquo;{query}&rdquo;</p>
               <p className="text-[11px] text-muted-foreground mt-0.5">
-                Press Enter to search across all 980+ live verified offers
+                Press Enter to search across all live verified offers in Deals Vault
               </p>
             </div>
           )}

@@ -1,5 +1,6 @@
 import { STORES_DATA } from "@/data/storesData";
-
+import { REGISTERED_STORES } from "@/lib/services/store-registry";
+import UNIFIED_STORES from "@/data/unified-stores.json";
 
 export interface StoreCatalogEntry {
   name: string;
@@ -39,12 +40,16 @@ export function slugify(name: string): string {
 // In-memory catalog cache indexed by `${slug}-coupons`
 let catalogCache: Map<string, StoreCatalogEntry> | null = null;
 
+export function invalidateStoreCatalogCache(): void {
+  catalogCache = null;
+}
+
 export function getStoreCatalog(): Map<string, StoreCatalogEntry> {
   if (catalogCache) return catalogCache;
 
   const catalog = new Map<string, StoreCatalogEntry>();
 
-  // 1. Seed from storesData.ts
+  // 1. Seed from storesData.ts (top priority curated metadata)
   for (const s of STORES_DATA) {
     const slugKey = s.slug.endsWith("-coupons") ? s.slug : `${s.slug}-coupons`;
     catalog.set(slugKey, {
@@ -52,7 +57,7 @@ export function getStoreCatalog(): Map<string, StoreCatalogEntry> {
       slug: slugKey,
       category: s.category || "General",
       logo: s.logo,
-      fallbackIcon: s.fallbackIcon || "",
+      fallbackIcon: s.fallbackIcon || "🛍️",
       badge: s.badge || "Verified Partner",
       rating: s.rating || 4.8,
       couponsCount: s.couponsCount || 10,
@@ -74,57 +79,147 @@ export function getStoreCatalog(): Map<string, StoreCatalogEntry> {
     });
   }
 
-  // 2. Ingest all stores and active deals from live-deals.json
-  // Note: live deals are now served via /api/deals (not bundled). This section
-  // is populated at runtime when data is fetched dynamically.
-  const rawList: any[] = [];
-
-
-  for (const d of rawList) {
-    const rawName = d.store || d.storeName || d.merchant;
-    if (!rawName) continue;
-    const name = String(rawName).trim();
-    const baseSlug = slugify(name);
-    if (!baseSlug) continue;
+  // 2. Seed from REGISTERED_STORES (store-registry.ts) for stores not yet present
+  for (const r of REGISTERED_STORES) {
+    const baseSlug = slugify(r.id || r.name);
     const slugKey = `${baseSlug}-coupons`;
-
     if (!catalog.has(slugKey)) {
       catalog.set(slugKey, {
-        name,
+        name: r.name,
         slug: slugKey,
-        category: d.category || "Online Shopping",
-        fallbackIcon: "",
-        badge: "Verified Merchant",
+        category: r.category ? r.category.charAt(0).toUpperCase() + r.category.slice(1) : "General",
+        logo: r.logo,
+        fallbackIcon: "🛍️",
+        badge: r.status === "instant_open" ? "Instant Track" : "Verified Partner",
         rating: 4.8,
-        couponsCount: 0,
-        maxDiscount: "60% OFF",
-        cashbackRate: "Up to 8.5%",
-        description: `Verified ${name} promo codes, discount vouchers, and exclusive savings tested against live checkout carts.`,
-        deals: [],
+        couponsCount: r.defaultCoupon?.code ? 1 : 0,
+        maxDiscount: r.defaultCoupon?.description || "Special Savings",
+        cashbackRate: r.cashbackRate,
+        description: `Verified promo codes, discount vouchers, and shopping deals for ${r.name}.`,
+        deals: r.defaultCoupon?.code ? [
+          {
+            id: `${r.id}-default`,
+            title: r.defaultCoupon.description,
+            code: r.defaultCoupon.code,
+            discount: r.defaultCoupon.discountAmount
+              ? `₹${r.defaultCoupon.discountAmount} OFF`
+              : r.defaultCoupon.discountPct
+              ? `${Math.round(r.defaultCoupon.discountPct * 100)}% OFF`
+              : "Special Offer",
+            description: r.defaultCoupon.description,
+            minSpend: "₹499",
+            category: r.category,
+            expiry: "Active Today",
+            link: r.storeUrl,
+          }
+        ] : [],
+      });
+    } else if (r.defaultCoupon?.code) {
+      // Add default coupon if missing from existing store entry
+      const existing = catalog.get(slugKey)!;
+      if (!existing.deals.some((d) => d.code === r.defaultCoupon?.code)) {
+        existing.deals.push({
+          id: `${r.id}-default`,
+          title: r.defaultCoupon.description,
+          code: r.defaultCoupon.code,
+          discount: r.defaultCoupon.discountAmount
+            ? `₹${r.defaultCoupon.discountAmount} OFF`
+            : r.defaultCoupon.discountPct
+            ? `${Math.round(r.defaultCoupon.discountPct * 100)}% OFF`
+            : "Special Offer",
+          description: r.defaultCoupon.description,
+          category: r.category,
+          expiry: "Active Today",
+          link: r.storeUrl,
+        });
+      }
+    }
+  }
+
+  // 3. Seed from UNIFIED_STORES (all 384 merchants with live deals & brand assets)
+  for (const u of UNIFIED_STORES) {
+    const slugKey = u.slug.endsWith("-coupons") ? u.slug : `${u.slug}-coupons`;
+    const baseSlug = slugKey.replace(/-coupons$/, "");
+    if (!catalog.has(slugKey) && !catalog.has(baseSlug)) {
+      catalog.set(slugKey, {
+        name: u.name,
+        slug: slugKey,
+        category: u.category || "General",
+        logo: u.logo,
+        fallbackIcon: u.fallbackIcon || "🛍️",
+        badge: u.badge || "Verified Partner",
+        rating: u.rating || 4.8,
+        couponsCount: u.couponsCount || u.deals?.length || 1,
+        maxDiscount: u.maxDiscount || "Special Offer",
+        cashbackRate: u.cashbackRate || "Available",
+        description: u.description || `Verified promo codes, discount vouchers, and shopping deals for ${u.name}.`,
+        deals: u.deals || [],
       });
     }
-
-    const entry = catalog.get(slugKey)!;
-    entry.couponsCount++;
-    entry.deals.push({
-      id: d.id || `${baseSlug}-${entry.deals.length}`,
-      title: d.title || `Save on ${name}`,
-      code: d.code || (d.coupon_code ? String(d.coupon_code) : undefined),
-      discount: d.discount || (d.code ? "Exclusive Code" : "Instant Deal"),
-      description: d.description || d.title || `Special promotional offer on ${name}.`,
-      minSpend: d.min_order_value || d.minSpend || undefined,
-      category: d.category || entry.category,
-      expiry: d.valid_to || d.expiry || "Active Today",
-      link: d.affiliateLink || d.url || d.link,
-    });
   }
 
   catalogCache = catalog;
   return catalog;
 }
 
+export function registerDynamicStore(entry: StoreCatalogEntry): void {
+  const catalog = getStoreCatalog();
+  const slugKey = entry.slug.endsWith("-coupons") ? entry.slug : `${entry.slug}-coupons`;
+  if (!catalog.has(slugKey)) {
+    catalog.set(slugKey, { ...entry, slug: slugKey });
+  } else {
+    const existing = catalog.get(slugKey)!;
+    for (const d of entry.deals) {
+      if (!existing.deals.some((ed) => ed.id === d.id || (ed.code && ed.code === d.code))) {
+        existing.deals.push(d);
+        existing.couponsCount++;
+      }
+    }
+  }
+}
+
 export function getStoreBySlug(slug: string): StoreCatalogEntry | null {
   const catalog = getStoreCatalog();
-  const normalizedSlug = slug.endsWith("-coupons") ? slug : `${slug}-coupons`;
-  return catalog.get(normalizedSlug) || null;
+  const cleanSlug = (slug || "").toLowerCase().trim();
+  if (!cleanSlug) return null;
+
+  const normalizedSlug = cleanSlug.endsWith("-coupons") ? cleanSlug : `${cleanSlug}-coupons`;
+  const baseSlug = cleanSlug.replace(/-coupons$/, "");
+
+  // 1. Exact match
+  if (catalog.has(normalizedSlug)) return catalog.get(normalizedSlug)!;
+  if (catalog.has(baseSlug)) return catalog.get(baseSlug)!;
+  if (catalog.has(cleanSlug)) return catalog.get(cleanSlug)!;
+
+  // 2. Case-insensitive slug / name match
+  for (const [key, value] of catalog.entries()) {
+    if (key.toLowerCase() === normalizedSlug || key.toLowerCase() === baseSlug) {
+      return value;
+    }
+    const valBase = value.slug.replace(/-coupons$/, "").toLowerCase();
+    if (valBase === baseSlug || valBase === cleanSlug) {
+      return value;
+    }
+    if (value.name.toLowerCase() === baseSlug || value.name.toLowerCase() === cleanSlug) {
+      return value;
+    }
+  }
+
+  // 3. Fallback: normalize non-alphanumeric chars (e.g. "booking.com" -> "bookingcom")
+  const simpleSlug = cleanSlug.replace(/[^a-z0-9]/g, "");
+  if (simpleSlug.length >= 2) {
+    for (const [key, value] of catalog.entries()) {
+      const keySimple = key.replace(/[^a-z0-9]/g, "");
+      const nameSimple = value.name.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const valBaseSimple = value.slug.replace(/-coupons$/, "").replace(/[^a-z0-9]/g, "");
+      if (keySimple === simpleSlug || nameSimple === simpleSlug || valBaseSimple === simpleSlug) {
+        return value;
+      }
+      if (keySimple.startsWith(simpleSlug) || nameSimple.startsWith(simpleSlug) || valBaseSimple.startsWith(simpleSlug)) {
+        return value;
+      }
+    }
+  }
+
+  return null;
 }
