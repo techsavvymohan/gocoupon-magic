@@ -1,10 +1,10 @@
 import { useExtensionBridge } from "@/lib/useExtensionBridge";
 import { MagneticButton } from "../MagneticButton";
-import { ArrowRight, Star, Tag } from "lucide-react";
+import { ArrowRight, Star, Tag, ShieldCheck } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 export function CTA() {
-  const { isInstalled, version } = useExtensionBridge();
+  const { isInstalled } = useExtensionBridge();
   return (
     <section id="cta" className="relative px-4 sm:px-6 py-10 sm:py-14 border-t border-border">
       <div className="reveal relative mx-auto max-w-4xl rounded-2xl border border-border bg-card p-6 sm:p-10 text-center shadow-xs">
@@ -22,13 +22,33 @@ export function CTA() {
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           {/* Desktop CTA: Chrome Web Store */}
           {isInstalled ? (
-            <Link
-              to="/offers"
-              className="hidden md:inline-flex items-center gap-2 rounded-full bg-emerald-600 px-7 py-3.5 text-sm font-bold text-white shadow-xs transition-all hover:scale-105 active:scale-95"
+            <MagneticButton
+              as="a"
+              href="/offers"
+              className="group relative hidden md:inline-flex min-h-[50px] items-center gap-2.5 sm:gap-3 overflow-hidden rounded-full bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 px-7 py-3.5 text-sm font-bold text-white border border-emerald-300/40 shadow-lg shadow-emerald-600/30 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl hover:shadow-emerald-500/40 active:scale-[0.98] animate-button-glow-pulse"
             >
-              <span>Extension Active (v{version || "1.2.0"}) — Browse 1,390+ Deals</span>
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+              {/* Animated Light Shimmer Sweep */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 -translate-x-full animate-shimmer-fast bg-gradient-to-r from-transparent via-white/25 to-transparent"
+              />
+
+              {/* Pulsing Live Radar Beacon */}
+              <span className="relative flex h-2.5 w-2.5 items-center justify-center shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-200 opacity-80" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-white shadow-xs" />
+              </span>
+
+              {/* Shield Icon */}
+              <ShieldCheck className="h-5 w-5 text-white transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-6deg] shrink-0 drop-shadow-xs" />
+
+              {/* Clean Human-Readable Label */}
+              <span className="tracking-tight text-white drop-shadow-xs">Extension Active</span>
+              <span className="inline-block h-1 w-1 rounded-full bg-emerald-200/80 shrink-0" />
+              <span className="font-semibold text-emerald-50 tracking-tight drop-shadow-xs">Browse 1,390+ Deals</span>
+
+              <ArrowRight className="h-4 w-4 text-emerald-100 transition-transform duration-300 group-hover:translate-x-1 shrink-0" />
+            </MagneticButton>
           ) : (
             <MagneticButton
               as="a"

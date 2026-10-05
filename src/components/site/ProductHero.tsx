@@ -8,9 +8,10 @@ import { Link } from "@tanstack/react-router";
 import { useExtensionBridge } from "@/lib/useExtensionBridge";
 import { Zap, ShieldCheck, ArrowRight, Sparkles, CheckCircle2, Clock } from "lucide-react";
 import { useFestiveBanner } from "@/lib/hero-banner";
+import { MagneticButton } from "../MagneticButton";
 
 export function ProductHero() {
-  const { isInstalled, version } = useExtensionBridge();
+  const { isInstalled } = useExtensionBridge();
   const { banner, isActive, styles } = useFestiveBanner();
 
   return (
@@ -71,19 +72,48 @@ export function ProductHero() {
         {/* Action CTAs */}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3.5">
           {isInstalled ? (
-            <a
+            <MagneticButton
+              as="a"
               href="#checkout-simulator"
-              className="inline-flex min-h-[48px] items-center gap-2.5 rounded-full bg-emerald-600 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              onClick={(e) => {
+                const el = document.getElementById("checkout-simulator");
+                if (el) {
+                  e.preventDefault();
+                  el.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              className="group relative inline-flex min-h-[50px] items-center gap-2.5 sm:gap-3 overflow-hidden rounded-full bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 px-6 sm:px-7 py-3 text-sm font-bold text-white border border-emerald-300/40 shadow-lg shadow-emerald-600/30 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl hover:shadow-emerald-500/40 active:scale-[0.98] animate-button-glow-pulse cursor-pointer select-none"
             >
-              <ShieldCheck className="h-5 w-5 text-white" />
-              <span>Extension Active (v{version || "1.2.0"}) — Test Carts</span>
-            </a>
+              {/* Animated Light Shimmer Sweep */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 -translate-x-full animate-shimmer-fast bg-gradient-to-r from-transparent via-white/25 to-transparent"
+              />
+
+              {/* Pulsing Live Radar Beacon */}
+              <span className="relative flex h-2.5 w-2.5 items-center justify-center shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-200 opacity-80" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-white shadow-xs" />
+              </span>
+
+              {/* Verified Shield Icon with Hover Micro-Motion */}
+              <ShieldCheck className="h-5 w-5 text-white transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-6deg] shrink-0 drop-shadow-xs" />
+
+              {/* Clear, Intuitive Non-Technical Copy */}
+              <span className="tracking-tight text-white drop-shadow-xs">Extension Active</span>
+              <span className="inline-block h-1 w-1 rounded-full bg-emerald-200/80 shrink-0" />
+              <span className="font-semibold text-emerald-50 tracking-tight drop-shadow-xs">Ready to Save</span>
+
+              {/* Micro-animated Arrow */}
+              <ArrowRight className="h-4 w-4 text-emerald-100 transition-transform duration-300 group-hover:translate-x-1 shrink-0" />
+            </MagneticButton>
           ) : (
-            <a
+            <MagneticButton
+              as="a"
               href="https://chromewebstore.google.com/detail/gbmfihnboadlmmjbikajlmocjmlpehij"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-[48px] items-center gap-2.5 rounded-full bg-primary px-7 py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              className="inline-flex min-h-[50px] items-center gap-2.5 rounded-full bg-primary px-7 py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
             >
               <img
                 src="/icons/icon_48.png"
@@ -97,16 +127,33 @@ export function ProductHero() {
                 height={20}
               />
               <span>Add to Chrome — It&apos;s 100% Free</span>
-            </a>
+            </MagneticButton>
           )}
 
-          <a
-            href="#checkout-simulator"
-            className="inline-flex min-h-[48px] items-center gap-2 rounded-full border border-border bg-card/80 px-6 py-3 text-sm font-semibold text-foreground hover:bg-muted active:scale-95 transition-all shadow-2xs cursor-pointer"
-          >
-            <Zap className="h-4 w-4 text-primary" />
-            <span>Try Live Simulator ↓</span>
-          </a>
+          {isInstalled ? (
+            <Link
+              to="/offers"
+              className="inline-flex min-h-[50px] items-center gap-2 rounded-full border border-border bg-card/80 px-6 py-3 text-sm font-semibold text-foreground hover:bg-muted hover:border-primary/40 active:scale-95 transition-all shadow-2xs cursor-pointer"
+            >
+              <Sparkles className="h-4 w-4 text-amber-500" />
+              <span>Browse 1,390+ Deals →</span>
+            </Link>
+          ) : (
+            <a
+              href="#checkout-simulator"
+              onClick={(e) => {
+                const el = document.getElementById("checkout-simulator");
+                if (el) {
+                  e.preventDefault();
+                  el.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              className="inline-flex min-h-[50px] items-center gap-2 rounded-full border border-border bg-card/80 px-6 py-3 text-sm font-semibold text-foreground hover:bg-muted active:scale-95 transition-all shadow-2xs cursor-pointer"
+            >
+              <Zap className="h-4 w-4 text-primary" />
+              <span>Try Live Simulator ↓</span>
+            </a>
+          )}
         </div>
 
         {/* Trust Telemetry Strip */}
