@@ -50,13 +50,14 @@ export interface BankCardSavingsResult {
   affiliateApplyUrl: string;
 }
 
-const CUELINKS_PUB_ID = process.env.VITE_CUELINKS_PUB_ID || "148920";
+const CUELINKS_PUB_ID =
+  (typeof import.meta !== "undefined" && import.meta.env?.VITE_CUELINKS_PUB_ID) ||
+  (typeof process !== "undefined" && process.env?.VITE_CUELINKS_PUB_ID) ||
+  "148920";
 
 function buildCardAffiliateUrl(rawBankUrl: string, bankId: string): string {
-  if (CUELINKS_PUB_ID && /^https?:\/\//i.test(rawBankUrl)) {
-    return `https://linksredirect.com/?pub_id=${CUELINKS_PUB_ID}&subid=gocoupon_cards_${bankId}&url=${encodeURIComponent(
-      rawBankUrl
-    )}`;
+  if (/^https?:\/\//i.test(rawBankUrl)) {
+    return `/api/redirect/deal?url=${encodeURIComponent(rawBankUrl)}&dealId=card_${encodeURIComponent(bankId)}&store=${encodeURIComponent(bankId)}&source=gocoupon_cards_${encodeURIComponent(bankId)}`;
   }
   return rawBankUrl;
 }

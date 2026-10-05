@@ -82,7 +82,7 @@ export function MobileHeroInstantFinder() {
       bankHack: getDynamicBankHack(deal.category),
       successRate: `${95 + (idx % 4)}%`,
       directUrl: buildDealRedirectUrl({
-        url: deal.merchantUrl || deal.affiliateUrl,
+        url: deal.affiliateUrl || deal.merchantUrl,
         dealId: deal.id,
         storeName: deal.brandName,
         storeSlug: `${deal.brandSlug}-coupons`,

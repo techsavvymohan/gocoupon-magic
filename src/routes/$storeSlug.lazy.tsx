@@ -85,6 +85,7 @@ function DynamicStoreCouponsPage() {
         category: category,
         expiry: "Active Today",
         isExclusive: idx === 0,
+        dealLink: d.link || (d as any).affiliateUrl || (d as any).url,
       }))
     : [];
 
@@ -97,6 +98,7 @@ function DynamicStoreCouponsPage() {
         category: d.category || category,
         expiry: d.expiry || "Active Today",
         isExclusive: idx === 0,
+        dealLink: (d as any).link || (d as any).affiliateUrl || (d as any).url,
       }))
     : [];
 
@@ -211,7 +213,7 @@ function DynamicStoreCouponsPage() {
         storeName={storeName}
         category={category}
         storeLogo={store?.logo}
-        storeUrl={(store as any)?.storeUrl || (store as any)?.link}
+        storeUrl={(store as any)?.storeUrl || ((store as any)?.domain ? `https://${(store as any).domain}` : undefined)}
         eeatProof={{
           verifiedCount: `${store?.deals?.length || 10} Verified Offers`,
           successRate: "96.4%",

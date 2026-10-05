@@ -16,6 +16,7 @@ import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema } from "@/lib/seo";
+import { buildDealRedirectUrl } from "@/lib/services/store-registry";
 import {
   FEATURED_CAMPAIGN_INFO,
   FEATURED_DEALS_COLLECTION,
@@ -260,7 +261,17 @@ function FeaturedDealsPage() {
       });
     }
 
-    window.open(item.affiliateUrl || item.merchantUrl, "_blank", "noopener,noreferrer");
+    const redirectUrl = buildDealRedirectUrl({
+      url: item.affiliateUrl || item.merchantUrl,
+      dealId: item.id || item.campaignId,
+      storeName: item.brandName,
+      storeSlug: item.brandSlug,
+      title: item.subTitle || item.discountText,
+      code: item.couponCode,
+      source: "featured_deals",
+    });
+
+    window.open(redirectUrl, "_blank", "noopener,noreferrer");
   };
 
   const hasActiveFilters = selectedCategory !== "all" || Boolean(searchQuery.trim());

@@ -1,5 +1,5 @@
 import { StoreLogo } from "@/components/common/StoreLogo";
-import { getStoreEarnKaroLink, wrapAffiliateTracking } from "@/lib/services/store-registry";
+import { getStoreEarnKaroLink, wrapAffiliateTracking, findStoreByNameOrSlug } from "@/lib/services/store-registry";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
@@ -109,9 +109,16 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
     const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   const storeAffiliateUrl = (() => {
+    if (storeUrl && /^https?:\/\//i.test(storeUrl)) {
+      return wrapAffiliateTracking(storeUrl, "gocoupon_store_hero");
+    }
     const directEarnkaro = getStoreEarnKaroLink(storeName || (breadcrumb && breadcrumb[breadcrumb.length - 1]?.path) || "");
-    if (directEarnkaro) return directEarnkaro;
-    if (storeUrl) return wrapAffiliateTracking(storeUrl, "gocoupon_store_hero");
+    if (directEarnkaro) return wrapAffiliateTracking(directEarnkaro, "gocoupon_store_hero");
+    // Look up real registered store to avoid guessing invalid domains like boatlifestyle.com
+    const registered = findStoreByNameOrSlug(storeName || (breadcrumb && breadcrumb[breadcrumb.length - 1]?.name) || "");
+    if (registered?.storeUrl) {
+      return wrapAffiliateTracking(registered.storeUrl, "gocoupon_store_hero");
+    }
     const slugCandidate = (storeName || "store").toLowerCase().replace(/[^\w]/g, "");
     return wrapAffiliateTracking(`https://${slugCandidate}.com`, "gocoupon_store_hero");
   })();
@@ -124,7 +131,10 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
     });
     const dest = targetAffiliateUrl || storeAffiliateUrl;
     if (dest && dest !== "#") {
-      window.open(dest, "_blank", "noopener,noreferrer");
+      const finalDest = dest.startsWith("/api/redirect/deal") || dest.startsWith("/out")
+        ? dest
+        : wrapAffiliateTracking(dest, "seo_store_coupon");
+      window.open(finalDest, "_blank", "noopener,noreferrer");
     }
     setTimeout(() => {
       setCopiedCode((current) => (current === code ? null : current));
@@ -308,7 +318,7 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
                 const isCopied = copiedCode === cleanCode;
 
                 const couponAffiliateUrl = coupon.dealLink
-                  ? (getStoreEarnKaroLink(coupon.dealLink) || getStoreEarnKaroLink(storeName) || wrapAffiliateTracking(coupon.dealLink, "gocoupon_store_deal"))
+                  ? wrapAffiliateTracking(coupon.dealLink, "gocoupon_store_deal")
                   : storeAffiliateUrl;
 
                 return (

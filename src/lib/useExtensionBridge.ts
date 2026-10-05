@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect } from "react";
+import { wrapAffiliateTracking } from "./services/store-registry";
 
 export interface ExtensionStatus {
   isInstalled: boolean;
@@ -62,14 +63,15 @@ export function useExtensionBridge(): ExtensionStatus {
   }, []);
 
   const openStoreWithExtension = (storeUrl: string, couponCode?: string) => {
+    const wrappedUrl = wrapAffiliateTracking(storeUrl, "extension_autoapply");
     // Dispatch event to content bridge
     window.dispatchEvent(
       new CustomEvent("gocoupon-trigger-autoapply", {
-        detail: { storeUrl, couponCode },
+        detail: { storeUrl: wrappedUrl, couponCode },
       })
     );
     // Also open the URL in a new window/tab
-    window.open(storeUrl, "_blank", "noopener,noreferrer");
+    window.open(wrappedUrl, "_blank", "noopener,noreferrer");
   };
 
   return {

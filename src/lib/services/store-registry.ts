@@ -239,17 +239,36 @@ export function wrapAffiliateTracking(targetUrl: string, subId = "gocoupon_web")
 export function buildStoreAffiliateUrl(store: RegisteredStore, subId = "gocoupon_instant_search"): string {
   const earnkaroLink = getStoreEarnKaroLink(store.id || store.name || store.storeUrl);
   if (earnkaroLink) {
-    return earnkaroLink;
+    return wrapAffiliateTracking(earnkaroLink, subId);
   }
   if (store.id === "amazon_in") {
-    return `https://www.amazon.in/?tag=${AMAZON_IN_PARTNER_TAG}`;
+    return wrapAffiliateTracking(`https://www.amazon.in/?tag=${AMAZON_IN_PARTNER_TAG}`, subId);
   }
   if (store.id === "amazon_us") {
-    return AMAZON_US_PARTNER_TAG
+    const raw = AMAZON_US_PARTNER_TAG
       ? `https://www.amazon.com/?tag=${AMAZON_US_PARTNER_TAG}`
       : `https://www.amazon.com/`;
+    return wrapAffiliateTracking(raw, subId);
   }
   return wrapAffiliateTracking(store.storeUrl, subId);
+}
+
+/**
+ * Finds a registered store by name, alias, domain, or slug.
+ */
+export function findStoreByNameOrSlug(nameOrSlug?: string): RegisteredStore | null {
+  if (!nameOrSlug) return null;
+  const q = nameOrSlug.toLowerCase().trim();
+  const cleanQ = q.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "").replace(/-coupons$/, "");
+  return (
+    REGISTERED_STORES.find(
+      (s) =>
+        s.id.toLowerCase() === cleanQ ||
+        s.domain.toLowerCase() === cleanQ ||
+        s.name.toLowerCase() === q ||
+        (s.aliases && s.aliases.some((a) => a.toLowerCase() === q || a.toLowerCase() === cleanQ))
+    ) || null
+  );
 }
 
 export const REGISTERED_STORES: RegisteredStore[] = [
@@ -342,7 +361,7 @@ export const REGISTERED_STORES: RegisteredStore[] = [
     defaultCoupon: { code: "MYNTRA200", description: "Extra ₹200 off on first purchase above ₹999", discountAmount: 200 },
     cashbackRate: "Up to 8.5%",
     cashbackPct: 0.085,
-    buildSearchUrl: () => "https://myntr.it/t6fMvnP",
+    buildSearchUrl: () => wrapAffiliateTracking("https://myntr.it/t6fMvnP", "gocoupon_instant_search"),
   },
   {
     id: "ajio",
@@ -360,7 +379,7 @@ export const REGISTERED_STORES: RegisteredStore[] = [
     defaultCoupon: { code: "AJIOMANIA", description: "Extra 30% off on fashion & footwear above ₹1,990", discountPct: 0.3 },
     cashbackRate: "Up to 9.5%",
     cashbackPct: 0.095,
-    buildSearchUrl: () => "https://ajiio.in/5gIGQ46",
+    buildSearchUrl: () => wrapAffiliateTracking("https://ajiio.in/5gIGQ46", "gocoupon_instant_search"),
   },
   {
     id: "dot-and-key",
@@ -378,7 +397,7 @@ export const REGISTERED_STORES: RegisteredStore[] = [
     defaultCoupon: { code: "GLOW20", description: "Flat 20% off on sunscreens, serums & skincare", discountPct: 0.2 },
     cashbackRate: "Up to 12.0%",
     cashbackPct: 0.12,
-    buildSearchUrl: () => "https://bitli.in/Q8p6Tb5",
+    buildSearchUrl: () => wrapAffiliateTracking("https://bitli.in/Q8p6Tb5", "gocoupon_instant_search"),
   },
   {
     id: "mcaffeine",
@@ -396,7 +415,7 @@ export const REGISTERED_STORES: RegisteredStore[] = [
     defaultCoupon: { code: "CAFFEINE15", description: "Flat 15% off on coffee body scrubs & face care", discountPct: 0.15 },
     cashbackRate: "Up to 15.0%",
     cashbackPct: 0.15,
-    buildSearchUrl: () => "https://bitli.in/30c3jZD",
+    buildSearchUrl: () => wrapAffiliateTracking("https://bitli.in/30c3jZD", "gocoupon_instant_search"),
   },
   {
     id: "shopsy",
@@ -414,7 +433,7 @@ export const REGISTERED_STORES: RegisteredStore[] = [
     defaultCoupon: { code: "SHOPSYNEW", description: "Budget deals starting at ₹25 + extra 10% off", discountPct: 0.1 },
     cashbackRate: "Up to 8.0%",
     cashbackPct: 0.08,
-    buildSearchUrl: () => "https://bitli.in/X8hNAWk",
+    buildSearchUrl: () => wrapAffiliateTracking("https://bitli.in/X8hNAWk", "gocoupon_instant_search"),
   },
   {
     id: "the-man-company",
@@ -432,7 +451,7 @@ export const REGISTERED_STORES: RegisteredStore[] = [
     defaultCoupon: { code: "GENTLEMAN20", description: "Flat 20% off on beard oils & men's grooming kits", discountPct: 0.2 },
     cashbackRate: "Up to 14.0%",
     cashbackPct: 0.14,
-    buildSearchUrl: () => "https://bitli.in/Aiq8ef4",
+    buildSearchUrl: () => wrapAffiliateTracking("https://bitli.in/Aiq8ef4", "gocoupon_instant_search"),
   },
   // ─── Instant Open: Top Priority Cuelinks Merchants (Pre-Approved / Instant Track) ────
   {
