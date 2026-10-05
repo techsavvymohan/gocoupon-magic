@@ -234,6 +234,10 @@ export function storeCouponSchema(params: StoreCouponSchemaParams) {
   const storeUrl = absoluteUrl(params.url);
   const rating = params.ratingValue || 4.8;
   const count = params.reviewCount || 420;
+  const now = new Date();
+  const dateModified = now.toISOString();
+  const validUntil = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+  const validFrom = now.toISOString().split("T")[0];
   const logoUrl = params.logo
     ? params.logo.startsWith("http")
       ? params.logo
@@ -244,6 +248,17 @@ export function storeCouponSchema(params: StoreCouponSchemaParams) {
     "@context": "https://schema.org",
     "@graph": [
       {
+        "@type": "WebPage",
+        "@id": `${storeUrl}#webpage`,
+        url: storeUrl,
+        name: `Verified ${params.storeName} Coupon Codes & Deals`,
+        datePublished: "2026-01-01T00:00:00Z",
+        dateModified: dateModified,
+        isPartOf: {
+          "@id": "https://gocoupon.io/#website",
+        },
+      },
+      {
         "@type": "Store",
         "@id": `${storeUrl}#store`,
         name: params.storeName,
@@ -251,6 +266,7 @@ export function storeCouponSchema(params: StoreCouponSchemaParams) {
         description: params.description,
         image: logoUrl,
         priceRange: "$$",
+        dateModified: dateModified,
         aggregateRating: {
           "@type": "AggregateRating",
           ratingValue: rating.toString(),
@@ -264,7 +280,7 @@ export function storeCouponSchema(params: StoreCouponSchemaParams) {
         hasOfferCatalog: {
           "@type": "OfferCatalog",
           name: `${params.storeName} Verified Coupons & Deals`,
-          itemListElement: (params.coupons || []).slice(0, 6).map((c, i) => ({
+          itemListElement: (params.coupons || []).slice(0, 8).map((c, i) => ({
             "@type": "Offer",
             position: i + 1,
             name: c.discount || `${params.storeName} Promo Deal`,
@@ -272,6 +288,8 @@ export function storeCouponSchema(params: StoreCouponSchemaParams) {
             price: "0",
             priceCurrency: "INR",
             availability: "https://schema.org/InStock",
+            priceValidUntil: validUntil,
+            validFrom: validFrom,
             url: storeUrl,
             seller: {
               "@type": "Organization",

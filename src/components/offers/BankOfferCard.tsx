@@ -13,7 +13,32 @@ export function BankOfferCard({ bank }: BankOfferCardProps) {
   const handleCopy = () => {
     navigator.clipboard.writeText(bank.code);
     setCopied(true);
-    toast.success(`Bank code "${bank.code}" copied to clipboard!`);
+    const primaryStore = bank.applicableStores?.[0] || "merchant";
+    toast.success(`Bank code "${bank.code}" copied to clipboard!`, {
+      description: `Opening ${primaryStore} in a new tab to apply at checkout.`,
+    });
+
+    const targetStore = primaryStore.toLowerCase();
+    const storeUrl = targetStore.includes("flipkart")
+      ? "https://www.flipkart.com"
+      : targetStore.includes("myntra")
+      ? "https://www.myntra.com"
+      : targetStore.includes("amazon")
+      ? "https://www.amazon.in"
+      : targetStore.includes("swiggy")
+      ? "https://www.swiggy.com"
+      : targetStore.includes("zomato")
+      ? "https://www.zomato.com"
+      : targetStore.includes("nykaa")
+      ? "https://www.nykaa.com"
+      : targetStore.includes("croma")
+      ? "https://www.croma.com"
+      : null;
+
+    if (storeUrl) {
+      window.open(storeUrl, "_blank", "noopener,noreferrer");
+    }
+
     setTimeout(() => setCopied(false), 2500);
   };
 
@@ -30,7 +55,9 @@ export function BankOfferCard({ bank }: BankOfferCardProps) {
               <img
                 src={bank.logo}
                 alt={`${bank.bankName} logo`}
-                className="max-h-full max-w-full object-contain"
+                width={44}
+                height={44}
+                className="max-h-full max-w-full object-contain aspect-square"
                 loading="lazy"
               />
             </div>

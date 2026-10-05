@@ -1,7 +1,7 @@
 import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
-import { breadcrumbSchema, itemListSchema } from "@/lib/seo";
+import { breadcrumbSchema, itemListSchema, faqSchema } from "@/lib/seo";
 import { useDeals } from "@/hooks/use-deals";
 import { useInternationalDeals } from "@/hooks/use-international-deals";
 import { triggerLiveSync, type DealSortField, type Deal, parseExpiryTimestamp } from "@/lib/api/deals-api";
@@ -665,10 +665,36 @@ function OffersHubPage() {
     setSearchQuery("");
   };
 
+  const OFFERS_FAQS = [
+    {
+      question: "How often are deals, promo codes, and offers updated on GoCoupon?",
+      answer:
+        "Offers and promo codes on GoCoupon are refreshed 24/7 through real-time merchant network APIs (Cuelinks, EarnKaro, Admitad, CJ) and validated by automated tests so expired codes are purged immediately.",
+    },
+    {
+      question: "Can I combine bank credit card discounts with merchant coupon codes?",
+      answer:
+        "Yes! GoCoupon specializes in double savings arbitrage. You can apply verified brand coupon codes at checkout and pay using partner bank credit cards (such as Flipkart Axis Bank, Amazon Pay ICICI, or HDFC Millennia) to unlock an extra 5% to 10% instant discount or cashback.",
+    },
+    {
+      question: "How do I redeem online coupons and offers on GoCoupon?",
+      answer:
+        "Simply click 'Copy Code' or 'Activate Deal' on any offer card. The discount code will be copied to your clipboard, and the merchant checkout page will open in a new tab where you can paste the code.",
+    },
+    {
+      question: "Are all deals and coupons on GoCoupon completely free to use?",
+      answer:
+        "Yes, 100% free. GoCoupon never charges shoppers or requires sensitive personal details to access verified discount codes.",
+    },
+  ] as const;
+
+  const faqSchemaData = faqSchema(OFFERS_FAQS);
+
   return (
     <SiteShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchemaData) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchemaData) }} />
 
       {/* ───────────────────────────────────────────────────────────────────────── */}
       {/* 1. TOP QUICK NAVIGATION BAR                                              */}
@@ -1629,6 +1655,39 @@ function OffersHubPage() {
                 Install the free Chrome extension to test and apply codes automatically at checkout.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ───────────────────────────────────────────────────────────────────────── */}
+      {/* 5. VERIFIED OFFERS FREQUENTLY ASKED QUESTIONS (FAQ SCHEMA & ACCORDION)    */}
+      {/* ───────────────────────────────────────────────────────────────────────── */}
+      <section className="border-t border-border/80 bg-card/40 px-4 sm:px-6 py-12">
+        <div className="mx-auto max-w-4xl">
+          <div className="text-center mb-8">
+            <h2 className="font-display text-xl sm:text-2xl font-black text-foreground">
+              Frequently Asked Questions About GoCoupon Offers
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1.5">
+              Everything you need to know about redeeming verified discounts and stacking bank card cashback.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {OFFERS_FAQS.map((faq, i) => (
+              <details
+                key={i}
+                className="group rounded-2xl border border-border/80 bg-card p-4 transition-all open:border-primary/40 open:shadow-xs"
+              >
+                <summary className="flex items-center justify-between font-bold text-sm text-foreground cursor-pointer list-none">
+                  <span>{faq.question}</span>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180 shrink-0 ml-2" />
+                </summary>
+                <p className="mt-2.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  {faq.answer}
+                </p>
+              </details>
+            ))}
           </div>
         </div>
       </section>
