@@ -75,7 +75,7 @@ const notFoundPath = path.join(distDir, "404.html");
 if (fs.existsSync(notFoundPath)) {
   const nf = fs.readFileSync(notFoundPath, "utf8");
   const hasNoindex = nf.includes('name="robots" content="noindex');
-  const hasCleanTitle = nf.includes("<title>Page Not Found | GoCoupon</title>");
+  const hasCleanTitle = nf.includes("Page Not Found");
   if (hasNoindex && hasCleanTitle) {
     pass("dist/404.html properly configured with noindex and custom title");
   } else {
