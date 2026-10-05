@@ -977,60 +977,82 @@ function OffersHubPage() {
                     </span>
                   </div>
 
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    {SUPPORTED_BANK_CARDS.map((card) => (
-                      <div
-                        key={card.id}
-                        className="rounded-2xl border border-border/80 bg-card p-5 shadow-xs hover:border-primary/40 hover:shadow-md transition-all flex flex-col justify-between"
-                      >
-                        <div>
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex items-center gap-3 min-w-0">
-                              <div className="h-12 w-12 rounded-xl bg-white dark:bg-card border border-border/80 p-1.5 shrink-0 flex items-center justify-center shadow-xs">
-                                <BankLogoIcon cardId={card.id} className="h-8 w-8 object-contain" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full min-w-0">
+                    {SUPPORTED_BANK_CARDS.map((card) => {
+                      const welcomeShort = card.welcomeBonus.split("+")[0].trim();
+                      return (
+                        <div
+                          key={card.id}
+                          className="w-full min-w-0 max-w-full rounded-2xl border border-border/80 bg-card p-4 sm:p-5 shadow-xs hover:border-primary/40 hover:shadow-md transition-all flex flex-col justify-between overflow-hidden"
+                        >
+                          <div className="w-full min-w-0">
+                            {/* Top: Logo + Name & Welcome Badge */}
+                            <div className="flex items-start gap-3 w-full min-w-0">
+                              <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl bg-white dark:bg-card border border-border/80 p-1.5 shrink-0 flex items-center justify-center shadow-xs">
+                                <BankLogoIcon cardId={card.id} className="h-7 w-7 sm:h-8 sm:w-8 object-contain" />
                               </div>
-                              <div className="min-w-0">
-                                <h4 className="font-display font-bold text-sm text-foreground truncate">
+
+                              <div className="flex-1 min-w-0">
+                                <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                                  <span className="text-[11px] font-semibold text-muted-foreground">
+                                    {card.bankName}
+                                  </span>
+                                  {welcomeShort && (
+                                    <span className="rounded-full bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-emerald-600 dark:text-emerald-400 font-mono">
+                                      {welcomeShort}
+                                    </span>
+                                  )}
+                                </div>
+
+                                <h4 className="font-display font-bold text-sm sm:text-base text-foreground leading-snug line-clamp-2">
                                   {card.cardName}
                                 </h4>
-                                <div className="text-xs text-muted-foreground mt-0.5 font-medium truncate">
-                                  {card.bankName} &bull; {card.annualFee}
+
+                                <div className="text-xs text-muted-foreground mt-1 font-medium">
+                                  Fee: <span className="text-foreground font-semibold">{card.annualFee}</span>
                                 </div>
                               </div>
                             </div>
-                            <span className="rounded-full bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 shrink-0 font-mono">
-                              {card.welcomeBonus.split("+")[0].trim()}
-                            </span>
+
+                            {/* Key Perks with strict min-w-0 truncation */}
+                            <div className="mt-3.5 pt-3 border-t border-border/60 w-full min-w-0">
+                              <ul className="space-y-2 text-xs text-muted-foreground w-full min-w-0">
+                                {card.keyPerks.slice(0, 2).map((perk, i) => (
+                                  <li key={i} className="flex items-start gap-2 w-full min-w-0">
+                                    <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0 stroke-[3] mt-0.5" />
+                                    <span className="text-xs text-muted-foreground leading-relaxed line-clamp-2 min-w-0 break-words">
+                                      {perk}
+                                    </span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
                           </div>
 
-                          <div className="mt-3.5 pt-3 border-t border-border/60">
-                            <ul className="space-y-1.5 text-xs text-muted-foreground">
-                              {card.keyPerks.slice(0, 2).map((perk, i) => (
-                                <li key={i} className="flex items-center gap-1.5">
-                                  <Check className="h-3 w-3 text-emerald-500 shrink-0 stroke-[3]" />
-                                  <span className="line-clamp-1">{perk}</span>
-                                </li>
-                              ))}
-                            </ul>
+                          {/* Footer: Zero CIBIL Impact + Clear Tap Target Apply Button */}
+                          <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between gap-3 w-full min-w-0">
+                            <div className="min-w-0">
+                              <span className="text-[11px] text-muted-foreground font-mono block truncate">
+                                Zero CIBIL Impact
+                              </span>
+                              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold block truncate">
+                                Instant 2-Min KYC
+                              </span>
+                            </div>
+
+                            <a
+                              href={card.affiliateApplyUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-xs hover:bg-primary/90 active:scale-95 transition-all cursor-pointer shrink-0"
+                            >
+                              <span>Apply in 2 Mins</span>
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </a>
                           </div>
                         </div>
-
-                        <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between gap-2">
-                          <span className="text-[11px] text-muted-foreground font-mono">
-                            Zero CIBIL Impact
-                          </span>
-                          <a
-                            href={card.affiliateApplyUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-1.5 text-xs font-bold text-primary-foreground shadow-xs hover:bg-primary/90 transition-all cursor-pointer"
-                          >
-                            <span>Apply in 2 Mins</span>
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
 

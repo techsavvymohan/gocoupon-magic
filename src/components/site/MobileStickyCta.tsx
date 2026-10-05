@@ -45,7 +45,13 @@ export function MobileStickyCta() {
     hasCookieConsent = true;
   }
 
-  if (isDismissed || !isVisible || !hasCookieConsent || pathname.startsWith("/product/")) {
+  if (
+    isDismissed ||
+    !isVisible ||
+    !hasCookieConsent ||
+    pathname.startsWith("/product/") ||
+    pathname.startsWith("/offers")
+  ) {
     return null;
   }
 
