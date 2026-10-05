@@ -14,7 +14,6 @@ import { useI18n } from "@/context/I18nContext";
 import { useExtensionBridge } from "@/lib/useExtensionBridge";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { NavbarSearch } from "./NavbarSearch";
-import { RealtimeIndicator } from "@/components/common/RealtimeIndicator";
 import {
   Search,
   Menu,
@@ -286,7 +285,6 @@ export function Navbar() {
 
             {/* Quick Utility Link on Right of Sub-nav: Price Comparison */}
             <div className="hidden lg:flex items-center gap-3 pl-4 shrink-0">
-              <RealtimeIndicator />
               <Link
                 to="/compare"
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors py-1"
