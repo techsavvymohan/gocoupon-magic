@@ -132,17 +132,29 @@ export function buildDealRedirectUrl(options: {
   // Check if store has an EarnKaro affiliate link configured
   const earnkaroLink = getStoreEarnKaroLink(options.storeSlug || options.storeName || options.url);
 
-  let targetUrl = options.url;
-  // If targetUrl is empty, placeholder, or clean merchant link, route through EarnKaro affiliate link
-  if (earnkaroLink) {
-    if (
-      !targetUrl ||
-      targetUrl === "#" ||
-      targetUrl.startsWith("javascript:") ||
-      !targetUrl.includes("linksredirect.com")
-    ) {
-      targetUrl = earnkaroLink;
-    }
+  // Check if targetUrl is already an active affiliate link from Cuelinks, CJ, Admitad, or Amazon
+  const isAlreadyAffiliate =
+    Boolean(targetUrl) &&
+    (targetUrl.includes("linksredirect.com") ||
+      targetUrl.includes("clnk.in") ||
+      targetUrl.includes("tkqlhce.com") ||
+      targetUrl.includes("anrdoezrs.net") ||
+      targetUrl.includes("dpbolvw.net") ||
+      targetUrl.includes("jdoqocy.com") ||
+      targetUrl.includes("kqzyfj.com") ||
+      targetUrl.includes("emjcd.com") ||
+      targetUrl.includes("qksrv.net") ||
+      targetUrl.includes("admitad.com") ||
+      targetUrl.includes("alitems.com") ||
+      targetUrl.includes("tag=") ||
+      targetUrl.includes("myntr.it") ||
+      targetUrl.includes("fktr.in") ||
+      targetUrl.includes("ajiio.in") ||
+      targetUrl.includes("bitli.in"));
+
+  // Only assign EarnKaro fallback if NOT already an active affiliate link
+  if (earnkaroLink && !isAlreadyAffiliate) {
+    targetUrl = earnkaroLink;
   }
 
   if (!targetUrl || targetUrl.startsWith("#") || targetUrl.startsWith("javascript:")) {

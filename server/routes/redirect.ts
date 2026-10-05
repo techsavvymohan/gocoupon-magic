@@ -101,57 +101,89 @@ export async function handleDealRedirect(req: Request, res: Response) {
     return;
   }
 
-  // 1. Determine monetized affiliate redirect URL
+  // 1. Identify active affiliate networks to preserve 100% commission tracking
+  const isCuelinks =
+    rawUrl.includes("linksredirect.com") ||
+    rawUrl.includes("clnk.in") ||
+    rawUrl.includes("cuelinks");
+
+  const isCj =
+    rawUrl.includes("tkqlhce.com") ||
+    rawUrl.includes("anrdoezrs.net") ||
+    rawUrl.includes("dpbolvw.net") ||
+    rawUrl.includes("jdoqocy.com") ||
+    rawUrl.includes("kqzyfj.com") ||
+    rawUrl.includes("emjcd.com") ||
+    rawUrl.includes("qksrv.net") ||
+    rawUrl.includes("cj.com");
+
+  const isAdmitad =
+    rawUrl.includes("admitad.com") ||
+    rawUrl.includes("alitems.com") ||
+    rawUrl.includes("lenmit.com") ||
+    rawUrl.includes("mitgo.com") ||
+    rawUrl.includes("cityads.com");
+
+  const isEarnKaro =
+    rawUrl.includes("myntr.it") ||
+    rawUrl.includes("fktr.in") ||
+    rawUrl.includes("ajiio.in") ||
+    rawUrl.includes("bitli.in") ||
+    rawUrl.includes("earnkaro");
+
+  const isAmazon =
+    (rawUrl.includes("amazon.in") || rawUrl.includes("amazon.com") || rawUrl.includes("amzn.to")) &&
+    rawUrl.includes("tag=");
+
+  const isImpact = rawUrl.includes("impact.com") || rawUrl.includes("sjv.io");
+
   let targetUrl = rawUrl;
 
-  const EARNKARO_DIRECT_LINKS: Record<string, string> = {
-    myntra: "https://myntr.it/t6fMvnP",
-    flipkart: "https://fktr.in/xL95eGk",
-    ajio: "https://ajiio.in/5gIGQ46",
-    "dot-and-key": "https://bitli.in/Q8p6Tb5",
-    dotandkey: "https://bitli.in/Q8p6Tb5",
-    mcaffeine: "https://bitli.in/30c3jZD",
-    shopsy: "https://bitli.in/X8hNAWk",
-    themancompany: "https://bitli.in/Aiq8ef4",
-    "the-man-company": "https://bitli.in/Aiq8ef4",
-  };
-
-  const normTarget = `${slug} ${store} ${rawUrl}`.toLowerCase();
-  let matchedEarnKaro: string | null = null;
-  if (normTarget.includes("myntra") || normTarget.includes("myntr.it")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.myntra;
-  else if (normTarget.includes("flipkart") || normTarget.includes("fktr.in")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.flipkart;
-  else if (normTarget.includes("ajio") || normTarget.includes("ajiio.in")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.ajio;
-  else if (normTarget.includes("dot") && normTarget.includes("key")) matchedEarnKaro = EARNKARO_DIRECT_LINKS["dot-and-key"];
-  else if (normTarget.includes("mcaffeine") || normTarget.includes("caffeine")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.mcaffeine;
-  else if (normTarget.includes("shopsy")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.shopsy;
-  else if (normTarget.includes("themancompany") || (normTarget.includes("man") && normTarget.includes("company"))) {
-    matchedEarnKaro = EARNKARO_DIRECT_LINKS.themancompany;
+  // Case A: If rawUrl is ALREADY an active affiliate tracking link from CJ, Admitad, Cuelinks, EarnKaro, Amazon, or Impact,
+  // NEVER alter, double-wrap, or strip it! Pass it straight to the network so every single click counts!
+  if (isCj || isAdmitad || isCuelinks || isEarnKaro || isAmazon || isImpact) {
+    targetUrl = rawUrl;
   }
-
-  if (matchedEarnKaro) {
-    targetUrl = matchedEarnKaro;
+  // Case B: If rawUrl is an untagged Amazon merchant URL, attach verified GoCoupon Amazon partner tag
+  else if (rawUrl.includes("amazon.in")) {
+    const sep = rawUrl.includes("?") ? "&" : "?";
+    targetUrl = `${rawUrl}${sep}tag=gocoupon0e-21`;
   }
+  // Case C: Check if merchant has a high-commission EarnKaro partnership link (Myntra, Flipkart, Ajio, etc.)
+  else {
+    const EARNKARO_DIRECT_LINKS: Record<string, string> = {
+      myntra: "https://myntr.it/t6fMvnP",
+      flipkart: "https://fktr.in/xL95eGk",
+      ajio: "https://ajiio.in/5gIGQ46",
+      "dot-and-key": "https://bitli.in/Q8p6Tb5",
+      dotandkey: "https://bitli.in/Q8p6Tb5",
+      mcaffeine: "https://bitli.in/30c3jZD",
+      shopsy: "https://bitli.in/X8hNAWk",
+      themancompany: "https://bitli.in/Aiq8ef4",
+      "the-man-company": "https://bitli.in/Aiq8ef4",
+    };
 
-  // Check if link already contains active affiliate tracking
-  const isAffiliate =
-    targetUrl.includes("linksredirect.com") ||
-    targetUrl.includes("clnk.in") ||
-    targetUrl.includes("admitad.com") ||
-    targetUrl.includes("tag=") ||
-    targetUrl.includes("impact.com") ||
-    targetUrl.includes("cuelinks") ||
-    targetUrl.includes("myntr.it") ||
-    targetUrl.includes("fktr.in") ||
-    targetUrl.includes("ajiio.in") ||
-    targetUrl.includes("bitli.in") ||
-    targetUrl.includes("earnkaro");
+    const normTarget = `${slug} ${store} ${rawUrl}`.toLowerCase();
+    let matchedEarnKaro: string | null = null;
+    if (normTarget.includes("myntra") || normTarget.includes("myntr.it")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.myntra;
+    else if (normTarget.includes("flipkart") || normTarget.includes("fktr.in")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.flipkart;
+    else if (normTarget.includes("ajio") || normTarget.includes("ajiio.in")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.ajio;
+    else if (normTarget.includes("dot") && normTarget.includes("key")) matchedEarnKaro = EARNKARO_DIRECT_LINKS["dot-and-key"];
+    else if (normTarget.includes("mcaffeine") || normTarget.includes("caffeine")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.mcaffeine;
+    else if (normTarget.includes("shopsy")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.shopsy;
+    else if (normTarget.includes("themancompany") || (normTarget.includes("man") && normTarget.includes("company"))) {
+      matchedEarnKaro = EARNKARO_DIRECT_LINKS.themancompany;
+    }
 
-  if (!isAffiliate && /^https?:\/\//i.test(targetUrl)) {
-    // Automatically wrap clean merchant URLs with Cuelinks linksredirect protocol
-    targetUrl = buildCuelinksRedirectUrl({
-      merchantUrl: targetUrl,
-      subId: source || "gocoupon_web",
-    });
+    if (matchedEarnKaro) {
+      targetUrl = matchedEarnKaro;
+    } else if (/^https?:\/\//i.test(targetUrl)) {
+      // Case D: Default universal coverage via Cuelinks (pub_id=148920) for all clean Indian and Global e-commerce stores
+      targetUrl = buildCuelinksRedirectUrl({
+        merchantUrl: targetUrl,
+        subId: source || "gocoupon_web",
+      });
+    }
   }
 
   // 2. Track click in database / analytics
