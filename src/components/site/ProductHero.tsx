@@ -6,7 +6,7 @@
 
 import { Link } from "@tanstack/react-router";
 import { useExtensionBridge } from "@/lib/useExtensionBridge";
-import { Zap, ShieldCheck, ArrowRight, Sparkles, CheckCircle2, Clock } from "lucide-react";
+import { Zap, ShieldCheck, ArrowRight, CheckCircle2, Clock } from "lucide-react";
 import { useFestiveBanner } from "@/lib/hero-banner";
 import { MagneticButton } from "../MagneticButton";
 
@@ -52,7 +52,6 @@ export function ProductHero() {
 
         {/* Sharp Wedge Eyebrow */}
         <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 font-mono text-xs font-semibold text-primary mb-5">
-          <span className="text-sm">🇮🇳</span>
           <span>Engineered for D2C &amp; Top Online Checkouts</span>
         </div>
 
@@ -135,7 +134,6 @@ export function ProductHero() {
               to="/offers"
               className="inline-flex min-h-[50px] items-center gap-2 rounded-full border border-border bg-card/80 px-6 py-3 text-sm font-semibold text-foreground hover:bg-muted hover:border-primary/40 active:scale-95 transition-all shadow-2xs cursor-pointer"
             >
-              <Sparkles className="h-4 w-4 text-amber-500" />
               <span>Browse 1,390+ Deals →</span>
             </Link>
           ) : (

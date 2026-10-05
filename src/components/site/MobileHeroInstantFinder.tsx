@@ -16,7 +16,6 @@ import {
   Copy,
   Check,
   Flame,
-  Sparkles,
   ShieldCheck,
   CreditCard,
   ChevronRight,
@@ -201,7 +200,7 @@ export function MobileHeroInstantFinder() {
         <div className="space-y-2.5 pt-2">
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+              <Flame className="h-3.5 w-3.5 text-rose-500" />
               <h2 className="text-xs font-bold font-display uppercase tracking-wider text-foreground">
                 Top Tested Codes Right Now
               </h2>
@@ -326,7 +325,7 @@ export function MobileHeroInstantFinder() {
           </div>
           <span className="text-border">•</span>
           <div className="flex items-center gap-1">
-            <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+            <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
             <span>Zero Spam Ads</span>
           </div>
         </div>
