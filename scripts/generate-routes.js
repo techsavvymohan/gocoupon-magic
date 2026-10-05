@@ -2086,10 +2086,21 @@ for (const route of allRoutes) {
     `<meta name="description" content="${finalDesc}">`
   );
 
-  // 3. Update Canonical URL
+  // 3. Update Canonical & International Hreflang URLs (US, UK, CA, AU, IN, Global)
+  const canonicalHreflangBlock = [
+    `<link rel="canonical" href="${canonicalUrl}" />`,
+    `<link rel="alternate" hreflang="en" href="${canonicalUrl}" />`,
+    `<link rel="alternate" hreflang="en-us" href="${canonicalUrl}" />`,
+    `<link rel="alternate" hreflang="en-gb" href="${canonicalUrl}" />`,
+    `<link rel="alternate" hreflang="en-ca" href="${canonicalUrl}" />`,
+    `<link rel="alternate" hreflang="en-au" href="${canonicalUrl}" />`,
+    `<link rel="alternate" hreflang="en-in" href="${canonicalUrl}" />`,
+    `<link rel="alternate" hreflang="x-default" href="${canonicalUrl}" />`,
+  ].join("\n    ");
+
   pageHtml = pageHtml.replace(
-    /<link\s+rel="canonical"[\s\S]*?>/i,
-    `<link rel="canonical" href="${canonicalUrl}">`
+    /<link\s+rel="canonical"[\s\S]*?(?=\s*<!-- Performance)/i,
+    `${canonicalHreflangBlock}\n\n    `
   );
 
   // 4. Update OpenGraph Title

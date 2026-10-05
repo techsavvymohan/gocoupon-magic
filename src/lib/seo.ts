@@ -121,7 +121,11 @@ export function createSeoHead(input: SeoInput) {
         property: "og:image:alt",
         content: `${SITE_NAME} — Deals, Discounts, Coupons, 30-Day Price Tracker & Live Cross-Store Comparison`,
       },
-      { property: "og:locale", content: "en_IN" },
+      { property: "og:locale", content: "en_US" },
+      { property: "og:locale:alternate", content: "en_GB" },
+      { property: "og:locale:alternate", content: "en_CA" },
+      { property: "og:locale:alternate", content: "en_AU" },
+      { property: "og:locale:alternate", content: "en_IN" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@gocoupon_in" },
       { name: "twitter:creator", content: "@gocoupon_in" },
@@ -131,6 +135,11 @@ export function createSeoHead(input: SeoInput) {
     ],
     links: [
       { rel: "canonical", href: url },
+      { rel: "alternate", hrefLang: "en", href: url },
+      { rel: "alternate", hrefLang: "en-us", href: url },
+      { rel: "alternate", hrefLang: "en-gb", href: url },
+      { rel: "alternate", hrefLang: "en-ca", href: url },
+      { rel: "alternate", hrefLang: "en-au", href: url },
       { rel: "alternate", hrefLang: "en-in", href: url },
       { rel: "alternate", hrefLang: "x-default", href: url },
     ],
@@ -465,6 +474,13 @@ export function organizationSchema() {
     description:
       "GoCoupon is the official shopping intelligence platform and browser extension for online shoppers worldwide, providing verified coupon automation, price comparison, 30-day price tracking, and bank card cashback stacking.",
     email: "support@gocoupon.io",
+    areaServed: [
+      { "@type": "Country", "name": "United States" },
+      { "@type": "Country", "name": "United Kingdom" },
+      { "@type": "Country", "name": "Canada" },
+      { "@type": "Country", "name": "Australia" },
+      { "@type": "Country", "name": "India" },
+    ],
     knowsAbout: [
       "Automated Coupon Testing & 1-Click Checkout Extension",
       "GrabOn and CouponDuniya Alternative for Indian Online Shoppers",
