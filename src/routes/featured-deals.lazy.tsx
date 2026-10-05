@@ -300,9 +300,9 @@ function FeaturedDealsPage() {
                 <span className="text-muted-foreground">•</span>
                 <span className="text-emerald-600 dark:text-emerald-400 font-bold">100% Verified</span>
               </div>
-              <h1 className="font-display text-base font-extrabold tracking-tight text-foreground truncate mt-0.5">
+              <p className="font-display text-base font-extrabold tracking-tight text-foreground truncate mt-0.5">
                 Featured Deals &amp; Coupons
-              </h1>
+              </p>
             </div>
             <div className="shrink-0 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-2 py-1 shadow-2xs">
               <div className="font-display text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">

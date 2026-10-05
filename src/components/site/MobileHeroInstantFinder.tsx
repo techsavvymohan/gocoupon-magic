@@ -142,10 +142,10 @@ export function MobileHeroInstantFinder() {
 
         {/* Crisp, Direct Mobile Headline */}
         <div className="text-center space-y-1.5">
-          <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground leading-tight text-balance">
+          <h2 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground leading-tight text-balance">
             Never Pay Full Price Online.
             <span className="text-primary block">Copy Working Coupons in 1 Tap.</span>
-          </h1>
+          </h2>
           <p className="text-xs text-muted-foreground leading-relaxed px-1 text-balance">
             Zero expired codes. Search your store or tap below to copy working promo codes directly into your cart.
           </p>
