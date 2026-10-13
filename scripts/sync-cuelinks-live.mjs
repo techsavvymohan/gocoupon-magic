@@ -131,15 +131,34 @@ export function formatViralSeoDeal(storeName, rawCode, discount, rawTitle, rawDe
   const code = hasCoupon ? rawCode.toUpperCase().trim() : "";
 
   // Clean rawTitle
-  let cleanDetail = (rawTitle || "").trim();
+  let cleanDetail = (rawTitle || "")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/[\uFFFD\u00BF]/g, "")
+    .trim();
 
-  // Strip repeated store names from start of rawTitle (e.g. "Gritzo Super Champ Sale" -> "Super Champ Sale")
+  // Strip campaign prefix junk & international locale tokens
+  cleanDetail = cleanDetail.replace(/^(?:[A-Z0-9]{2,}\s*)?Campaign[-_\s:]+/i, "");
+  cleanDetail = cleanDetail.replace(/^[A-Z]{2,4}\s*Campaign[-_\s:]+/i, "");
+  cleanDetail = cleanDetail.replace(/^QR\s*Campaign[-_\s:]*/i, "");
+  cleanDetail = cleanDetail.replace(/(?:[A-Za-z\s]+)?\([A-Z]{2}\)\s*(?:\/\s*\([A-Z]{2}\))?(?:[A-Z]{2})?[-_\s:]*/g, " ");
+  cleanDetail = cleanDetail.replace(
+    /[-_\s/]*(?:\([A-Z]{2}\)|\b(?:KH|EN|MY|JP|ZH|VN|IN|PK|BD|AU|IE|MT|TR|RS|NL|DE|GR|TH|SG|RO|HU|IT|US|GB|UK|CA|AE)\b)(?:\/[-_\s]*(?:\([A-Z]{2}\)|\b(?:KH|EN|MY|JP|ZH|VN|IN|PK|BD|AU|IE|MT|TR|RS|NL|DE|GR|TH|SG|RO|HU|IT|US|GB|UK|CA|AE)\b))*[-_\s:]*/g,
+    " "
+  );
+  cleanDetail = cleanDetail.replace(/\b(?:APAC|EMEA|LATAM|NA)\s+(?:Winter|Summer|Spring|Fall|Phase\s*\d*)[-_\s:]*/gi, "");
+  cleanDetail = cleanDetail.replace(/\bPromocode\b/gi, "");
+
+  // Strip repeated store names from start of rawTitle
   const storeRegex = new RegExp(`^${cleanStore.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")}\\s*[-–:–]?\\s*`, "i");
   cleanDetail = cleanDetail.replace(storeRegex, "").trim();
 
   // Strip generic marketing words that reduce CTR and SEO power
   cleanDetail = cleanDetail
-    .replace(/^(grab your savings|snag|unlock|score|enjoy|get exclusive|get|exclusive offer|special offer|limited time offer|best deal)[:\s–-]*/i, "")
+    .replace(/^(grab your savings|snag|unlock|score|enjoy|get exclusive|get|exclusive offer|special offer|limited time offer|best deal|flash sale)[:\s–-]*/i, "")
     .trim();
 
   // Strip redundant discount text if it already starts with it
@@ -157,10 +176,10 @@ export function formatViralSeoDeal(storeName, rawCode, discount, rawTitle, rawDe
   }
 
   // Clean up punctuation at ends
-  cleanDetail = cleanDetail.replace(/^[-–:,\s]+|[-–:,\s]+$/g, "").trim();
+  cleanDetail = cleanDetail.replace(/^[?*–:,\s|/]+|[?*–:,\s|/]+$/g, "").replace(/\s+/g, " ").trim();
 
   if (!cleanDetail || cleanDetail.length < 3) {
-    cleanDetail = "Sitewide Savings & Exclusive Offers";
+    cleanDetail = discount ? `${discount} Sitewide Savings` : "Verified Store Offer";
   }
 
   // Construct Viral SEO Title matching:

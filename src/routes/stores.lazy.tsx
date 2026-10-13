@@ -4,7 +4,6 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, itemListSchema } from "@/lib/seo";
 import { useStores } from "@/hooks/use-stores";
 import type { Store, StoreSortField } from "@/lib/api/stores-api";
-import { wrapAffiliateTracking } from "@/lib/services/store-registry";
 import { StoreGridSkeleton, FetchError } from "@/components/ui/DataSkeleton";
 import { useCurrency } from "@/context/CurrencyContext";
 import { StoreLogo } from "@/components/common/StoreLogo";
@@ -12,7 +11,6 @@ import {
   Search,
   Store as StoreIcon,
   Tag,
-  ExternalLink,
   ArrowRight,
   Check,
   Copy,
@@ -495,7 +493,9 @@ function StoreCard({
   const formattedDescription = formatPriceString(couponDesc);
 
   const ratingNum = typeof store.rating === "number" ? store.rating : parseFloat(String(store.rating)) || 4.8;
-  const storeLink = store.link || (store.slug ? `/${store.slug}` : "/stores");
+  const rawSlug = store.slug || store.id || store.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  const cleanSlug = rawSlug.startsWith("/") ? rawSlug.slice(1) : rawSlug;
+  const internalRoute = `/${cleanSlug.endsWith("-coupons") ? cleanSlug : `${cleanSlug}-coupons`}`;
   const couponsCount = store.couponsCount ?? 0;
 
   const CardContent = (
@@ -599,34 +599,17 @@ function StoreCard({
         </span>
 
         <div className="inline-flex items-center gap-1 text-xs font-bold text-primary min-h-[36px] group-hover:underline">
-          <span>{store.isInternalRoute ? "View store deals" : "Visit store"}</span>
-          {store.isInternalRoute ? (
-            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-          ) : (
-            <ExternalLink className="h-3.5 w-3.5" />
-          )}
+          <span>View store deals</span>
+          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
         </div>
       </div>
     </div>
   );
 
-  if (store.isInternalRoute) {
-    return (
-      <Link to={storeLink} className="block h-full">
-        {CardContent}
-      </Link>
-    );
-  }
-
   return (
-    <a
-      href={wrapAffiliateTracking(storeLink, "gocoupon_stores_directory")}
-      target="_blank"
-      rel="noopener noreferrer nofollow"
-      className="block h-full"
-    >
+    <Link to={internalRoute} className="block h-full">
       {CardContent}
-    </a>
+    </Link>
   );
 }
 

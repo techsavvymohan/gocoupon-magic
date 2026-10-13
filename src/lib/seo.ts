@@ -28,11 +28,11 @@ export function absoluteUrl(path: string): string {
 
 export function normalizeSeoTitle(rawTitle: string, fallbackBrand = " | GoCoupon"): string {
   let title = rawTitle.replace(/\s*–\s*GoCoupon.*$/i, "").replace(/\s*\|\s*GoCoupon.*$/i, "").trim();
-  const maxTitleLen = 58 - fallbackBrand.length; // 47
+  const maxTitleLen = 60 - fallbackBrand.length;
   if (title.length > maxTitleLen) {
     let trimmed = title.slice(0, maxTitleLen);
     const lastSpace = trimmed.lastIndexOf(" ");
-    if (lastSpace > 24) {
+    if (lastSpace > 28) {
       trimmed = trimmed.slice(0, lastSpace);
     }
     title = trimmed.replace(/[\s,&;:-]+$/, "").trim();
@@ -41,10 +41,10 @@ export function normalizeSeoTitle(rawTitle: string, fallbackBrand = " | GoCoupon
   if (fullTitle.length < 35) {
     if (fullTitle.includes("Terms")) fullTitle = "Terms of Service & User Agreement | GoCoupon";
     else if (fullTitle.includes("Privacy")) fullTitle = "Privacy Policy & Zero Data Tracking | GoCoupon";
-    else fullTitle = `${title} Deals & Coupons | GoCoupon`;
+    else fullTitle = `${title}: Verified Promo Codes & Deals (2026) | GoCoupon`;
   }
-  if (fullTitle.length > 58) {
-    fullTitle = fullTitle.slice(0, 55) + "...";
+  if (fullTitle.length > 60) {
+    fullTitle = fullTitle.slice(0, 57) + "...";
   }
   return fullTitle;
 }
@@ -108,29 +108,15 @@ export function createSeoHead(input: SeoInput) {
         content: `${SITE_NAME} — Deals, Discounts, Coupons, 30-Day Price Tracker & Live Cross-Store Comparison`,
       },
       { property: "og:locale", content: "en_IN" },
+      { property: "og:locale:alternate", content: "en_US" },
+      { property: "og:locale:alternate", content: "en_GB" },
+      { property: "og:locale:alternate", content: "en_CA" },
+      { property: "og:locale:alternate", content: "en_AU" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@gocoupon_in" },
       { name: "twitter:creator", content: "@gocoupon_in" },
       { name: "twitter:title", content: cleanTitle },
       { name: "twitter:description", content: cleanDescription },
-      { property: "og:url", content: url },
-      { property: "og:image", content: ogImage },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
-      {
-        property: "og:image:alt",
-        content: `${SITE_NAME} — Deals, Discounts, Coupons, 30-Day Price Tracker & Live Cross-Store Comparison`,
-      },
-      { property: "og:locale", content: "en_US" },
-      { property: "og:locale:alternate", content: "en_GB" },
-      { property: "og:locale:alternate", content: "en_CA" },
-      { property: "og:locale:alternate", content: "en_AU" },
-      { property: "og:locale:alternate", content: "en_IN" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@gocoupon_in" },
-      { name: "twitter:creator", content: "@gocoupon_in" },
-      { name: "twitter:title", content: title },
-      { name: "twitter:description", content: description },
       { name: "twitter:image", content: ogImage },
     ],
     links: [

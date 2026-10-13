@@ -32,7 +32,7 @@ function optimizeTitle(rawTitle, fallbackBrand = " | GoCoupon") {
     return rawTitle;
   }
   let title = rawTitle.replace(/\s*–\s*GoCoupon.*$/i, "").replace(/\s*\|\s*GoCoupon.*$/i, "").trim();
-  const maxTitleLen = 58 - fallbackBrand.length; // 47
+  const maxTitleLen = 60 - fallbackBrand.length;
   if (title.length > maxTitleLen) {
     let trimmed = title.slice(0, maxTitleLen);
     const lastSpace = trimmed.lastIndexOf(" ");
@@ -48,10 +48,10 @@ function optimizeTitle(rawTitle, fallbackBrand = " | GoCoupon") {
   if (fullTitle.length < 35) {
     if (fullTitle.includes("Terms")) fullTitle = "Terms of Service & User Agreement | GoCoupon";
     else if (fullTitle.includes("Privacy")) fullTitle = "Privacy Policy & Zero Data Tracking | GoCoupon";
-    else fullTitle = `${title} Official Platform | GoCoupon`;
+    else fullTitle = `${title}: Verified Promo Codes & Discounts (2026) | GoCoupon`;
   }
-  if (fullTitle.length > 58) {
-    fullTitle = fullTitle.slice(0, 55) + "...";
+  if (fullTitle.length > 60) {
+    fullTitle = fullTitle.slice(0, 57) + "...";
   }
   return fullTitle;
 }
@@ -2028,16 +2028,59 @@ try {
       storeMap.get(slug).deals.push(d);
     }
 
-        for (const [slug, store] of storeMap) {
+    const unifiedStoresPath = path.resolve(__dirname, "../src/data/unified-stores.json");
+    if (fs.existsSync(unifiedStoresPath)) {
+      try {
+        const unifiedRaw = JSON.parse(fs.readFileSync(unifiedStoresPath, "utf-8"));
+        const unifiedList = Array.isArray(unifiedRaw) ? unifiedRaw : [];
+        for (const u of unifiedList) {
+          if (!u.name) continue;
+          const name = sanitizeStore(u.name);
+          if (!name) continue;
+          const slugKey = u.slug
+            ? (u.slug.endsWith("-coupons") ? u.slug : `${u.slug}-coupons`)
+            : `${slugifyStore(name)}-coupons`;
+          if (!slugKey || existingPaths.has(slugKey)) continue;
+
+          if (!storeMap.has(slugKey)) {
+            const uDeals = Array.isArray(u.deals) ? u.deals : [];
+            storeMap.set(slugKey, {
+              name,
+              slug: slugKey,
+              deals: uDeals.map((ud) => ({
+                code: ud.code || "ACTIVATE DEAL",
+                discount: ud.discount || u.maxDiscount || "Verified Deal",
+                title: ud.title || `Save up to ${u.maxDiscount || "50%"} at ${name}`,
+                storeLogo: u.logo || "",
+              })),
+              category: u.category || "Online Shopping",
+              logo: u.logo || "",
+            });
+          }
+        }
+      } catch (e) {
+        console.warn("Could not load unified-stores into pre-rendered routes:", e.message);
+      }
+    }
+
+    for (const [slug, store] of storeMap) {
       const storeName = store.name;
       const cleanKey = storeName.toLowerCase().replace(/[^a-z0-9]/g, "");
-      const storeLogoUrl = brandAssetsMap.get(cleanKey) || store.deals.find(d => d.storeLogo)?.storeLogo || "";
+      const storeLogoUrl = brandAssetsMap.get(cleanKey) || store.logo || store.deals.find(d => d.storeLogo)?.storeLogo || "";
       const optTitle = optimizeTitle(`${storeName} Coupon Codes & Deals (2026)`);
       const optDesc = optimizeDescription(
         `Verified ${storeName} promo codes, discount vouchers, and bank card offers for 2026. Auto-apply the highest working discount on GoCoupon.io.`
       );
 
-      const topDeals = store.deals.slice(0, 8);
+      const rawTopDeals = store.deals.slice(0, 8);
+      const topDeals = rawTopDeals.length > 0 ? rawTopDeals : [
+        {
+          code: "DEALACTIVATED",
+          discount: "Verified Deal",
+          title: `Exclusive ${storeName} Promotional Offer & Free Shipping`,
+          storeLogo: storeLogoUrl,
+        }
+      ];
       const dealsHtml = `
         <div class="store-deals-vault" style="margin: 24px 0;">
           <h3 style="color: #38bdf8; font-size: 18px; margin-bottom: 16px;">Active Verified Coupons for ${storeName}</h3>

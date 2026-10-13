@@ -599,11 +599,22 @@ body {
 }
 
 /* ── Thunderbolt AI Support - Mobile Isolation ── */
-/* Strictly applied only to mobile screens (<= 768px). Desktop remains 100% untouched. */
+/* Strictly applied only to mobile screens (<= 768px). Desktop launcher remains untouched once cookies are handled. */
 @media (max-width: 768px) {
   /* Hide the floating launcher bubble on Android/mobile when closed to prevent overlapping bottom nav */
-  div[data-thunderbolt-host="true"]:not([data-open="true"]) {
+  div[data-thunderbolt-host="true"]:not([data-open="true"]),
+  iframe[title*="Thunderbolt"]:not([data-open="true"]),
+  iframe[src*="thunderbolt"]:not([data-open="true"]) {
     display: none !important;
   }
+}
+
+/* ── Cookie Consent Isolation: prevent third-party widgets from intercepting clicks or visually blocking choices ── */
+body.cookie-consent-active iframe[title*="Thunderbolt"],
+body.cookie-consent-active iframe[src*="thunderbolt"],
+body.cookie-consent-active div[data-thunderbolt-host="true"] {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
 }
 

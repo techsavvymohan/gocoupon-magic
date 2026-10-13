@@ -20,11 +20,24 @@ export function CookieConsent() {
     }
   }, []);
 
+  // Isolate third-party floating widgets while cookie consent choices are pending
+  useEffect(() => {
+    if (isVisible) {
+      document.body.classList.add("cookie-consent-active");
+      return () => {
+        document.body.classList.remove("cookie-consent-active");
+      };
+    }
+  }, [isVisible]);
+
   const handleConsent = (level: "all" | "essential") => {
     try {
       localStorage.setItem(
         CONSENT_STORAGE_KEY,
         JSON.stringify({ level, timestamp: new Date().toISOString() }),
+      );
+      window.dispatchEvent(
+        new CustomEvent("gocoupon:cookie-consent", { detail: { level } }),
       );
     } catch (e) {
       void e;
@@ -38,7 +51,8 @@ export function CookieConsent() {
     <aside
       role="region"
       aria-label="Cookie preferences"
-      className="fixed bottom-20 md:bottom-6 left-4 right-4 md:left-auto md:right-6 md:max-w-md z-50 rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-2xl animate-in fade-in slide-in-from-bottom-5 duration-300"
+      style={{ zIndex: 2147483646 }}
+      className="fixed bottom-20 sm:bottom-6 left-3 sm:left-6 right-3 sm:right-auto sm:max-w-md z-[2147483646] rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-2xl animate-in fade-in slide-in-from-bottom-5 duration-300"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2.5">
@@ -81,14 +95,14 @@ export function CookieConsent() {
         <button
           type="button"
           onClick={() => handleConsent("essential")}
-          className="rounded-xl border border-border bg-background px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-muted/80 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary touch-manipulation min-h-[38px] transition-all"
+          className="rounded-xl border border-border bg-background px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-muted/80 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary touch-manipulation min-h-[38px] transition-all cursor-pointer"
         >
           Essential Only
         </button>
         <button
           type="button"
           onClick={() => handleConsent("all")}
-          className="flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm hover:bg-primary/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary touch-manipulation min-h-[38px] transition-all"
+          className="flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm hover:bg-primary/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary touch-manipulation min-h-[38px] transition-all cursor-pointer"
         >
           <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
           <span>Accept All</span>

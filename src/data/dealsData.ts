@@ -26,6 +26,8 @@ export interface Deal {
   terms: string;
   link: string;
   usesCount: number;
+  seoKeywords?: string[];
+  directAnswer?: string;
 }
 
 // Filter out expired deals from a deal array

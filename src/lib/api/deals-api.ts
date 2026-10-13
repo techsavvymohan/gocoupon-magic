@@ -115,15 +115,28 @@ async function getStaticDeals(options: FetchDealsOptions = {}): Promise<DealsApi
 
   if (options.q) {
     const qLower = options.q.toLowerCase().trim();
-    filtered = filtered.filter(
-      (d) =>
+    const cleanQ = qLower
+      .replace(/\b(coupons?|coupon\s*codes?|promo\s*codes?|promos?|discounts?|deals?|offers?|vouchers?|codes?|2026|today|online|free|flat)\b/gi, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    filtered = filtered.filter((d) => {
+      const dStore = (d.storeName || "").toLowerCase();
+      const seoSynthetic = `${dStore} coupon code ${dStore} promo code`;
+      const keywords = Array.isArray(d.seoKeywords) ? d.seoKeywords.join(" ").toLowerCase() : "";
+      return (
         (d.title || "").toLowerCase().includes(qLower) ||
-        (d.storeName || "").toLowerCase().includes(qLower) ||
+        dStore.includes(qLower) ||
+        qLower.includes(dStore) ||
+        (cleanQ.length >= 2 && (dStore.includes(cleanQ) || cleanQ.includes(dStore) || (d.title || "").toLowerCase().includes(cleanQ))) ||
         (d.storeSlug || "").toLowerCase().includes(qLower) ||
         (d.code || "").toLowerCase().includes(qLower) ||
         (d.discount || "").toLowerCase().includes(qLower) ||
-        (d.terms || "").toLowerCase().includes(qLower)
-    );
+        (d.terms || "").toLowerCase().includes(qLower) ||
+        seoSynthetic.includes(qLower) ||
+        keywords.includes(qLower)
+      );
+    });
   }
 
   if (options.badge) {

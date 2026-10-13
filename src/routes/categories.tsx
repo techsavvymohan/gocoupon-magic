@@ -53,7 +53,7 @@ const CATEGORIES_LIST: CategoryItem[] = [
       { name: "Myntra", to: "/myntra-coupons" },
       { name: "Flipkart Fashion", to: "/flipkart-coupons" },
       { name: "Meesho", to: "/meesho-coupons" },
-      { name: "AJIO", href: "https://www.ajio.com" },
+      { name: "AJIO", to: "/ajio-coupons" },
     ],
     description:
       "Save on branded apparel, ethnic sarees, sneakers, luxury handbags, and accessories. Combine first-time app codes with seasonal flash discounts.",
@@ -69,8 +69,8 @@ const CATEGORIES_LIST: CategoryItem[] = [
     popularStores: [
       { name: "Amazon India", to: "/amazon-coupons" },
       { name: "Flipkart Electronics", to: "/flipkart-coupons" },
-      { name: "Tata CLiQ", href: "https://www.tatacliq.com" },
-      { name: "boAt Lifestyle", href: "https://www.boat-lifestyle.com" },
+      { name: "Tata CLiQ", to: "/tata-cliq-coupons" },
+      { name: "boAt Lifestyle", to: "/boat-coupons" },
     ],
     description:
       "Get instant bank discounts on 5G smartphones, gaming laptops, smart TVs, noise-cancelling headphones, and home smart appliances.",
@@ -84,9 +84,9 @@ const CATEGORIES_LIST: CategoryItem[] = [
     tagline: "Restaurant Food, Midnight Snacks & Pizza",
     avgSavings: "30% – 50% OFF",
     popularStores: [
-      { name: "Swiggy", href: "https://www.swiggy.com" },
-      { name: "Zomato", href: "https://www.zomato.com" },
-      { name: "Domino's Pizza", href: "https://www.dominos.co.in" },
+      { name: "Swiggy", to: "/swiggy-coupons" },
+      { name: "Zomato", to: "/zomato-coupons" },
+      { name: "Domino's Pizza", to: "/dominos-coupons" },
     ],
     description:
       "Auto-test coupon codes on Swiggy and Zomato food orders, gourmet cloud kitchens, party pizza combos, and weekend dine-in bookings.",
@@ -100,8 +100,8 @@ const CATEGORIES_LIST: CategoryItem[] = [
     tagline: "Domestic & International Flights, Resorts & Trains",
     avgSavings: "Flat ₹1,200 – ₹5,000 OFF",
     popularStores: [
-      { name: "MakeMyTrip", href: "https://www.makemytrip.com" },
-      { name: "Cleartrip", href: "https://www.cleartrip.com" },
+      { name: "MakeMyTrip", to: "/makemytrip-coupons" },
+      { name: "Cleartrip", to: "/cleartrip-coupons" },
     ],
     description:
       "Unlock discounted flight tickets, zero cancellation charges, boutique resort packages, and instant bank card promo codes.",
@@ -115,8 +115,8 @@ const CATEGORIES_LIST: CategoryItem[] = [
     tagline: "Skincare, Makeup, Haircare & Fragrances",
     avgSavings: "20% – 50% OFF",
     popularStores: [
-      { name: "Nykaa", href: "https://www.nykaa.com" },
-      { name: "Mamaearth", href: "https://mamaearth.in" },
+      { name: "Nykaa", to: "/nykaa-coupons" },
+      { name: "Mamaearth", to: "/mamaearth-coupons" },
       { name: "Amazon Beauty", to: "/amazon-coupons" },
       { name: "Myntra Beauty", to: "/myntra-coupons" },
     ],
@@ -148,7 +148,7 @@ const CATEGORIES_LIST: CategoryItem[] = [
     tagline: "Diapers, Toys, Baby Clothes & Strollers",
     avgSavings: "25% – 55% OFF",
     popularStores: [
-      { name: "FirstCry", href: "https://www.firstcry.com" },
+      { name: "FirstCry", to: "/firstcry-coupons" },
       { name: "Amazon Family", to: "/amazon-coupons" },
       { name: "Meesho Kids", to: "/meesho-coupons" },
     ],
@@ -166,7 +166,7 @@ const CATEGORIES_LIST: CategoryItem[] = [
     popularStores: [
       { name: "Amazon Fresh", to: "/amazon-coupons" },
       { name: "Flipkart Minutes", to: "/flipkart-coupons" },
-      { name: "Swiggy Instamart", href: "https://www.swiggy.com" },
+      { name: "Swiggy Instamart", to: "/swiggy-coupons" },
     ],
     description:
       "Get cashback and coupon discounts on daily milk, fresh fruits, organic pantry staples, breakfast cereals, and household cleaners.",

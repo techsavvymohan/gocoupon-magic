@@ -11,6 +11,7 @@ import { StoreLogo } from "@/components/common/StoreLogo";
 import { RedeemCouponButton } from "@/components/common/RedeemCouponButton";
 import { RealtimeIndicator } from "@/components/common/RealtimeIndicator";
 import { SubmitCouponButton } from "@/components/submit_coupon";
+import { formatSeoCouponTitle } from "@/lib/services/seo-title-formatter";
 import {
   DealCard,
   BankOfferCard,
@@ -433,7 +434,18 @@ function OffersHubPage() {
     return allRealStores.filter((store) => {
       if (storeSearchQuery) {
         const q = storeSearchQuery.toLowerCase().trim();
-        if (!store.name.toLowerCase().includes(q) && !store.category.toLowerCase().includes(q)) {
+        const cleanQ = q
+          .replace(/\b(coupons?|coupon\s*codes?|promo\s*codes?|promos?|discounts?|deals?|offers?|vouchers?|codes?|2026|today|online|free|flat)\b/gi, "")
+          .replace(/\s+/g, " ")
+          .trim();
+        const sName = store.name.toLowerCase();
+        const sCat = store.category.toLowerCase();
+        const matches =
+          sName.includes(q) ||
+          q.includes(sName) ||
+          sCat.includes(q) ||
+          (cleanQ.length >= 2 && (sName.includes(cleanQ) || cleanQ.includes(sName)));
+        if (!matches) {
           return false;
         }
       }
@@ -502,6 +514,10 @@ function OffersHubPage() {
       // 7. Filter by Search Query
       const q = searchQuery.toLowerCase().trim();
       if (q) {
+        const cleanQ = q
+          .replace(/\b(coupons?|coupon\s*codes?|promo\s*codes?|promos?|discounts?|deals?|offers?|vouchers?|codes?|2026|today|online|free|flat)\b/gi, "")
+          .replace(/\s+/g, " ")
+          .trim();
         const title = (deal.title || "").toLowerCase();
         const storeName = (deal.storeName || "").toLowerCase();
         const storeSlug = (deal.storeSlug || "").toLowerCase();
@@ -509,14 +525,20 @@ function OffersHubPage() {
         const discount = (deal.discount || "").toLowerCase();
         const category = (deal.category || "").toLowerCase();
         const terms = (deal.terms || "").toLowerCase();
+        const seoSynthetic = `${storeName} coupon code ${storeName} promo code ${storeName} discount code`;
+        const keywords = Array.isArray(deal.seoKeywords) ? deal.seoKeywords.join(" ").toLowerCase() : "";
         const matchesSearch =
           title.includes(q) ||
           storeName.includes(q) ||
+          q.includes(storeName) ||
+          (cleanQ.length >= 2 && (storeName.includes(cleanQ) || cleanQ.includes(storeName) || title.includes(cleanQ))) ||
           storeSlug.includes(q) ||
           code.includes(q) ||
           discount.includes(q) ||
           category.includes(q) ||
-          terms.includes(q);
+          terms.includes(q) ||
+          seoSynthetic.includes(q) ||
+          keywords.includes(q);
         if (!matchesSearch) return false;
       }
 
@@ -641,8 +663,9 @@ function OffersHubPage() {
       const targetPath = deal.storeSlug
         ? `/${deal.storeSlug}`
         : `/offers?store=${encodeURIComponent(deal.storeName || "retailer")}`;
+      const seoTitle = formatSeoCouponTitle(deal.storeName, deal.code, deal.discount, deal.title);
       return {
-        name: deal.title,
+        name: seoTitle,
         description: `${deal.discount} at ${deal.storeName}${
           deal.code && deal.code.length > 1 ? ` — use code ${deal.code}` : ` — no code needed, discount auto-applied`
         }`,

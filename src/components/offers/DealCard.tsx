@@ -3,6 +3,7 @@ import { Clock, Users, ChevronDown, ShieldCheck } from "lucide-react";
 import { StoreLogo } from "@/components/common/StoreLogo";
 import { RedeemCouponButton } from "@/components/common/RedeemCouponButton";
 import { buildDealRedirectUrl, wrapAffiliateTracking } from "@/lib/services/store-registry";
+import { formatSeoCouponTitle } from "@/lib/services/seo-title-formatter";
 import type { Deal } from "@/lib/api/deals-api";
 
 export interface DealCardProps {
@@ -25,12 +26,16 @@ export const DealCard = React.memo(function DealCard({
   onRedeem,
 }: DealCardProps) {
   const isListView = viewDensity === "list";
+  const seoTitle = React.useMemo(() => {
+    return formatSeoCouponTitle(deal.storeName, deal.code, deal.discount, deal.title);
+  }, [deal.storeName, deal.code, deal.discount, deal.title]);
+
   const affiliateUrl = buildDealRedirectUrl({
     url: deal.link,
     dealId: deal.id,
     storeName: deal.storeName,
     storeSlug: deal.storeSlug,
-    title: deal.title,
+    title: seoTitle,
     code: deal.code,
     source: isListView ? "gocoupon_offers_list" : "gocoupon_offers_grid",
   });
@@ -54,7 +59,7 @@ export const DealCard = React.memo(function DealCard({
       <article
         role="article"
         tabIndex={0}
-        aria-label={`${deal.storeName} - ${deal.title}`}
+        aria-label={`${deal.storeName} - ${seoTitle}`}
         onClick={(e) => onCardClick(deal, e)}
         onKeyDown={handleKeyDown}
         className="group relative flex flex-col md:flex-row md:items-center justify-between gap-5 rounded-2xl border border-border/80 bg-card p-5 sm:p-6 transition-all duration-200 hover:border-primary/50 hover:shadow-md cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
@@ -80,7 +85,7 @@ export const DealCard = React.memo(function DealCard({
             </div>
 
             <h3 className="font-display text-sm sm:text-base font-bold text-foreground group-hover:text-primary transition-colors leading-snug">
-              {deal.title}
+              {seoTitle}
             </h3>
 
             {deal.terms && (
@@ -151,7 +156,7 @@ export const DealCard = React.memo(function DealCard({
     <article
       role="article"
       tabIndex={0}
-      aria-label={`${deal.storeName} - ${deal.title}`}
+      aria-label={`${deal.storeName} - ${seoTitle}`}
       onClick={(e) => onCardClick(deal, e)}
       onKeyDown={handleKeyDown}
       className="group flex flex-col justify-between rounded-2xl border border-border bg-card p-4 transition-all duration-200 hover:border-primary/40 hover:shadow-md cursor-pointer overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
@@ -182,7 +187,7 @@ export const DealCard = React.memo(function DealCard({
             {deal.discount}
           </div>
           <h3 className="text-xs font-medium text-foreground leading-snug line-clamp-2 group-hover:text-primary transition-colors">
-            {deal.title}
+            {seoTitle}
           </h3>
         </div>
 

@@ -61,10 +61,17 @@ export function NavbarSearch({
       return;
     }
 
+    const cleanApiQ = trimmed
+      .replace(/\b(coupons?|coupon\s*codes?|promo\s*codes?|promos?|discounts?|deals?|offers?|vouchers?|codes?|2026|today|online|free|flat)\b/gi, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    const queryToUse = cleanApiQ.length >= 2 ? cleanApiQ : trimmed;
+
     setIsSearchingApi(true);
     const timer = setTimeout(async () => {
       try {
-        const res = await fetchDeals({ q: trimmed, limit: 5 });
+        const res = await fetchDeals({ q: queryToUse, limit: 5 });
         let deals = (res.deals || []).map((d) => ({
           id: d.id,
           storeName: d.storeName,
@@ -78,7 +85,7 @@ export function NavbarSearch({
         if (deals.length < 3) {
           try {
             const { fetchInternationalDeals } = await import("@/lib/api/international-deals-api");
-            const intlRes = await fetchInternationalDeals({ q: trimmed });
+            const intlRes = await fetchInternationalDeals({ q: queryToUse });
             if (intlRes.deals && intlRes.deals.length > 0) {
               const existingIds = new Set(deals.map((d) => d.id));
               for (const d of intlRes.deals) {
@@ -113,13 +120,23 @@ export function NavbarSearch({
     const q = query.trim().toLowerCase();
     if (!q) return { stores: [], deals: [], hasMore: false };
 
+    const cleanQ = q
+      .replace(/\b(coupons?|coupon\s*codes?|promo\s*codes?|promos?|discounts?|deals?|offers?|vouchers?|codes?|2026|today|online|free|flat)\b/gi, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    const matchesIntent = (target: string) => {
+      const t = (target || "").toLowerCase();
+      if (!t) return false;
+      if (t.includes(q) || q.includes(t)) return true;
+      if (cleanQ.length >= 2 && (t.includes(cleanQ) || cleanQ.includes(t))) return true;
+      return false;
+    };
+
     // 1. Match stores from catalog
     const matchedStores = allStores
       .filter((s) => {
-        const name = s.name.toLowerCase();
-        const cat = s.category.toLowerCase();
-        const slug = s.slug.toLowerCase();
-        return name.includes(q) || cat.includes(q) || slug.includes(q);
+        return matchesIntent(s.name) || matchesIntent(s.category) || matchesIntent(s.slug);
       })
       .slice(0, 5);
 
@@ -139,7 +156,7 @@ export function NavbarSearch({
         const title = (d.title || "").toLowerCase();
         const code = (d.code || "").toLowerCase();
         const storeName = s.name.toLowerCase();
-        if (title.includes(q) || code.includes(q) || storeName.includes(q)) {
+        if (matchesIntent(title) || matchesIntent(code) || matchesIntent(storeName)) {
           dealMap.set(d.id || code || title, {
             id: d.id || `${s.slug}-${code}`,
             storeName: s.name,
@@ -216,12 +233,21 @@ export function NavbarSearch({
 
     // If query matches a store exactly or closely, jump to that store
     const cleanLower = cleanQ.toLowerCase();
-    const exactStore = allStores.find(
-      (s) =>
-        s.name.toLowerCase() === cleanLower ||
-        s.slug.replace(/-coupons$/, "").toLowerCase() === cleanLower ||
-        s.slug.toLowerCase() === cleanLower
-    );
+    const strippedLower = cleanLower
+      .replace(/\b(coupons?|coupon\s*codes?|promo\s*codes?|promos?|discounts?|deals?|offers?|vouchers?|codes?|2026|today|online|free|flat)\b/gi, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    const exactStore = allStores.find((s) => {
+      const sName = s.name.toLowerCase();
+      const sSlug = s.slug.replace(/-coupons$/, "").toLowerCase();
+      return (
+        sName === cleanLower ||
+        sSlug === cleanLower ||
+        s.slug.toLowerCase() === cleanLower ||
+        (strippedLower.length >= 2 && (sName === strippedLower || sSlug === strippedLower))
+      );
+    });
 
     if (exactStore) {
       navigate({ to: `/${exactStore.slug}` as any });
