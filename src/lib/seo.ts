@@ -262,13 +262,6 @@ export function storeCouponSchema(params: StoreCouponSchemaParams) {
         image: logoUrl,
         priceRange: "$$",
         dateModified: dateModified,
-        aggregateRating: {
-          "@type": "AggregateRating",
-          ratingValue: rating.toString(),
-          reviewCount: count.toString(),
-          bestRating: "5",
-          worstRating: "1",
-        },
         parentOrganization: {
           "@id": "https://gocoupon.io/#organization",
         },

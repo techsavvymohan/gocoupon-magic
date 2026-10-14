@@ -2451,13 +2451,6 @@ for (const route of allRoutes) {
       "description": finalDesc.replace(/"/g, '\\"'),
       "image": "https://gocoupon.io/gc-logo.webp",
       "priceRange": "$$",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "460",
-        "bestRating": "5",
-        "worstRating": "1",
-      },
       "parentOrganization": {
         "@type": "Organization",
         "name": "GoCoupon",
