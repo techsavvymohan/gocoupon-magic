@@ -100,3 +100,6 @@ jobs:
             fi
             curl -sf http://127.0.0.1:3000/api/health || true
             echo "✅ GoCoupon successfully reloaded on VPS!"
+            echo "📡 Triggering automated search engine IndexNow submission..."
+            node scripts/submit-indexnow.mjs || true
+

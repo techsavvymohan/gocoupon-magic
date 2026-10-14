@@ -40,3 +40,7 @@ docs/reference/
 scratch/
 coupon_audit_data/
 *.tar.gz
+
+# Automated Indexing Credentials & State
+*service-account*.json
+.indexing-history.json

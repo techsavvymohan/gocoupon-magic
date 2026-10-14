@@ -1,0 +1,34 @@
+name: 🤖 Automated Search Engine Indexing
+
+on:
+  schedule:
+    # Runs daily at 02:00 UTC (07:30 AM IST)
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  index:
+    name: 🚀 Submit URLs to Google & IndexNow
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Check out repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js 22 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 🔑 Configure Google Service Account (if secret provided)
+        if: ${{ env.GSC_SECRET != '' }}
+        env:
+          GSC_SECRET: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}" > service-account.json
+          echo "✅ Google Service Account credentials configured."
+
+      - name: 📡 Run Automated Indexing Suite
+        run: |
+          node scripts/submit-indexing.mjs
