@@ -43,4 +43,5 @@ coupon_audit_data/
 
 # Automated Indexing Credentials & State
 *service-account*.json
+gen-lang-client*.json
 .indexing-history.json
