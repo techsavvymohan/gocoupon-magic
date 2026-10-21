@@ -1,3 +1,4 @@
+
 import { createFileRoute } from "@tanstack/react-router";
 import { SeoLandingPage } from "@/components/site/SeoLandingPage";
 import { breadcrumbSchema, createSeoHead, faqSchema, storeCouponSchema } from "@/lib/seo";
@@ -161,6 +162,7 @@ function HostingerCouponsPage() {
         primaryCtaLabel="Install Extension Free"
         primaryCtaTo="/extension"
         storeName="Hostinger"
+        storeUrl="https://www.hostinger.in"
         eeatProof={{
           verifiedCount: "14 Codes",
           successRate: "96.4%",

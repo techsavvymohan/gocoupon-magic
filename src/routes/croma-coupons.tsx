@@ -160,6 +160,7 @@ function CromaCouponsPage() {
         primaryCtaLabel="Install Extension Free"
         primaryCtaTo="/extension"
         storeName="Croma Retail"
+        storeUrl="https://www.croma.com"
         eeatProof={{
           verifiedCount: "19 Codes",
           successRate: "91.8%",

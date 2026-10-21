@@ -163,6 +163,7 @@ function AmazonCouponsPage() {
         primaryCtaLabel="Install Extension Free"
         primaryCtaTo="/extension"
         storeName="Amazon India"
+        storeUrl="https://www.amazon.in"
         eeatProof={{
           verifiedCount: "38 Codes",
           successRate: "92.4%",

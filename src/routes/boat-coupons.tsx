@@ -160,6 +160,7 @@ function BoatCouponsPage() {
         primaryCtaLabel="Install Extension Free"
         primaryCtaTo="/extension"
         storeName="boAt Lifestyle"
+        storeUrl="https://www.boat-lifestyle.com"
         eeatProof={{
           verifiedCount: "16 Codes",
           successRate: "95.2%",

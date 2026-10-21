@@ -160,6 +160,7 @@ function TataCliqCouponsPage() {
         primaryCtaLabel="Install Extension Free"
         primaryCtaTo="/extension"
         storeName="Tata CLiQ"
+        storeUrl="https://www.tatacliq.com"
         eeatProof={{
           verifiedCount: "18 Codes",
           successRate: "92.8%",

@@ -160,6 +160,7 @@ function MyntraCouponsPage() {
         primaryCtaLabel="Install Extension Free"
         primaryCtaTo="/extension"
         storeName="Myntra"
+        storeUrl="https://www.myntra.com"
         eeatProof={{
           verifiedCount: "34 Codes",
           successRate: "93.1%",

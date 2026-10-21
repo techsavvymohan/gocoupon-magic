@@ -81,7 +81,7 @@ export function extractMerchantDestination(rawUrl: string): string {
  * - source: Page or component source, e.g. "offers_grid" (Optional)
  */
 export async function handleDealRedirect(req: Request, res: Response) {
-  const rawUrl = String(
+  let rawUrl = String(
     req.query.url ||
     req.query.target ||
     req.query.link ||
@@ -96,9 +96,66 @@ export async function handleDealRedirect(req: Request, res: Response) {
   const code = String(req.query.code || "").trim();
   const source = String(req.query.source || "offers").trim();
 
-  if (!rawUrl) {
-    res.redirect(302, "/offers");
-    return;
+  // If rawUrl is missing, "#", or blank, fallback to known merchant homepage
+  if (!rawUrl || rawUrl === "#" || rawUrl === "about:blank" || rawUrl.startsWith("javascript:")) {
+    const storeQuery = `${slug} ${store}`.toLowerCase().trim();
+    const KNOWN_MERCHANT_HOMEPAGES: Record<string, string> = {
+      boat: "https://www.boat-lifestyle.com",
+      "boat-lifestyle": "https://www.boat-lifestyle.com",
+      hostinger: "https://www.hostinger.in",
+      meesho: "https://www.meesho.com",
+      croma: "https://www.croma.com",
+      "tata-cliq": "https://www.tatacliq.com",
+      tatacliq: "https://www.tatacliq.com",
+      "1mg": "https://www.1mg.com",
+      tata1mg: "https://www.1mg.com",
+      nykaa: "https://www.nykaa.com",
+      myntra: "https://www.myntra.com",
+      flipkart: "https://www.flipkart.com",
+      amazon: "https://www.amazon.in",
+      ajio: "https://www.ajio.com",
+      swiggy: "https://www.swiggy.com",
+      zomato: "https://www.zomato.com",
+      dominos: "https://www.dominos.co.in",
+      pizzahut: "https://www.pizzahut.co.in",
+      mamaearth: "https://www.mamaearth.in",
+      makemytrip: "https://www.makemytrip.com",
+      goibibo: "https://www.goibibo.com",
+      easemytrip: "https://www.easemytrip.com",
+      booking: "https://www.booking.com",
+      agoda: "https://www.agoda.com",
+      dell: "https://www.dell.com",
+      samsung: "https://www.samsung.com",
+      lenovo: "https://www.lenovo.com",
+      hp: "https://www.hp.com",
+      puma: "https://in.puma.com",
+      adidas: "https://www.adidas.co.in",
+      nike: "https://www.nike.com/in",
+      aliexpress: "https://www.aliexpress.com",
+      udemy: "https://www.udemy.com",
+      coursera: "https://www.coursera.org",
+      namecheap: "https://www.namecheap.com",
+      godaddy: "https://www.godaddy.com",
+      kinguin: "https://www.kinguin.net",
+      g2a: "https://www.g2a.com",
+    };
+
+    let resolvedFallback: string | null = null;
+    for (const [key, homeUrl] of Object.entries(KNOWN_MERCHANT_HOMEPAGES)) {
+      if (storeQuery.includes(key)) {
+        resolvedFallback = homeUrl;
+        break;
+      }
+    }
+
+    if (resolvedFallback) {
+      rawUrl = resolvedFallback;
+    } else if (slug && /^[a-z0-9-]+$/i.test(slug)) {
+      rawUrl = `https://www.${slug.replace(/^www\./, "")}.com`;
+    } else {
+      res.redirect(302, "/offers");
+      return;
+    }
   }
 
   // 1. Identify active affiliate networks to preserve 100% commission tracking

@@ -160,6 +160,7 @@ function FlipkartCouponsPage() {
         primaryCtaLabel="Install Extension Free"
         primaryCtaTo="/extension"
         storeName="Flipkart"
+        storeUrl="https://www.flipkart.com"
         eeatProof={{
           verifiedCount: "29 Codes",
           successRate: "90.8%",

@@ -160,6 +160,7 @@ function MeeshoCouponsPage() {
         primaryCtaLabel="Install Extension Free"
         primaryCtaTo="/extension"
         storeName="Meesho"
+        storeUrl="https://www.meesho.com"
         eeatProof={{
           verifiedCount: "22 Codes",
           successRate: "94.2%",

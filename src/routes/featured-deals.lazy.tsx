@@ -209,12 +209,12 @@ function FeaturedDealsPage() {
   // Copy coupon code handler
   const handleCopyCode = (item: FeaturedDealItem, e?: React.MouseEvent) => {
     e?.stopPropagation();
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(item.couponCode);
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(item.couponCode).catch(() => {});
     }
     setCopiedCode(item.couponCode);
     toast.success(`Coupon code ${item.couponCode} copied!`, {
-      description: `Use it at ${item.brandName} checkout for ${item.discountText}.`,
+      description: `Opening ${item.brandName}... Use code at checkout for ${item.discountText}.`,
     });
 
     // Fire custom analytics event
@@ -229,6 +229,22 @@ function FeaturedDealsPage() {
         placement: "featured_catalog",
         campaign_source: item.campaignSource,
       });
+    }
+
+    const isAnchor = Boolean(e?.currentTarget && (e.currentTarget as HTMLElement).tagName === "A");
+    if (!isAnchor) {
+      const redirectUrl = buildDealRedirectUrl({
+        url: item.affiliateUrl || item.merchantUrl,
+        dealId: item.id || item.campaignId,
+        storeName: item.brandName,
+        storeSlug: item.brandSlug,
+        title: item.subTitle || item.discountText,
+        code: item.couponCode,
+        source: "featured_deals_copy",
+      });
+      if (redirectUrl && redirectUrl !== "#") {
+        window.open(redirectUrl, "_blank", "noopener,noreferrer");
+      }
     }
 
     setTimeout(() => {
@@ -494,14 +510,25 @@ function FeaturedDealsPage() {
                             </span>
                           </div>
 
-                          <button
-                            type="button"
+                          <a
+                            href={buildDealRedirectUrl({
+                              url: item.affiliateUrl || item.merchantUrl,
+                              dealId: item.id || item.campaignId,
+                              storeName: item.brandName,
+                              storeSlug: item.brandSlug,
+                              title: item.subTitle || item.discountText,
+                              code: item.couponCode,
+                              source: "featured_deals_copy",
+                            })}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             onClick={(e) => handleCopyCode(item, e)}
                             className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-1.5 font-mono text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${
                               isCopied
                                 ? "bg-emerald-600 text-white"
                                 : "bg-primary text-primary-foreground hover:opacity-90 active:scale-95"
                             }`}
+                            title={`Copy ${item.couponCode} and open ${item.brandName}`}
                           >
                             {isCopied ? (
                               <>
@@ -514,7 +541,7 @@ function FeaturedDealsPage() {
                                 <span>Copy</span>
                               </>
                             )}
-                          </button>
+                          </a>
                         </div>
                       </div>
                     </div>

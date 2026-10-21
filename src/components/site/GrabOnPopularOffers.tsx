@@ -138,12 +138,18 @@ export function GrabOnPopularOffers() {
     });
   }, [liveIndiaDeals, liveIntlDeals]);
 
-  const handleCopy = (code: string, brandName: string, redirectUrl: string) => {
-    navigator.clipboard.writeText(code);
+  const handleCopy = (code: string, brandName: string, redirectUrl: string, e?: React.MouseEvent) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(code).catch(() => {});
+    }
     setCopiedCode(code);
     toast.success(`Coupon code ${code} copied!`, {
       description: `Opening ${brandName}... Paste code at checkout to claim your discount.`,
     });
+    const isAnchor = Boolean(e?.currentTarget && (e.currentTarget as HTMLElement).tagName === "A");
+    if (!isAnchor && redirectUrl && redirectUrl !== "#") {
+      window.open(redirectUrl, "_blank", "noopener,noreferrer");
+    }
     setTimeout(() => setCopiedCode(null), 3000);
   };
 
@@ -231,16 +237,18 @@ export function GrabOnPopularOffers() {
                 {/* Bottom Card Action Footer: Copy Button + Direct Affiliate Launch */}
                 <div className="p-2 sm:p-4 pt-0">
                   <div className="pt-2 sm:pt-3 border-t border-slate-100 dark:border-border/60 flex items-center gap-1.5 sm:gap-2">
-                    {/* Copy Code Button with Bounce Effect */}
-                    <button
-                      type="button"
-                      onClick={() => handleCopy(deal.couponCode, deal.brandName, deal.affiliateUrl)}
+                    {/* Copy Code Button with Bounce Effect & Direct Navigation */}
+                    <a
+                      href={deal.affiliateUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => handleCopy(deal.couponCode, deal.brandName, deal.affiliateUrl, e)}
                       className={`flex-1 inline-flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 sm:py-2 px-1.5 sm:px-3 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all duration-200 border active:scale-95 cursor-pointer min-w-0 ${
                         isCopied
                           ? "bg-emerald-500 text-white border-emerald-500 shadow-xs"
                           : "bg-slate-50 dark:bg-muted text-slate-800 dark:text-foreground border-slate-200 dark:border-border hover:bg-slate-100 dark:hover:bg-muted/80 hover:border-primary/40"
                       }`}
-                      title={`Copy ${deal.couponCode}`}
+                      title={`Copy ${deal.couponCode} and open ${deal.brandName}`}
                     >
                       {isCopied ? (
                         <>
@@ -254,7 +262,7 @@ export function GrabOnPopularOffers() {
                           <Copy className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-muted-foreground ml-auto shrink-0 hidden xs:inline" />
                         </>
                       )}
-                    </button>
+                    </a>
 
                     {/* Direct Outbound Visit CTA (Monetized via Cuelinks/EarnKaro) */}
                     <a

@@ -168,8 +168,14 @@ export function buildDealRedirectUrl(options: {
     }
   }
 
+  // If targetUrl is missing or dead, fall back to registered store homepage
   if (!targetUrl || targetUrl.startsWith("#") || targetUrl.startsWith("javascript:")) {
-    return "#";
+    const fallbackStore = findStoreByNameOrSlug(options.storeSlug || options.storeName);
+    if (fallbackStore?.storeUrl) {
+      targetUrl = fallbackStore.storeUrl;
+    } else {
+      return "#";
+    }
   }
 
   // If already routed through our redirect
@@ -259,19 +265,127 @@ export function buildStoreAffiliateUrl(store: RegisteredStore, subId = "gocoupon
 export function findStoreByNameOrSlug(nameOrSlug?: string): RegisteredStore | null {
   if (!nameOrSlug) return null;
   const q = nameOrSlug.toLowerCase().trim();
-  const cleanQ = q.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "").replace(/-coupons$/, "");
+  const cleanQ = q
+    .replace(/^https?:\/\/(www\.)?/, "")
+    .replace(/\/.*$/, "")
+    .replace(/-coupons$/, "")
+    .replace(/[^a-z0-9-]/g, "");
+
+  const normalizedAlpha = cleanQ.replace(/[^a-z0-9]/g, "");
+
   return (
     REGISTERED_STORES.find(
       (s) =>
         s.id.toLowerCase() === cleanQ ||
+        s.id.toLowerCase().replace(/[^a-z0-9]/g, "") === normalizedAlpha ||
         s.domain.toLowerCase() === cleanQ ||
+        s.domain.toLowerCase().replace(/[^a-z0-9]/g, "") === normalizedAlpha ||
         s.name.toLowerCase() === q ||
-        (s.aliases && s.aliases.some((a) => a.toLowerCase() === q || a.toLowerCase() === cleanQ))
+        s.name.toLowerCase().replace(/[^a-z0-9]/g, "") === normalizedAlpha ||
+        (s.aliases &&
+          s.aliases.some((a) => {
+            const aLower = a.toLowerCase();
+            return (
+              aLower === q ||
+              aLower === cleanQ ||
+              aLower.replace(/[^a-z0-9]/g, "") === normalizedAlpha
+            );
+          }))
     ) || null
   );
 }
 
 export const REGISTERED_STORES: RegisteredStore[] = [
+  {
+    id: "boat",
+    name: "boAt Lifestyle",
+    category: "electronics",
+    region: "IN",
+    tier: 1,
+    logo: "/Brand logos/brand_boat.webp",
+    domain: "boat-lifestyle.com",
+    storeUrl: "https://www.boat-lifestyle.com",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["boat", "boat lifestyle", "boat audio", "boat-lifestyle", "boatlifestyle", "boat electronics"],
+    internalRoute: "/boat-coupons",
+    defaultCoupon: { code: "BOATFEST", description: "Extra 10% off on Airdopes, Rockerz & Smartwatches", discountPct: 0.1 },
+    cashbackRate: "Up to 8.0%",
+    cashbackPct: 0.08,
+    buildSearchUrl: (q) => wrapAffiliateTracking(`https://www.boat-lifestyle.com/search?q=${encodeURIComponent(q)}`),
+  },
+  {
+    id: "hostinger",
+    name: "Hostinger",
+    category: "education",
+    region: "GLOBAL",
+    tier: 1,
+    logo: "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060832/gocoupon/brands/real_brand_hostinger.svg",
+    domain: "hostinger.in",
+    storeUrl: "https://www.hostinger.in",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["hostinger", "hostinger india", "hostinger hosting", "hostinger.in", "hostinger.com"],
+    internalRoute: "/hostinger-coupons",
+    defaultCoupon: { code: "GLOBALHOST10", description: "Extra 10% off on web hosting & free domain", discountPct: 0.1 },
+    cashbackRate: "Up to 15.0%",
+    cashbackPct: 0.15,
+    buildSearchUrl: () => wrapAffiliateTracking("https://www.hostinger.in"),
+  },
+  {
+    id: "meesho",
+    name: "Meesho",
+    category: "fashion",
+    region: "IN",
+    tier: 1,
+    logo: "https://www.google.com/s2/favicons?domain=meesho.com&sz=128",
+    domain: "meesho.com",
+    storeUrl: "https://www.meesho.com",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["meesho", "meesho app", "meesho shopping", "meesho online"],
+    internalRoute: "/meesho-coupons",
+    defaultCoupon: { code: "MEESHONEW", description: "Extra 15% off on your first fashion & home order", discountPct: 0.15 },
+    cashbackRate: "Up to 7.0%",
+    cashbackPct: 0.07,
+    buildSearchUrl: (q) => wrapAffiliateTracking(`https://www.meesho.com/search?q=${encodeURIComponent(q)}`),
+  },
+  {
+    id: "croma",
+    name: "Croma",
+    category: "electronics",
+    region: "IN",
+    tier: 1,
+    logo: "/Brand logos/Croma.webp",
+    domain: "croma.com",
+    storeUrl: "https://www.croma.com",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["croma", "croma retail", "tata croma", "croma electronics"],
+    internalRoute: "/croma-coupons",
+    defaultCoupon: { code: "CRMA500", description: "Flat ₹500 instant discount on electronics & appliances above ₹10,000", discountAmount: 500 },
+    cashbackRate: "Up to 6.5%",
+    cashbackPct: 0.065,
+    buildSearchUrl: (q) => wrapAffiliateTracking(`https://www.croma.com/searchB?q=${encodeURIComponent(q)}`),
+  },
+  {
+    id: "1mg",
+    name: "Tata 1mg",
+    category: "general",
+    region: "IN",
+    tier: 1,
+    logo: "https://www.google.com/s2/favicons?domain=1mg.com&sz=128",
+    domain: "1mg.com",
+    storeUrl: "https://www.1mg.com",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["1mg", "tata 1mg", "tata1mg", "1mg pharmacy", "one mg"],
+    internalRoute: "/stores",
+    defaultCoupon: { code: "CARE20", description: "Flat 20% off on medicines & health supplements", discountPct: 0.2 },
+    cashbackRate: "Up to 9.0%",
+    cashbackPct: 0.09,
+    buildSearchUrl: (q) => wrapAffiliateTracking(`https://www.1mg.com/search/all?name=${encodeURIComponent(q)}`),
+  },
   {
     id: "plum-goodness",
     name: "Plum Goodness",

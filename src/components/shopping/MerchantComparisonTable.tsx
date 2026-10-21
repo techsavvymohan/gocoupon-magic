@@ -24,11 +24,16 @@ export function MerchantComparisonTable({ comparison, productTitle }: MerchantCo
   const { formatPrice } = useCurrency();
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
-  const handleCopy = (code: string) => {
+  const handleCopy = (code: string, storeName?: string, redirectUrl?: string, e?: React.MouseEvent) => {
     navigator.clipboard.writeText(code).catch(() => {});
     setCopiedCode(code);
-    toast.success(`Copied code: ${code}`);
+    toast.success(`Copied code: ${code}! Opening ${storeName || "store"}...`);
     setTimeout(() => setCopiedCode(null), 2500);
+
+    const isAnchorClick = e && (e.currentTarget as HTMLElement).tagName.toLowerCase() === "a";
+    if (!isAnchorClick && redirectUrl && redirectUrl !== "#") {
+      window.open(redirectUrl, "_blank", "noopener,noreferrer");
+    }
   };
 
   return (
@@ -120,18 +125,20 @@ export function MerchantComparisonTable({ comparison, productTitle }: MerchantCo
                 </div>
                 <div className="mt-1.5 flex flex-col gap-1">
                   {row.bestCouponCode ? (
-                    <button
-                      type="button"
-                      onClick={() => handleCopy(row.bestCouponCode!)}
+                    <a
+                      href={row.affiliateUrl}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow"
+                      onClick={(e) => handleCopy(row.bestCouponCode!, row.storeName, row.affiliateUrl, e)}
                       className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-primary/40 bg-primary/5 px-2.5 py-1 text-xs font-mono font-bold text-primary hover:bg-primary/10 transition-colors w-fit group"
-                      title="Click to copy coupon code"
+                      title={`Click to copy ${row.bestCouponCode} & open ${row.storeName}`}
                     >
                       <Tag className="h-3 w-3" />
                       <span>{copiedCode === row.bestCouponCode ? "Copied!" : row.bestCouponCode}</span>
                       <span className="text-[10px] text-emerald-500 font-bold">
                         (-{formatPrice(row.couponSavings)})
                       </span>
-                    </button>
+                    </a>
                   ) : (
                     <span className="text-xs text-muted-foreground">No extra coupons</span>
                   )}
@@ -235,17 +242,20 @@ export function MerchantComparisonTable({ comparison, productTitle }: MerchantCo
               {/* Discount / Coupon Strip on Mobile */}
               <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-muted/40 p-2.5 text-xs font-mono">
                 {row.bestCouponCode ? (
-                  <button
-                    type="button"
-                    onClick={() => handleCopy(row.bestCouponCode!)}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-primary/40 bg-card px-2 py-1 text-[11px] font-bold text-primary"
+                  <a
+                    href={row.affiliateUrl}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    onClick={(e) => handleCopy(row.bestCouponCode!, row.storeName, row.affiliateUrl, e)}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-primary/40 bg-card px-2 py-1 text-[11px] font-bold text-primary hover:bg-muted/80 transition-colors"
+                    title={`Click to copy ${row.bestCouponCode} & open ${row.storeName}`}
                   >
                     <Tag className="h-3 w-3" />
                     <span>{copiedCode === row.bestCouponCode ? "Copied!" : row.bestCouponCode}</span>
                     <span className="text-emerald-500 font-bold">
                       (-{formatPrice(row.couponSavings)})
                     </span>
-                  </button>
+                  </a>
                 ) : (
                   <span className="text-[11px] text-muted-foreground">Standard Price</span>
                 )}

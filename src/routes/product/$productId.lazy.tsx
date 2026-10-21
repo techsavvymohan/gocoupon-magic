@@ -320,9 +320,16 @@ function ProductDetailsPage() {
               Verified Stackable Promo Codes
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
-              {coupons.map((c) => (
-                <CouponStackPill key={c.id} coupon={c} />
-              ))}
+              {coupons.map((c) => {
+                const matchingRow = comparison?.rows.find((r) => r.offer.storeId === c.storeId);
+                return (
+                  <CouponStackPill
+                    key={c.id}
+                    coupon={c}
+                    storeUrl={matchingRow?.offer.rawUrl || matchingRow?.affiliateUrl}
+                  />
+                );
+              })}
             </div>
           </section>
         )}

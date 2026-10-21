@@ -123,14 +123,15 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
     return wrapAffiliateTracking(`https://${slugCandidate}.com`, "gocoupon_store_hero");
   })();
 
-  const handleCopyCode = (code: string, targetAffiliateUrl?: string) => {
+  const handleCopyCode = (code: string, targetAffiliateUrl?: string, e?: React.MouseEvent) => {
     navigator.clipboard.writeText(code).catch(() => {});
     setCopiedCode(code);
     toast.success(`Coupon code "${code}" copied!`, {
       description: "Opening store in a new tab with verified tracking to auto-apply.",
     });
     const dest = targetAffiliateUrl || storeAffiliateUrl;
-    if (dest && dest !== "#") {
+    const isAnchor = Boolean(e?.currentTarget && (e.currentTarget as HTMLElement).tagName === "A");
+    if (!isAnchor && dest && dest !== "#") {
       const finalDest = dest.startsWith("/api/redirect/deal") || dest.startsWith("/out")
         ? dest
         : wrapAffiliateTracking(dest, "seo_store_coupon");
@@ -358,9 +359,11 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
                             <Tag className="h-3 w-3 text-sky-400" />
                             <span>{cleanCode}</span>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => handleCopyCode(cleanCode, couponAffiliateUrl)}
+                          <a
+                            href={couponAffiliateUrl}
+                            target="_blank"
+                            rel="noopener noreferrer nofollow"
+                            onClick={(e) => handleCopyCode(cleanCode, couponAffiliateUrl, e)}
                             className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
                               isCopied
                                 ? "bg-emerald-600 text-white shadow-xs"
@@ -377,7 +380,7 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
                                 <Copy className="h-3.5 w-3.5" /> Copy Code
                               </>
                             )}
-                          </button>
+                          </a>
                         </div>
                       ) : (
                         <div className="flex items-center justify-between gap-2">

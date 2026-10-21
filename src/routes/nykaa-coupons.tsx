@@ -160,6 +160,7 @@ function NykaaCouponsPage() {
         primaryCtaLabel="Install Extension Free"
         primaryCtaTo="/extension"
         storeName="Nykaa"
+        storeUrl="https://www.nykaa.com"
         eeatProof={{
           verifiedCount: "21 Codes",
           successRate: "94.6%",

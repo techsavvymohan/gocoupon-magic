@@ -20,6 +20,7 @@ import { StoreLogo } from "@/components/common/StoreLogo";
 import { useFestiveBanner } from "@/lib/hero-banner";
 import { useDeals } from "@/hooks/use-deals";
 import { useInternationalDeals } from "@/hooks/use-international-deals";
+import { findStoreByNameOrSlug } from "@/lib/services/store-registry";
 
 // Color palettes for hero banner slides to give each brand an authentic, vibrant look
 
@@ -281,12 +282,18 @@ export function GrabOnHero() {
     emblaSideApi?.scrollTo(index);
   };
 
-  const handleCopy = (code: string, brandName: string) => {
-    navigator.clipboard.writeText(code);
+  const handleCopy = (code: string, brandName: string, targetUrl?: string, e?: React.MouseEvent) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(code).catch(() => {});
+    }
     setCopiedCode(code);
     toast.success(`Coupon code ${code} copied!`, {
-      description: `Paste at ${brandName} checkout to claim your discount.`,
+      description: `Opening ${brandName}... Paste at checkout to claim your discount.`,
     });
+    const isAnchor = Boolean(e?.currentTarget && (e.currentTarget as HTMLElement).tagName === "A");
+    if (!isAnchor && targetUrl && targetUrl !== "#") {
+      window.open(targetUrl, "_blank", "noopener,noreferrer");
+    }
     setTimeout(() => setCopiedCode(null), 3000);
   };
 
@@ -410,10 +417,13 @@ export function GrabOnHero() {
                           {/* Bottom Actions: Coupon Code Copy + Get Deal CTA */}
                           <div className="relative z-10 flex flex-wrap items-center gap-2 sm:gap-3 pt-2">
                             {deal.couponCode ? (
-                              <button
-                                type="button"
-                                onClick={() => handleCopy(deal.couponCode, deal.brandName)}
+                              <a
+                                href={deal.affiliateUrl || deal.merchantUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => handleCopy(deal.couponCode, deal.brandName, deal.affiliateUrl || deal.merchantUrl, e)}
                                 className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl bg-white text-slate-900 px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold shadow-md hover:bg-slate-100 active:scale-95 transition-all group cursor-pointer"
+                                title={`Copy ${deal.couponCode} and open ${deal.brandName}`}
                               >
                                 <Tag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
                                 <span className="font-mono tracking-wider">{deal.couponCode}</span>
@@ -426,7 +436,7 @@ export function GrabOnHero() {
                                     <Copy className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Copy
                                   </span>
                                 )}
-                              </button>
+                              </a>
                             ) : null}
 
                             <a
@@ -551,14 +561,17 @@ export function GrabOnHero() {
                           </p>
 
                           <div className="mt-3 pt-3 border-t border-slate-100 dark:border-border/60 flex items-center justify-between gap-2">
-                            <button
-                              type="button"
-                              onClick={() => handleCopy(pick.code, pick.storeName)}
+                            <a
+                              href={findStoreByNameOrSlug(pick.storeSlug)?.storeUrl || "/stores"}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => handleCopy(pick.code, pick.storeName, findStoreByNameOrSlug(pick.storeSlug)?.storeUrl, e)}
                               className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1 active:scale-95 transition-transform cursor-pointer"
+                              title={`Copy ${pick.code} and open ${pick.storeName}`}
                             >
                               <Tag className="w-3 h-3" />
                               <span>{pick.code}</span>
-                            </button>
+                            </a>
 
                             <Link
                               to={pick.linkUrl as any}

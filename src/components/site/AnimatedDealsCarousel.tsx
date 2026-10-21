@@ -37,7 +37,7 @@ function CarouselDealCard({
 }: {
   deal: Deal;
   copiedCode: string | null;
-  onCopy: (code: string, storeName: string) => void;
+  onCopy: (code: string, storeName: string, redirectUrl?: string, e?: React.MouseEvent) => void;
 }) {
   const hasWorkingCode = deal.code && deal.code !== "DEALACTIVATED";
   const logoUrl = getRealStoreLogo(deal.storeLogo, deal.storeName);
@@ -114,14 +114,16 @@ function CarouselDealCard({
       {/* Bottom Action Row */}
       <div className="mt-4 flex items-center gap-2 border-t border-border/60 pt-3">
         {hasWorkingCode ? (
-          <button
-            type="button"
+          <a
+            href={redirectUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={(e) => {
               e.stopPropagation();
-              onCopy(deal.code, deal.storeName);
+              onCopy(deal.code, deal.storeName, redirectUrl, e);
             }}
             className="flex-1 rounded-xl border border-dashed border-primary/40 bg-primary/5 py-2 px-2 text-center text-xs font-mono font-bold text-primary hover:bg-primary/10 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-            title="Click to copy coupon code"
+            title={`Click to copy code and open ${deal.storeName}`}
           >
             <span>{copiedCode === deal.code ? "Copied!" : deal.code}</span>
             {copiedCode === deal.code ? (
@@ -129,7 +131,7 @@ function CarouselDealCard({
             ) : (
               <Copy className="h-3 w-3 opacity-60 group-hover:opacity-100" />
             )}
-          </button>
+          </a>
         ) : (
           <div className="flex-1 rounded-xl bg-muted/60 py-2 px-2 text-center text-[11px] font-mono text-muted-foreground font-semibold">
             No Code Needed
@@ -163,12 +165,18 @@ export function AnimatedDealsCarousel() {
   // Fetch real live deals directly from /api/deals
   const { deals, isLoading } = useDeals({ limit: 12, sortBy: "trending" });
 
-  const handleCopy = (code: string, storeName: string) => {
-    navigator.clipboard.writeText(code).catch(() => {});
+  const handleCopy = (code: string, storeName: string, redirectUrl?: string, e?: React.MouseEvent) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(code).catch(() => {});
+    }
     setCopiedCode(code);
     toast.success(`Coupon "${code}" copied!`, {
       description: `Opening ${storeName} to apply at checkout.`,
     });
+    const isAnchor = Boolean(e?.currentTarget && (e.currentTarget as HTMLElement).tagName === "A");
+    if (!isAnchor && redirectUrl && redirectUrl !== "#") {
+      window.open(redirectUrl, "_blank", "noopener,noreferrer");
+    }
     setTimeout(() => setCopiedCode(null), 2500);
   };
 

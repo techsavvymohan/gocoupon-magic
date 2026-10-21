@@ -5,29 +5,46 @@
 
 import { useState } from "react";
 import type { StoreCoupon } from "@/lib/services/canonical-types";
+import { buildDealRedirectUrl, findStoreByNameOrSlug } from "@/lib/services/store-registry";
 import { Tag, Check, Copy, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 interface CouponStackPillProps {
   coupon: StoreCoupon;
   compact?: boolean;
+  storeUrl?: string;
 }
 
-export function CouponStackPill({ coupon, compact = false }: CouponStackPillProps) {
+export function CouponStackPill({ coupon, compact = false, storeUrl }: CouponStackPillProps) {
   const [isCopied, setIsCopied] = useState(false);
 
+  const destinationUrl =
+    storeUrl || findStoreByNameOrSlug(coupon.storeId || coupon.storeName)?.storeUrl || "";
+
+  const affiliateUrl = buildDealRedirectUrl({
+    url: destinationUrl,
+    storeName: coupon.storeName,
+    storeSlug: coupon.storeId,
+  });
+
   const handleCopy = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
     navigator.clipboard.writeText(coupon.code).catch(() => {});
     setIsCopied(true);
-    toast.success(`Coupon ${coupon.code} copied! Ready to paste.`);
+    toast.success(`Coupon ${coupon.code} copied! Opening ${coupon.storeName || "store"}...`);
     setTimeout(() => setIsCopied(false), 2500);
+
+    const isAnchorClick = (e.currentTarget as HTMLElement).tagName.toLowerCase() === "a";
+    if (!isAnchorClick && affiliateUrl && affiliateUrl !== "#") {
+      window.open(affiliateUrl, "_blank", "noopener,noreferrer");
+    }
   };
 
   if (compact) {
     return (
-      <button
+      <a
+        href={affiliateUrl}
+        target="_blank"
+        rel="noopener noreferrer nofollow"
         onClick={handleCopy}
         className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-primary/40 bg-primary/5 px-2.5 py-1 text-xs font-mono font-medium text-primary hover:bg-primary/10 transition-colors"
         title={`Click to copy: ${coupon.description}`}
@@ -35,7 +52,7 @@ export function CouponStackPill({ coupon, compact = false }: CouponStackPillProp
         <Tag className="h-3 w-3" />
         <span>{isCopied ? "Copied!" : coupon.code}</span>
         <span className="font-bold text-emerald-500">({coupon.discountLabel})</span>
-      </button>
+      </a>
     );
   }
 
@@ -66,8 +83,10 @@ export function CouponStackPill({ coupon, compact = false }: CouponStackPillProp
         </div>
       </div>
 
-      <button
-        type="button"
+      <a
+        href={affiliateUrl}
+        target="_blank"
+        rel="noopener noreferrer nofollow"
         onClick={handleCopy}
         className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-xs transition-transform hover:scale-105 active:scale-95"
       >
@@ -82,7 +101,7 @@ export function CouponStackPill({ coupon, compact = false }: CouponStackPillProp
             <span>Copy Code</span>
           </>
         )}
-      </button>
+      </a>
     </div>
   );
 }
