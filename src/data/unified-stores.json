@@ -403,7 +403,7 @@
     "fallbackIcon": "🛍️",
     "badge": "Luxury & Tech",
     "rating": 4.6,
-    "couponsCount": 40,
+    "couponsCount": 3,
     "maxDiscount": "65% OFF",
     "cashbackRate": "Up to 4.5%",
     "description": "Tata Group's trusted platform for certified electronics, luxury timepieces, genuine apparel, and NeuPass rewards.",
@@ -802,7 +802,7 @@
   {
     "id": "bestbuy",
     "name": "Best Buy",
-    "slug": "bestbuy-coupons",
+    "slug": "best-buy-coupons",
     "category": "Electronics",
     "logo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791057642/gocoupon/brands/brand_bestbuy.svg",
     "fallbackIcon": "🛍️",
@@ -822,7 +822,7 @@
       "description": "Save $50 on qualifying smart home and computer gear",
       "discount": "$50 OFF"
     },
-    "link": "/bestbuy-coupons",
+    "link": "/best-buy-coupons",
     "isInternalRoute": true,
     "deals": [
       {
@@ -1048,43 +1048,6 @@
         "discount": "20% OFF",
         "description": "20% off selected raw denim jeans, graphic hoodies, utility overshirts & sneakers",
         "category": "Fashion",
-        "expiry": "Active Today"
-      }
-    ]
-  },
-  {
-    "id": "tatacliq",
-    "name": "Tata CLiQ",
-    "slug": "tatacliq-coupons",
-    "category": "General",
-    "logo": "/Brand logos/Tata-cliq.webp",
-    "fallbackIcon": "🛍️",
-    "badge": "Tata Trusted",
-    "rating": 4.7,
-    "couponsCount": 28,
-    "maxDiscount": "70% OFF",
-    "cashbackRate": "Up to 5%",
-    "description": "Authentic online marketplace offering premium electronics, luxury apparel, footwear, and home appliances from Tata Group.",
-    "features": [
-      "100% Genuine Brands",
-      "Tata Neu Rewards",
-      "Easy Returns & Exchanges"
-    ],
-    "popularCoupon": {
-      "code": "CLIQFEST",
-      "description": "15% off electronics and fashion orders over ₹1,999",
-      "discount": "15% OFF"
-    },
-    "link": "/tatacliq-coupons",
-    "isInternalRoute": true,
-    "deals": [
-      {
-        "id": "tatacliq-pop",
-        "title": "15% off electronics and fashion orders over ₹1,999",
-        "code": "CLIQFEST",
-        "discount": "15% OFF",
-        "description": "15% off electronics and fashion orders over ₹1,999",
-        "category": "General",
         "expiry": "Active Today"
       }
     ]
@@ -1507,7 +1470,7 @@
   {
     "id": "banggood-cj-affiliate-program",
     "name": "Banggood CJ",
-    "slug": "banggood-cj-affiliate-program-coupons",
+    "slug": "banggood-coupons",
     "category": "Virtual Malls",
     "logo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745883/gocoupon/brands/brand_banggood.png",
     "fallbackIcon": "🛍️",
@@ -1527,7 +1490,7 @@
       "description": "8% OFF for Auto Parts",
       "discount": "8% OFF"
     },
-    "link": "/banggood-cj-affiliate-program-coupons",
+    "link": "/banggood-coupons",
     "isInternalRoute": true,
     "deals": [
       {
@@ -1783,7 +1746,7 @@
   {
     "id": "stylevana-affiliate-program",
     "name": "Stylevana",
-    "slug": "stylevana-affiliate-program-coupons",
+    "slug": "stylevana-coupons",
     "category": "Cosmetics",
     "logo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058497/gocoupon/brands/brand_stylevana.png",
     "fallbackIcon": "🛍️",
@@ -1803,7 +1766,7 @@
       "description": "US: VANA Seasonal Shift Sale - Upto 50% off",
       "discount": "50% OFF"
     },
-    "link": "/stylevana-affiliate-program-coupons",
+    "link": "/stylevana-coupons",
     "isInternalRoute": true,
     "deals": [
       {
@@ -2184,44 +2147,6 @@
     ]
   },
   {
-    "id": "raynatours-many-geos-tracking-promo-codes",
-    "name": "RaynaTours Many Geos",
-    "slug": "raynatours-many-geos-tracking-promo-codes-coupons",
-    "category": "Tours & Travels",
-    "logo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059114/gocoupon/brands/real_brand_raynatours.png",
-    "fallbackIcon": "🛍️",
-    "badge": "Verified Partner",
-    "rating": 4.8,
-    "couponsCount": 12,
-    "maxDiscount": "15%",
-    "cashbackRate": "Available",
-    "description": "Verified promo codes, discount vouchers, and shopping deals for RaynaTours Many Geos. Tested daily with real-time cart verification.",
-    "features": [
-      "Verified Codes",
-      "Tested Today",
-      "Instant Apply"
-    ],
-    "popularCoupon": {
-      "code": "DEAL ACTIVATED",
-      "description": "Sea world - Penguin Encounter Ticket 250 AED was (295)",
-      "discount": "15%"
-    },
-    "link": "/raynatours-many-geos-tracking-promo-codes-coupons",
-    "isInternalRoute": true,
-    "deals": [
-      {
-        "id": "admitad-776832",
-        "title": "Sea world - Penguin Encounter Ticket 250 AED was (295)",
-        "code": "DEAL ACTIVATED",
-        "discount": "15%",
-        "description": "Inclusions\r\nSea turtle experience is for 1 hour approximately.\r\nAdmission to Dugong or Sea Turtle experience.\r\nInteract closely with Malquot, a rescued dugong.\r\nShare a lettuce treat amidst swimming sea turtles.\r\nParticipants must be minimum 2 years old.",
-        "category": "Tours & Travels",
-        "expiry": "Ongoing",
-        "link": "https://www.raynatours.com/"
-      }
-    ]
-  },
-  {
     "id": "hamara-mall",
     "name": "Hamara Mall",
     "slug": "hamara-mall-coupons",
@@ -2456,7 +2381,7 @@
   {
     "id": "jcpenney-affiliate",
     "name": "JCPenney",
-    "slug": "jcpenney-affiliate-coupons",
+    "slug": "jcpenney-coupons",
     "category": "Womens",
     "logo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791058514/gocoupon/brands/brand_jcpenney.png",
     "fallbackIcon": "🛍️",
@@ -2476,7 +2401,7 @@
       "description": "Extra 20% Off Today",
       "discount": "20% OFF"
     },
-    "link": "/jcpenney-affiliate-coupons",
+    "link": "/jcpenney-coupons",
     "isInternalRoute": true,
     "deals": [
       {
@@ -4142,7 +4067,7 @@
   {
     "id": "contactsdirect-affiliate-program",
     "name": "ContactsDirect",
-    "slug": "contactsdirect-affiliate-program-coupons",
+    "slug": "contactsdirect-coupons",
     "category": "Vision Care",
     "logo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060024/gocoupon/brands/real_brand_contactsdirect.svg",
     "fallbackIcon": "🛍️",
@@ -4162,7 +4087,7 @@
       "description": "$30 off on orders above $100 with code SPECIAL30",
       "discount": "$30 OFF"
     },
-    "link": "/contactsdirect-affiliate-program-coupons",
+    "link": "/contactsdirect-coupons",
     "isInternalRoute": true,
     "deals": [
       {
@@ -8016,7 +7941,7 @@
   {
     "id": "caribbean-affiliate-program",
     "name": "Caribbean",
-    "slug": "caribbean-affiliate-program-coupons",
+    "slug": "caribbean-coupons",
     "category": "Vacation",
     "logo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060026/gocoupon/brands/real_brand_caribbean.svg",
     "fallbackIcon": "🛍️",
@@ -8036,7 +7961,7 @@
       "description": "Ends 10/8 - Semi-Annual Sale - $250 Code",
       "discount": "$250 OFF"
     },
-    "link": "/caribbean-affiliate-program-coupons",
+    "link": "/caribbean-coupons",
     "isInternalRoute": true,
     "deals": [
       {
@@ -10373,44 +10298,6 @@
         "category": "General",
         "expiry": "Active Offer",
         "link": "https://linksredirect.com/?cid=318931&source=api&url=https%3A%2F%2Freply.io%2Fpricing%2F"
-      }
-    ]
-  },
-  {
-    "id": "banggood",
-    "name": "Banggood",
-    "slug": "banggood-coupons",
-    "category": "Electronics",
-    "logo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745883/gocoupon/brands/brand_banggood.png",
-    "fallbackIcon": "🛍️",
-    "badge": "Verified Partner",
-    "rating": 4.8,
-    "couponsCount": 1,
-    "maxDiscount": "60% OFF",
-    "cashbackRate": "Available",
-    "description": "Verified promo codes, discount vouchers, and shopping deals for Banggood. Tested daily with real-time cart verification.",
-    "features": [
-      "Verified Codes",
-      "Tested Today",
-      "Instant Apply"
-    ],
-    "popularCoupon": {
-      "code": "BANGGOOD60",
-      "description": "Global Tech Mega Sale: Up to 60% OFF 3D Printers, RC Toys & Smart Home",
-      "discount": "60% OFF"
-    },
-    "link": "/banggood-coupons",
-    "isInternalRoute": true,
-    "deals": [
-      {
-        "id": "admitad-intl-deal-banggood-01",
-        "title": "Global Tech Mega Sale: Up to 60% OFF 3D Printers, RC Toys & Smart Home",
-        "code": "BANGGOOD60",
-        "discount": "60% OFF",
-        "description": "Valid on warehouse-direct shipments to US, UK, EU, and worldwide destinations.",
-        "category": "Electronics",
-        "expiry": "20 days left",
-        "link": "https://www.banggood.com"
       }
     ]
   },

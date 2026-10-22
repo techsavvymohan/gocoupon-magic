@@ -218,14 +218,77 @@ if (fs.existsSync(distDir)) {
       return next();
     }
 
+    // 1. Host normalization: redirect www.gocoupon.io -> gocoupon.io
+    const host = req.headers.host || "";
+    if (host.startsWith("www.")) {
+      return res.redirect(301, `https://gocoupon.io${req.url}`);
+    }
+
+    // 2. Trailing-slash normalization: 301 redirect /path/ -> /path (except root "/")
+    if (req.path.length > 1 && req.path.endsWith("/")) {
+      const cleanTrailing = req.path.replace(/\/+$/, "");
+      const queryString = req.url.slice(req.path.length);
+      return res.redirect(301, cleanTrailing + queryString);
+    }
+
     const cleanPath = req.path.replace(/\/+$/, "") || "/";
 
-    // Clean 301 redirect for legacy/subpath store links: /stores/:slug -> /:slug-coupons
+    // 3. Clean 301 redirect for legacy/subpath store links: /stores/:slug -> /:slug-coupons
     if (cleanPath.startsWith("/stores/") && cleanPath.length > 8) {
       const rawStoreSlug = cleanPath.slice(8).replace(/-coupons$/, "").trim();
       if (rawStoreSlug) {
         return res.redirect(301, `/${rawStoreSlug}-coupons`);
       }
+    }
+
+    // 4. Clean 301 redirects for all known duplicate/alias store slugs
+    const CANONICAL_SLUG_REDIRECTS: Record<string, string> = {
+      "/tatacliq-coupons": "/tata-cliq-coupons",
+      "/tatacliq": "/tata-cliq-coupons",
+      "/bestbuy-coupons": "/best-buy-coupons",
+      "/bestbuy": "/best-buy-coupons",
+      "/bookingcom-coupons": "/booking-com-coupons",
+      "/bookingcom": "/booking-com-coupons",
+      "/siderai-coupons": "/sider-ai-coupons",
+      "/siderai": "/sider-ai-coupons",
+      "/adcreativeai-coupons": "/adcreative-ai-coupons",
+      "/adcreativeai": "/adcreative-ai-coupons",
+      "/reclaimai-coupons": "/reclaim-ai-coupons",
+      "/reclaimai": "/reclaim-ai-coupons",
+      "/tripcom-coupons": "/trip-com-coupons",
+      "/tripcom": "/trip-com-coupons",
+      "/domaincom-coupons": "/domain-com-coupons",
+      "/domaincom": "/domain-com-coupons",
+      "/replyio-coupons": "/reply-io-coupons",
+      "/replyio": "/reply-io-coupons",
+      "/allegropl-coupons": "/allegro-pl-coupons",
+      "/allegropl": "/allegro-pl-coupons",
+      "/aosomcom-coupons": "/aosom-com-coupons",
+      "/aosomcom": "/aosom-com-coupons",
+      "/apohealthde-coupons": "/apohealth-de-coupons",
+      "/apohealthde": "/apohealth-de-coupons",
+      "/answearsi-coupons": "/answear-si-coupons",
+      "/answearsi": "/answear-si-coupons",
+      "/answearhu-coupons": "/answear-hu-coupons",
+      "/answearhu": "/answear-hu-coupons",
+      "/answearhr-coupons": "/answear-hr-coupons",
+      "/answearhr": "/answear-hr-coupons",
+      "/agatinsvetcz-coupons": "/agatinsvet-cz-coupons",
+      "/agatinsvetcz": "/agatinsvet-cz-coupons",
+      "/adblockultimatenet-coupons": "/adblockultimate-net-coupons",
+      "/adblockultimatenet": "/adblockultimate-net-coupons",
+      "/e-armyshopcz-coupons": "/e-armyshop-cz-coupons",
+      "/e-armyshopcz": "/e-armyshop-cz-coupons",
+      "/banggood-cj-affiliate-program-coupons": "/banggood-coupons",
+      "/raynatours-many-geos-tracking-promo-codes-coupons": "/raynatours-coupons",
+      "/stylevana-affiliate-program-coupons": "/stylevana-coupons",
+      "/jcpenney-affiliate-coupons": "/jcpenney-coupons",
+      "/contactsdirect-affiliate-program-coupons": "/contactsdirect-coupons",
+      "/caribbean-affiliate-program-coupons": "/caribbean-coupons",
+    };
+
+    if (CANONICAL_SLUG_REDIRECTS[cleanPath]) {
+      return res.redirect(301, CANONICAL_SLUG_REDIRECTS[cleanPath]);
     }
 
     // HTML pages: allow browser to cache but must revalidate with server.
@@ -254,11 +317,18 @@ if (fs.existsSync(distDir)) {
       return res.sendFile(subDirHtmlPath);
     }
 
-    // D. SPA Fallback: send dist/index.html for TanStack Router
-    const fallbackHtml = path.join(distDir, "index.html");
-    if (fs.existsSync(fallbackHtml)) {
+    // D. SPA Fallback: send dist/index.html with dynamic canonical for TanStack Router
+    const fallbackHtmlPath = path.join(distDir, "index.html");
+    if (fs.existsSync(fallbackHtmlPath)) {
       res.setHeader("Content-Type", "text/html; charset=utf-8");
-      return res.sendFile(fallbackHtml);
+      const rawHtml = fs.readFileSync(fallbackHtmlPath, "utf-8");
+      const currentUrl = `https://gocoupon.io${cleanPath}`;
+      const dynamicHtml = rawHtml
+        .replace(/<link\s+rel="canonical"\s+href="[^"]*"/i, `<link rel="canonical" href="${currentUrl}"`)
+        .replace(/<link\s+rel="alternate"\s+hreflang="[^"]*"\s+href="https:\/\/gocoupon\.io\/"/g, (match) => {
+          return match.replace("https://gocoupon.io/", currentUrl);
+        });
+      return res.send(dynamicHtml);
     }
 
     next();

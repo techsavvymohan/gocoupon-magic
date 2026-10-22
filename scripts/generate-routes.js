@@ -2006,6 +2006,119 @@ try {
         .trim();
     }
 
+    const CANONICAL_SLUG_ALIASES = {
+      "tatacliq-coupons": "tata-cliq-coupons",
+      "tatacliq": "tata-cliq-coupons",
+      "bestbuy-coupons": "best-buy-coupons",
+      "bestbuy": "best-buy-coupons",
+      "bookingcom-coupons": "booking-com-coupons",
+      "bookingcom": "booking-com-coupons",
+      "siderai-coupons": "sider-ai-coupons",
+      "siderai": "sider-ai-coupons",
+      "adcreativeai-coupons": "adcreative-ai-coupons",
+      "adcreativeai": "adcreative-ai-coupons",
+      "reclaimai-coupons": "reclaim-ai-coupons",
+      "reclaimai": "reclaim-ai-coupons",
+      "tripcom-coupons": "trip-com-coupons",
+      "tripcom": "trip-com-coupons",
+      "domaincom-coupons": "domain-com-coupons",
+      "domaincom": "domain-com-coupons",
+      "replyio-coupons": "reply-io-coupons",
+      "replyio": "reply-io-coupons",
+      "allegropl-coupons": "allegro-pl-coupons",
+      "allegropl": "allegro-pl-coupons",
+      "aosomcom-coupons": "aosom-com-coupons",
+      "aosomcom": "aosom-com-coupons",
+      "apohealthde-coupons": "apohealth-de-coupons",
+      "apohealthde": "apohealth-de-coupons",
+      "answearsi-coupons": "answear-si-coupons",
+      "answearsi": "answear-si-coupons",
+      "answearhu-coupons": "answear-hu-coupons",
+      "answearhu": "answear-hu-coupons",
+      "answearhr-coupons": "answear-hr-coupons",
+      "answearhr": "answear-hr-coupons",
+      "agatinsvetcz-coupons": "agatinsvet-cz-coupons",
+      "agatinsvetcz": "agatinsvet-cz-coupons",
+      "adblockultimatenet-coupons": "adblockultimate-net-coupons",
+      "adblockultimatenet": "adblockultimate-net-coupons",
+      "e-armyshopcz-coupons": "e-armyshop-cz-coupons",
+      "e-armyshopcz": "e-armyshop-cz-coupons",
+      "banggood-cj-affiliate-program-coupons": "banggood-coupons",
+      "raynatours-many-geos-tracking-promo-codes-coupons": "raynatours-coupons",
+      "stylevana-affiliate-program-coupons": "stylevana-coupons",
+      "jcpenney-affiliate-coupons": "jcpenney-coupons",
+      "contactsdirect-affiliate-program-coupons": "contactsdirect-coupons",
+      "caribbean-affiliate-program-coupons": "caribbean-coupons",
+    };
+
+    function resolveCanonicalSlug(rawSlug) {
+      if (!rawSlug) return "";
+      let s = rawSlug.trim().toLowerCase();
+      if (CANONICAL_SLUG_ALIASES[s]) s = CANONICAL_SLUG_ALIASES[s];
+      return s;
+    }
+
+    function generateStoreSavingsTips(storeName, category, maxDiscount) {
+      const cat = (category || "").toLowerCase();
+      const isGlobal = /cz|de|hu|pl|si|hr|es|apac|anz|uk|us|global/i.test(storeName);
+
+      if (cat.includes("fashion") || cat.includes("clothing") || cat.includes("apparel") || cat.includes("beauty") || cat.includes("footwear")) {
+        return `
+          <h2>Top 3 Ways to Save at ${storeName}</h2>
+          <ul>
+            <li><strong>First-Order &amp; Sign-Up Vouchers:</strong> New shoppers frequently receive 10% to 15% off their initial order upon email registration or mobile app download.</li>
+            <li><strong>Seasonal &amp; Clearance Stacking:</strong> Apply working promotional coupon codes during mid-season clearance and festive sales for maximum stacked markdowns up to ${maxDiscount || "60%"}.</li>
+            <li><strong>Free Shipping Thresholds:</strong> Combine cart items to surpass the minimum delivery benchmark and eliminate shipping fees.</li>
+          </ul>
+        `;
+      } else if (cat.includes("electronics") || cat.includes("tech") || cat.includes("gadget") || cat.includes("mobile") || cat.includes("appliance")) {
+        return `
+          <h2>Top 3 Ways to Save at ${storeName}</h2>
+          <ul>
+            <li><strong>Bank Card &amp; Instant Checkout Offers:</strong> Stack verified promo codes with partner payment cards (HDFC, ICICI, SBI, Axis) or digital payment bonuses to unlock extra cart deductions.</li>
+            <li><strong>Exchange &amp; Trade-In Bonuses:</strong> Leverage merchant trade-in programs alongside sitewide voucher codes for double-dip savings on electronics and upgrades.</li>
+            <li><strong>Extended Warranty &amp; Bundled Deals:</strong> Look for promotional bundles that include free accessories or complimentary service care plans.</li>
+          </ul>
+        `;
+      } else if (cat.includes("travel") || cat.includes("hotel") || cat.includes("flight") || cat.includes("booking")) {
+        return `
+          <h2>Top 3 Ways to Save at ${storeName}</h2>
+          <ul>
+            <li><strong>Advance Booking Discounts:</strong> Secure reservations 14 to 30 days ahead to unlock tier-1 promotional fare codes and complimentary date change flexibility.</li>
+            <li><strong>Loyalty Member Specials:</strong> Combine GoCoupon promo codes with member reward accounts for room upgrades and flight bonus miles.</li>
+            <li><strong>Off-Peak Travel Windows:</strong> Plan bookings during midweek departures to access lower base fares before applying coupon codes.</li>
+          </ul>
+        `;
+      } else if (cat.includes("hosting") || cat.includes("software") || cat.includes("saas") || cat.includes("cloud") || cat.includes("ai")) {
+        return `
+          <h2>Top 3 Ways to Save at ${storeName}</h2>
+          <ul>
+            <li><strong>Annual &amp; Multi-Year Billing:</strong> Switching from monthly to annual billing plans automatically reduces recurring costs by up to 40% before coupon application.</li>
+            <li><strong>Developer &amp; Student Credits:</strong> Claim startup credits, academic discounts, or trial upgrade codes verified through GoCoupon.</li>
+            <li><strong>Free Domain &amp; SSL Bundles:</strong> Select premium tier plans that include complimentary domain registrations, migration support, and security certificates.</li>
+          </ul>
+        `;
+      } else if (isGlobal) {
+        return `
+          <h2>Top 3 Ways to Save at ${storeName}</h2>
+          <ul>
+            <li><strong>Direct Digital Payment:</strong> Pay with verified credit cards, PayPal, or localized payment options to bypass foreign currency conversion surcharges.</li>
+            <li><strong>Exclusive Promotional Vouchers:</strong> Auto-apply tested discount codes directly at checkout to ensure instant price reduction.</li>
+            <li><strong>Volume &amp; Bulk Purchasing:</strong> Combine multiple qualifying items into a single order to lower per-unit international freight costs.</li>
+          </ul>
+        `;
+      } else {
+        return `
+          <h2>Top 3 Ways to Save at ${storeName}</h2>
+          <ul>
+            <li><strong>Prepaid Payment Discount:</strong> Pay with UPI (Google Pay, PhonePe, Paytm) or cards to unlock instant merchant checkout discounts.</li>
+            <li><strong>Bank Card Offers:</strong> Stack your cart with partner bank cards (HDFC, ICICI, SBI, Axis) for up to 10% extra instant off during promotional cycles.</li>
+            <li><strong>Free Shipping Benchmark:</strong> Combine qualifying items above the minimum order threshold to eliminate delivery charges.</li>
+          </ul>
+        `;
+      }
+    }
+
     const existingPaths = new Set(routeConfigs.map((r) => r.path));
     const storeMap = new Map();
 
@@ -2014,7 +2127,7 @@ try {
       if (!raw) continue;
       const name = sanitizeStore(raw);
       if (!name) continue;
-      const slug = `${slugifyStore(name)}-coupons`;
+      const slug = resolveCanonicalSlug(`${slugifyStore(name)}-coupons`);
       if (!slug || existingPaths.has(slug)) continue;
 
       if (!storeMap.has(slug)) {
@@ -2037,25 +2150,41 @@ try {
           if (!u.name) continue;
           const name = sanitizeStore(u.name);
           if (!name) continue;
-          const slugKey = u.slug
+          const rawKey = u.slug
             ? (u.slug.endsWith("-coupons") ? u.slug : `${u.slug}-coupons`)
             : `${slugifyStore(name)}-coupons`;
+          const slugKey = resolveCanonicalSlug(rawKey);
           if (!slugKey || existingPaths.has(slugKey)) continue;
 
+          const uDeals = (Array.isArray(u.deals) ? u.deals : []).map((ud) => ({
+            code: ud.code || "ACTIVATE DEAL",
+            discount: ud.discount || u.maxDiscount || "Verified Deal",
+            title: ud.title || `Save up to ${u.maxDiscount || "50%"} at ${name}`,
+            storeLogo: u.logo || "",
+          }));
+
           if (!storeMap.has(slugKey)) {
-            const uDeals = Array.isArray(u.deals) ? u.deals : [];
             storeMap.set(slugKey, {
               name,
               slug: slugKey,
-              deals: uDeals.map((ud) => ({
-                code: ud.code || "ACTIVATE DEAL",
-                discount: ud.discount || u.maxDiscount || "Verified Deal",
-                title: ud.title || `Save up to ${u.maxDiscount || "50%"} at ${name}`,
-                storeLogo: u.logo || "",
-              })),
+              deals: uDeals,
               category: u.category || "Online Shopping",
               logo: u.logo || "",
+              rating: u.rating,
+              maxDiscount: u.maxDiscount,
+              cashbackRate: u.cashbackRate,
             });
+          } else {
+            const existing = storeMap.get(slugKey);
+            const existingCodes = new Set(existing.deals.map((ed) => ed.code || ed.title));
+            for (const ud of uDeals) {
+              if (!existingCodes.has(ud.code || ud.title)) {
+                existing.deals.push(ud);
+                existingCodes.add(ud.code || ud.title);
+              }
+            }
+            if (u.logo && !existing.logo) existing.logo = u.logo;
+            if (u.category && existing.category === "Online Shopping") existing.category = u.category;
           }
         }
       } catch (e) {
@@ -2073,7 +2202,8 @@ try {
       );
 
       const rawTopDeals = store.deals.slice(0, 8);
-      const topDeals = rawTopDeals.length > 0 ? rawTopDeals : [
+      const hasRealDeals = rawTopDeals.length > 0;
+      const topDeals = hasRealDeals ? rawTopDeals : [
         {
           code: "DEALACTIVATED",
           discount: "Verified Deal",
@@ -2112,6 +2242,8 @@ try {
         </div>
       `;
 
+      const savingsTipsHtml = generateStoreSavingsTips(storeName, store.category, store.maxDiscount);
+
       const articleHtml = `
         <div style="display: flex; align-items: center; gap: 18px; margin-bottom: 20px;">
           ${storeLogoUrl ? `<div style="height: 64px; width: 64px; padding: 6px; background: #ffffff; border-radius: 14px; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2);"><img src="${storeLogoUrl}" alt="${storeName} Logo" style="max-height: 100%; max-width: 100%; object-fit: contain;" /></div>` : ""}
@@ -2123,12 +2255,7 @@ try {
 
         ${dealsHtml}
 
-        <h2>Top 3 Ways to Save at ${storeName}</h2>
-        <ul>
-          <li><strong>Prepaid Payment Discount:</strong> Pay with UPI (Google Pay, PhonePe, Paytm) or cards to unlock instant merchant checkout discounts.</li>
-          <li><strong>Bank Card Offers:</strong> Stack your cart with HDFC, ICICI, SBI, or Axis Bank cards for up to 10% extra instant off during promotional cycles.</li>
-          <li><strong>Free Shipping:</strong> Combine qualifying items above the minimum order threshold to eliminate delivery charges.</li>
-        </ul>
+        ${savingsTipsHtml}
 
         <h2>Frequently Asked Questions</h2>
         <div style="margin-top: 16px;">
@@ -2138,7 +2265,7 @@ try {
           </div>
           <div style="margin-bottom: 16px;">
             <h4 style="color: #38bdf8; margin: 0 0 4px 0;">Can I combine bank discounts with ${storeName} promo codes?</h4>
-            <p style="margin: 0; color: #cbd5e1; font-size: 14px;">Yes, coupon codes can often be stacked with partner bank credit card discounts and digital wallet cashback.</p>
+            <p style="margin: 0; color: #cbd5e1; font-size: 14px;">Yes, coupon codes can often be stacked with partner payment methods, card discounts, and digital wallet cashback.</p>
           </div>
         </div>
       `;
@@ -2149,10 +2276,11 @@ try {
         description: optDesc,
         h1: `${storeName} Coupon Codes, Promo Vouchers & Deals (2026)`,
         lead: `Auto-apply working promo codes and exclusive discount vouchers for ${storeName}. Verified across checkout carts with live success tracking.`,
-        directAnswer: `Save money at ${storeName} by auto-applying verified coupon codes and combining them with bank payment discounts on GoCoupon.`,
+        directAnswer: `Save money at ${storeName} by auto-applying verified coupon codes and combining them with payment discounts on GoCoupon.`,
         articleContent: articleHtml,
         storeName,
         isStoreHub: true,
+        hasOnlyDummyDeals: !hasRealDeals,
       });
     }
   }
@@ -2901,8 +3029,20 @@ fs.writeFileSync(path.join(distDir, "404.html"), notFoundHtml, "utf-8");
 
 console.log(`Successfully generated ${generatedCount} rich pre-rendered static route files!`);
 
-// Generate comprehensive, verified sitemap.xml
-const sitemapUrls = allRoutes.map((r) => {
+// Generate comprehensive, verified sitemap.xml with quality filtering
+const seenSitemapPaths = new Set();
+const sitemapRoutes = allRoutes.filter((r) => {
+  // Exclude error pages
+  if (r.path === "404" || !r.path && r.path !== "") return false;
+  // Exclude store pages that have only dummy fallback deals
+  if (r.isStoreHub && r.hasOnlyDummyDeals) return false;
+  // Exclude duplicate paths
+  if (seenSitemapPaths.has(r.path)) return false;
+  seenSitemapPaths.add(r.path);
+  return true;
+});
+
+const sitemapUrls = sitemapRoutes.map((r) => {
   let priority = "0.8";
   let changefreq = "weekly";
   if (r.path === "") {
@@ -2937,4 +3077,5 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http:
 
 fs.writeFileSync(path.join(distDir, "sitemap.xml"), sitemapXml, "utf-8");
 fs.writeFileSync(path.resolve(__dirname, "../public/sitemap.xml"), sitemapXml, "utf-8");
-console.log(`Successfully updated sitemap.xml with all ${allRoutes.length} indexed URLs!`);
+console.log(`Successfully updated sitemap.xml with all ${sitemapUrls.length} verified unique indexed URLs!`);
+

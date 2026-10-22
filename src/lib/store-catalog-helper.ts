@@ -178,10 +178,60 @@ export function registerDynamicStore(entry: StoreCatalogEntry): void {
   }
 }
 
+export const STORE_SLUG_ALIASES: Record<string, string> = {
+  "tatacliq-coupons": "tata-cliq-coupons",
+  "tatacliq": "tata-cliq-coupons",
+  "bestbuy-coupons": "best-buy-coupons",
+  "bestbuy": "best-buy-coupons",
+  "bookingcom-coupons": "booking-com-coupons",
+  "bookingcom": "booking-com-coupons",
+  "siderai-coupons": "sider-ai-coupons",
+  "siderai": "sider-ai-coupons",
+  "adcreativeai-coupons": "adcreative-ai-coupons",
+  "adcreativeai": "adcreative-ai-coupons",
+  "reclaimai-coupons": "reclaim-ai-coupons",
+  "reclaimai": "reclaim-ai-coupons",
+  "tripcom-coupons": "trip-com-coupons",
+  "tripcom": "trip-com-coupons",
+  "domaincom-coupons": "domain-com-coupons",
+  "domaincom": "domain-com-coupons",
+  "replyio-coupons": "reply-io-coupons",
+  "replyio": "reply-io-coupons",
+  "allegropl-coupons": "allegro-pl-coupons",
+  "allegropl": "allegro-pl-coupons",
+  "aosomcom-coupons": "aosom-com-coupons",
+  "aosomcom": "aosom-com-coupons",
+  "apohealthde-coupons": "apohealth-de-coupons",
+  "apohealthde": "apohealth-de-coupons",
+  "answearsi-coupons": "answear-si-coupons",
+  "answearsi": "answear-si-coupons",
+  "answearhu-coupons": "answear-hu-coupons",
+  "answearhu": "answear-hu-coupons",
+  "answearhr-coupons": "answear-hr-coupons",
+  "answearhr": "answear-hr-coupons",
+  "agatinsvetcz-coupons": "agatinsvet-cz-coupons",
+  "agatinsvetcz": "agatinsvet-cz-coupons",
+  "adblockultimatenet-coupons": "adblockultimate-net-coupons",
+  "adblockultimatenet": "adblockultimate-net-coupons",
+  "e-armyshopcz-coupons": "e-armyshop-cz-coupons",
+  "e-armyshopcz": "e-armyshop-cz-coupons",
+  "banggood-cj-affiliate-program-coupons": "banggood-coupons",
+  "raynatours-many-geos-tracking-promo-codes-coupons": "raynatours-coupons",
+  "stylevana-affiliate-program-coupons": "stylevana-coupons",
+  "jcpenney-affiliate-coupons": "jcpenney-coupons",
+  "contactsdirect-affiliate-program-coupons": "contactsdirect-coupons",
+  "caribbean-affiliate-program-coupons": "caribbean-coupons",
+};
+
 export function getStoreBySlug(slug: string): StoreCatalogEntry | null {
   const catalog = getStoreCatalog();
-  const cleanSlug = (slug || "").toLowerCase().trim();
+  let cleanSlug = (slug || "").toLowerCase().trim();
   if (!cleanSlug) return null;
+
+  // Resolve alias if present
+  if (STORE_SLUG_ALIASES[cleanSlug]) {
+    cleanSlug = STORE_SLUG_ALIASES[cleanSlug];
+  }
 
   const normalizedSlug = cleanSlug.endsWith("-coupons") ? cleanSlug : `${cleanSlug}-coupons`;
   const baseSlug = cleanSlug.replace(/-coupons$/, "");
