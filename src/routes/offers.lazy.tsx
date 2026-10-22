@@ -614,7 +614,7 @@ function OffersHubPage() {
       source: "gocoupon_offers_box",
     });
     handleRedeemDeal(deal, e);
-    window.open(affiliateUrl, "_blank", "noopener,noreferrer");
+    window.open(affiliateUrl, "_blank", "noopener");
   };
 
   const handleLiveSync = async () => {

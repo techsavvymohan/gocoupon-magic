@@ -373,7 +373,7 @@ export function ComparePage() {
     setCopiedCode(code);
     toast.success(`Copied coupon: ${code}! Opening store...`);
     if (targetUrl && targetUrl !== "#") {
-      window.open(targetUrl, "_blank", "noopener,noreferrer");
+      window.open(targetUrl, "_blank", "noopener");
     }
     setTimeout(() => setCopiedCode(null), 2500);
   };

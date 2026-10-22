@@ -194,7 +194,7 @@ export function HeroStoreDealSearch() {
         source: "hero_search",
       });
 
-      window.open(redirectUrl, "_blank", "noopener,noreferrer");
+      window.open(redirectUrl, "_blank", "noopener");
       setIsFocused(false);
     },
     []

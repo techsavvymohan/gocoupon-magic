@@ -243,7 +243,7 @@ function FeaturedDealsPage() {
         source: "featured_deals_copy",
       });
       if (redirectUrl && redirectUrl !== "#") {
-        window.open(redirectUrl, "_blank", "noopener,noreferrer");
+        window.open(redirectUrl, "_blank", "noopener");
       }
     }
 
@@ -287,7 +287,7 @@ function FeaturedDealsPage() {
       source: "featured_deals",
     });
 
-    window.open(redirectUrl, "_blank", "noopener,noreferrer");
+    window.open(redirectUrl, "_blank", "noopener");
   };
 
   const hasActiveFilters = selectedCategory !== "all" || Boolean(searchQuery.trim());

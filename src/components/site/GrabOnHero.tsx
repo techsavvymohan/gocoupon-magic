@@ -292,7 +292,7 @@ export function GrabOnHero() {
     });
     const isAnchor = Boolean(e?.currentTarget && (e.currentTarget as HTMLElement).tagName === "A");
     if (!isAnchor && targetUrl && targetUrl !== "#") {
-      window.open(targetUrl, "_blank", "noopener,noreferrer");
+      window.open(targetUrl, "_blank", "noopener");
     }
     setTimeout(() => setCopiedCode(null), 3000);
   };

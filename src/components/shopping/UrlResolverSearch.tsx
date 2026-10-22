@@ -269,7 +269,7 @@ export function UrlResolverSearch({
       const affUrl = buildStoreAffiliateUrl(store, "gocoupon_instant_search");
       toast.success(`Opening ${store.name} with GoCoupon Cuelinks auto-savings!`);
       if (openWindow) {
-        window.open(affUrl, "_blank", "noopener,noreferrer");
+        window.open(affUrl, "_blank", "noopener");
       }
     },
     [],

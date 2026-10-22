@@ -71,7 +71,7 @@ export function useExtensionBridge(): ExtensionStatus {
       })
     );
     // Also open the URL in a new window/tab
-    window.open(wrappedUrl, "_blank", "noopener,noreferrer");
+    window.open(wrappedUrl, "_blank", "noopener");
   };
 
   return {

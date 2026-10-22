@@ -114,7 +114,7 @@ export function MobileHeroInstantFinder() {
 
     // 3. Open store cleanly in a new window/tab
     setTimeout(() => {
-      window.open(deal.directUrl, "_blank", "noopener,noreferrer");
+      window.open(deal.directUrl, "_blank", "noopener");
     }, 450);
 
     // 4. Reset copied status after 3.5 seconds

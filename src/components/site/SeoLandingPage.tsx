@@ -135,7 +135,7 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
       const finalDest = dest.startsWith("/api/redirect/deal") || dest.startsWith("/out")
         ? dest
         : wrapAffiliateTracking(dest, "seo_store_coupon");
-      window.open(finalDest, "_blank", "noopener,noreferrer");
+      window.open(finalDest, "_blank", "noopener");
     }
     setTimeout(() => {
       setCopiedCode((current) => (current === code ? null : current));

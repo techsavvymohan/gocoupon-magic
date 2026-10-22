@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import type { BankOffer } from "./types";
+import { wrapAffiliateTracking } from "@/lib/services/store-registry";
 
 export interface BankOfferCardProps {
   bank: BankOffer;
@@ -19,7 +20,7 @@ export function BankOfferCard({ bank }: BankOfferCardProps) {
     });
 
     const targetStore = primaryStore.toLowerCase();
-    const storeUrl = targetStore.includes("flipkart")
+    const rawStoreUrl = targetStore.includes("flipkart")
       ? "https://www.flipkart.com"
       : targetStore.includes("myntra")
       ? "https://www.myntra.com"
@@ -35,8 +36,10 @@ export function BankOfferCard({ bank }: BankOfferCardProps) {
       ? "https://www.croma.com"
       : null;
 
-    if (storeUrl) {
-      window.open(storeUrl, "_blank", "noopener,noreferrer");
+    if (rawStoreUrl) {
+      const bankSlug = (bank.bankName || "card").toLowerCase().replace(/\s+/g, "_");
+      const affiliateUrl = wrapAffiliateTracking(rawStoreUrl, `bank_offer_${bankSlug}`);
+      window.open(affiliateUrl, "_blank", "noopener");
     }
 
     setTimeout(() => setCopied(false), 2500);

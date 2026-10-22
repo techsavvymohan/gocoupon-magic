@@ -32,7 +32,7 @@ export function MerchantComparisonTable({ comparison, productTitle }: MerchantCo
 
     const isAnchorClick = e && (e.currentTarget as HTMLElement).tagName.toLowerCase() === "a";
     if (!isAnchorClick && redirectUrl && redirectUrl !== "#") {
-      window.open(redirectUrl, "_blank", "noopener,noreferrer");
+      window.open(redirectUrl, "_blank", "noopener");
     }
   };
 

@@ -20,7 +20,7 @@ async function testAdmitad() {
     const params = new URLSearchParams();
     params.append("grant_type", "client_credentials");
     params.append("client_id", clientId);
-    params.append("scope", "coupons advcampaigns banners deeplink_generator");
+    params.append("scope", "coupons_for_website advcampaigns_for_website coupons advcampaigns banners deeplink_generator websites");
 
     const tokenRes = await fetch("https://api.admitad.com/token/", {
       method: "POST",
@@ -46,10 +46,10 @@ async function testAdmitad() {
     console.log(`Expires In:   ${tokenData.expires_in}s (${(tokenData.expires_in / 3600).toFixed(1)} hours)`);
     console.log(`Scopes:       ${tokenData.scope || "N/A"}`);
 
-    // Test 2: Fetching Coupons/Offers with this token
+    // Test 2: Fetching Coupons/Offers with this token specifically for Website 3007234
     if (tokenData.access_token) {
-      console.log("\n--- 2. Testing Live Coupons & Promo Codes Feed (/coupons/) ---");
-      const couponsRes = await fetch("https://api.admitad.com/coupons/?limit=5", {
+      console.log("\n--- 2. Testing Live Coupons Feed for Ad Space 3007234 (/coupons/website/3007234/) ---");
+      const couponsRes = await fetch("https://api.admitad.com/coupons/website/3007234/?limit=5", {
         headers: {
           "Authorization": `Bearer ${tokenData.access_token}`,
           "Accept": "application/json",
@@ -60,6 +60,10 @@ async function testAdmitad() {
       if (couponsRes.ok) {
         const couponsData = await couponsRes.json();
         console.log(`✅ Retrieved ${couponsData.results?.length || 0} coupons from Admitad (Total available: ${couponsData._meta?.count || 0})`);
+        couponsData.results?.slice(0, 3).forEach((c: any, i: number) => {
+          console.log(`  [#${i + 1}] Store: ${c.campaign?.name} | Code: ${c.promocode || 'N/A'}`);
+          console.log(`      Goto Link: ${c.goto_link}`);
+        });
       }
 
       console.log("\n--- 3. Testing Global Merchant Campaigns (/advcampaigns/) ---");

@@ -179,7 +179,16 @@ export async function handleDealRedirect(req: Request, res: Response) {
     rawUrl.includes("alitems.com") ||
     rawUrl.includes("lenmit.com") ||
     rawUrl.includes("mitgo.com") ||
-    rawUrl.includes("cityads.com");
+    rawUrl.includes("cityads.com") ||
+    rawUrl.includes("rzekl.com") ||
+    rawUrl.includes("tjzuh.com") ||
+    rawUrl.includes("bednari.com") ||
+    rawUrl.includes("kjuzv.com") ||
+    rawUrl.includes("hxbok.com") ||
+    rawUrl.includes("ntzgd.com") ||
+    rawUrl.includes("ali.click") ||
+    rawUrl.includes("fas.st") ||
+    rawUrl.includes("artfut.com");
 
   const isEarnKaro =
     rawUrl.includes("myntr.it") ||
@@ -232,10 +241,24 @@ export async function handleDealRedirect(req: Request, res: Response) {
       matchedEarnKaro = EARNKARO_DIRECT_LINKS.themancompany;
     }
 
-    if (matchedEarnKaro) {
+    // Check if rawUrl is a specific deep product link (not just a homepage or generic root)
+    let isDeepProductLink = false;
+    try {
+      const parsed = new URL(rawUrl);
+      const cleanPath = parsed.pathname.replace(/^\/+|\/+$/g, "");
+      // If it has a specific path (e.g. /p/itm..., /tshirts/..., /product/..., /collections/...)
+      if (cleanPath && cleanPath !== "index.html" && cleanPath.length > 2) {
+        isDeepProductLink = true;
+      }
+    } catch {
+      // Ignore URL parse error
+    }
+
+    // Only use generic EarnKaro direct store link if NOT a specific deep product link
+    if (matchedEarnKaro && !isDeepProductLink) {
       targetUrl = matchedEarnKaro;
     } else if (/^https?:\/\//i.test(targetUrl)) {
-      // Case D: Default universal coverage via Cuelinks (pub_id=272970) for all clean Indian and Global e-commerce stores
+      // Case D: Universal deep linking via Cuelinks (pub_id=272970) - lands users on the EXACT product page with affiliate tracking
       targetUrl = buildCuelinksRedirectUrl({
         merchantUrl: targetUrl,
         subId: source || "gocoupon_web",

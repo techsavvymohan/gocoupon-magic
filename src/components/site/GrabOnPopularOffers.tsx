@@ -148,7 +148,7 @@ export function GrabOnPopularOffers() {
     });
     const isAnchor = Boolean(e?.currentTarget && (e.currentTarget as HTMLElement).tagName === "A");
     if (!isAnchor && redirectUrl && redirectUrl !== "#") {
-      window.open(redirectUrl, "_blank", "noopener,noreferrer");
+      window.open(redirectUrl, "_blank", "noopener");
     }
     setTimeout(() => setCopiedCode(null), 3000);
   };

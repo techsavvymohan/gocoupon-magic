@@ -143,6 +143,15 @@ export function isAffiliateNetworkUrl(url?: string | null): boolean {
     lower.includes("alitems.com") ||
     lower.includes("lenmit.com") ||
     lower.includes("mitgo.com") ||
+    lower.includes("rzekl.com") ||
+    lower.includes("tjzuh.com") ||
+    lower.includes("bednari.com") ||
+    lower.includes("kjuzv.com") ||
+    lower.includes("hxbok.com") ||
+    lower.includes("ntzgd.com") ||
+    lower.includes("ali.click") ||
+    lower.includes("fas.st") ||
+    lower.includes("artfut.com") ||
     lower.includes("tag=") ||
     lower.includes("myntr.it") ||
     lower.includes("fktr.in") ||

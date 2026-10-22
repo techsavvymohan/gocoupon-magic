@@ -35,7 +35,7 @@ export function CouponStackPill({ coupon, compact = false, storeUrl }: CouponSta
 
     const isAnchorClick = (e.currentTarget as HTMLElement).tagName.toLowerCase() === "a";
     if (!isAnchorClick && affiliateUrl && affiliateUrl !== "#") {
-      window.open(affiliateUrl, "_blank", "noopener,noreferrer");
+      window.open(affiliateUrl, "_blank", "noopener");
     }
   };
 
