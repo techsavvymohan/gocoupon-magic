@@ -8025,5 +8025,29 @@
     "name": "The Wallet Store",
     "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060081/gocoupon/brands/real_brand_thewalletstore.png",
     "updatedAt": "2026-10-03T20:41:24.026Z"
+  },
+  {
+    "slug": "agoda",
+    "name": "Agoda",
+    "domain": "agoda.com",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059104/gocoupon/brands/real_brand_agoda.png",
+    "source": "cloudinary",
+    "affiliateSource": "cuelinks",
+    "width": 200,
+    "height": 200,
+    "format": "png",
+    "updatedAt": "2026-10-22T13:14:07.346Z"
+  },
+  {
+    "slug": "agoda-coupons",
+    "name": "Agoda",
+    "domain": "agoda.com",
+    "logoUrl": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059104/gocoupon/brands/real_brand_agoda.png",
+    "source": "cloudinary",
+    "affiliateSource": "cuelinks",
+    "width": 200,
+    "height": 200,
+    "format": "png",
+    "updatedAt": "2026-10-22T13:14:07.347Z"
   }
 ]

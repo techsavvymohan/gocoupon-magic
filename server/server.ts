@@ -285,6 +285,12 @@ if (fs.existsSync(distDir)) {
       "/jcpenney-affiliate-coupons": "/jcpenney-coupons",
       "/contactsdirect-affiliate-program-coupons": "/contactsdirect-coupons",
       "/caribbean-affiliate-program-coupons": "/caribbean-coupons",
+      "/flyfairly-coupons": "/fly-fairly-coupons",
+      "/flyfairly": "/fly-fairly-coupons",
+      "/agoda": "/agoda-coupons",
+      "/dhgate": "/dhgate-coupons",
+      "/udemy": "/udemy-coupons",
+      "/shopbop": "/shopbop-coupons",
     };
 
     if (CANONICAL_SLUG_REDIRECTS[cleanPath]) {

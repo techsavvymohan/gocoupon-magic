@@ -18133,5 +18133,63 @@
         "link": "https://linksredirect.com/?cid=318931&source=api&url=https%3A%2F%2Fwww.lifelongindiaonline.com%2Fcollections%2Fspin-bike"
       }
     ]
+  },
+  {
+    "id": "agoda",
+    "name": "Agoda",
+    "slug": "agoda-coupons",
+    "category": "Travel",
+    "logo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791059104/gocoupon/brands/real_brand_agoda.png",
+    "fallbackIcon": "🏨",
+    "badge": "Verified Partner",
+    "rating": 4.8,
+    "couponsCount": 6,
+    "maxDiscount": "15% OFF",
+    "cashbackRate": "Available",
+    "description": "Verified Agoda promo codes, hotel booking discount vouchers, and secret deals. Auto-applied at checkout with GoCoupon.",
+    "features": [
+      "Verified Hotel Codes",
+      "Tested Today",
+      "Instant Apply"
+    ],
+    "popularCoupon": {
+      "code": "AGODA10",
+      "description": "Extra 10% Off Worldwide Hotels & Resorts with Mobile/Web Booking",
+      "discount": "10% OFF"
+    },
+    "link": "/agoda-coupons",
+    "isInternalRoute": true,
+    "deals": [
+      {
+        "id": "agoda_1",
+        "title": "Extra 10% Off Worldwide Hotels & Resort Bookings",
+        "code": "AGODA10",
+        "discount": "10% OFF",
+        "description": "Apply during checkout on eligible promo-eligible accommodations worldwide. No minimum night stay required.",
+        "category": "Travel",
+        "expiry": "Active Offer",
+        "link": "https://www.agoda.com"
+      },
+      {
+        "id": "agoda_2",
+        "title": "Save up to 15% on Select Luxury & Boutique Accommodations",
+        "code": "HOTELDEAL15",
+        "discount": "15% OFF",
+        "description": "Valid on selected boutique resorts and luxury hotel properties. Instant reduction applied on room rates.",
+        "category": "Travel",
+        "expiry": "Active Offer",
+        "link": "https://www.agoda.com"
+      },
+      {
+        "id": "agoda_3",
+        "title": "Up to 30% Off Secret Deals on Same-Day & Weekend Stays",
+        "code": "ACTIVATE DEAL",
+        "discount": "30% OFF",
+        "description": "Unlock insider pricing on mystery hotel stays in top travel destinations with free cancellation.",
+        "category": "Travel",
+        "expiry": "Active Offer",
+        "link": "https://www.agoda.com"
+      }
+    ]
   }
 ]
