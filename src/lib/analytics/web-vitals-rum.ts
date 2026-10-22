@@ -28,8 +28,8 @@ declare global {
 // Fallback / default GA4 measurement ID (overridden via VITE_GA_MEASUREMENT_ID in .env)
 const GA_MEASUREMENT_ID =
   (import.meta.env.VITE_GA_MEASUREMENT_ID as string) ||
-  (typeof window !== "undefined" ? window.__GA_MEASUREMENT_ID__ : undefined) ||
-  "G-GC980DEALS";
+  (typeof window !== "undefined" ? window.__GA_MEASUREMENT_ID__ || (window as any).GA_MEASUREMENT_ID : undefined) ||
+  "G-E8SYQ664V2";
 
 let rumInitialized = false;
 

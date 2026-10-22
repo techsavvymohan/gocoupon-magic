@@ -6,7 +6,7 @@
     <!-- HTTP Security & Transport Policies (Fallback & Client-Side Enforcement) -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://utt.impactcdn.com https://www.thunderbolt.com https://www.googletagmanager.com https://apis.google.com https://s.skimresources.com https://*.skimresources.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.thunderbolt.com; img-src 'self' data: blob: https: http:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https: wss:; frame-src 'self' https://www.thunderbolt.com https://chromewebstore.google.com; object-src 'none'; base-uri 'self'; upgrade-insecure-requests;"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://utt.impactcdn.com https://www.thunderbolt.com https://www.googletagmanager.com https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://apis.google.com https://s.skimresources.com https://*.skimresources.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.thunderbolt.com; img-src 'self' data: blob: https: http:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https: wss: https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self' https://www.thunderbolt.com https://chromewebstore.google.com; object-src 'none'; base-uri 'self'; upgrade-insecure-requests;"
     />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -255,8 +255,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <link rel="preconnect" href="https://www.google-analytics.com" crossorigin />
     <link rel="dns-prefetch" href="https://api.country.is" />
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
     <link rel="dns-prefetch" href="https://utt.impactcdn.com" />
     <link rel="dns-prefetch" href="https://s.skimresources.com" />
 
@@ -490,23 +493,21 @@
       }
     </script>
 
-    <!-- Google tag (gtag.js) — conditionally loaded when valid GA4 measurement ID is supplied -->
+    <!-- Google tag (gtag.js) — Google Analytics 4 (Measurement ID: G-E8SYQ664V2) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-E8SYQ664V2"></script>
     <script>
-      (function () {
-        var gaId = window.GA_MEASUREMENT_ID || "";
-        if (gaId && gaId !== "G-XXXXXXXXXX") {
-          var s = document.createElement("script");
-          s.async = true;
-          s.src = "https://www.googletagmanager.com/gtag/js?id=" + gaId;
-          document.head.appendChild(s);
-          window.dataLayer = window.dataLayer || [];
-          function gtag() {
-            window.dataLayer.push(arguments);
-          }
-          gtag("js", new Date());
-          gtag("config", gaId);
-        }
-      })();
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        window.dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-E8SYQ664V2", {
+        send_page_view: true,
+        anonymize_ip: true,
+        cookie_flags: "SameSite=None;Secure",
+      });
+      window.GA_MEASUREMENT_ID = "G-E8SYQ664V2";
+      window.__GA_MEASUREMENT_ID__ = "G-E8SYQ664V2";
     </script>
     <style>
       #site-loader{position:fixed;inset:0;display:grid;place-items:center;background:#090d16;z-index:9999}

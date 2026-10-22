@@ -1,4 +1,4 @@
-import { Outlet, Link, createRootRoute, HeadContent } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, useLocation } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { useState, useEffect } from "react";
@@ -12,9 +12,23 @@ import { GlobalLoadingBar } from "@/components/common/GlobalLoadingBar";
 import { initWebVitalsRum } from "@/lib/analytics/web-vitals-rum";
 
 function RootComponent() {
+  const location = useLocation();
+
   useEffect(() => {
     initWebVitalsRum();
   }, []);
+
+  // Dispatch GA4 page_view on every client-side navigation
+  useEffect(() => {
+    if (typeof window !== "undefined" && typeof (window as any).gtag === "function") {
+      (window as any).gtag("event", "page_view", {
+        page_path: location.pathname,
+        page_title: document.title,
+        page_location: window.location.href,
+        send_to: "G-E8SYQ664V2",
+      });
+    }
+  }, [location.pathname]);
 
   const [queryClient] = useState(
     () =>
