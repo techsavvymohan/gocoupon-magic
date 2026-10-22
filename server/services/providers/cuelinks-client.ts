@@ -122,9 +122,9 @@ export function getCuelinksConfig() {
   const publisherId =
     process.env.CUELINKS_PUBLISHER_ID ||
     process.env.VITE_CUELINKS_PUB_ID ||
-    "148920";
+    "272970";
   const apiKey = (process.env.CUELINKS_API_KEY || "").trim();
-  const channelId = (process.env.CUELINKS_CHANNEL_ID || "").trim();
+  const channelId = (process.env.CUELINKS_CHANNEL_ID || process.env.VITE_CUELINKS_CHANNEL_ID || "318931").trim();
 
   return {
     publisherId,
@@ -147,7 +147,7 @@ function getV3Headers(apiKey: string) {
 
 /**
  * Builds a fast, synchronous affiliate redirect link using Cuelinks linksredirect protocol.
- * Format: https://linksredirect.com/?pub_id=[pubId]&subid=[subId]&url=[encodedUrl]
+ * Format: https://linksredirect.com/?pub_id=[pubId]&cid=[channelId]&subid=[subId]&url=[encodedUrl]
  * Zero latency, requires no network request.
  */
 export function buildCuelinksRedirectUrl(options: CuelinksLinkOptions): string {
@@ -156,7 +156,7 @@ export function buildCuelinksRedirectUrl(options: CuelinksLinkOptions): string {
     return "#";
   }
 
-  const { publisherId } = getCuelinksConfig();
+  const { publisherId, channelId } = getCuelinksConfig();
   const subId = options.subId || "gocoupon_web";
 
   // Already a tracking redirect
@@ -165,7 +165,8 @@ export function buildCuelinksRedirectUrl(options: CuelinksLinkOptions): string {
   }
 
   const encoded = encodeURIComponent(targetUrl);
-  return `https://linksredirect.com/?pub_id=${publisherId}&subid=${encodeURIComponent(subId)}&url=${encoded}`;
+  const effectiveChannelId = options.channelId || (channelId ? Number(channelId) : 318931);
+  return `https://linksredirect.com/?pub_id=${publisherId}&cid=${effectiveChannelId}&subid=${encodeURIComponent(subId)}&url=${encoded}`;
 }
 
 /**

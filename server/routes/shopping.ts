@@ -15,7 +15,7 @@ import { recordPriceSnapshot } from "../../src/lib/services/price-tracking-stora
 export const shoppingRouter = Router();
 
 const AMAZON_IN_TAG = process.env.VITE_AMAZON_IN_PARTNER_TAG || "gocoupon0e-21";
-const CUELINKS_PUB_ID = process.env.VITE_CUELINKS_PUB_ID || "148920";
+const CUELINKS_PUB_ID = process.env.VITE_CUELINKS_PUB_ID || "272970";
 
 function getSerpApiKey(): string {
   if (process.env.SERPAPI_API_KEY) return process.env.SERPAPI_API_KEY.trim();

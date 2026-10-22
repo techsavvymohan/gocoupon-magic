@@ -31,13 +31,13 @@ const tests = [
   {
     name: "3. Cuelinks Pre-Wrapped Deal",
     input: {
-      url: "https://linksredirect.com/?pub_id=148920&subid=deal_123&url=https%3A%2F%2Fwww.boat-lifestyle.com",
+      url: "https://linksredirect.com/?pub_id=272970&subid=deal_123&url=https%3A%2F%2Fwww.boat-lifestyle.com",
       store: "boAt Lifestyle",
       slug: "boat",
       code: "BOATHEAD",
     },
     expectedDomain: "linksredirect.com",
-    expectedPublisherTag: "148920",
+    expectedPublisherTag: "272970",
   },
   {
     name: "4. Clean Merchant URL (Auto-Wrapped by Cuelinks)",
@@ -48,7 +48,7 @@ const tests = [
       code: "IDBITCF",
     },
     expectedDomain: "linksredirect.com",
-    expectedPublisherTag: "148920",
+    expectedPublisherTag: "272970",
   },
   {
     name: "5. EarnKaro Direct Partner Store (Myntra)",

@@ -141,8 +141,8 @@ const courseraDealRedirect = buildDealRedirectUrl({
   storeSlug: "coursera-coupons",
 });
 assert(
-  "buildDealRedirectUrl wraps Coursera with Cuelinks pub_id=148920",
-  courseraDealRedirect.includes("148920") || courseraDealRedirect.includes("coursera.org"),
+  "buildDealRedirectUrl wraps Coursera with Cuelinks pub_id=272970",
+  courseraDealRedirect.includes("272970") || courseraDealRedirect.includes("coursera.org"),
   `Redirect URL: ${courseraDealRedirect}`
 );
 
@@ -211,8 +211,8 @@ if (axisCard) {
     axisCard.officialApplyUrl === "https://web.axis.bank.in/DigitalChannel/WebForm/"
   );
   assert(
-    "Axis affiliate URL wraps with pub_id 148920",
-    axisCard.affiliateApplyUrl.includes("148920") && axisCard.affiliateApplyUrl.includes("web.axis.bank.in")
+    "Axis affiliate URL wraps with pub_id 272970",
+    axisCard.affiliateApplyUrl.includes("272970") && axisCard.affiliateApplyUrl.includes("web.axis.bank.in")
   );
   assert("Axis CPA bounty is ₹1,890+", axisCard.cpaBountyInr >= 1890);
 }
@@ -226,8 +226,8 @@ if (hdfcCard) {
     hdfcCard.officialApplyUrl === "https://applyonline.hdfc.bank.in/cards/credit-cards.html"
   );
   assert(
-    "HDFC affiliate URL wraps with pub_id 148920",
-    hdfcCard.affiliateApplyUrl.includes("148920") && hdfcCard.affiliateApplyUrl.includes("applyonline.hdfc")
+    "HDFC affiliate URL wraps with pub_id 272970",
+    hdfcCard.affiliateApplyUrl.includes("272970") && hdfcCard.affiliateApplyUrl.includes("applyonline.hdfc")
   );
   assert("HDFC CPA bounty is ₹1,829", hdfcCard.cpaBountyInr === 1829);
 }
@@ -241,8 +241,8 @@ if (scapiaCard) {
     scapiaCard.officialApplyUrl === "https://apply.scapia.cards/landing_page"
   );
   assert(
-    "Scapia affiliate URL wraps with pub_id 148920",
-    scapiaCard.affiliateApplyUrl.includes("148920") && scapiaCard.affiliateApplyUrl.includes("scapia.cards")
+    "Scapia affiliate URL wraps with pub_id 272970",
+    scapiaCard.affiliateApplyUrl.includes("272970") && scapiaCard.affiliateApplyUrl.includes("scapia.cards")
   );
   assert("Scapia CPA bounty is ₹1,200", scapiaCard.cpaBountyInr === 1200);
   assert("Scapia annual fee is Lifetime FREE", scapiaCard.annualFee.includes("Lifetime FREE"));
@@ -264,8 +264,8 @@ if (sbiCard) {
     sbiCard.officialApplyUrl === "https://www.sbicard.com/sprint/cashback"
   );
   assert(
-    "SBI affiliate URL wraps with pub_id 148920",
-    sbiCard.affiliateApplyUrl.includes("148920") && sbiCard.affiliateApplyUrl.includes("sprint%2Fcashback")
+    "SBI affiliate URL wraps with pub_id 272970",
+    sbiCard.affiliateApplyUrl.includes("272970") && sbiCard.affiliateApplyUrl.includes("sprint%2Fcashback")
   );
   assert("SBI CPA bounty is ₹1,890", sbiCard.cpaBountyInr === 1890);
 }

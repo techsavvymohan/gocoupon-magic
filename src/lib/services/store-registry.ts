@@ -42,7 +42,12 @@ const AMAZON_US_PARTNER_TAG =
 const CUELINKS_PUB_ID =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_CUELINKS_PUB_ID) ||
   (typeof process !== "undefined" && process.env?.VITE_CUELINKS_PUB_ID) ||
-  "148920";
+  "272970";
+
+const CUELINKS_CHANNEL_ID =
+  (typeof import.meta !== "undefined" && import.meta.env?.VITE_CUELINKS_CHANNEL_ID) ||
+  (typeof process !== "undefined" && process.env?.VITE_CUELINKS_CHANNEL_ID) ||
+  "318931";
 
 /**
  * Wraps any target merchant link with Cuelinks or Amazon affiliate attribution.
@@ -71,8 +76,8 @@ export const EARNKARO_STORE_LINKS: Record<string, string> = {
   plum: "https://clnk.in/CWoK",
   plumgoodness: "https://clnk.in/CWoK",
   "plum-goodness": "https://clnk.in/CWoK",
-  coursera: "https://linksredirect.com/?pub_id=148920&subid=gocoupon_coursera&url=https%3A%2F%2Fwww.coursera.org%2F",
-  robinhood: "https://linksredirect.com/?pub_id=148920&subid=gocoupon_robinhood&url=https%3A%2F%2Frobinhood.com%2Fus%2Fen%2F",
+  coursera: "https://linksredirect.com/?pub_id=272970&cid=318931&subid=gocoupon_coursera&url=https%3A%2F%2Fwww.coursera.org%2F",
+  robinhood: "https://linksredirect.com/?pub_id=272970&cid=318931&subid=gocoupon_robinhood&url=https%3A%2F%2Frobinhood.com%2Fus%2Fen%2F",
 };
 
 /**
@@ -412,7 +417,7 @@ export const REGISTERED_STORES: RegisteredStore[] = [
     tier: 1,
     logo: "https://www.google.com/s2/favicons?domain=coursera.org&sz=128",
     domain: "coursera.org",
-    storeUrl: "https://linksredirect.com/?pub_id=148920&subid=gocoupon_coursera&url=https%3A%2F%2Fwww.coursera.org%2F",
+    storeUrl: "https://linksredirect.com/?pub_id=272970&cid=318931&subid=gocoupon_coursera&url=https%3A%2F%2Fwww.coursera.org%2F",
     isInstantOpen: true,
     status: "instant_open",
     aliases: ["coursera", "coursera.org", "coursera plus", "online courses"],
@@ -420,7 +425,7 @@ export const REGISTERED_STORES: RegisteredStore[] = [
     defaultCoupon: { code: "LEARN40", description: "Save 40% on Coursera Plus Annual Subscription", discountPct: 0.4 },
     cashbackRate: "7.12%",
     cashbackPct: 0.0712,
-    buildSearchUrl: () => "https://linksredirect.com/?pub_id=148920&subid=gocoupon_coursera&url=https%3A%2F%2Fwww.coursera.org%2F",
+    buildSearchUrl: () => "https://linksredirect.com/?pub_id=272970&cid=318931&subid=gocoupon_coursera&url=https%3A%2F%2Fwww.coursera.org%2F",
   },
   {
     id: "robinhood",
@@ -430,7 +435,7 @@ export const REGISTERED_STORES: RegisteredStore[] = [
     tier: 1,
     logo: "https://www.google.com/s2/favicons?domain=robinhood.com&sz=128",
     domain: "robinhood.com",
-    storeUrl: "https://linksredirect.com/?pub_id=148920&subid=gocoupon_robinhood&url=https%3A%2F%2Frobinhood.com%2Fus%2Fen%2F",
+    storeUrl: "https://linksredirect.com/?pub_id=272970&cid=318931&subid=gocoupon_robinhood&url=https%3A%2F%2Frobinhood.com%2Fus%2Fen%2F",
     isInstantOpen: true,
     status: "instant_open",
     aliases: ["robinhood", "robinhood.com", "robinhood investing", "robinhood gold"],
@@ -438,7 +443,7 @@ export const REGISTERED_STORES: RegisteredStore[] = [
     defaultCoupon: { code: "FREEINVEST", description: "Up to $200 in free fractional stock on account funding", discountAmount: 200 },
     cashbackRate: "₹4,881 per account",
     cashbackPct: 0.08,
-    buildSearchUrl: () => "https://linksredirect.com/?pub_id=148920&subid=gocoupon_robinhood&url=https%3A%2F%2Frobinhood.com%2Fus%2Fen%2F",
+    buildSearchUrl: () => "https://linksredirect.com/?pub_id=272970&cid=318931&subid=gocoupon_robinhood&url=https%3A%2F%2Frobinhood.com%2Fus%2Fen%2F",
   },
   // ─── Direct EarnKaro Verified Affiliate Merchants (Tier 1 Priority) ────
   {

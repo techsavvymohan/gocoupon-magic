@@ -53,7 +53,7 @@ export interface BankCardSavingsResult {
 const CUELINKS_PUB_ID =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_CUELINKS_PUB_ID) ||
   (typeof process !== "undefined" && process.env?.VITE_CUELINKS_PUB_ID) ||
-  "148920";
+  "272970";
 
 function buildCardAffiliateUrl(rawBankUrl: string, bankId: string): string {
   if (/^https?:\/\//i.test(rawBankUrl)) {

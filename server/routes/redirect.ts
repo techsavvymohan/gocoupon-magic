@@ -235,7 +235,7 @@ export async function handleDealRedirect(req: Request, res: Response) {
     if (matchedEarnKaro) {
       targetUrl = matchedEarnKaro;
     } else if (/^https?:\/\//i.test(targetUrl)) {
-      // Case D: Default universal coverage via Cuelinks (pub_id=148920) for all clean Indian and Global e-commerce stores
+      // Case D: Default universal coverage via Cuelinks (pub_id=272970) for all clean Indian and Global e-commerce stores
       targetUrl = buildCuelinksRedirectUrl({
         merchantUrl: targetUrl,
         subId: source || "gocoupon_web",

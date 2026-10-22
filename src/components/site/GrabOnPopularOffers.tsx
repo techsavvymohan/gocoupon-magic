@@ -109,7 +109,7 @@ export function GrabOnPopularOffers() {
       const rawUrl = liveMatch?.link || base.affiliateUrl || base.merchantUrl;
       const logoUrl = liveMatch?.storeLogo || base.logoUrl;
 
-      // Wrap with smart affiliate tracking (pub_id=148920 / EarnKaro)
+      // Wrap with smart affiliate tracking (pub_id=272970 / EarnKaro)
       const redirectUrl = buildDealRedirectUrl({
         url: rawUrl,
         dealId: liveMatch?.id || base.id,

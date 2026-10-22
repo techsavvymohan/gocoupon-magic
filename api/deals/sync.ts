@@ -1,6 +1,6 @@
 const CUELINKS_V3_BASE_URL = "https://developers.cuelinks.com/pub_api/v3";
 const apiKey = (process.env.CUELINKS_API_KEY || "").trim();
-const pubId = process.env.CUELINKS_PUBLISHER_ID || "148920";
+const pubId = process.env.CUELINKS_PUBLISHER_ID || "272970";
 
 function extractDiscount(o: any) {
   if (o.percent_off && Number(o.percent_off) > 0) return `${o.percent_off}% OFF`;

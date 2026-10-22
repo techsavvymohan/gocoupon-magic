@@ -42,7 +42,7 @@ async function fetchCampaign(keyword: string): Promise<any | null> {
 
 async function runAudit() {
   console.log("=========================================================================");
-  console.log(" 🔍 Cuelinks Campaign Approval Status Audit for GoCoupon (Pub ID: 148920)");
+  console.log(" 🔍 Cuelinks Campaign Approval Status Audit for GoCoupon (Pub ID: 272970)");
   console.log("=========================================================================\n");
 
   const candidates = [
