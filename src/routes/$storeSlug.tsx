@@ -9,6 +9,14 @@ export const Route = createFileRoute("/$storeSlug")({
   },
   head: ({ loaderData, params }) => {
     const store = loaderData?.store;
+    if (!store && !params.storeSlug.endsWith("-coupons")) {
+      return {
+        meta: [
+          { name: "robots", content: "noindex, nofollow" },
+          { title: "404 - Store Not Found | GoCoupon" },
+        ],
+      };
+    }
     const storeName = store ? store.name : params.storeSlug.replace(/-coupons$/, "").replace(/-/g, " ");
     const canonicalPath = store ? `/${store.slug}` : `/${params.storeSlug}`;
     return createSeoHead({

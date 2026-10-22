@@ -51,6 +51,17 @@ function RootComponent() {
 }
 
 function NotFoundComponent() {
+  useEffect(() => {
+    document.title = "404 - Page Not Found | GoCoupon";
+    let meta = document.querySelector('meta[name="robots"]');
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.setAttribute("name", "robots");
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute("content", "noindex, nofollow");
+  }, []);
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">

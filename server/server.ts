@@ -317,21 +317,52 @@ if (fs.existsSync(distDir)) {
       return res.sendFile(subDirHtmlPath);
     }
 
-    // D. SPA Fallback: send dist/index.html with dynamic canonical for TanStack Router
-    const fallbackHtmlPath = path.join(distDir, "index.html");
-    if (fs.existsSync(fallbackHtmlPath)) {
-      res.setHeader("Content-Type", "text/html; charset=utf-8");
-      const rawHtml = fs.readFileSync(fallbackHtmlPath, "utf-8");
-      const currentUrl = `https://gocoupon.io${cleanPath}`;
-      const dynamicHtml = rawHtml
-        .replace(/<link\s+rel="canonical"\s+href="[^"]*"/i, `<link rel="canonical" href="${currentUrl}"`)
-        .replace(/<link\s+rel="alternate"\s+hreflang="[^"]*"\s+href="https:\/\/gocoupon\.io\/"/g, (match) => {
-          return match.replace("https://gocoupon.io/", currentUrl);
-        });
-      return res.send(dynamicHtml);
+    // D. Known SPA Client Routes (served via index.html with dynamic canonical)
+    const KNOWN_SPA_ROUTES = new Set([
+      "/admin",
+      "/login",
+      "/welcome",
+      "/uninstall",
+      "/thank-you",
+      "/watchlist",
+      "/categories",
+      "/deals",
+      "/stores",
+      "/offers",
+      "/compare",
+      "/submit-coupon",
+    ]);
+
+    const isKnownSpaRoute =
+      KNOWN_SPA_ROUTES.has(cleanPath) ||
+      cleanPath.startsWith("/admin/") ||
+      cleanPath.startsWith("/product/") ||
+      cleanPath.startsWith("/category/") ||
+      cleanPath.startsWith("/collections/");
+
+    if (isKnownSpaRoute) {
+      const fallbackHtmlPath = path.join(distDir, "index.html");
+      if (fs.existsSync(fallbackHtmlPath)) {
+        res.setHeader("Content-Type", "text/html; charset=utf-8");
+        const rawHtml = fs.readFileSync(fallbackHtmlPath, "utf-8");
+        const currentUrl = `https://gocoupon.io${cleanPath}`;
+        const dynamicHtml = rawHtml
+          .replace(/<link\s+rel="canonical"\s+href="[^"]*"/i, `<link rel="canonical" href="${currentUrl}"`)
+          .replace(/<link\s+rel="alternate"\s+hreflang="[^"]*"\s+href="https:\/\/gocoupon\.io\/"/g, (match) => {
+            return match.replace("https://gocoupon.io/", currentUrl);
+          });
+        return res.send(dynamicHtml);
+      }
     }
 
-    next();
+    // E. True 404 Handler for all unknown web pages: sends HTTP 404 with 404.html to eliminate Soft 404s
+    const notFoundHtmlPath = path.join(distDir, "404.html");
+    if (fs.existsSync(notFoundHtmlPath)) {
+      res.status(404).setHeader("Content-Type", "text/html; charset=utf-8");
+      return res.sendFile(notFoundHtmlPath);
+    }
+
+    res.status(404).send("404 Not Found");
   });
 }
 
