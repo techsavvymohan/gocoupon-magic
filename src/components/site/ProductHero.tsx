@@ -73,14 +73,9 @@ export function ProductHero() {
           {isInstalled ? (
             <MagneticButton
               as="a"
-              href="#checkout-simulator"
-              onClick={(e) => {
-                const el = document.getElementById("checkout-simulator");
-                if (el) {
-                  e.preventDefault();
-                  el.scrollIntoView({ behavior: "smooth" });
-                }
-              }}
+              href="https://chromewebstore.google.com/detail/gbmfihnboadlmmjbikajlmocjmlpehij"
+              target="_blank"
+              rel="noopener noreferrer"
               className="group relative inline-flex min-h-[50px] items-center gap-2.5 sm:gap-3 overflow-hidden rounded-full bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 px-6 sm:px-7 py-3 text-sm font-bold text-white border border-emerald-300/40 shadow-lg shadow-emerald-600/30 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl hover:shadow-emerald-500/40 active:scale-[0.98] animate-button-glow-pulse cursor-pointer select-none"
             >
               {/* Animated Light Shimmer Sweep */}
