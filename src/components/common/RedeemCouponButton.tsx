@@ -46,6 +46,13 @@ export function RedeemCouponButton({
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onRedeem(deal, e);
+    try {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("gocoupon-coupon-copied", { detail: { deal } })
+        );
+      }
+    } catch {}
   };
 
   // Copied state: reveals full code with checkmark

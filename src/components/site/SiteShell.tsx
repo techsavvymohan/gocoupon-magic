@@ -4,6 +4,8 @@ import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { CookieConsent } from "@/components/site/CookieConsent";
 import { MobileStickyCta } from "@/components/site/MobileStickyCta";
+import { ExtensionStickyTopBar } from "@/components/site/ExtensionStickyTopBar";
+import { ExtensionExitIntentModal } from "@/components/site/ExtensionExitIntentModal";
 import { useRevealOnScroll } from "@/hooks/use-reveal";
 
 type SiteShellProps = {
@@ -46,6 +48,9 @@ export function SiteShell({
         {showParticles && <Particles count={30} />}
       </div>
 
+      {/* Sticky Chrome Extension Promo Top Bar */}
+      <ExtensionStickyTopBar />
+
       <Navbar />
       {/* Main content layer positioned above background particles (z-10) */}
       <div className="relative z-10 overflow-x-clip" style={{ overflowX: "clip" }}>
@@ -56,6 +61,8 @@ export function SiteShell({
       {/* Conversion & Compliance Floating Elements */}
       <MobileStickyCta />
       <CookieConsent />
+      <ExtensionExitIntentModal />
     </div>
   );
 }
+
