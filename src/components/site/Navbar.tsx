@@ -12,7 +12,7 @@ import { CurrencyToggle } from "../CurrencyToggle";
 import { LanguageToggle } from "../LanguageToggle";
 import { useI18n } from "@/context/I18nContext";
 import { useExtensionBridge } from "@/lib/useExtensionBridge";
-import { AnnouncementBar } from "./AnnouncementBar";
+import { ExtensionStickyTopBar } from "./ExtensionStickyTopBar";
 import { NavbarSearch } from "./NavbarSearch";
 import {
   Search,
@@ -131,7 +131,7 @@ export function Navbar() {
           WebkitBackdropFilter: "blur(24px) saturate(160%)",
         }}
       >
-        <AnnouncementBar />
+        <ExtensionStickyTopBar />
 
         {/* ── TIER 1: PRIMARY ACTION ROW (Logo, GrabOn-Style Live Search, Controls) ── */}
         <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 sm:gap-6 px-4 sm:px-6">
