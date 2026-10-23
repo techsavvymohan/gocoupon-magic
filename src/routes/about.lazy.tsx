@@ -121,7 +121,7 @@ export function AboutPage() {
                   </li>
                   <li>
                     <strong className="text-foreground">Ad Space Verification:</strong>{" "}
-                    <span className="font-mono text-muted-foreground text-xs">admitad-verification: 9fa8ccb538 | admitad-extension: f9a6</span>
+                    <span className="font-mono text-muted-foreground text-xs">admitad-verification: 9fa8ccb538 | admitad-extension: 502e</span>
                   </li>
                 </ul>
               </div>
