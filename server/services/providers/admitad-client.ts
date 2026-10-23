@@ -19,14 +19,16 @@ export function getAdmitadConfig() {
   const clientId = process.env.ADMITAD_CLIENT_ID || "WTuJJKIiFNj2ZnibEj23HScasY0fTk";
   const clientSecret = process.env.ADMITAD_CLIENT_SECRET || "yeeIyd9JLb1dyplDk2yIbfjJhy3Ebi";
   const websiteId = process.env.ADMITAD_WEBSITE_ID || "3007234";
+  const publisherId = process.env.ADMITAD_PUBLISHER_ID || "2526582";
   const base64Header =
     process.env.ADMITAD_BASE64_HEADER ||
-    Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
+    "V1R1SkpLSWlGTmoyWm5pYkVqMjNIU2Nhc1kwZlRrOnllZUl5ZDlKTGIxZHlwbERrMnlJYmZqSmh5M0ViaQ==";
 
   return {
     clientId,
     clientSecret,
     websiteId,
+    publisherId,
     base64Header,
     isConfigured: Boolean(clientId && clientSecret),
   };
@@ -358,7 +360,7 @@ export async function fetchLiveInternationalDeals(): Promise<Deal[]> {
 
   try {
     // 1. Fetch live active coupons from Admitad for Ad Space 3007234 (GoCoupon)
-    const res = await fetch(`https://api.admitad.com/coupons/website/${config.websiteId}/?limit=50`, {
+    const res = await fetch(`https://api.admitad.com/coupons/website/${config.websiteId}/?limit=100`, {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: "application/json",
@@ -378,27 +380,97 @@ export async function fetchLiveInternationalDeals(): Promise<Deal[]> {
             ? buildCuelinksRedirectUrl({ merchantUrl: item.campaign.site_url, subId: "admitad_live" })
             : "https://gocoupon.io";
 
+          // Reliable Logo: Prefer Admitad CDN image or Google S2 Favicon CDN (never fails)
+          let logoUrl = item.image;
+          if (!logoUrl && item.campaign?.site_url) {
+            try {
+              const host = new URL(item.campaign.site_url).hostname.replace(/^www\./, "");
+              logoUrl = `https://www.google.com/s2/favicons?domain=${host}&sz=128`;
+            } catch {
+              logoUrl = undefined;
+            }
+          }
+
+          let cleanCode = String(item.promocode || "").trim();
+          if (!cleanCode || cleanCode === "НЕ НУЖЕН" || cleanCode === "NOT REQUIRED" || cleanCode === "null") {
+            cleanCode = "DEAL ACTIVATED";
+          }
+
           deals.unshift({
             id: `admitad-${item.id || Math.random().toString(36).slice(2, 9)}`,
             storeName: merchantName,
             storeSlug: merchantSlug,
-            storeLogo: item.campaign?.site_url
-              ? `https://logo.clearbit.com/${new URL(item.campaign.site_url).hostname.replace(/^www\./, "")}`
-              : undefined,
+            storeLogo: logoUrl,
             category: (item.categories?.[0]?.name as any) || "General",
             title: item.name,
-            code: item.promocode || "DEAL ACTIVATED",
+            code: cleanCode,
             discount: item.discount || "Verified Deal",
-            badge: "Verified",
+            badge: item.exclusive ? "Exclusive" : "Verified",
             verifiedDate: "Verified Live",
             expiresIn: item.date_end ? "Active" : "Ongoing",
             endDate: item.date_end || undefined,
-            terms: item.description || "Limited time international store offer.",
+            terms: item.description || "Limited time verified merchant offer.",
             link: item.goto_link || fallbackTrackingUrl,
             usesCount: Math.floor(Math.random() * 800) + 120,
           });
         }
       }
+    }
+
+    // 2. Fetch connected active advertiser campaigns and ensure top merchants are represented
+    try {
+      const campRes = await fetch(`https://api.admitad.com/advcampaigns/website/${config.websiteId}/?limit=50`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      });
+
+      if (campRes.ok) {
+        const campData = await campRes.json();
+        if (Array.isArray(campData.results)) {
+          const activeWithLinks = campData.results.filter(
+            (c: any) => c.status === "active" && c.gotolink && c.gotolink.trim().length > 0
+          );
+
+          for (const camp of activeWithLinks) {
+            const slug = (camp.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+            // If deals list doesn't already contain a deal for this active campaign, add a primary deal
+            const alreadyHasDeal = deals.some(
+              (d) => d.storeSlug.includes(slug) || slug.includes(d.storeSlug)
+            );
+
+            if (!alreadyHasDeal && camp.site_url) {
+              let campLogo = camp.image;
+              try {
+                const host = new URL(camp.site_url).hostname.replace(/^www\./, "");
+                campLogo = campLogo || `https://www.google.com/s2/favicons?domain=${host}&sz=128`;
+              } catch {
+                campLogo = undefined;
+              }
+
+              deals.push({
+                id: `admitad-camp-${camp.id}`,
+                storeName: camp.name,
+                storeSlug: slug,
+                storeLogo: campLogo,
+                category: (camp.categories?.[0]?.name as any) || "General",
+                title: `${camp.name}: Exclusive Verified Offers & Storewide Discounts`,
+                code: "DISCOUNT ACTIVATED",
+                discount: "Verified Offer",
+                badge: "Trending",
+                verifiedDate: "Verified Today",
+                expiresIn: "Active",
+                terms: `Shop verified deals at ${camp.name} official online store.`,
+                link: camp.gotolink,
+                usesCount: Math.floor(Math.random() * 1200) + 300,
+              });
+            }
+          }
+        }
+      }
+    } catch (e: any) {
+      console.warn("⚠️ [Admitad] Campaign sync notice:", e?.message);
     }
   } catch (err: any) {
     console.warn("⚠️ [Admitad] Could not fetch live coupons endpoint:", err?.message);
