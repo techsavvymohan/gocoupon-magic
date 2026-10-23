@@ -1,7 +1,7 @@
 import UNIFIED_STORES from "@/data/unified-stores.json";
 /**
  * @file store-registry.ts
- * @description Central Store Registry & Direct Search URL Generator with Cuelinks Affiliate Tracking.
+ * @description Central Store Registry & Direct Search URL Generator with Verified Partner Affiliate Tracking.
  * Covers top Indian and International e-commerce merchants with verified Instant Open & Available status.
  */
 
@@ -221,15 +221,45 @@ export function wrapAffiliateTracking(targetUrl: string, subId = "gocoupon_web")
     return targetUrl;
   }
 
+  // Auto-infer merchant store name and slug from domain so attribution is never blank
+  let inferredStore = "";
+  let inferredSlug = "";
+  try {
+    const parsed = new URL(targetUrl);
+    const host = parsed.hostname.toLowerCase().replace(/^www\./, "");
+    const parts = host.split(".");
+    const rootName = parts.length >= 2 ? parts[0] : host;
+    inferredSlug = rootName;
+    inferredStore = rootName.charAt(0).toUpperCase() + rootName.slice(1);
+
+    const match = findStoreByNameOrSlug(rootName);
+    if (match) {
+      inferredStore = match.name;
+      inferredSlug = match.id || rootName;
+    }
+  } catch {
+    // Non-parseable URL fallback
+  }
+
   // If already an active affiliate link (CJ, Admitad, Cuelinks, EarnKaro, Amazon), preserve verbatim through tracker
   if (isAffiliateNetworkUrl(targetUrl)) {
-    return `/api/redirect/deal?url=${encodeURIComponent(targetUrl)}&source=${encodeURIComponent(subId)}`;
+    const qp = new URLSearchParams();
+    qp.set("url", targetUrl);
+    qp.set("source", subId);
+    if (inferredStore) qp.set("store", inferredStore);
+    if (inferredSlug) qp.set("slug", inferredSlug);
+    return `/api/redirect/deal?${qp.toString()}`;
   }
 
   // Check EarnKaro affiliate link first
   const earnkaroLink = getStoreEarnKaroLink(targetUrl);
   if (earnkaroLink) {
-    return `/api/redirect/deal?url=${encodeURIComponent(earnkaroLink)}&source=${encodeURIComponent(subId)}`;
+    const qp = new URLSearchParams();
+    qp.set("url", earnkaroLink);
+    qp.set("source", subId);
+    if (inferredStore) qp.set("store", inferredStore);
+    if (inferredSlug) qp.set("slug", inferredSlug);
+    return `/api/redirect/deal?${qp.toString()}`;
   }
 
   let finalUrl = targetUrl;
@@ -250,7 +280,12 @@ export function wrapAffiliateTracking(targetUrl: string, subId = "gocoupon_web")
   }
 
   // Route through GoCoupon's Smart Outbound Redirect & Click Tracker
-  return `/api/redirect/deal?url=${encodeURIComponent(finalUrl)}&source=${encodeURIComponent(subId)}`;
+  const qp = new URLSearchParams();
+  qp.set("url", finalUrl);
+  qp.set("source", subId);
+  if (inferredStore) qp.set("store", inferredStore);
+  if (inferredSlug) qp.set("slug", inferredSlug);
+  return `/api/redirect/deal?${qp.toString()}`;
 }
 
 /**
@@ -331,7 +366,7 @@ export const REGISTERED_STORES: RegisteredStore[] = [
   {
     id: "hostinger",
     name: "Hostinger",
-    category: "education",
+    category: "general",
     region: "GLOBAL",
     tier: 1,
     logo: "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060832/gocoupon/brands/real_brand_hostinger.svg",
@@ -339,11 +374,23 @@ export const REGISTERED_STORES: RegisteredStore[] = [
     storeUrl: "https://www.hostinger.in",
     isInstantOpen: true,
     status: "instant_open",
-    aliases: ["hostinger", "hostinger india", "hostinger hosting", "hostinger.in", "hostinger.com"],
+    aliases: [
+      "hostinger",
+      "hostinger india",
+      "hosting",
+      "web hosting",
+      "wordpress hosting",
+      "vps",
+      "vps hosting",
+      "cloud hosting",
+      "domains",
+      "hostinger.in",
+      "hostinger.com",
+    ],
     internalRoute: "/hostinger-coupons",
-    defaultCoupon: { code: "GLOBALHOST10", description: "Extra 10% off on web hosting & free domain", discountPct: 0.1 },
-    cashbackRate: "Up to 15.0%",
-    cashbackPct: 0.15,
+    defaultCoupon: { code: "GLOBALHOST10", description: "Up to 83% OFF + Extra 10% Coupon + Free Domain", discountPct: 0.1 },
+    cashbackRate: "Up to 60% CPS / ₹3,500 Payout",
+    cashbackPct: 0.6,
     buildSearchUrl: () => wrapAffiliateTracking("https://www.hostinger.in"),
   },
   {
@@ -1142,26 +1189,99 @@ export const REGISTERED_STORES: RegisteredStore[] = [
     cashbackPct: 0.075,
     buildSearchUrl: (q) => wrapAffiliateTracking(`https://www.udemy.com/courses/search/?q=${encodeURIComponent(q)}`),
   },
+  // ─── High-Yield Global Powerhouses (SaaS, Digital Assets, Global Retail) ────
   {
-    id: "hostinger",
-    name: "Hostinger",
+    id: "semrush",
+    name: "Semrush",
     category: "general",
     region: "GLOBAL",
-    tier: 2,
-    logo: "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060832/gocoupon/brands/real_brand_hostinger.svg",
-    domain: "hostinger.in",
-    storeUrl: "https://www.hostinger.in",
-    isInstantOpen: false,
-    status: "available",
-    aliases: ["hostinger", "web hosting", "hosting", "domains"],
-    internalRoute: "/hostinger-coupons",
-    defaultCoupon: { code: "GLOBALHOST10", description: "Up to 75% OFF + Extra 10% Coupon + Free Domain", discountPct: 0.1 },
-    cashbackRate: "Up to 25%",
+    tier: 1,
+    logo: "https://www.google.com/s2/favicons?domain=semrush.com&sz=128",
+    domain: "semrush.com",
+    storeUrl: "https://www.semrush.com",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["semrush", "sem rush", "seo tools", "keyword research", "competitor analysis"],
+    internalRoute: "/stores",
+    defaultCoupon: { code: "SEMRUSHPRO", description: "14-Day Free Pro Trial + Competitive Intelligence Access", discountPct: 0.15 },
+    cashbackRate: "Dynamic CPC + Up to $200 CPS",
     cashbackPct: 0.2,
-    buildSearchUrl: (q) => wrapAffiliateTracking(`https://www.hostinger.in`),
+    buildSearchUrl: () => wrapAffiliateTracking("https://www.semrush.com"),
+  },
+  {
+    id: "envato",
+    name: "Envato Elements",
+    category: "general",
+    region: "GLOBAL",
+    tier: 1,
+    logo: "https://www.google.com/s2/favicons?domain=elements.envato.com&sz=128",
+    domain: "elements.envato.com",
+    storeUrl: "https://elements.envato.com",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["envato", "envato elements", "themeforest", "codecanyon", "videohive", "audiojungle"],
+    internalRoute: "/stores",
+    defaultCoupon: { code: "ENVATOSAVE", description: "Unlimited Creative Downloads & WordPress Themes", discountPct: 0.2 },
+    cashbackRate: "Up to $102 Payout",
+    cashbackPct: 0.25,
+    buildSearchUrl: () => wrapAffiliateTracking("https://elements.envato.com"),
+  },
+  {
+    id: "aliexpress",
+    name: "AliExpress",
+    category: "general",
+    region: "GLOBAL",
+    tier: 1,
+    logo: "https://www.google.com/s2/favicons?domain=aliexpress.com&sz=128",
+    domain: "aliexpress.com",
+    storeUrl: "https://www.aliexpress.com",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["aliexpress", "ali express", "ali", "aliexpress global"],
+    internalRoute: "/stores",
+    defaultCoupon: { code: "ALISAVE", description: "Choice Day Deals: Up to 70% Off + Free Shipping", discountPct: 0.15 },
+    cashbackRate: "Up to 9.0% CPS",
+    cashbackPct: 0.09,
+    buildSearchUrl: (q) => wrapAffiliateTracking(`https://www.aliexpress.com/wholesale?SearchText=${encodeURIComponent(q)}`),
+  },
+  {
+    id: "sephora_in",
+    name: "Sephora India",
+    category: "beauty",
+    region: "IN",
+    tier: 1,
+    logo: "https://www.google.com/s2/favicons?domain=sephora.nnnow.com&sz=128",
+    domain: "sephora.nnnow.com",
+    storeUrl: "https://sephora.nnnow.com",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["sephora", "sephora india", "sephora nnnow", "luxury cosmetics", "beauty"],
+    internalRoute: "/stores",
+    defaultCoupon: { code: "BEAUTY10", description: "Flat 10% Off on Prestige Fragrances & Skincare", discountPct: 0.1 },
+    cashbackRate: "6.30% CPS",
+    cashbackPct: 0.063,
+    buildSearchUrl: (q) => wrapAffiliateTracking(`https://sephora.nnnow.com/search?q=${encodeURIComponent(q)}`),
+  },
+  {
+    id: "crocs_in",
+    name: "Crocs India",
+    category: "fashion",
+    region: "IN",
+    tier: 1,
+    logo: "https://www.google.com/s2/favicons?domain=crocs.in&sz=128",
+    domain: "crocs.in",
+    storeUrl: "https://www.crocs.in",
+    isInstantOpen: true,
+    status: "instant_open",
+    aliases: ["crocs", "crocs india", "clogs", "jibbitz", "crocs footwear"],
+    internalRoute: "/stores",
+    defaultCoupon: { code: "CROCSNEW", description: "Flat 15% Off on Classic Clogs & Sandals", discountPct: 0.15 },
+    cashbackRate: "5.85% CPS",
+    cashbackPct: 0.0585,
+    buildSearchUrl: (q) => wrapAffiliateTracking(`https://www.crocs.in/search?q=${encodeURIComponent(q)}`),
   },
 
-  // ─── Amazon India (Direct Associates Tag / Cuelinks Campaign) ──────────────
+  // ─── Amazon India (Direct Associates Tag / Authorized Partner Network) ──────────────
   {
     id: "amazon_in",
     name: "Amazon India",

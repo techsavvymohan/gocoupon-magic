@@ -22,6 +22,7 @@ import {
 import {
   findMatchingStores,
   buildStoreAffiliateUrl,
+  wrapAffiliateTracking,
   type RegisteredStore,
 } from "@/lib/services/store-registry";
 import {
@@ -35,6 +36,7 @@ import {
   Store as StoreIcon,
   Zap,
   Barcode,
+  Clipboard,
 } from "lucide-react";
 import type { FoodProductComparison } from "@/open_food_fact/types.js";
 import { NutriScoreBadge } from "@/open_food_fact/components/NutriScoreBadge.js";
@@ -247,6 +249,14 @@ export function UrlResolverSearch({
         return;
       }
 
+      // If user inputs or pastes an HTTP URL, instantly resolve with verified affiliate attribution
+      if (/^https?:\/\//i.test(trimmed)) {
+        const affUrl = wrapAffiliateTracking(trimmed, "gocoupon_url_resolver");
+        toast.success("Resolved partner store! Opening with verified cashback tracking...");
+        window.open(affUrl, "_blank", "noopener");
+        return;
+      }
+
       navigate({
         to: "/compare",
         search: { q: trimmed } as unknown as Record<string, string>,
@@ -267,7 +277,7 @@ export function UrlResolverSearch({
       inputRef.current?.blur();
 
       const affUrl = buildStoreAffiliateUrl(store, "gocoupon_instant_search");
-      toast.success(`Opening ${store.name} with GoCoupon Cuelinks auto-savings!`);
+      toast.success(`Opening ${store.name} with verified partner auto-savings!`);
       if (openWindow) {
         window.open(affUrl, "_blank", "noopener");
       }
@@ -429,11 +439,16 @@ export function UrlResolverSearch({
               <button
                 type="submit"
                 disabled={!query.trim() || isResolving}
-                aria-label="Compare prices across stores"
-                className="inline-flex items-center gap-1.5 rounded-xl sm:rounded-2xl bg-primary px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-primary-foreground shadow-xs transition-transform hover:scale-[1.03] active:scale-[0.97] disabled:opacity-40 min-h-[36px] sm:min-h-[40px] touch-manipulation"
+                aria-label="Compare prices or open store"
+                className="inline-flex items-center gap-1.5 rounded-xl sm:rounded-2xl bg-primary px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-primary-foreground shadow-xs transition-transform hover:scale-[1.03] active:scale-[0.97] disabled:opacity-40 min-h-[36px] sm:min-h-[40px] touch-manipulation cursor-pointer"
               >
                 {isResolving ? (
                   <span>Searching…</span>
+                ) : /^https?:\/\//i.test(query.trim()) ? (
+                  <>
+                    <Zap className="h-3.5 w-3.5 text-amber-300 fill-amber-300" aria-hidden="true" />
+                    <span>Open &amp; Save</span>
+                  </>
                 ) : (
                   <>
                     <span>Compare</span>
@@ -444,6 +459,33 @@ export function UrlResolverSearch({
             </>
           ) : (
             <>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    const text = await navigator.clipboard.readText();
+                    if (text && text.trim()) {
+                      const trimmed = text.trim();
+                      setQuery(trimmed);
+                      if (/^https?:\/\//i.test(trimmed)) {
+                        const affUrl = wrapAffiliateTracking(trimmed, "gocoupon_url_resolver");
+                        toast.success("Resolved partner store! Opening with verified cashback tracking...");
+                        window.open(affUrl, "_blank", "noopener");
+                      } else {
+                        inputRef.current?.focus();
+                      }
+                    }
+                  } catch {
+                    inputRef.current?.focus();
+                  }
+                }}
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-muted/60 hover:bg-muted text-[11px] font-medium text-foreground px-2.5 py-1.5 transition-colors border border-border/60 cursor-pointer"
+                title="Paste merchant link from clipboard"
+              >
+                <Clipboard className="h-3 w-3 text-primary" />
+                <span>Paste Link</span>
+              </button>
+
               <span className="hidden sm:inline text-xs sm:text-sm font-normal text-muted-foreground/75 select-none mr-1">
                 supports
               </span>
@@ -474,12 +516,48 @@ export function UrlResolverSearch({
 
       {/* Live Dropdown Suggestions — Stores Top-Ranked */}
       {showDropdown &&
-        (foodComparison || matchedStores.length > 0 || searxngSuggestions.length > 0) && (
+        (foodComparison || /^https?:\/\//i.test(query.trim()) || matchedStores.length > 0 || searxngSuggestions.length > 0) && (
           <div
             role="listbox"
             id="search-suggestions-list"
             className="absolute top-full left-0 right-0 mt-1.5 sm:mt-2 z-50 rounded-2xl sm:rounded-3xl border border-border/80 bg-card/98 backdrop-blur-2xl p-2.5 sm:p-3 shadow-2xl text-left animate-in fade-in zoom-in-95 duration-150 divide-y divide-border/40 max-h-[70vh] sm:max-h-[480px] overflow-y-auto overscroll-contain"
           >
+            {/* ── 0. DIRECT URL MONETIZATION CARD ── */}
+            {/^https?:\/\//i.test(query.trim()) && (
+              <div className="pb-2.5">
+                <div
+                  onClick={() => {
+                    const affUrl = wrapAffiliateTracking(query.trim(), "gocoupon_url_resolver");
+                    toast.success("Opening partner store with verified cashback tracking!");
+                    window.open(affUrl, "_blank", "noopener");
+                  }}
+                  className="group/url flex items-center justify-between gap-3 rounded-xl sm:rounded-2xl p-2.5 sm:p-3 transition-all bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/15 hover:from-amber-500/25 hover:to-orange-500/20 border border-amber-500/30 cursor-pointer shadow-xs"
+                >
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="h-10 w-10 shrink-0 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-500">
+                      <Zap className="h-5 w-5 fill-amber-500" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-foreground truncate">
+                          ⚡ Instant Open &amp; Activate Cashback
+                        </span>
+                        <span className="rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2 py-0.5 border border-emerald-500/30">
+                          100% Tracked
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground truncate font-mono mt-0.5">
+                        {query.trim()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="shrink-0 flex items-center gap-1 text-xs font-bold text-amber-500 group-hover/url:translate-x-0.5 transition-transform">
+                    <span>Open</span>
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </div>
+                </div>
+              </div>
+            )}
             {/* ── 0. OPEN FOOD FACTS BARCODE MATCH ── */}
             {foodComparison && (
               <div className="pb-2.5">
@@ -548,7 +626,7 @@ export function UrlResolverSearch({
                   </span>
                   <span className="text-[9px] font-mono font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
                     <Zap className="h-2.5 w-2.5 fill-emerald-500 text-emerald-500" />
-                    Cuelinks Tracking Active
+                    Verified Auto-Savings Active
                   </span>
                 </div>
 
@@ -651,7 +729,7 @@ export function UrlResolverSearch({
                               handleInstantOpen(store, false);
                             }}
                             className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold px-3 py-1.5 sm:py-2 shadow-xs transition-all touch-manipulation focus-visible:ring-2 focus-visible:ring-emerald-400"
-                            title={`Instant Open ${store.name} with Cuelinks auto-tracking`}
+                            title={`Instant Open ${store.name} with verified partner auto-savings`}
                           >
                             <span>Instant Open</span>
                             <ExternalLink className="h-3 w-3" />

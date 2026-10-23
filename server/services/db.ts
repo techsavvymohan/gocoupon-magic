@@ -1256,6 +1256,11 @@ export interface DealClickRecord {
   device?: string;
   ip?: string;
   userAgent?: string;
+  subid1?: string;
+  subid2?: string;
+  subid3?: string;
+  subid4?: string;
+  subid5?: string;
   createdAt: string;
 }
 
@@ -1276,6 +1281,11 @@ export const clicksDb = {
       device: click.device || "desktop",
       ip: click.ip || "",
       userAgent: click.userAgent || "",
+      subid1: click.subid1,
+      subid2: click.subid2,
+      subid3: click.subid3,
+      subid4: click.subid4,
+      subid5: click.subid5,
       createdAt: click.createdAt || new Date().toISOString(),
     };
 

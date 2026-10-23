@@ -170,7 +170,7 @@ const SELECTORS_CONFIG: Record<string, MerchantSelectorConfig> = {
       injectionAnchor: "before",
     },
     supportedFeatures: {
-      autoApply: false,
+      autoApply: true,
       savingsHud: true,
       crossStoreArbitrage: false,
     },
@@ -190,7 +190,127 @@ const SELECTORS_CONFIG: Record<string, MerchantSelectorConfig> = {
       injectionAnchor: "before",
     },
     supportedFeatures: {
-      autoApply: false,
+      autoApply: true,
+      savingsHud: true,
+      crossStoreArbitrage: false,
+    },
+  },
+  "hostinger.in": {
+    domain: "hostinger.in",
+    name: "Hostinger India",
+    cartCouponBox: {
+      inputSelector: "input[placeholder*='coupon' i], input#coupon_code, input[name='coupon']",
+      applyButtonSelector: "button:contains('Apply'), button[type='submit']:contains('Apply')",
+      successMessageSelector: ".coupon-success, [class*='coupon-applied']",
+      errorMessageSelector: ".coupon-error, [class*='coupon-error']",
+    },
+    productPageHud: {
+      buyNowButtonSelector: "button:contains('Choose plan'), a:contains('Add to cart')",
+      priceContainerSelector: ".price, [class*='price-wrapper']",
+      injectionAnchor: "before",
+    },
+    supportedFeatures: {
+      autoApply: true,
+      savingsHud: true,
+      crossStoreArbitrage: false,
+    },
+  },
+  "hostinger.com": {
+    domain: "hostinger.com",
+    name: "Hostinger Global",
+    cartCouponBox: {
+      inputSelector: "input[placeholder*='coupon' i], input#coupon_code, input[name='coupon']",
+      applyButtonSelector: "button:contains('Apply'), button[type='submit']:contains('Apply')",
+      successMessageSelector: ".coupon-success, [class*='coupon-applied']",
+      errorMessageSelector: ".coupon-error, [class*='coupon-error']",
+    },
+    productPageHud: {
+      buyNowButtonSelector: "button:contains('Choose plan'), a:contains('Add to cart')",
+      priceContainerSelector: ".price, [class*='price-wrapper']",
+      injectionAnchor: "before",
+    },
+    supportedFeatures: {
+      autoApply: true,
+      savingsHud: true,
+      crossStoreArbitrage: false,
+    },
+  },
+  "boat-lifestyle.com": {
+    domain: "boat-lifestyle.com",
+    name: "boAt Lifestyle",
+    cartCouponBox: {
+      inputSelector: "input[placeholder*='discount' i], input#checkout_reduction_code, input[name='checkout[reduction_code]']",
+      applyButtonSelector: "button#apply-reduction-code, button:contains('Apply')",
+      successMessageSelector: ".reduction-code-applied",
+      errorMessageSelector: "#error-for-reduction_code, .field__message--error",
+    },
+    productPageHud: {
+      buyNowButtonSelector: "button[name='add'], button.product-form__submit",
+      priceContainerSelector: ".price__current, .price-item--sale",
+      injectionAnchor: "before",
+    },
+    supportedFeatures: {
+      autoApply: true,
+      savingsHud: true,
+      crossStoreArbitrage: false,
+    },
+  },
+  "semrush.com": {
+    domain: "semrush.com",
+    name: "Semrush",
+    cartCouponBox: {
+      inputSelector: "input[name='promoCode'], input[placeholder*='promo' i]",
+      applyButtonSelector: "button:contains('Apply')",
+      successMessageSelector: "[class*='promo-success']",
+      errorMessageSelector: "[class*='promo-error']",
+    },
+    productPageHud: {
+      buyNowButtonSelector: "button:contains('Subscribe'), button:contains('Get Free Trial')",
+      priceContainerSelector: "[data-test='price-amount']",
+      injectionAnchor: "before",
+    },
+    supportedFeatures: {
+      autoApply: true,
+      savingsHud: true,
+      crossStoreArbitrage: false,
+    },
+  },
+  "elements.envato.com": {
+    domain: "elements.envato.com",
+    name: "Envato Elements",
+    cartCouponBox: {
+      inputSelector: "input[placeholder*='coupon' i], input[name='coupon_code']",
+      applyButtonSelector: "button:contains('Apply')",
+      successMessageSelector: "[data-test-id='coupon-success']",
+      errorMessageSelector: "[data-test-id='coupon-error']",
+    },
+    productPageHud: {
+      buyNowButtonSelector: "a:contains('Start now'), button:contains('Subscribe')",
+      priceContainerSelector: "[data-test-id='pricing-price']",
+      injectionAnchor: "before",
+    },
+    supportedFeatures: {
+      autoApply: true,
+      savingsHud: true,
+      crossStoreArbitrage: false,
+    },
+  },
+  "aliexpress.com": {
+    domain: "aliexpress.com",
+    name: "AliExpress",
+    cartCouponBox: {
+      inputSelector: "input[placeholder*='code' i], input.promo-input",
+      applyButtonSelector: "button:contains('Apply'), button.promo-btn",
+      successMessageSelector: ".promo-success",
+      errorMessageSelector: ".promo-error",
+    },
+    productPageHud: {
+      buyNowButtonSelector: "button:contains('Buy Now')",
+      priceContainerSelector: ".product-price-current",
+      injectionAnchor: "before",
+    },
+    supportedFeatures: {
+      autoApply: true,
       savingsHud: true,
       crossStoreArbitrage: false,
     },

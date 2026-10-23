@@ -4,7 +4,7 @@
  *
  * Strategies:
  * 1. High-resolution local SVG/WebP vector assets for enterprise partners (Flipkart, Amazon, Myntra, Tata CLiQ, etc.)
- * 2. Exact merchant domain extraction directly from Cuelinks tracking redirect URLs (eliminating name collision/mismatch)
+ * 2. Exact merchant domain extraction directly from partner tracking redirect URLs (eliminating name collision/mismatch)
  * 3. Google S2 128px HD Favicon CDN for authentic brand favicons/icons
  * 4. Deterministic branded gradient monogram avatar fallback for network/load failures
  */
@@ -270,7 +270,7 @@ export const CLOUDINARY_STORE_LOGOS: Record<string, string> = {
 export const LOCAL_STORE_LOGOS: Record<string, string> = CLOUDINARY_STORE_LOGOS;
 
 /**
- * Extracts the exact destination merchant root domain from a Cuelinks tracking URL.
+ * Extracts the exact destination merchant root domain from a partner tracking URL.
  */
 export function extractMerchantDomain(
   trackingUrl?: string,

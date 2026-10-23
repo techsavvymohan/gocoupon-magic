@@ -8,11 +8,13 @@ import { Link } from "@tanstack/react-router";
 import { useExtensionBridge } from "@/lib/useExtensionBridge";
 import { Zap, ShieldCheck, ArrowRight, CheckCircle2, Clock } from "lucide-react";
 import { useFestiveBanner } from "@/lib/hero-banner";
+import { useLiveStats } from "@/hooks/use-live-stats";
 import { MagneticButton } from "../MagneticButton";
 
 export function ProductHero() {
   const { isInstalled } = useExtensionBridge();
   const { banner, isActive, styles } = useFestiveBanner();
+  const stats = useLiveStats();
 
   return (
     <section className="relative overflow-hidden pt-8 sm:pt-14 pb-12 sm:pb-16 bg-gradient-to-b from-card/30 via-background to-background border-b border-border/60">
@@ -129,7 +131,7 @@ export function ProductHero() {
               to="/offers"
               className="inline-flex min-h-[50px] items-center gap-2 rounded-full border border-border bg-card/80 px-6 py-3 text-sm font-semibold text-foreground hover:bg-muted hover:border-primary/40 active:scale-95 transition-all shadow-2xs cursor-pointer"
             >
-              <span>Browse 1,390+ Deals →</span>
+              <span>{stats.browseButtonLabel}</span>
             </Link>
           ) : (
             <a
@@ -153,7 +155,7 @@ export function ProductHero() {
         <div className="mt-10 pt-6 border-t border-border/60 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs font-mono text-muted-foreground">
           <div className="flex items-center gap-1.5">
             <Zap className="h-4 w-4 text-primary" />
-            <span><strong className="text-foreground">1.4s</strong> Auto-Apply Speed</span>
+            <span><strong className="text-foreground">{stats.autoApplySpeed}</strong> Auto-Apply Speed</span>
           </div>
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="h-4 w-4 text-emerald-500" />
@@ -161,11 +163,11 @@ export function ProductHero() {
           </div>
           <div className="flex items-center gap-1.5">
             <CheckCircle2 className="h-4 w-4 text-blue-500" />
-            <span><strong className="text-foreground">94.8%</strong> Cart Verification Rate</span>
+            <span><strong className="text-foreground">{stats.verificationRate}</strong> Cart Verification Rate</span>
           </div>
           <div className="flex items-center gap-1.5">
             <Clock className="h-4 w-4 text-amber-500" />
-            <span>Updated Today: <strong className="text-foreground">1,390+ Deals</strong></span>
+            <span>Updated Today: <strong className="text-foreground">{stats.formattedCount} Deals</strong></span>
           </div>
         </div>
       </div>

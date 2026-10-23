@@ -2,9 +2,11 @@ import { useExtensionBridge } from "@/lib/useExtensionBridge";
 import { MagneticButton } from "../MagneticButton";
 import { ArrowRight, Star, Tag, ShieldCheck } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { useLiveStats } from "@/hooks/use-live-stats";
 
 export function CTA() {
   const { isInstalled } = useExtensionBridge();
+  const stats = useLiveStats();
   return (
     <section id="cta" className="relative px-4 sm:px-6 py-10 sm:py-14 border-t border-border">
       <div className="reveal relative mx-auto max-w-4xl rounded-2xl border border-border bg-card p-6 sm:p-10 text-center shadow-xs">
@@ -47,7 +49,7 @@ export function CTA() {
               {/* Clean Human-Readable Label */}
               <span className="tracking-tight text-white drop-shadow-xs">Extension Active</span>
               <span className="inline-block h-1 w-1 rounded-full bg-emerald-200/80 shrink-0" />
-              <span className="font-semibold text-emerald-50 tracking-tight drop-shadow-xs">Browse 1,390+ Deals</span>
+              <span className="font-semibold text-emerald-50 tracking-tight drop-shadow-xs">Browse {stats.formattedCount} Deals</span>
 
               <ArrowRight className="h-4 w-4 text-emerald-100 transition-transform duration-300 group-hover:translate-x-1 shrink-0" />
             </MagneticButton>
@@ -76,7 +78,7 @@ export function CTA() {
 
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-mono">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>1,390+ Active Deals Verified Today</span>
+            <span>{stats.formattedCount} Active Deals Verified Today</span>
           </div>
         </div>
       </div>

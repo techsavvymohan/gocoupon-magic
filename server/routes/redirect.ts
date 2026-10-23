@@ -190,6 +190,23 @@ export async function handleDealRedirect(req: Request, res: Response) {
     rawUrl.includes("fas.st") ||
     rawUrl.includes("artfut.com");
 
+  // Generate authoritative Click ID and subID parameters before any network branch
+  const clientIp =
+    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+    (req.headers["x-real-ip"] as string) ||
+    req.socket.remoteAddress ||
+    "127.0.0.1";
+
+  const userAgent = String(req.headers["user-agent"] || "");
+  const device = detectDevice(userAgent);
+  const clickId = `clk_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+  const subid1 = source || "gocoupon_web";
+  const subid2 = slug || store.toLowerCase().replace(/\s+/g, "-");
+  const subid3 = dealId && dealId !== "unknown" ? dealId : (code || "deal");
+  const subid4 = clickId; // Crucial for S2S conversion postback reconciliation!
+  const subid5 = device;
+
   const isEarnKaro =
     rawUrl.includes("myntr.it") ||
     rawUrl.includes("fktr.in") ||
@@ -206,14 +223,30 @@ export async function handleDealRedirect(req: Request, res: Response) {
   let targetUrl = rawUrl;
 
   // Case A: If rawUrl is ALREADY an active affiliate tracking link from CJ, Admitad, Cuelinks, EarnKaro, Amazon, or Impact,
-  // NEVER alter, double-wrap, or strip it! Pass it straight to the network so every single click counts!
+  // NEVER alter or strip destination, but attach clickId / subid parameters so S2S postbacks reconcile!
   if (isCj || isAdmitad || isCuelinks || isEarnKaro || isAmazon || isImpact) {
     targetUrl = rawUrl;
+    if (isCuelinks && !targetUrl.includes("subid4=")) {
+      const sep = targetUrl.includes("?") ? "&" : "?";
+      targetUrl = `${targetUrl}${sep}subid4=${encodeURIComponent(clickId)}`;
+    } else if (isCj && !targetUrl.includes("sid=")) {
+      const sep = targetUrl.includes("?") ? "&" : "?";
+      targetUrl = `${targetUrl}${sep}sid=${encodeURIComponent(clickId)}`;
+    } else if (isAdmitad && !targetUrl.includes("subid=")) {
+      const sep = targetUrl.includes("?") ? "&" : "?";
+      targetUrl = `${targetUrl}${sep}subid=${encodeURIComponent(clickId)}`;
+    }
   }
-  // Case B: If rawUrl is an untagged Amazon merchant URL, attach verified GoCoupon Amazon partner tag
+  // Case B: If rawUrl is an untagged Amazon merchant URL, attach verified GoCoupon partner tags
   else if (rawUrl.includes("amazon.in")) {
     const sep = rawUrl.includes("?") ? "&" : "?";
-    targetUrl = `${rawUrl}${sep}tag=gocoupon0e-21`;
+    const tag = process.env.VITE_AMAZON_IN_PARTNER_TAG || "gocoupon0e-21";
+    targetUrl = `${rawUrl}${sep}tag=${tag}&ascsubtag=${encodeURIComponent(clickId)}`;
+  }
+  else if (rawUrl.includes("amazon.com")) {
+    const sep = rawUrl.includes("?") ? "&" : "?";
+    const tag = process.env.VITE_AMAZON_US_PARTNER_TAG || "gocouponus-20";
+    targetUrl = `${rawUrl}${sep}tag=${tag}&ascsubtag=${encodeURIComponent(clickId)}`;
   }
   // Case C: Check if merchant has a high-commission EarnKaro partnership link (Myntra, Flipkart, Ajio, etc.)
   else {
@@ -246,7 +279,6 @@ export async function handleDealRedirect(req: Request, res: Response) {
     try {
       const parsed = new URL(rawUrl);
       const cleanPath = parsed.pathname.replace(/^\/+|\/+$/g, "");
-      // If it has a specific path (e.g. /p/itm..., /tshirts/..., /product/..., /collections/...)
       if (cleanPath && cleanPath !== "index.html" && cleanPath.length > 2) {
         isDeepProductLink = true;
       }
@@ -258,28 +290,32 @@ export async function handleDealRedirect(req: Request, res: Response) {
     if (matchedEarnKaro && !isDeepProductLink) {
       targetUrl = matchedEarnKaro;
     } else if (/^https?:\/\//i.test(targetUrl)) {
-      // Case D: Universal deep linking via Cuelinks (pub_id=272970) - lands users on the EXACT product page with affiliate tracking
+      // Case D: Universal deep linking with full 5-tier subID attribution
       targetUrl = buildCuelinksRedirectUrl({
         merchantUrl: targetUrl,
-        subId: source || "gocoupon_web",
+        subId: subid1,
+        subid1,
+        subid2,
+        subid3,
+        subid4,
+        subid5,
       });
     }
   }
 
-  // 2. Track click in database / analytics
-  const cleanMerchant = extractMerchantDestination(rawUrl);
-  const clientIp =
-    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
-    (req.headers["x-real-ip"] as string) ||
-    req.socket.remoteAddress ||
-    "127.0.0.1";
+  // If already an existing linksredirect URL without subid4, attach clickId for S2S tracking
+  if (targetUrl.includes("linksredirect.com") && !targetUrl.includes("subid4=")) {
+    const sep = targetUrl.includes("?") ? "&" : "?";
+    targetUrl = `${targetUrl}${sep}subid4=${encodeURIComponent(clickId)}`;
+  }
 
-  const userAgent = String(req.headers["user-agent"] || "");
-  const device = detectDevice(userAgent);
+  // 2. Track click in database / analytics with complete 5 sub-IDs
+  const cleanMerchant = extractMerchantDestination(rawUrl);
 
   // Log in background
   clicksDb
     .recordClick({
+      id: clickId,
       dealId,
       dealTitle: title,
       storeName: store,
@@ -290,6 +326,11 @@ export async function handleDealRedirect(req: Request, res: Response) {
       device,
       ip: clientIp,
       userAgent,
+      subid1,
+      subid2,
+      subid3,
+      subid4: clickId,
+      subid5: device,
     })
     .catch((err) => {
       console.warn("[ClickTracker] Background logging notice:", err?.message);

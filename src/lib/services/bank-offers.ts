@@ -50,7 +50,7 @@ export interface BankCardSavingsResult {
   affiliateApplyUrl: string;
 }
 
-const CUELINKS_PUB_ID =
+const AFFILIATE_PARTNER_PUB_ID =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_CUELINKS_PUB_ID) ||
   (typeof process !== "undefined" && process.env?.VITE_CUELINKS_PUB_ID) ||
   "272970";

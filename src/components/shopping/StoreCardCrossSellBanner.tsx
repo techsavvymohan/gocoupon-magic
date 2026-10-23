@@ -3,7 +3,7 @@
  * @description Store-Specific Bank Card Cross-Sell Banner (Double Monetization Engine).
  * Contextually detects the store (Flipkart, Swiggy, Travel, Amazon/General) and displays
  * the highest-converting co-branded or universal cashback card with instant approval link,
- * generating ₹1,200 - ₹2,362 CPA bounties via Cuelinks.
+ * generating ₹1,200 - ₹2,362 CPA bounties via verified bank affiliate programs.
  */
 
 import React from "react";

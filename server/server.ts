@@ -21,6 +21,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { apiRouter } from "./routes/index.js";
 import { redirectRouter } from "./routes/redirect.js";
+import { postbackRouter } from "./routes/postback.js";
 import { startBackgroundWorkers, stopBackgroundWorkers } from "./workers/price-watcher.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -73,7 +74,7 @@ app.set("etag", "strong");
 app.use((_req: Request, res: Response, next: NextFunction) => {
   res.setHeader(
     "Content-Security-Policy",
-    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://utt.impactcdn.com https://www.thunderbolt.com https://www.googletagmanager.com https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://apis.google.com https://s.skimresources.com https://*.skimresources.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.thunderbolt.com; img-src 'self' data: blob: https: http: https://*.google-analytics.com https://*.googletagmanager.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https: wss: http://localhost:* http://127.0.0.1:* https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://s.skimresources.com https://*.skimresources.com; frame-src 'self' https://www.thunderbolt.com https://chromewebstore.google.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self' https:; upgrade-insecure-requests;"
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://utt.impactcdn.com https://www.thunderbolt.com https://www.googletagmanager.com https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://apis.google.com https://s.skimresources.com https://*.skimresources.com https://cdn0.cuelinks.com https://*.cuelinks.com https://linksredirect.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.thunderbolt.com; img-src 'self' data: blob: https: http: https://*.google-analytics.com https://*.googletagmanager.com https://*.cuelinks.com https://linksredirect.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https: wss: http://localhost:* http://127.0.0.1:* https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://s.skimresources.com https://*.skimresources.com https://*.cuelinks.com https://linksredirect.com; frame-src 'self' https://www.thunderbolt.com https://chromewebstore.google.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self' https:; upgrade-insecure-requests;"
   );
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
   res.setHeader("X-Frame-Options", "DENY");
@@ -145,6 +146,7 @@ app.get("/api/health", (_req: Request, res: Response) => {
 // 2. Mount API Routes & Outbound Deal Redirection
 app.use("/api", apiRouter);
 app.use(["/out", "/redirect"], redirectRouter);
+app.use(["/postback", "/api/postback"], postbackRouter);
 
 // 3. Static Files & SPA Pre-rendered Serving from dist/
 if (fs.existsSync(distDir)) {

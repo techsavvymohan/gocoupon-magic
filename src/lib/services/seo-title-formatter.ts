@@ -1,7 +1,7 @@
 /**
  * @file src/lib/services/seo-title-formatter.ts
  * @description High-intent SEO title & keyword generator for coupons and deals.
- * Transforms raw affiliate network feeds (Cuelinks, CJ, Admitad, etc.) into the canonical
+ * Transforms raw affiliate network feeds (verified partner networks, CJ, Admitad, etc.) into the canonical
  * Google search format: "{Store Name} Coupon Code: {Code} – {Discount} ({Detail})".
  */
 

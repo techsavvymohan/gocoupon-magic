@@ -5,6 +5,7 @@
 
 import { useState } from "react";
 import { useExtensionBridge } from "@/lib/useExtensionBridge";
+import { useLiveStats } from "@/hooks/use-live-stats";
 import { MagneticButton } from "../MagneticButton";
 import {
   Zap,
@@ -20,6 +21,7 @@ import {
 
 export function ExtensionShowcase() {
   const { isInstalled, version } = useExtensionBridge();
+  const stats = useLiveStats();
   const [demoState, setDemoState] = useState<"idle" | "testing" | "applied">("applied");
 
   const runDemo = () => {
@@ -118,7 +120,7 @@ export function ExtensionShowcase() {
                   <Star className="h-3.5 w-3.5 fill-current" />
                 </div>
                 <span className="font-semibold text-foreground">4.9 / 5</span>
-                <span>(Verified Extension • 94.8% Success)</span>
+                <span>(Verified Extension • {stats.verificationRate} Success)</span>
               </div>
             </div>
           </div>

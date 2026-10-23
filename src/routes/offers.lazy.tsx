@@ -12,6 +12,7 @@ import { RedeemCouponButton } from "@/components/common/RedeemCouponButton";
 import { RealtimeIndicator } from "@/components/common/RealtimeIndicator";
 import { SubmitCouponButton } from "@/components/submit_coupon";
 import { formatSeoCouponTitle } from "@/lib/services/seo-title-formatter";
+import { DailySavingsStreak } from "@/components/common/DailySavingsStreak";
 import {
   DealCard,
   BankOfferCard,
@@ -301,7 +302,7 @@ function OffersHubPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch active verified Indian offers from Cuelinks API
+  // Fetch active verified Indian offers from authorized partner network
   const { deals: indianDeals, isLoading: isIndianLoading, refetch: refetchIndian } = useDeals({
     limit: 0,
     sortBy,
@@ -573,7 +574,10 @@ function OffersHubPage() {
       const code = deal.code.trim();
       navigator.clipboard.writeText(code);
       setCopiedCode(code);
-      toast.success(`Coupon code "${code}" copied! Opening ${deal.storeName} to auto-apply...`);
+      toast.success(`Coupon code "${code}" copied! Opening ${deal.storeName} to auto-apply...`, {
+        description: "Tip: Apply this code directly to secure your direct partner discount and prevent 3rd-party extension overrides.",
+        duration: 4500,
+      });
       setTimeout(() => setCopiedCode((curr) => (curr === code ? null : curr)), 5000);
     } else {
       setCopiedCode(deal.id);
@@ -692,7 +696,7 @@ function OffersHubPage() {
     {
       question: "How often are deals, promo codes, and offers updated on GoCoupon?",
       answer:
-        "Offers and promo codes on GoCoupon are refreshed 24/7 through real-time merchant network APIs (Cuelinks, EarnKaro, Admitad, CJ) and validated by automated tests so expired codes are purged immediately.",
+        "Offers and promo codes on GoCoupon are refreshed 24/7 through real-time merchant network APIs (direct merchant feeds, EarnKaro, Admitad, CJ) and validated by automated tests so expired codes are purged immediately.",
     },
     {
       question: "Can I combine bank credit card discounts with merchant coupon codes?",
@@ -1530,6 +1534,11 @@ function OffersHubPage() {
                   </button>
                 </div>
               )}
+
+              {/* ───────────────────────────────────────────────────────────────── */}
+              {/* GAMIFICATION & RETENTION: DAILY SAVINGS STREAK                    */}
+              {/* ───────────────────────────────────────────────────────────────── */}
+              <DailySavingsStreak className="mb-6" />
 
               {/* ───────────────────────────────────────────────────────────────── */}
               {/* OFFERS CARDS RENDERING                                            */}

@@ -1,0 +1,19 @@
+[
+  {
+    "id": "conv_1792760679998_3f7xp0",
+    "clickId": "clk_test_12345",
+    "transactionId": "TX_TEST_9988",
+    "network": "partner_network",
+    "storeSlug": "hostinger",
+    "storeName": "Hostinger",
+    "subid1": "seo_blog",
+    "subid2": "hostinger",
+    "subid4": "clk_test_12345",
+    "saleAmount": 3499,
+    "commissionAmount": 1400,
+    "currency": "INR",
+    "status": "approved",
+    "validatedAt": "2026-10-23T13:04:39.998Z",
+    "createdAt": "2026-10-23T13:04:39.998Z"
+  }
+]

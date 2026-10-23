@@ -25,6 +25,7 @@ import { StoreLogo } from "@/components/common/StoreLogo";
 import { NavbarSearch } from "@/components/site/NavbarSearch";
 import { buildDealRedirectUrl } from "@/lib/services/store-registry";
 import { FEATURED_DEALS_COLLECTION, type FeaturedDealItem } from "@/data/featured-deals-campaign";
+import { useLiveStats } from "@/hooks/use-live-stats";
 
 interface QuickBrandChip {
   name: string;
@@ -66,6 +67,7 @@ function getDynamicBankHack(category: string): string {
 }
 
 export function MobileHeroInstantFinder() {
+  const stats = useLiveStats();
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
 
   // Dynamically resolve top 4 featured partner deals
@@ -136,7 +138,7 @@ export function MobileHeroInstantFinder() {
               <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
             </span>
-            <span>1,390+ Working Coupons Tested Today</span>
+            <span>{stats.formattedCount} Working Coupons Tested Today</span>
           </div>
         </div>
 

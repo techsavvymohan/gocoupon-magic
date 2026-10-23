@@ -56,7 +56,7 @@ export const privacyFaqs = [
   {
     question: "How does GoCoupon earn revenue if it is 100% free for consumers?",
     answer:
-      "GoCoupon is free for all users. When you complete a qualifying purchase after explicitly activating cash back or using an affiliate-supported coupon, retail affiliate networks (such as Amazon Associates or Cuelinks) may pay GoCoupon a small referral commission at zero additional cost to you.",
+      "GoCoupon is free for all users. When you complete a qualifying purchase after explicitly activating cash back or using an affiliate-supported coupon, retail affiliate networks (such as Amazon Associates or authorized merchant partner networks) may pay GoCoupon a small referral commission at zero additional cost to you.",
   },
 ];
 
@@ -490,7 +490,7 @@ function PrivacyPage() {
           {/* Section 8 */}
           <h2 id="affiliate">8. Affiliate &amp; Commercial Monetization Transparency (Grey Titanium Compliance)</h2>
           <p>
-            GoCoupon is 100% free for consumers. To maintain servers and engineering operations, GoCoupon may receive an affiliate commission from merchant affiliate networks (e.g., Amazon Associates, Cuelinks, Skimlinks, Impact) when a user applies a working coupon and completes a qualifying purchase. In accordance with Chrome Web Store Affiliate Ads policy (Grey Titanium):
+            GoCoupon is 100% free for consumers. To maintain servers and engineering operations, GoCoupon may receive an affiliate commission from merchant affiliate networks (e.g., Amazon Associates, Impact, Skimlinks, and authorized merchant partner networks) when a user applies a working coupon and completes a qualifying purchase. In accordance with Chrome Web Store Affiliate Ads policy (Grey Titanium):
           </p>
           <ul>
             <li><strong>Prominently Disclosed Before Installation:</strong> All affiliate monetization is prominently disclosed in our Chrome Web Store listing page, on our website, and prior to installation.</li>

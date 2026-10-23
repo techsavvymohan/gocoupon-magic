@@ -1,5 +1,10 @@
 import { StoreLogo } from "@/components/common/StoreLogo";
-import { getStoreEarnKaroLink, wrapAffiliateTracking, findStoreByNameOrSlug } from "@/lib/services/store-registry";
+import {
+  getStoreEarnKaroLink,
+  wrapAffiliateTracking,
+  findStoreByNameOrSlug,
+  buildDealRedirectUrl,
+} from "@/lib/services/store-registry";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
@@ -108,34 +113,52 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
 
     const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
-  const storeAffiliateUrl = (() => {
-    if (storeUrl && /^https?:\/\//i.test(storeUrl)) {
-      return wrapAffiliateTracking(storeUrl, "gocoupon_store_hero");
-    }
-    const directEarnkaro = getStoreEarnKaroLink(storeName || (breadcrumb && breadcrumb[breadcrumb.length - 1]?.path) || "");
-    if (directEarnkaro) return wrapAffiliateTracking(directEarnkaro, "gocoupon_store_hero");
-    // Look up real registered store to avoid guessing invalid domains like boatlifestyle.com
-    const registered = findStoreByNameOrSlug(storeName || (breadcrumb && breadcrumb[breadcrumb.length - 1]?.name) || "");
-    if (registered?.storeUrl) {
-      return wrapAffiliateTracking(registered.storeUrl, "gocoupon_store_hero");
-    }
-    const slugCandidate = (storeName || "store").toLowerCase().replace(/[^\w]/g, "");
-    return wrapAffiliateTracking(`https://${slugCandidate}.com`, "gocoupon_store_hero");
-  })();
+  const resolvedStoreSlug = (storeName || "store").toLowerCase().replace(/[^\w]/g, "-");
+  const registeredStore = findStoreByNameOrSlug(storeName || (breadcrumb && breadcrumb[breadcrumb.length - 1]?.name) || "");
+  const effectiveStoreName = storeName || registeredStore?.name || "Partner Store";
+  const effectiveStoreUrl = (storeUrl && /^https?:\/\//i.test(storeUrl))
+    ? storeUrl
+    : (registeredStore?.storeUrl || getStoreEarnKaroLink(storeName || resolvedStoreSlug) || `https://${resolvedStoreSlug.replace(/-+/g, "")}.com`);
+
+  const storeAffiliateUrl = buildDealRedirectUrl({
+    url: effectiveStoreUrl,
+    storeName: effectiveStoreName,
+    storeSlug: resolvedStoreSlug,
+    source: "seo_landing_hero",
+  });
 
   const handleCopyCode = (code: string, targetAffiliateUrl?: string, e?: React.MouseEvent) => {
     navigator.clipboard.writeText(code).catch(() => {});
     setCopiedCode(code);
+
+    // Track click intent beacon in background
+    try {
+      if (typeof navigator !== "undefined" && navigator.sendBeacon) {
+        navigator.sendBeacon(
+          "/api/redirect/deals/click",
+          JSON.stringify({
+            dealId: code,
+            dealTitle: `Coupon ${code} Copied`,
+            storeName: effectiveStoreName,
+            storeSlug: resolvedStoreSlug,
+            couponCode: code,
+            source: "seo_landing_copy",
+          })
+        );
+      }
+    } catch {
+      // Beacon fallback
+    }
+
     toast.success(`Coupon code "${code}" copied!`, {
-      description: "Opening store in a new tab with verified tracking to auto-apply.",
+      description: "Opening store with verified tracking. ⚠️ Tip: Disable third-party extensions (Honey, Coupert) at checkout so discounts & cashback track properly.",
+      duration: 4500,
     });
+
     const dest = targetAffiliateUrl || storeAffiliateUrl;
     const isAnchor = Boolean(e?.currentTarget && (e.currentTarget as HTMLElement).tagName === "A");
     if (!isAnchor && dest && dest !== "#") {
-      const finalDest = dest.startsWith("/api/redirect/deal") || dest.startsWith("/out")
-        ? dest
-        : wrapAffiliateTracking(dest, "seo_store_coupon");
-      window.open(finalDest, "_blank", "noopener");
+      window.open(dest, "_blank", "noopener");
     }
     setTimeout(() => {
       setCopiedCode((current) => (current === code ? null : current));
@@ -215,6 +238,17 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
               <span>{primaryCtaLabel}</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
+            {storeName && (
+              <a
+                href={storeAffiliateUrl}
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 backdrop-blur-md px-5 py-3.5 text-sm font-semibold text-foreground hover:bg-card hover:border-primary/50 transition-all hover:scale-[1.02] shadow-xs cursor-pointer"
+              >
+                <span>Shop at {storeName}</span>
+                <ExternalLink className="h-4 w-4 text-muted-foreground" />
+              </a>
+            )}
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
               <span className="inline-flex items-center gap-1">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" /> 100% Free
@@ -318,9 +352,15 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
                 const hasRealCode = Boolean(cleanCode && !isPlaceholder && cleanCode.length > 1);
                 const isCopied = copiedCode === cleanCode;
 
-                const couponAffiliateUrl = coupon.dealLink
-                  ? wrapAffiliateTracking(coupon.dealLink, "gocoupon_store_deal")
-                  : storeAffiliateUrl;
+                const couponAffiliateUrl = buildDealRedirectUrl({
+                  url: coupon.dealLink || effectiveStoreUrl,
+                  storeName: effectiveStoreName,
+                  storeSlug: resolvedStoreSlug,
+                  title: coupon.discount || coupon.description,
+                  code: cleanCode,
+                  dealId: cleanCode || `deal_${idx}`,
+                  source: "seo_landing_coupon",
+                });
 
                 return (
                   <div
@@ -411,6 +451,35 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
                   </div>
                 );
               })}
+            </div>
+
+            {/* Anti-Extension Cookie Hijack Advisory */}
+            <div className="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-amber-500/15 text-amber-500 border border-amber-500/20">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    Guaranteed Savings Protection
+                    <span className="rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2 py-0.5 border border-emerald-500/30 uppercase">
+                      Active
+                    </span>
+                  </h4>
+                  <p className="mt-1 text-xs text-muted-foreground leading-relaxed max-w-2xl">
+                    Third-party browser extensions (Honey, Coupert, Capital One) often overwrite checkout cookies and cancel out GoCoupon promo discounts. For guaranteed coupon redemption and cashback tracking, temporarily pause other shopping extensions at checkout.
+                  </p>
+                </div>
+              </div>
+              <a
+                href={storeAffiliateUrl}
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                className="shrink-0 inline-flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-4 py-2.5 transition-all shadow-xs cursor-pointer"
+              >
+                <span>Activate Clean Session</span>
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
             </div>
           </div>
         </section>

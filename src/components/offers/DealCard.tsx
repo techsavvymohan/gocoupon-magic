@@ -4,6 +4,7 @@ import { StoreLogo } from "@/components/common/StoreLogo";
 import { RedeemCouponButton } from "@/components/common/RedeemCouponButton";
 import { buildDealRedirectUrl, wrapAffiliateTracking } from "@/lib/services/store-registry";
 import { formatSeoCouponTitle } from "@/lib/services/seo-title-formatter";
+import { DealTemperatureVote } from "@/components/offers/DealTemperatureVote";
 import type { Deal } from "@/lib/api/deals-api";
 
 export interface DealCardProps {
@@ -124,6 +125,7 @@ export const DealCard = React.memo(function DealCard({
                   <span>Verified Working</span>
                 </span>
               )}
+              <DealTemperatureVote dealId={deal.id} />
             </div>
           </div>
         </div>
@@ -212,11 +214,13 @@ export const DealCard = React.memo(function DealCard({
           </div>
         )}
 
-        {/* Expiry line */}
-        <div className="flex items-center gap-1 text-[10px] text-muted-foreground mb-3 font-mono">
-          <Clock className="h-3 w-3 text-muted-foreground/60 shrink-0" />
-          <span>{deal.expiresIn}</span>
-          <span className="ml-auto opacity-70">{deal.category}</span>
+        {/* Expiry line & Community Temperature */}
+        <div className="flex items-center justify-between gap-1 text-[10px] text-muted-foreground mb-3 font-mono">
+          <div className="flex items-center gap-1">
+            <Clock className="h-3 w-3 text-muted-foreground/60 shrink-0" />
+            <span>{deal.expiresIn}</span>
+          </div>
+          <DealTemperatureVote dealId={deal.id} compact />
         </div>
       </div>
 

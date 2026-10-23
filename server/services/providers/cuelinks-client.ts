@@ -61,6 +61,11 @@ export interface CuelinksCampaign {
 export interface CuelinksLinkOptions {
   merchantUrl: string;
   subId?: string;
+  subid1?: string;
+  subid2?: string;
+  subid3?: string;
+  subid4?: string;
+  subid5?: string;
   shorten?: boolean;
   channelId?: number;
 }
@@ -157,7 +162,11 @@ export function buildCuelinksRedirectUrl(options: CuelinksLinkOptions): string {
   }
 
   const { publisherId, channelId } = getCuelinksConfig();
-  const subId = options.subId || "gocoupon_web";
+  const subid1 = options.subid1 || options.subId || "gocoupon_web";
+  const subid2 = options.subid2 || "";
+  const subid3 = options.subid3 || "";
+  const subid4 = options.subid4 || "";
+  const subid5 = options.subid5 || "";
 
   // Already a tracking redirect
   if (targetUrl.includes("linksredirect.com") || targetUrl.includes("clnk.in")) {
@@ -166,7 +175,14 @@ export function buildCuelinksRedirectUrl(options: CuelinksLinkOptions): string {
 
   const encoded = encodeURIComponent(targetUrl);
   const effectiveChannelId = options.channelId || (channelId ? Number(channelId) : 318931);
-  return `https://linksredirect.com/?pub_id=${publisherId}&cid=${effectiveChannelId}&subid=${encodeURIComponent(subId)}&url=${encoded}`;
+  let redirectUrl = `https://linksredirect.com/?pub_id=${publisherId}&cid=${effectiveChannelId}&subid=${encodeURIComponent(subid1)}`;
+  if (subid2) redirectUrl += `&subid2=${encodeURIComponent(subid2)}`;
+  if (subid3) redirectUrl += `&subid3=${encodeURIComponent(subid3)}`;
+  if (subid4) redirectUrl += `&subid4=${encodeURIComponent(subid4)}`;
+  if (subid5) redirectUrl += `&subid5=${encodeURIComponent(subid5)}`;
+  redirectUrl += `&url=${encoded}`;
+
+  return redirectUrl;
 }
 
 /**
@@ -188,7 +204,11 @@ export async function convertCuelinksLinkApi(options: CuelinksLinkOptions): Prom
         headers: getV3Headers(config.apiKey),
         body: JSON.stringify({
           url: options.merchantUrl,
-          sub_id: options.subId || "gocoupon_web",
+          sub_id: options.subid1 || options.subId || "gocoupon_web",
+          subid2: options.subid2,
+          subid3: options.subid3,
+          subid4: options.subid4,
+          subid5: options.subid5,
           shorten: Boolean(options.shorten),
           channel_id: options.channelId,
         }),

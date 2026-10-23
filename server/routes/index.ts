@@ -46,6 +46,8 @@ import {
 } from "../services/providers/admitad-client.js";
 import { intelligenceRouter } from "./intelligence.js";
 import { redirectRouter } from "./redirect.js";
+import { postbackRouter } from "./postback.js";
+import { affiliateAiToolsRouter } from "./affiliate-ai-tools.js";
 import { rumRouter } from "./rum.js";
 import { Router as ExpressRouter } from "express";
 
@@ -146,6 +148,10 @@ apiRouter.use("/intelligence", intelligenceRouter);
 apiRouter.use("/rum", rumRouter);
 apiRouter.use("/realtime", realtimeRouter);
 apiRouter.use("/redirect", redirectRouter);
+apiRouter.use("/postback", postbackRouter);
+apiRouter.use("/affiliates/postback", postbackRouter);
+apiRouter.use("/affiliates/tools", affiliateAiToolsRouter);
+apiRouter.use("/mcp", affiliateAiToolsRouter);
 apiRouter.use(redirectRouter);
 
 

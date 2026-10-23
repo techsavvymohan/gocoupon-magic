@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { ArrowRight, X, Tag } from "lucide-react";
+import { useLiveStats } from "@/hooks/use-live-stats";
 
 export function MobileStickyCta() {
+  const stats = useLiveStats();
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -71,7 +73,7 @@ export function MobileStickyCta() {
               Need a Working Coupon?
             </span>
             <span className="block truncate text-[10px] text-muted-foreground font-mono">
-              1,390+ tested codes today
+              {stats.formattedCount} tested codes today
             </span>
           </div>
         </div>
