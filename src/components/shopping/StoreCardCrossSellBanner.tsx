@@ -226,7 +226,7 @@ export function StoreCardCrossSellBanner({
           <a
             href={card.affiliateApplyUrl}
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener sponsored nofollow"
             className="group inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-center"
           >
             <span>Apply Now (Instant Approval)</span>

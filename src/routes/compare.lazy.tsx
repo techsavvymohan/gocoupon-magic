@@ -1289,7 +1289,7 @@ export function ComparePage() {
                           <a
                             href={wrapAffiliateTracking(product.directUrl, "gocoupon_compare_grid")}
                             target="_blank"
-                            rel="noopener noreferrer nofollow"
+                            rel="noopener sponsored nofollow"
                             className="flex-1 inline-flex items-center justify-center gap-1 rounded-xl bg-primary hover:bg-primary/90 px-3 py-2 text-xs font-bold text-primary-foreground shadow-2xs transition-colors"
                           >
                             <span>Buy Now</span>
@@ -1573,7 +1573,7 @@ export function ComparePage() {
                       "gocoupon_compare_modal_top"
                     )}
                     target="_blank"
-                    rel="noopener noreferrer nofollow"
+                    rel="noopener sponsored nofollow"
                     className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 dark:bg-emerald-500 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition-colors"
                   >
                     <span>Go to Deal</span>
@@ -1675,7 +1675,7 @@ export function ComparePage() {
                           <a
                             href={wrapAffiliateTracking(offer.affiliateUrl, "gocoupon_compare_modal_row")}
                             target="_blank"
-                            rel="noopener noreferrer nofollow"
+                            rel="noopener sponsored nofollow"
                             className="inline-flex items-center gap-1 rounded-xl bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground shadow-2xs hover:bg-primary/90 transition-colors"
                           >
                             <span>Shop</span>

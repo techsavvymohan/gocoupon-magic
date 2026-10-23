@@ -22,39 +22,39 @@ const CTA_MAP: Record<string, CTAConfig> = {
   amazon: {
     label: "View Deal on Amazon",
     ariaLabel: "View this deal on Amazon — opens in a new tab",
-    rel: "noopener noreferrer sponsored",
+    rel: "noopener sponsored nofollow",
   },
   impact: {
     label: "View Deal",
     ariaLabel: "View this deal — opens in a new tab",
-    rel: "noopener noreferrer sponsored",
+    rel: "noopener sponsored nofollow",
   },
   awin: {
     label: "View Offer",
     ariaLabel: "View this offer — opens in a new tab",
-    rel: "noopener noreferrer sponsored",
+    rel: "noopener sponsored nofollow",
   },
   cj: {
     label: "View Deal",
     ariaLabel: "View this deal — opens in a new tab",
-    rel: "noopener noreferrer sponsored",
+    rel: "noopener sponsored nofollow",
   },
   sharesale: {
     label: "View Deal",
     ariaLabel: "View this deal — opens in a new tab",
-    rel: "noopener noreferrer sponsored",
+    rel: "noopener sponsored nofollow",
   },
   mock: {
     label: "Check Live Price",
     ariaLabel: "Check live price on store — opens in a new tab",
-    rel: "noopener noreferrer",
+    rel: "noopener sponsored nofollow",
   },
 };
 
 const DEFAULT_CTA: CTAConfig = {
   label: "View Deal",
   ariaLabel: "View this deal — opens in a new tab",
-  rel: "noopener noreferrer sponsored",
+  rel: "noopener sponsored nofollow",
 };
 
 /**

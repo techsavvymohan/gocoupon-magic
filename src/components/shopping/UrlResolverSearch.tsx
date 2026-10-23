@@ -723,7 +723,7 @@ export function UrlResolverSearch({
                           <a
                             href={affiliateUrl}
                             target="_blank"
-                            rel="noopener noreferrer nofollow"
+                            rel="noopener sponsored nofollow"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleInstantOpen(store, false);

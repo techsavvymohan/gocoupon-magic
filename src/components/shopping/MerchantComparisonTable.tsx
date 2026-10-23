@@ -128,7 +128,7 @@ export function MerchantComparisonTable({ comparison, productTitle }: MerchantCo
                     <a
                       href={row.affiliateUrl}
                       target="_blank"
-                      rel="noopener noreferrer nofollow"
+                      rel="noopener sponsored nofollow"
                       onClick={(e) => handleCopy(row.bestCouponCode!, row.storeName, row.affiliateUrl, e)}
                       className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-primary/40 bg-primary/5 px-2.5 py-1 text-xs font-mono font-bold text-primary hover:bg-primary/10 transition-colors w-fit group"
                       title={`Click to copy ${row.bestCouponCode} & open ${row.storeName}`}
@@ -177,7 +177,7 @@ export function MerchantComparisonTable({ comparison, productTitle }: MerchantCo
                 <a
                   href={row.affiliateUrl}
                   target="_blank"
-                  rel="noopener noreferrer nofollow"
+                  rel="noopener sponsored nofollow"
                   className={`inline-flex w-full items-center justify-center gap-2 rounded-xl py-2.5 px-4 text-xs font-bold transition-transform shadow-sm active:scale-98 touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                     row.isBestDeal
                       ? "bg-primary text-primary-foreground hover:scale-[1.02] shadow-primary/25"
@@ -245,7 +245,7 @@ export function MerchantComparisonTable({ comparison, productTitle }: MerchantCo
                   <a
                     href={row.affiliateUrl}
                     target="_blank"
-                    rel="noopener noreferrer nofollow"
+                    rel="noopener sponsored nofollow"
                     onClick={(e) => handleCopy(row.bestCouponCode!, row.storeName, row.affiliateUrl, e)}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-primary/40 bg-card px-2 py-1 text-[11px] font-bold text-primary hover:bg-muted/80 transition-colors"
                     title={`Click to copy ${row.bestCouponCode} & open ${row.storeName}`}
@@ -269,7 +269,7 @@ export function MerchantComparisonTable({ comparison, productTitle }: MerchantCo
               <a
                 href={row.affiliateUrl}
                 target="_blank"
-                rel="noopener noreferrer nofollow"
+                rel="noopener sponsored nofollow"
                 className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 min-h-[44px] text-xs font-bold transition-transform shadow-sm active:scale-98 touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                   row.isBestDeal
                     ? "bg-primary text-primary-foreground shadow-primary/20"

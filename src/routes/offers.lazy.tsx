@@ -1096,7 +1096,7 @@ function OffersHubPage() {
                             <a
                               href={card.affiliateApplyUrl}
                               target="_blank"
-                              rel="noopener noreferrer"
+                              rel="noopener sponsored nofollow"
                               className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-xs hover:bg-primary/90 active:scale-95 transition-all cursor-pointer shrink-0"
                             >
                               <span>Apply in 2 Mins</span>

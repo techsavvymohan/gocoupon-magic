@@ -521,7 +521,7 @@ function FeaturedDealsPage() {
                               source: "featured_deals_copy",
                             })}
                             target="_blank"
-                            rel="noopener noreferrer"
+                            rel="noopener sponsored nofollow"
                             onClick={(e) => handleCopyCode(item, e)}
                             className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-1.5 font-mono text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${
                               isCopied

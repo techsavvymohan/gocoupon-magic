@@ -241,7 +241,7 @@ export function GrabOnPopularOffers() {
                     <a
                       href={deal.affiliateUrl}
                       target="_blank"
-                      rel="noopener noreferrer"
+                      rel="noopener sponsored nofollow"
                       onClick={(e) => handleCopy(deal.couponCode, deal.brandName, deal.affiliateUrl, e)}
                       className={`flex-1 inline-flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 sm:py-2 px-1.5 sm:px-3 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all duration-200 border active:scale-95 cursor-pointer min-w-0 ${
                         isCopied
@@ -268,7 +268,7 @@ export function GrabOnPopularOffers() {
                     <a
                       href={deal.affiliateUrl}
                       target="_blank"
-                      rel="noopener noreferrer"
+                      rel="noopener sponsored nofollow"
                       className="inline-flex items-center justify-center p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold shadow-xs hover:scale-105 active:scale-90 transition-all shrink-0"
                       title={`Redeem deal on ${deal.brandName}`}
                     >

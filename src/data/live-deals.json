@@ -6,10 +6,10 @@
   "deals": [
     {
       "id": "admitad-camp-124942",
-      "storeName": "Palmonas [CPS] IN",
+      "storeName": "Palmonas",
       "storeSlug": "palmonas-cps-in",
       "storeLogo": "https://cdn.admitad-connect.com/campaign/images/2025/3/24/124942-ff2cf4d2aee518ea.svg",
-      "category": "Интернет-магазины",
+      "category": "Online Shopping",
       "title": "Palmonas [CPS] IN: Exclusive Verified Offers & Storewide Discounts",
       "code": "DISCOUNT ACTIVATED",
       "discount": "Verified Offer",
@@ -26,10 +26,10 @@
     },
     {
       "id": "admitad-camp-49268",
-      "storeName": "Hello Molly WW",
+      "storeName": "Hello Molly",
       "storeSlug": "hello-molly-ww",
       "storeLogo": "https://cdn.admitad-connect.com/campaign/images/2023/12/27/49268-7f956ab0c4c07df8.svg",
-      "category": "Интернет-магазины",
+      "category": "Online Shopping",
       "title": "Hello Molly WW: Exclusive Verified Offers & Storewide Discounts",
       "code": "DISCOUNT ACTIVATED",
       "discount": "Verified Offer",
@@ -46,10 +46,10 @@
     },
     {
       "id": "admitad-camp-23157",
-      "storeName": "Wondershare WW",
+      "storeName": "Wondershare",
       "storeSlug": "wondershare-ww",
       "storeLogo": "https://cdn.admitad-connect.com/campaign/images/2025/11/28/23157-cd85af7f8d7bfe13.svg",
-      "category": "Интернет-услуги",
+      "category": "Online Services",
       "title": "Wondershare WW: Exclusive Verified Offers & Storewide Discounts",
       "code": "DISCOUNT ACTIVATED",
       "discount": "Verified Offer",
@@ -66,10 +66,10 @@
     },
     {
       "id": "admitad-camp-23120",
-      "storeName": "Adidas [CPS] ID",
+      "storeName": "Adidas",
       "storeSlug": "adidas-cps-id",
       "storeLogo": "https://cdn.admitad-connect.com/campaign/images/2021/5/13/23120-04aa3157363d99c1.png",
-      "category": "Одежда, обувь, аксессуары",
+      "category": "Fashion & Apparel",
       "title": "Adidas [CPS] ID: Exclusive Verified Offers & Storewide Discounts",
       "code": "DISCOUNT ACTIVATED",
       "discount": "Verified Offer",
@@ -86,10 +86,10 @@
     },
     {
       "id": "admitad-camp-22221",
-      "storeName": "Mivi [CPS] IN",
+      "storeName": "Mivi",
       "storeSlug": "mivi-cps-in",
       "storeLogo": "https://cdn.admitad-connect.com/campaign/images/2023/1/25/22221-657f2db221c2c925.svg",
-      "category": "Электроника и бытовая техника",
+      "category": "Electronics",
       "title": "Mivi [CPS] IN: Exclusive Verified Offers & Storewide Discounts",
       "code": "DISCOUNT ACTIVATED",
       "discount": "Verified Offer",
@@ -106,11 +106,11 @@
     },
     {
       "id": "admitad-967638",
-      "storeName": "AliExpress RU&CIS",
+      "storeName": "AliExpress &",
       "storeSlug": "aliexpress-ru-cis",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2026/9/21/25179-3486d23582bfb2fa.svg",
       "category": "Marketplaces (including Chinese Stores)",
-      "title": "Категорийные распродажи. Авто и мото товары.",
+      "title": "Category Mega Sale: Best Deals on Auto & Moto Accessories",
       "code": "DEAL ACTIVATED",
       "discount": "70%",
       "badge": "Verified",
@@ -127,7 +127,7 @@
     },
     {
       "id": "admitad-785883",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -147,7 +147,7 @@
     },
     {
       "id": "admitad-749565",
-      "storeName": "ChicMe WW",
+      "storeName": "ChicMe",
       "storeSlug": "chicme-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2020/9/30/18336-16313399a7473b4b.png",
       "category": "Accessories & Bags",
@@ -167,7 +167,7 @@
     },
     {
       "id": "admitad-679893",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -187,7 +187,7 @@
     },
     {
       "id": "admitad-665623",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Marketplaces (including Chinese Stores)",
@@ -207,7 +207,7 @@
     },
     {
       "id": "admitad-627266",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Accessories & Bags",
@@ -227,7 +227,7 @@
     },
     {
       "id": "admitad-625829",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Accessories & Bags",
@@ -247,7 +247,7 @@
     },
     {
       "id": "admitad-624992",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Accessories & Bags",
@@ -267,7 +267,7 @@
     },
     {
       "id": "admitad-624028",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Accessories & Bags",
@@ -287,7 +287,7 @@
     },
     {
       "id": "admitad-557681",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -307,7 +307,7 @@
     },
     {
       "id": "admitad-532223",
-      "storeName": "Acer [CPS] IN",
+      "storeName": "Acer",
       "storeSlug": "acer-cps-in",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/3/26/24575-e5a159bd7cde6682.png",
       "category": "Computers & Electronics",
@@ -327,7 +327,7 @@
     },
     {
       "id": "admitad-532222",
-      "storeName": "Acer [CPS] IN",
+      "storeName": "Acer",
       "storeSlug": "acer-cps-in",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/3/26/24575-e5a159bd7cde6682.png",
       "category": "Computers & Electronics",
@@ -347,7 +347,7 @@
     },
     {
       "id": "admitad-516211",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -371,7 +371,7 @@
       "storeSlug": "answear-ua",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/4/21/14578-bebcd89184c71b99.svg",
       "category": "Accessories & Bags",
-      "title": "Постійні знижки в аутлет! До 70%",
+      "title": "Outlet Sale: Save up to 70% on Designer Apparel & Shoes",
       "code": "DEAL ACTIVATED",
       "discount": "70%",
       "badge": "Verified",
@@ -387,7 +387,7 @@
     },
     {
       "id": "admitad-476201",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -407,7 +407,7 @@
     },
     {
       "id": "admitad-465664",
-      "storeName": "Acer [CPS] IN",
+      "storeName": "Acer",
       "storeSlug": "acer-cps-in",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/3/26/24575-e5a159bd7cde6682.png",
       "category": "Computers & Electronics",
@@ -427,7 +427,7 @@
     },
     {
       "id": "admitad-452072",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -447,7 +447,7 @@
     },
     {
       "id": "admitad-451320",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -467,7 +467,7 @@
     },
     {
       "id": "admitad-342434",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Personal Care & Pharmacy",
@@ -487,7 +487,7 @@
     },
     {
       "id": "admitad-328033",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Personal Care & Pharmacy",
@@ -507,11 +507,11 @@
     },
     {
       "id": "admitad-322183",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Personal Care & Pharmacy",
-      "title": "Максимальные скидки до 70% + дополнительные скидочные купоны от продавцов",
+      "title": "Mega Savings: Up to 70% OFF + Extra Seller Discount Vouchers",
       "code": "DEAL ACTIVATED",
       "discount": "70%",
       "badge": "Verified",
@@ -527,7 +527,7 @@
     },
     {
       "id": "admitad-321489",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Marketplaces (including Chinese Stores)",
@@ -613,7 +613,7 @@
     },
     {
       "id": "admitad-intl-deal-walmart-01",
-      "storeName": "Walmart US",
+      "storeName": "Walmart",
       "storeSlug": "walmart",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745883/gocoupon/brands/brand_walmart.png",
       "category": "General",
@@ -639,14 +639,14 @@
       "storeSlug": "answear-ua",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/4/21/14578-bebcd89184c71b99.svg",
       "category": "Accessories & Bags",
-      "title": "Знижка 5% на товари з розпродажу від 3500 грн",
+      "title": "Extra 5% OFF on Sale Items on Qualifying Orders",
       "code": "NOVEMBER",
       "discount": "5%",
       "badge": "Exclusive",
       "verifiedDate": "Verified Live",
       "expiresIn": "Active",
       "endDate": "2026-11-30T23:59:00",
-      "terms": "Знижка 5% на товари з розпродажу при мінімальному кошику 3500 грн. Код є багаторазовим та не поєднується з іншими акціями. Не розповсюджуються на ці товари: https://answear.ua/s/exclusions",
+      "terms": "Verified offer applicable at official Answear UA online store.",
       "link": "https://hxbok.com/g/18y92zfnvc9fa8ccb538a76d99edd2/?i=3",
       "usesCount": 236,
       "source": "admitad",
@@ -660,14 +660,14 @@
       "storeSlug": "answear-ua",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/4/21/14578-bebcd89184c71b99.svg",
       "category": "Accessories & Bags",
-      "title": "Знижка 25% на новинки від 3500 грн",
+      "title": "Flat 25% OFF on New Arrivals on Qualifying Orders",
       "code": "NOVEMBER",
       "discount": "25%",
       "badge": "Exclusive",
       "verifiedDate": "Verified Live",
       "expiresIn": "Active",
       "endDate": "2026-11-30T23:59:00",
-      "terms": "Знижка 25% на новинки (товари з \"чорними\" цінниками) при мінімальному кошику 3500 грн. Код є багаторазовим та не поєднується з іншими акціями. Не розповсюджуються на ці товари: https://answear.ua/s/exclusions",
+      "terms": "Verified offer applicable at official Answear UA online store.",
       "link": "https://hxbok.com/g/xamyj5wzl99fa8ccb538a76d99edd2/?i=3",
       "usesCount": 637,
       "source": "admitad",
@@ -677,11 +677,11 @@
     },
     {
       "id": "admitad-967638",
-      "storeName": "AliExpress RU&CIS",
+      "storeName": "AliExpress &",
       "storeSlug": "aliexpress-ru-cis",
       "storeLogo": "https://logo.clearbit.com/aliexpress.ru",
       "category": "Marketplaces (including Chinese Stores)",
-      "title": "Категорийные распродажи. Авто и мото товары.",
+      "title": "Category Mega Sale: Best Deals on Auto & Moto Accessories",
       "code": "НЕ НУЖЕН",
       "discount": "70%",
       "badge": "Verified",
@@ -702,13 +702,13 @@
       "storeSlug": "answear-ua",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/4/21/14578-bebcd89184c71b99.svg",
       "category": "Toys, Kids & Babies",
-      "title": "-20% на перші покупки за підписку на розсилку",
+      "title": "Answear UA: Exclusive Verified Discount & Special Seasonal Offer",
       "code": "DEAL ACTIVATED",
       "discount": "20%",
       "badge": "Verified",
       "verifiedDate": "Verified Live",
       "expiresIn": "Ongoing",
-      "terms": "ПІДПИСУЙСЯ НА РОЗСИЛКУ ТА ОТРИМАЙ ЗНИЖКУ 20%** НА ПЕРШІ ПОКУПКИ!\r\n**Знижка є одноразовою, діє лише на новинки (товари з \"чорними\" цінниками) при мінімальному кошику 4000 грн. Промокод не поєднується з іншими акціями, а деякі товари можуть бути виключені з його дії. Деталі за посиланням: виключення з акції: https://answear.ua/s/exclusions",
+      "terms": "Verified offer applicable at official Answear UA online store.",
       "link": "https://hxbok.com/g/kgpd89w9949fa8ccb538a76d99edd2/?i=3",
       "usesCount": 229,
       "source": "admitad",
@@ -722,14 +722,14 @@
       "storeSlug": "answear-ua",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/4/21/14578-bebcd89184c71b99.svg",
       "category": "Accessories & Bags",
-      "title": "15 YEARS OF ANSWEAR ДО -40%! Святкуємо разом",
+      "title": "Answear UA: Exclusive Verified Discount & Special Seasonal Offer",
       "code": "BDAY",
       "discount": "40%",
       "badge": "Verified",
       "verifiedDate": "Verified Live",
       "expiresIn": "Active",
       "endDate": "2026-10-31T23:59:00",
-      "terms": "Знижки до -40% з кодом: BDAY\r\nAnswear виповнюється 15 років, а подарунки отримуєш саме Ти! До -40% з кодом BDAY при покупці на мін. 4700 грн. А також збільшені знижки для учасників Answear Club Premium.",
+      "terms": "Verified offer applicable at official Answear UA online store.",
       "link": "https://hxbok.com/g/m6mzcbs6yr9fa8ccb538a76d99edd2/?i=3",
       "usesCount": 437,
       "source": "admitad",
@@ -739,7 +739,7 @@
     },
     {
       "id": "admitad-954163",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -760,7 +760,7 @@
     },
     {
       "id": "admitad-954162",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -781,7 +781,7 @@
     },
     {
       "id": "admitad-954161",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -802,7 +802,7 @@
     },
     {
       "id": "admitad-954160",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -823,7 +823,7 @@
     },
     {
       "id": "admitad-954159",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -844,7 +844,7 @@
     },
     {
       "id": "admitad-954158",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -865,7 +865,7 @@
     },
     {
       "id": "admitad-954157",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -886,7 +886,7 @@
     },
     {
       "id": "admitad-954156",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -907,7 +907,7 @@
     },
     {
       "id": "admitad-954155",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -928,7 +928,7 @@
     },
     {
       "id": "admitad-954154",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -949,7 +949,7 @@
     },
     {
       "id": "admitad-954153",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -970,7 +970,7 @@
     },
     {
       "id": "admitad-954152",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -991,7 +991,7 @@
     },
     {
       "id": "admitad-954151",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -1012,7 +1012,7 @@
     },
     {
       "id": "admitad-954150",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -1033,7 +1033,7 @@
     },
     {
       "id": "admitad-954149",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -1054,7 +1054,7 @@
     },
     {
       "id": "admitad-954148",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -1075,7 +1075,7 @@
     },
     {
       "id": "admitad-954147",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -1096,7 +1096,7 @@
     },
     {
       "id": "admitad-954146",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -1117,7 +1117,7 @@
     },
     {
       "id": "admitad-954145",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -1138,7 +1138,7 @@
     },
     {
       "id": "admitad-943050",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -1159,7 +1159,7 @@
     },
     {
       "id": "admitad-943049",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -1180,7 +1180,7 @@
     },
     {
       "id": "admitad-943048",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -1201,7 +1201,7 @@
     },
     {
       "id": "admitad-942792",
-      "storeName": "ChicMe WW",
+      "storeName": "ChicMe",
       "storeSlug": "chicme-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2020/9/30/18336-16313399a7473b4b.png",
       "category": "Clothing",
@@ -1226,14 +1226,14 @@
       "storeSlug": "answear-ua",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/4/21/14578-bebcd89184c71b99.svg",
       "category": "Accessories & Bags",
-      "title": "Знижка 5% на товари з розпродажу від 3500 грн",
+      "title": "Extra 5% OFF on Sale Items on Qualifying Orders",
       "code": "OCTOBER",
       "discount": "5%",
       "badge": "Exclusive",
       "verifiedDate": "Verified Live",
       "expiresIn": "Active",
       "endDate": "2026-10-31T23:59:00",
-      "terms": "Знижка 5% на товари з розпродажу при мінімальному кошику 3500 грн. Код є багаторазовим та не поєднується з іншими акціями. Не розповсюджуються на ці товари: https://answear.ua/s/exclusions",
+      "terms": "Verified offer applicable at official Answear UA online store.",
       "link": "https://hxbok.com/g/8n9i9pwgof9fa8ccb538a76d99edd2/?i=3",
       "usesCount": 392,
       "source": "admitad",
@@ -1247,14 +1247,14 @@
       "storeSlug": "answear-ua",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/4/21/14578-bebcd89184c71b99.svg",
       "category": "Accessories & Bags",
-      "title": "Знижка 25% на новинки від 3500 грн",
+      "title": "Flat 25% OFF on New Arrivals on Qualifying Orders",
       "code": "OCTOBER",
       "discount": "25%",
       "badge": "Exclusive",
       "verifiedDate": "Verified Live",
       "expiresIn": "Active",
       "endDate": "2026-10-31T23:59:00",
-      "terms": "Знижка 25% на новинки (товари з \"чорними\" цінниками) при мінімальному кошику 3500 грн. Код є багаторазовим та не поєднується з іншими акціями. Не розповсюджуються на ці товари: https://answear.ua/s/exclusions",
+      "terms": "Verified offer applicable at official Answear UA online store.",
       "link": "https://hxbok.com/g/i18uq8n9rv9fa8ccb538a76d99edd2/?i=3",
       "usesCount": 878,
       "source": "admitad",
@@ -1264,7 +1264,7 @@
     },
     {
       "id": "admitad-861990",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Marketplaces (including Chinese Stores)",
@@ -1284,7 +1284,7 @@
     },
     {
       "id": "admitad-785883",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "https://logo.clearbit.com/aliexpress.com",
       "category": "Homeware",
@@ -1304,7 +1304,7 @@
     },
     {
       "id": "admitad-785763",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -1324,7 +1324,7 @@
     },
     {
       "id": "admitad-785760",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -1344,7 +1344,7 @@
     },
     {
       "id": "admitad-785758",
-      "storeName": "AliExpress WW",
+      "storeName": "AliExpress",
       "storeSlug": "aliexpress-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2025/1/14/6115-e9b6f3723f58304b.svg",
       "category": "Homeware",
@@ -1868,7 +1868,7 @@
     },
     {
       "id": "cj-7954971-17367484",
-      "storeName": "FRP Moto  Affiliate",
+      "storeName": "FRP Moto Affiliate",
       "storeSlug": "frp-moto-affiliate",
       "title": "Exclusive Code FRPCJ30 - $30 Off GMB100P Mini Bike",
       "code": "FRPCJ30",
@@ -1889,7 +1889,7 @@
     },
     {
       "id": "cj-7954971-17367368",
-      "storeName": "FRP Moto  Affiliate",
+      "storeName": "FRP Moto Affiliate",
       "storeSlug": "frp-moto-affiliate",
       "title": "Exclusive Code FRPCJ40 - $40 Off FX140 Dirt Bike",
       "code": "FRPCJ40",
@@ -3051,7 +3051,7 @@
     },
     {
       "id": "cj-7851290-17308202",
-      "storeName": "apohealth.de",
+      "storeName": "apohealth.",
       "storeSlug": "apohealth-de",
       "title": "Apohealth.de Coupon Code: ZTE2PNZS4YFT – 5% OFF (On Entire Order)",
       "code": "ZTE2PNZS4YFT",
@@ -3089,7 +3089,7 @@
     },
     {
       "id": "cj-7851290-17308247",
-      "storeName": "apohealth.de",
+      "storeName": "apohealth.",
       "storeSlug": "apohealth-de",
       "title": "Apohealth.de Coupon Code: ZTE2PNZS4YFT – 5% OFF (5% Rabatt auf die gesamte Bestellung)",
       "code": "ZTE2PNZS4YFT",
@@ -5057,7 +5057,7 @@
     },
     {
       "id": "cj-6275247-17359648",
-      "storeName": "Allegro.pl",
+      "storeName": "Allegro.",
       "storeSlug": "allegro-pl",
       "title": "Allegro.pl Coupon Code: PAMPERS20 – 20% OFF (Allegro Pampers)",
       "code": "PAMPERS20",
@@ -15610,7 +15610,7 @@
     },
     {
       "id": "cue_105837",
-      "storeName": "Innisfree - US",
+      "storeName": "Innisfree -",
       "storeSlug": "innisfree-us-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060834/gocoupon/brands/real_brand_innisfree.svg",
       "category": "Food",
@@ -20947,7 +20947,7 @@
     },
     {
       "id": "cue_120934",
-      "storeName": "Ulike - DE",
+      "storeName": "Ulike -",
       "storeSlug": "ulike-de-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745877/gocoupon/brands/brand_ulike-de.png",
       "category": "Beauty",
@@ -22402,7 +22402,7 @@
     },
     {
       "id": "cue_128504",
-      "storeName": "Airalo WW",
+      "storeName": "Airalo",
       "storeSlug": "airalo-ww-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745879/gocoupon/brands/brand_airalo-ww.jpg",
       "category": "Travel",
@@ -23533,7 +23533,7 @@
     },
     {
       "id": "cue_129198",
-      "storeName": "Lifepro - US",
+      "storeName": "Lifepro -",
       "storeSlug": "lifepro-us-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745817/gocoupon/brands/brand_lifepro-us.png",
       "category": "Beauty",
@@ -23607,7 +23607,7 @@
     },
     {
       "id": "cue_129193",
-      "storeName": "Lifepro - US",
+      "storeName": "Lifepro -",
       "storeSlug": "lifepro-us-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745817/gocoupon/brands/brand_lifepro-us.png",
       "category": "Beauty",
@@ -28741,7 +28741,7 @@
     },
     {
       "id": "ac-as-it-is",
-      "storeName": "AS-IT-IS Nutrition",
+      "storeName": "AS--IS Nutrition",
       "storeSlug": "as-it-is-nutrition",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060063/gocoupon/brands/real_brand_asitisnutrition.svg",
       "logoUrl": null,
@@ -28785,7 +28785,7 @@
     },
     {
       "id": "admitad-776832",
-      "storeName": "RaynaTours Many Geos tracking promo codes",
+      "storeName": "RaynaTours",
       "storeSlug": "raynatours-many-geos-tracking-promo-codes",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/3/12/18183-80201c4cc1c1b8ea.jpg",
       "title": "Sea world - Penguin Encounter Ticket 250 AED was (295)",
@@ -28824,7 +28824,7 @@
     },
     {
       "id": "admitad-757238",
-      "storeName": "RaynaTours Many Geos tracking promo codes",
+      "storeName": "RaynaTours",
       "storeSlug": "raynatours-many-geos-tracking-promo-codes",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/3/12/18183-80201c4cc1c1b8ea.jpg",
       "title": "Dubai Parks and Resorts: Motiongate and Real Madrid World with meal offer save 60 AED per person*",
@@ -28863,7 +28863,7 @@
     },
     {
       "id": "admitad-776815",
-      "storeName": "RaynaTours Many Geos tracking promo codes",
+      "storeName": "RaynaTours",
       "storeSlug": "raynatours-many-geos-tracking-promo-codes",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/3/12/18183-80201c4cc1c1b8ea.jpg",
       "title": "Sea world - Dolphin Encounter Ticket  250 AED was (295)",
@@ -28902,7 +28902,7 @@
     },
     {
       "id": "admitad-776828",
-      "storeName": "RaynaTours Many Geos tracking promo codes",
+      "storeName": "RaynaTours",
       "storeSlug": "raynatours-many-geos-tracking-promo-codes",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/3/12/18183-80201c4cc1c1b8ea.jpg",
       "title": "Sea Venture- Sea Trek Adventure Ticket 240 AED was (245)",
@@ -28941,7 +28941,7 @@
     },
     {
       "id": "admitad-776185",
-      "storeName": "RaynaTours Many Geos tracking promo codes",
+      "storeName": "RaynaTours",
       "storeSlug": "raynatours-many-geos-tracking-promo-codes",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/3/12/18183-80201c4cc1c1b8ea.jpg",
       "title": "Yas waterworld with meal ticket 345 AED was (390)",
@@ -28980,7 +28980,7 @@
     },
     {
       "id": "admitad-899182",
-      "storeName": "Alibaba WW",
+      "storeName": "Alibaba",
       "storeSlug": "alibaba-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2020/11/2/20881-ff9430e87ffe5736.png",
       "title": "$20 off promo code",
@@ -29020,7 +29020,7 @@
     },
     {
       "id": "admitad-776831",
-      "storeName": "RaynaTours Many Geos tracking promo codes",
+      "storeName": "RaynaTours",
       "storeSlug": "raynatours-many-geos-tracking-promo-codes",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/3/12/18183-80201c4cc1c1b8ea.jpg",
       "title": "Sea world - Walrus Encounter Ticket 209 AED was (245)",
@@ -29059,7 +29059,7 @@
     },
     {
       "id": "admitad-683746",
-      "storeName": "RaynaTours Many Geos tracking promo codes",
+      "storeName": "RaynaTours",
       "storeSlug": "raynatours-many-geos-tracking-promo-codes",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/3/12/18183-80201c4cc1c1b8ea.jpg",
       "title": "Paramotor Adventure Tour now 750 AED (Was 950)",
@@ -29098,7 +29098,7 @@
     },
     {
       "id": "admitad-776184",
-      "storeName": "RaynaTours Many Geos tracking promo codes",
+      "storeName": "RaynaTours",
       "storeSlug": "raynatours-many-geos-tracking-promo-codes",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/3/12/18183-80201c4cc1c1b8ea.jpg",
       "title": "Warner Bros with meal ticket 302 AED was (340)",
@@ -29137,7 +29137,7 @@
     },
     {
       "id": "admitad-776183",
-      "storeName": "RaynaTours Many Geos tracking promo codes",
+      "storeName": "RaynaTours",
       "storeSlug": "raynatours-many-geos-tracking-promo-codes",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/3/12/18183-80201c4cc1c1b8ea.jpg",
       "title": "Ferrari with Meal Ticket (345) was 390",
@@ -29176,7 +29176,7 @@
     },
     {
       "id": "admitad-776187",
-      "storeName": "RaynaTours Many Geos tracking promo codes",
+      "storeName": "RaynaTours",
       "storeSlug": "raynatours-many-geos-tracking-promo-codes",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/3/12/18183-80201c4cc1c1b8ea.jpg",
       "title": "Ferrari with Meal Ticket (Abu Dhabi) 345 AED was (390)",
@@ -29215,7 +29215,7 @@
     },
     {
       "id": "admitad-776188",
-      "storeName": "RaynaTours Many Geos tracking promo codes",
+      "storeName": "RaynaTours",
       "storeSlug": "raynatours-many-geos-tracking-promo-codes",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/3/12/18183-80201c4cc1c1b8ea.jpg",
       "title": "Warner Bros with meal ticket(Abu Dhabi) 302 AED was (340)",
@@ -29650,7 +29650,7 @@
     },
     {
       "id": "admitad-776829",
-      "storeName": "RaynaTours Many Geos tracking promo codes",
+      "storeName": "RaynaTours",
       "storeSlug": "raynatours-many-geos-tracking-promo-codes",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2021/3/12/18183-80201c4cc1c1b8ea.jpg",
       "category": "Tours & Travels",
@@ -29683,7 +29683,7 @@
     },
     {
       "id": "admitad-780334",
-      "storeName": "Alibaba WW",
+      "storeName": "Alibaba",
       "storeSlug": "alibaba-ww",
       "storeLogo": "http://cdn.admitad.com/campaign/images/2020/11/2/20881-ff9430e87ffe5736.png",
       "category": "Clothing",
@@ -29857,7 +29857,7 @@
     },
     {
       "id": "cue_user_sub_1789320410976_oibdl",
-      "storeName": "New Community Brand",
+      "storeName": "Community Brand",
       "storeSlug": "new-community-brand-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060075/gocoupon/brands/real_brand_newcommunitybrand.svg",
       "category": "General",
@@ -31895,7 +31895,7 @@
     },
     {
       "id": "cue_99735",
-      "storeName": "Namecheap - US",
+      "storeName": "Namecheap -",
       "storeSlug": "namecheap-us-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745811/gocoupon/brands/brand_namecheap-us.png",
       "category": "Travel",
@@ -32065,7 +32065,7 @@
     },
     {
       "id": "cue_99723",
-      "storeName": "Namecheap - US",
+      "storeName": "Namecheap -",
       "storeSlug": "namecheap-us-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745811/gocoupon/brands/brand_namecheap-us.png",
       "category": "Recharge",
@@ -32099,7 +32099,7 @@
     },
     {
       "id": "cue_99720",
-      "storeName": "Namecheap - US",
+      "storeName": "Namecheap -",
       "storeSlug": "namecheap-us-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745811/gocoupon/brands/brand_namecheap-us.png",
       "category": "General",
@@ -32302,7 +32302,7 @@
     },
     {
       "id": "cue_99697",
-      "storeName": "Namecheap - US",
+      "storeName": "Namecheap -",
       "storeSlug": "namecheap-us-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745811/gocoupon/brands/brand_namecheap-us.png",
       "category": "Electronics",
@@ -32370,7 +32370,7 @@
     },
     {
       "id": "cue_99694",
-      "storeName": "Namecheap - US",
+      "storeName": "Namecheap -",
       "storeSlug": "namecheap-us-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745811/gocoupon/brands/brand_namecheap-us.png",
       "category": "General",
@@ -33356,7 +33356,7 @@
     },
     {
       "id": "cue_107526",
-      "storeName": "Travis Perkins UK",
+      "storeName": "Travis Perkins",
       "storeSlug": "travis-perkins-uk-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745791/gocoupon/brands/brand_travis-perkins-uk.png",
       "category": "General",
@@ -33390,7 +33390,7 @@
     },
     {
       "id": "cue_107524",
-      "storeName": "Travis Perkins UK",
+      "storeName": "Travis Perkins",
       "storeSlug": "travis-perkins-uk-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745791/gocoupon/brands/brand_travis-perkins-uk.png",
       "category": "Fashion",
@@ -39125,7 +39125,7 @@
     },
     {
       "id": "cue_110769",
-      "storeName": "Travis Perkins UK",
+      "storeName": "Travis Perkins",
       "storeSlug": "travis-perkins-uk-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745791/gocoupon/brands/brand_travis-perkins-uk.png",
       "category": "Electronics",
@@ -39880,7 +39880,7 @@
     },
     {
       "id": "cue_105838",
-      "storeName": "Innisfree - US",
+      "storeName": "Innisfree -",
       "storeSlug": "innisfree-us-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1791060834/gocoupon/brands/real_brand_innisfree.svg",
       "category": "Food",
@@ -42594,7 +42594,7 @@
     },
     {
       "id": "cue_110451",
-      "storeName": "Travis Perkins UK",
+      "storeName": "Travis Perkins",
       "storeSlug": "travis-perkins-uk-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745791/gocoupon/brands/brand_travis-perkins-uk.png",
       "category": "Electronics",
@@ -43614,7 +43614,7 @@
     },
     {
       "id": "cue_102266",
-      "storeName": "Travis Perkins UK",
+      "storeName": "Travis Perkins",
       "storeSlug": "travis-perkins-uk-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745791/gocoupon/brands/brand_travis-perkins-uk.png",
       "category": "Fashion",
@@ -43750,7 +43750,7 @@
     },
     {
       "id": "cue_102249",
-      "storeName": "Travis Perkins UK",
+      "storeName": "Travis Perkins",
       "storeSlug": "travis-perkins-uk-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745791/gocoupon/brands/brand_travis-perkins-uk.png",
       "category": "Fashion",
@@ -43818,7 +43818,7 @@
     },
     {
       "id": "cue_102248",
-      "storeName": "Travis Perkins UK",
+      "storeName": "Travis Perkins",
       "storeSlug": "travis-perkins-uk-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745791/gocoupon/brands/brand_travis-perkins-uk.png",
       "category": "Fashion",
@@ -46452,7 +46452,7 @@
     },
     {
       "id": "cue_101869",
-      "storeName": "Travis Perkins UK",
+      "storeName": "Travis Perkins",
       "storeSlug": "travis-perkins-uk-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745791/gocoupon/brands/brand_travis-perkins-uk.png",
       "category": "Food",
@@ -49452,7 +49452,7 @@
     },
     {
       "id": "cue_129573",
-      "storeName": "Angara IN",
+      "storeName": "Angara",
       "storeSlug": "angara-in-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745822/gocoupon/brands/brand_angara-in.png",
       "title": "Angara IN Coupon Code & Promo: Shop Stunning Tennis Bracelets at Unmatched Prices!",
@@ -49491,7 +49491,7 @@
     },
     {
       "id": "cue_129569",
-      "storeName": "Angara IN",
+      "storeName": "Angara",
       "storeSlug": "angara-in-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745822/gocoupon/brands/brand_angara-in.png",
       "title": "Angara IN Coupon Code & Promo: Gorgeous 18KT Gold Earrings at Unmatched Low Prices!",
@@ -49530,7 +49530,7 @@
     },
     {
       "id": "cue_129567",
-      "storeName": "Angara IN",
+      "storeName": "Angara",
       "storeSlug": "angara-in-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745822/gocoupon/brands/brand_angara-in.png",
       "title": "Angara IN Coupon Code & Promo: Limited Time: Kids Nazariya Starting at Rs. 11999!",
@@ -49569,7 +49569,7 @@
     },
     {
       "id": "cue_129566",
-      "storeName": "Angara IN",
+      "storeName": "Angara",
       "storeSlug": "angara-in-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745822/gocoupon/brands/brand_angara-in.png",
       "title": "Angara IN Coupon Code & Promo: Shop Beautiful Mangalsutra Necklaces Starting at Rs. 35999",
@@ -52845,7 +52845,7 @@
     },
     {
       "id": "cue_129200",
-      "storeName": "Lifepro - US",
+      "storeName": "Lifepro -",
       "storeSlug": "lifepro-us-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745817/gocoupon/brands/brand_lifepro-us.png",
       "category": "Beauty",
@@ -52879,7 +52879,7 @@
     },
     {
       "id": "cue_129199",
-      "storeName": "Lifepro - US",
+      "storeName": "Lifepro -",
       "storeSlug": "lifepro-us-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745817/gocoupon/brands/brand_lifepro-us.png",
       "category": "Food",
@@ -55072,7 +55072,7 @@
     },
     {
       "id": "cue_108916",
-      "storeName": "Travis Perkins UK",
+      "storeName": "Travis Perkins",
       "storeSlug": "travis-perkins-uk-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745791/gocoupon/brands/brand_travis-perkins-uk.png",
       "category": "Fashion",
@@ -55242,7 +55242,7 @@
     },
     {
       "id": "cue_108910",
-      "storeName": "Travis Perkins UK",
+      "storeName": "Travis Perkins",
       "storeSlug": "travis-perkins-uk-coupons",
       "storeLogo": "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745791/gocoupon/brands/brand_travis-perkins-uk.png",
       "category": "Beauty",

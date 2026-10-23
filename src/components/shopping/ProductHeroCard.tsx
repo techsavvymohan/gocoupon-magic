@@ -141,7 +141,7 @@ export function ProductHeroCard({ product }: ProductHeroCardProps) {
             <a
               href={bestDeal.affiliateUrl}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener sponsored nofollow"
               aria-label={`Shop on ${bestDeal.storeName}`}
               className="inline-flex items-center gap-1 rounded-xl bg-primary px-4 py-2.5 min-h-[36px] text-xs font-bold text-primary-foreground shadow-xs hover:scale-105 active:scale-95 transition-transform touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >

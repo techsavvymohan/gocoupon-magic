@@ -420,7 +420,7 @@ export function GrabOnHero() {
                               <a
                                 href={deal.affiliateUrl || deal.merchantUrl}
                                 target="_blank"
-                                rel="noopener noreferrer"
+                                rel="noopener sponsored nofollow"
                                 onClick={(e) => handleCopy(deal.couponCode, deal.brandName, deal.affiliateUrl || deal.merchantUrl, e)}
                                 className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl bg-white text-slate-900 px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold shadow-md hover:bg-slate-100 active:scale-95 transition-all group cursor-pointer"
                                 title={`Copy ${deal.couponCode} and open ${deal.brandName}`}
@@ -442,7 +442,7 @@ export function GrabOnHero() {
                             <a
                               href={deal.affiliateUrl || deal.merchantUrl}
                               target="_blank"
-                              rel="noopener noreferrer"
+                              rel="noopener sponsored nofollow"
                               className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-bold shadow-md shadow-primary/20 transition-all hover:scale-105 active:scale-95"
                             >
                               <span>Redeem Deal</span>
@@ -564,7 +564,7 @@ export function GrabOnHero() {
                             <a
                               href={findStoreByNameOrSlug(pick.storeSlug)?.storeUrl || "/stores"}
                               target="_blank"
-                              rel="noopener noreferrer"
+                              rel="noopener sponsored nofollow"
                               onClick={(e) => handleCopy(pick.code, pick.storeName, findStoreByNameOrSlug(pick.storeSlug)?.storeUrl, e)}
                               className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1 active:scale-95 transition-transform cursor-pointer"
                               title={`Copy ${pick.code} and open ${pick.storeName}`}

@@ -472,6 +472,7 @@ export async function fetchCuelinksCampaigns(options: {
       url.searchParams.set("per_page", String(Math.min(limit, 100)));
       url.searchParams.set("sort", "epc_7d");
       url.searchParams.set("order", "desc");
+      url.searchParams.set("access_status", "open");
       if (search) url.searchParams.set("q", search);
 
       const res = await fetch(url.toString(), {

@@ -44,7 +44,7 @@ export function CouponStackPill({ coupon, compact = false, storeUrl }: CouponSta
       <a
         href={affiliateUrl}
         target="_blank"
-        rel="noopener noreferrer nofollow"
+        rel="noopener sponsored nofollow"
         onClick={handleCopy}
         className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-primary/40 bg-primary/5 px-2.5 py-1 text-xs font-mono font-medium text-primary hover:bg-primary/10 transition-colors"
         title={`Click to copy: ${coupon.description}`}
@@ -86,7 +86,7 @@ export function CouponStackPill({ coupon, compact = false, storeUrl }: CouponSta
       <a
         href={affiliateUrl}
         target="_blank"
-        rel="noopener noreferrer nofollow"
+        rel="noopener sponsored nofollow"
         onClick={handleCopy}
         className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-xs transition-transform hover:scale-105 active:scale-95"
       >

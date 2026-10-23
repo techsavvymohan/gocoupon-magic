@@ -117,7 +117,7 @@ function CarouselDealCard({
           <a
             href={redirectUrl}
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener sponsored nofollow"
             onClick={(e) => {
               e.stopPropagation();
               onCopy(deal.code, deal.storeName, redirectUrl, e);
@@ -142,7 +142,7 @@ function CarouselDealCard({
         <a
           href={redirectUrl}
           target="_blank"
-          rel="noopener noreferrer"
+          rel="noopener sponsored nofollow"
           aria-label={`Redeem ${deal.storeName} deal: ${deal.title}`}
           className="rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-primary-foreground transition-opacity hover:opacity-90 shrink-0 inline-flex items-center gap-1 shadow-2xs"
           onClick={() => {

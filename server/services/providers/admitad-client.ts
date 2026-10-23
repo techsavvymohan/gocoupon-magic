@@ -345,6 +345,28 @@ export const CURATED_INTERNATIONAL_DEALS: Deal[] = [
 import { addDealToPool, buildCuelinksRedirectUrl } from "./cuelinks-client.js";
 import type { DealRecord } from "../../../src/lib/server-data/deals-db.js";
 
+export function cleanMerchantName(rawName: string): string {
+  if (!rawName) return "Partner Merchant";
+  return rawName
+    .replace(/\[.*?\]/g, "")
+    .replace(/\b(Many GEOs|Many Geos|tracking promo codes|WW|IN|ID|US|UK|PL|DE|FR|AT|IT|CIS|RU|SA|KW|AE|NEW)\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+const ADMITAD_CATEGORY_MAP: Record<string, string> = {
+  "интернет-магазины": "Online Shopping",
+  "интернет-услуги": "Online Services",
+  "одежда, обувь, аксессуары": "Fashion & Apparel",
+  "электроника и бытовая техника": "Electronics",
+  "туризм, путешествия": "Travel & Flights",
+  "красота и здоровье": "Beauty & Health",
+  "товары для детей": "Baby & Kids",
+  "товары для дома": "Home & Living",
+  "финансовые программы": "Finance",
+  "игры": "Gaming",
+};
+
 /**
  * Fetches live international coupons & deals from Admitad API.
  * Combines live API responses with curated global campaigns for complete reliability.
@@ -373,7 +395,8 @@ export async function fetchLiveInternationalDeals(): Promise<Deal[]> {
         for (const item of data.results) {
           if (!item.name) continue;
 
-          const merchantName = item.campaign?.name || "Global Merchant";
+          const rawMerchantName = item.campaign?.name || "Global Merchant";
+          const merchantName = cleanMerchantName(rawMerchantName);
           const merchantSlug = merchantName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
           const fallbackTrackingUrl = item.campaign?.site_url
@@ -396,20 +419,34 @@ export async function fetchLiveInternationalDeals(): Promise<Deal[]> {
             cleanCode = "DEAL ACTIVATED";
           }
 
+          const rawCategory = (item.categories?.[0]?.name as string || "General").trim();
+          const cleanCategory = ADMITAD_CATEGORY_MAP[rawCategory.toLowerCase()] || rawCategory;
+
+          // Cyrillic title fallback to clean English
+          let cleanTitle = item.name;
+          if (/[\u0400-\u04FF]/.test(cleanTitle)) {
+            cleanTitle = `${merchantName}: Exclusive Verified Offers & Storewide Discounts`;
+          }
+
+          let cleanTerms = item.description || `Limited time verified offer at ${merchantName}.`;
+          if (/[\u0400-\u04FF]/.test(cleanTerms)) {
+            cleanTerms = `Shop verified deals at official ${merchantName} online storefront.`;
+          }
+
           deals.unshift({
             id: `admitad-${item.id || Math.random().toString(36).slice(2, 9)}`,
             storeName: merchantName,
             storeSlug: merchantSlug,
             storeLogo: logoUrl,
-            category: (item.categories?.[0]?.name as any) || "General",
-            title: item.name,
+            category: cleanCategory as any,
+            title: cleanTitle,
             code: cleanCode,
             discount: item.discount || "Verified Deal",
             badge: item.exclusive ? "Exclusive" : "Verified",
             verifiedDate: "Verified Live",
             expiresIn: item.date_end ? "Active" : "Ongoing",
             endDate: item.date_end || undefined,
-            terms: item.description || "Limited time verified merchant offer.",
+            terms: cleanTerms,
             link: item.goto_link || fallbackTrackingUrl,
             usesCount: Math.floor(Math.random() * 800) + 120,
           });
@@ -434,7 +471,8 @@ export async function fetchLiveInternationalDeals(): Promise<Deal[]> {
           );
 
           for (const camp of activeWithLinks) {
-            const slug = (camp.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+            const cleanName = cleanMerchantName(camp.name || "Global Merchant");
+            const slug = cleanName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
             // If deals list doesn't already contain a deal for this active campaign, add a primary deal
             const alreadyHasDeal = deals.some(
               (d) => d.storeSlug.includes(slug) || slug.includes(d.storeSlug)
@@ -449,19 +487,22 @@ export async function fetchLiveInternationalDeals(): Promise<Deal[]> {
                 campLogo = undefined;
               }
 
+              const rawCategory = (camp.categories?.[0]?.name as string || "General").trim();
+              const cleanCategory = ADMITAD_CATEGORY_MAP[rawCategory.toLowerCase()] || rawCategory;
+
               deals.push({
                 id: `admitad-camp-${camp.id}`,
-                storeName: camp.name,
+                storeName: cleanName,
                 storeSlug: slug,
                 storeLogo: campLogo,
-                category: (camp.categories?.[0]?.name as any) || "General",
-                title: `${camp.name}: Exclusive Verified Offers & Storewide Discounts`,
+                category: cleanCategory as any,
+                title: `${cleanName}: Exclusive Verified Offers & Storewide Discounts`,
                 code: "DISCOUNT ACTIVATED",
                 discount: "Verified Offer",
                 badge: "Trending",
                 verifiedDate: "Verified Today",
                 expiresIn: "Active",
-                terms: `Shop verified deals at ${camp.name} official online store.`,
+                terms: `Shop verified deals at ${cleanName} official online store.`,
                 link: camp.gotolink,
                 usesCount: Math.floor(Math.random() * 1200) + 300,
               });

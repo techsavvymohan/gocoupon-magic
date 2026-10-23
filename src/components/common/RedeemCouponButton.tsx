@@ -54,7 +54,7 @@ export function RedeemCouponButton({
       <a
         href={affiliateUrl}
         target="_blank"
-        rel="noopener noreferrer nofollow"
+        rel="noopener sponsored nofollow"
         onClick={handleClick}
         className={`inline-flex items-center justify-center gap-2 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 text-xs font-mono font-bold shadow-xs transition-all duration-200 cursor-pointer select-none max-w-full overflow-hidden ${
           fullWidth ? "w-full" : ""
@@ -76,7 +76,7 @@ export function RedeemCouponButton({
       <a
         href={affiliateUrl}
         target="_blank"
-        rel="noopener noreferrer nofollow"
+        rel="noopener sponsored nofollow"
         onClick={handleClick}
         className={`group/btn h-10 rounded-xl overflow-hidden inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs uppercase tracking-wide px-3 shadow-xs hover:shadow-md transition-all duration-150 select-none cursor-pointer active:scale-[0.99] max-w-full ${
           fullWidth ? "w-full" : ""
@@ -100,7 +100,7 @@ export function RedeemCouponButton({
     <a
       href={affiliateUrl}
       target="_blank"
-      rel="noopener noreferrer nofollow"
+      rel="noopener sponsored nofollow"
       onClick={handleClick}
       className={`group/btn h-10 rounded-xl overflow-hidden inline-flex items-stretch border border-primary/30 shadow-xs hover:shadow-md transition-all duration-150 select-none cursor-pointer active:scale-[0.99] max-w-full ${
         fullWidth ? "w-full" : ""

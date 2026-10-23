@@ -220,99 +220,106 @@ export async function handleDealRedirect(req: Request, res: Response) {
 
   const isImpact = rawUrl.includes("impact.com") || rawUrl.includes("sjv.io");
 
+  // Destination merchant URL extracted from wrappers
+  const cleanMerchant = extractMerchantDestination(rawUrl);
+  const normTarget = `${slug} ${store} ${cleanMerchant} ${rawUrl}`.toLowerCase();
+
+  // High-commission direct networks mapping
+  const EARNKARO_DIRECT_LINKS: Record<string, string> = {
+    flipkart: "https://fktr.in/xL95eGk",
+    ajio: "https://ajiio.in/5gIGQ46",
+    "dot-and-key": "https://bitli.in/Q8p6Tb5",
+    dotandkey: "https://bitli.in/Q8p6Tb5",
+    mcaffeine: "https://bitli.in/30c3jZD",
+    shopsy: "https://bitli.in/X8hNAWk",
+    themancompany: "https://bitli.in/Aiq8ef4",
+    "the-man-company": "https://bitli.in/Aiq8ef4",
+  };
+
+  const ADMITAD_DIRECT_CAMPAIGNS: Record<string, string> = {
+    palmonas: "https://tjzuh.com/g/cozq2t2pxu9fa8ccb53848f53de592/",
+    bewakoof: "https://tjzuh.com/g/el5arbwari9fa8ccb5388f3bde6dea/",
+    mivi: "https://tjzuh.com/g/grfndh30zw9fa8ccb538a184524636/",
+    acer: "https://tjzuh.com/g/67hxm0ezhv9fa8ccb538759e60847d/",
+    asus: "https://tjzuh.com/g/9d2vnaf4jq9fa8ccb53803be1d2ce2/",
+    aliexpress: "https://rzekl.com/g/1e8d1144949fa8ccb53816525dc3e8/",
+    alibaba: "https://rzekl.com/g/pm1aev55cl9fa8ccb538219aa26f6f/",
+    walmart: "https://bednari.com/g/4jg2ecwjgp9fa8ccb538bef27d4341/",
+    raynatours: "https://xpuvo.com/g/ofc53p8nis9fa8ccb538e94db72a90/",
+    chicme: "https://rzekl.com/g/gf807z8tar9fa8ccb538312b8f391a/",
+    wondershare: "https://kjuzv.com/g/8u3trxihmw9fa8ccb538ef655e4ac9/",
+    "hello-molly": "https://ntzgd.com/g/v4mbsetakj9fa8ccb5385fd6c9cc83/",
+    hellomolly: "https://ntzgd.com/g/v4mbsetakj9fa8ccb5385fd6c9cc83/",
+  };
+
   let targetUrl = rawUrl;
 
-  // Case A: If rawUrl is ALREADY an active affiliate tracking link from CJ, Admitad, Cuelinks, EarnKaro, Amazon, or Impact,
-  // NEVER alter or strip destination, but attach clickId / subid parameters so S2S postbacks reconcile!
-  if (isCj || isAdmitad || isCuelinks || isEarnKaro || isAmazon || isImpact) {
-    targetUrl = rawUrl;
-    if (isCuelinks && !targetUrl.includes("subid4=")) {
-      const sep = targetUrl.includes("?") ? "&" : "?";
-      targetUrl = `${targetUrl}${sep}subid4=${encodeURIComponent(clickId)}`;
-    } else if (isCj && !targetUrl.includes("sid=")) {
-      const sep = targetUrl.includes("?") ? "&" : "?";
-      targetUrl = `${targetUrl}${sep}sid=${encodeURIComponent(clickId)}`;
-    } else if (isAdmitad && !targetUrl.includes("subid=")) {
-      const sep = targetUrl.includes("?") ? "&" : "?";
-      targetUrl = `${targetUrl}${sep}subid=${encodeURIComponent(clickId)}&subid1=${encodeURIComponent(subid1)}&subid2=${encodeURIComponent(subid2)}&subid3=${encodeURIComponent(subid3)}&subid4=${encodeURIComponent(subid5)}`;
+  // Branch 1: EarnKaro-specific stores (Ajio, Flipkart, Dot & Key, etc. where Cuelinks is unmonetized)
+  let matchedEarnKaro: string | null = null;
+  if (normTarget.includes("flipkart") || normTarget.includes("fktr.in")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.flipkart;
+  else if (normTarget.includes("ajio") || normTarget.includes("ajiio.in")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.ajio;
+  else if (normTarget.includes("dot") && normTarget.includes("key")) matchedEarnKaro = EARNKARO_DIRECT_LINKS["dot-and-key"];
+  else if (normTarget.includes("mcaffeine") || normTarget.includes("caffeine")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.mcaffeine;
+  else if (normTarget.includes("shopsy")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.shopsy;
+  else if (normTarget.includes("themancompany") || (normTarget.includes("man") && normTarget.includes("company"))) {
+    matchedEarnKaro = EARNKARO_DIRECT_LINKS.themancompany;
+  }
+
+  // Check if rawUrl is already an Admitad campaign link
+  let matchedAdmitadCampaign: string | null = null;
+  for (const [key, gotolink] of Object.entries(ADMITAD_DIRECT_CAMPAIGNS)) {
+    if (normTarget.includes(key)) {
+      matchedAdmitadCampaign = gotolink;
+      break;
     }
   }
-  // Case B: If rawUrl is an untagged Amazon merchant URL, attach verified GoCoupon partner tags
-  else if (rawUrl.includes("amazon.in")) {
+
+  if (matchedEarnKaro) {
+    targetUrl = matchedEarnKaro;
+  } else if (isAdmitad || (!isCj && matchedAdmitadCampaign && !rawUrl.includes("myntr.it"))) {
+    const baseGotolink = isAdmitad ? rawUrl : matchedAdmitadCampaign!;
+    const sep = baseGotolink.includes("?") ? "&" : "?";
+    if (!baseGotolink.includes("subid=")) {
+      targetUrl = `${baseGotolink}${sep}subid=${encodeURIComponent(clickId)}&subid1=${encodeURIComponent(subid1)}&subid2=${encodeURIComponent(subid2)}&subid3=${encodeURIComponent(subid3)}&subid4=${encodeURIComponent(subid5)}`;
+    } else {
+      targetUrl = baseGotolink;
+    }
+  } else if (isCj) {
+    targetUrl = rawUrl;
+    if (!targetUrl.includes("sid=")) {
+      const sep = targetUrl.includes("?") ? "&" : "?";
+      targetUrl = `${targetUrl}${sep}sid=${encodeURIComponent(clickId)}`;
+    }
+  } else if (isEarnKaro || isImpact) {
+    targetUrl = rawUrl;
+  } else if (rawUrl.includes("amazon.in") || cleanMerchant.includes("amazon.in")) {
     const sep = rawUrl.includes("?") ? "&" : "?";
     const tag = process.env.VITE_AMAZON_IN_PARTNER_TAG || "gocoupon0e-21";
     targetUrl = `${rawUrl}${sep}tag=${tag}&ascsubtag=${encodeURIComponent(clickId)}`;
-  }
-  else if (rawUrl.includes("amazon.com")) {
+  } else if (rawUrl.includes("amazon.com") || cleanMerchant.includes("amazon.com")) {
     const sep = rawUrl.includes("?") ? "&" : "?";
     const tag = process.env.VITE_AMAZON_US_PARTNER_TAG || "gocouponus-20";
     targetUrl = `${rawUrl}${sep}tag=${tag}&ascsubtag=${encodeURIComponent(clickId)}`;
-  }
-  // Case C: Check if merchant has a high-commission EarnKaro partnership link (Myntra, Flipkart, Ajio, etc.)
-  else {
-    const EARNKARO_DIRECT_LINKS: Record<string, string> = {
-      myntra: "https://myntr.it/t6fMvnP",
-      flipkart: "https://fktr.in/xL95eGk",
-      ajio: "https://ajiio.in/5gIGQ46",
-      "dot-and-key": "https://bitli.in/Q8p6Tb5",
-      dotandkey: "https://bitli.in/Q8p6Tb5",
-      mcaffeine: "https://bitli.in/30c3jZD",
-      shopsy: "https://bitli.in/X8hNAWk",
-      themancompany: "https://bitli.in/Aiq8ef4",
-      "the-man-company": "https://bitli.in/Aiq8ef4",
-    };
-
-    const normTarget = `${slug} ${store} ${rawUrl}`.toLowerCase();
-    let matchedEarnKaro: string | null = null;
-    if (normTarget.includes("myntra") || normTarget.includes("myntr.it")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.myntra;
-    else if (normTarget.includes("flipkart") || normTarget.includes("fktr.in")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.flipkart;
-    else if (normTarget.includes("ajio") || normTarget.includes("ajiio.in")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.ajio;
-    else if (normTarget.includes("dot") && normTarget.includes("key")) matchedEarnKaro = EARNKARO_DIRECT_LINKS["dot-and-key"];
-    else if (normTarget.includes("mcaffeine") || normTarget.includes("caffeine")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.mcaffeine;
-    else if (normTarget.includes("shopsy")) matchedEarnKaro = EARNKARO_DIRECT_LINKS.shopsy;
-    else if (normTarget.includes("themancompany") || (normTarget.includes("man") && normTarget.includes("company"))) {
-      matchedEarnKaro = EARNKARO_DIRECT_LINKS.themancompany;
+  } else if (isCuelinks) {
+    targetUrl = rawUrl;
+    if (!targetUrl.includes("subid4=")) {
+      const sep = targetUrl.includes("?") ? "&" : "?";
+      targetUrl = `${targetUrl}${sep}subid4=${encodeURIComponent(clickId)}`;
     }
-
-    // Check if rawUrl is a specific deep product link (not just a homepage or generic root)
-    let isDeepProductLink = false;
-    try {
-      const parsed = new URL(rawUrl);
-      const cleanPath = parsed.pathname.replace(/^\/+|\/+$/g, "");
-      if (cleanPath && cleanPath !== "index.html" && cleanPath.length > 2) {
-        isDeepProductLink = true;
-      }
-    } catch {
-      // Ignore URL parse error
-    }
-
-    // Only use generic EarnKaro direct store link if NOT a specific deep product link
-    if (matchedEarnKaro && !isDeepProductLink) {
-      targetUrl = matchedEarnKaro;
-    } else if (/^https?:\/\//i.test(targetUrl)) {
-      // Case D: Universal deep linking with full 5-tier subID attribution
-      targetUrl = buildCuelinksRedirectUrl({
-        merchantUrl: targetUrl,
-        subId: subid1,
-        subid1,
-        subid2,
-        subid3,
-        subid4,
-        subid5,
-      });
-    }
-  }
-
-  // If already an existing linksredirect URL without subid4, attach clickId for S2S tracking
-  if (targetUrl.includes("linksredirect.com") && !targetUrl.includes("subid4=")) {
-    const sep = targetUrl.includes("?") ? "&" : "?";
-    targetUrl = `${targetUrl}${sep}subid4=${encodeURIComponent(clickId)}`;
+  } else if (/^https?:\/\//i.test(targetUrl)) {
+    // Universal Cuelinks fallback with full 5-tier subID attribution
+    targetUrl = buildCuelinksRedirectUrl({
+      merchantUrl: targetUrl,
+      subId: subid1,
+      subid1,
+      subid2,
+      subid3,
+      subid4,
+      subid5,
+    });
   }
 
   // 2. Track click in database / analytics with complete 5 sub-IDs
-  const cleanMerchant = extractMerchantDestination(rawUrl);
-
-  // Log in background
   clicksDb
     .recordClick({
       id: clickId,
@@ -340,6 +347,7 @@ export async function handleDealRedirect(req: Request, res: Response) {
   res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
   res.redirect(302, targetUrl);
 }
 

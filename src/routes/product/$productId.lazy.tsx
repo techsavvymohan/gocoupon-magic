@@ -267,7 +267,7 @@ function ProductDetailsPage() {
                     <a
                       href={bestDeal.affiliateUrl}
                       target="_blank"
-                      rel="noopener noreferrer"
+                      rel="noopener sponsored nofollow"
                       className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3.5 text-sm font-bold text-primary-foreground shadow-md transition-transform hover:scale-[1.02]"
                     >
                       <span>Shop Deal on {bestDeal.storeName}</span>
@@ -360,7 +360,7 @@ function ProductDetailsPage() {
               <a
                 href={bestDeal.affiliateUrl}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener sponsored nofollow"
                 className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground shadow-md active:scale-95"
               >
                 <span>Shop Deal</span>

@@ -242,7 +242,7 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
               <a
                 href={storeAffiliateUrl}
                 target="_blank"
-                rel="noopener noreferrer nofollow"
+                rel="noopener sponsored nofollow"
                 className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 backdrop-blur-md px-5 py-3.5 text-sm font-semibold text-foreground hover:bg-card hover:border-primary/50 transition-all hover:scale-[1.02] shadow-xs cursor-pointer"
               >
                 <span>Shop at {storeName}</span>
@@ -402,7 +402,7 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
                           <a
                             href={couponAffiliateUrl}
                             target="_blank"
-                            rel="noopener noreferrer nofollow"
+                            rel="noopener sponsored nofollow"
                             onClick={(e) => handleCopyCode(cleanCode, couponAffiliateUrl, e)}
                             className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
                               isCopied
@@ -431,7 +431,7 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
                           <a
                             href={couponAffiliateUrl}
                             target="_blank"
-                            rel="noopener noreferrer nofollow"
+                            rel="noopener sponsored nofollow"
                             className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-bold bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white shadow-xs transition-all cursor-pointer"
                             title={`Activate ${coupon.discount} at ${storeName || "store"}`}
                           >
@@ -474,7 +474,7 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
               <a
                 href={storeAffiliateUrl}
                 target="_blank"
-                rel="noopener noreferrer nofollow"
+                rel="noopener sponsored nofollow"
                 className="shrink-0 inline-flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-4 py-2.5 transition-all shadow-xs cursor-pointer"
               >
                 <span>Activate Clean Session</span>
