@@ -30,6 +30,7 @@ async function handleConversionPostback(req: Request, res: Response) {
       data.tx_id ||
       data.order_id ||
       data.orderId ||
+      data.action_id ||
       data.conv_id ||
       `tx_${Date.now()}`
     ).trim();
@@ -45,13 +46,13 @@ async function handleConversionPostback(req: Request, res: Response) {
     const rawSubid = String(data.subid || data.sub_id || "").trim();
     const effectiveClickId = subid4 || (rawSubid.startsWith("clk_") ? rawSubid : undefined);
 
-    // Standardize financials
+    // Standardize financials (including Admitad order_sum & payment)
     const saleAmount = parseFloat(
-      String(data.sale_amount || data.amount || data.sale || data.order_amount || "0")
+      String(data.sale_amount || data.amount || data.sale || data.order_amount || data.order_sum || data.cart || "0")
     ) || 0;
 
     const commissionAmount = parseFloat(
-      String(data.commission_amount || data.commission || data.payout || data.earnings || "0")
+      String(data.commission_amount || data.commission || data.payout || data.earnings || data.payment || "0")
     ) || 0;
 
     const currency = String(data.currency || data.curr || "INR").toUpperCase();
@@ -69,7 +70,7 @@ async function handleConversionPostback(req: Request, res: Response) {
 
     const network = String(data.network || data.provider || "partner_network").trim();
     const campaignId = data.campaign_id || data.campaignId;
-    const campaignName = String(data.campaign_name || data.campaign || subid2 || "Affiliate Campaign").trim();
+    const campaignName = String(data.campaign_name || data.advcampaign_name || data.campaign || subid2 || "Affiliate Campaign").trim();
     const storeSlug = subid2 || String(data.store_slug || "").trim();
     const storeName = String(data.store_name || data.merchant || subid2 || "Partner Merchant").trim();
 

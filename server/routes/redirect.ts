@@ -234,7 +234,7 @@ export async function handleDealRedirect(req: Request, res: Response) {
       targetUrl = `${targetUrl}${sep}sid=${encodeURIComponent(clickId)}`;
     } else if (isAdmitad && !targetUrl.includes("subid=")) {
       const sep = targetUrl.includes("?") ? "&" : "?";
-      targetUrl = `${targetUrl}${sep}subid=${encodeURIComponent(clickId)}`;
+      targetUrl = `${targetUrl}${sep}subid=${encodeURIComponent(clickId)}&subid1=${encodeURIComponent(subid1)}&subid2=${encodeURIComponent(subid2)}&subid3=${encodeURIComponent(subid3)}&subid4=${encodeURIComponent(subid5)}`;
     }
   }
   // Case B: If rawUrl is an untagged Amazon merchant URL, attach verified GoCoupon partner tags
