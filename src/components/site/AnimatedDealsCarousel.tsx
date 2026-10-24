@@ -122,31 +122,31 @@ function CarouselDealCard({
               e.stopPropagation();
               onCopy(deal.code, deal.storeName, redirectUrl, e);
             }}
-            className={`flex-1 inline-flex items-stretch h-9 rounded-lg sm:rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all active:scale-[0.98] cursor-pointer ${
-              copiedCode === deal.code ? "bg-emerald-600 text-white" : "bg-primary text-white"
+            className={`flex-1 inline-flex items-stretch h-9 sm:h-10 rounded-xl sm:rounded-2xl overflow-hidden border border-indigo-200/50 dark:border-indigo-900/50 shadow-xs hover:shadow-md transition-all active:scale-[0.98] cursor-pointer select-none ${
+              copiedCode === deal.code ? "bg-emerald-600 text-white ring-2 ring-emerald-500/30" : "bg-[#3f38d6] dark:bg-indigo-600 hover:bg-[#352fc4] text-white"
             }`}
             title={`Click to copy code and open ${deal.storeName}`}
           >
-            <div className="flex-1 flex items-center justify-center gap-1.5 px-2 text-[11px] font-bold">
+            <div className="flex-1 flex items-center justify-center gap-1.5 px-2 text-[11px] sm:text-xs font-bold">
               {copiedCode === deal.code ? (
                 <>
-                  <Check className="h-3 w-3 animate-bounce shrink-0" />
+                  <Check className="h-3.5 w-3.5 animate-bounce shrink-0 stroke-[2.5]" />
                   <span>COPIED!</span>
                 </>
               ) : (
                 <>
-                  <Copy className="h-3 w-3 shrink-0" />
-                  <span className="uppercase font-display">
+                  <Copy className="h-3.5 w-3.5 shrink-0 stroke-[2.2]" />
+                  <span className="uppercase font-sans font-bold tracking-wider">
                     {deal.discount && deal.discount !== "Deal" ? `REDEEM ${deal.discount}` : "REDEEM CODE"}
                   </span>
                 </>
               )}
             </div>
             <div
-              className={`w-10 shrink-0 flex items-center justify-center border-l select-none font-mono font-black text-xs tracking-wider ${
+              className={`w-11 sm:w-13 shrink-0 flex items-center justify-center border-l select-none font-sans font-extrabold text-xs sm:text-sm tracking-widest ${
                 copiedCode === deal.code
                   ? "bg-emerald-700 text-white border-emerald-500/40"
-                  : "bg-slate-300/85 dark:bg-zinc-700/90 text-white border-white/20 drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]"
+                  : "bg-[#d4d4d8] dark:bg-zinc-700 text-white border-white/20 drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]"
               }`}
             >
               {copiedCode === deal.code

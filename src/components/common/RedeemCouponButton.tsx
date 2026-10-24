@@ -99,32 +99,31 @@ export function RedeemCouponButton({
     );
   }
 
-  // Hidden Code Voucher:
-  // - Outer container with w-full, fixed height, and overflow-hidden ensures 100% containment in the card.
-  // - Left section covers the code and displays punchy call to action.
-  // - Right stub shows the last 2 digits behind a dashed line neatly INSIDE the button.
+  // Ticket-Stub Split Button matching reference design:
+  // - Left: Vibrant Indigo action button with Copy icon and REDEEM {discount}
+  // - Right: Light silver contrasting tab with pure white spaced last 2 characters (e.g. "2  6")
   return (
     <a
       href={affiliateUrl}
       target="_blank"
       rel="noopener sponsored nofollow"
       onClick={handleClick}
-      className={`group/btn h-10 rounded-xl overflow-hidden inline-flex items-stretch border border-primary/30 shadow-xs hover:shadow-md transition-all duration-150 select-none cursor-pointer active:scale-[0.99] max-w-full ${
+      className={`group/stub relative inline-flex items-stretch h-11 sm:h-12 rounded-xl sm:rounded-2xl overflow-hidden border border-indigo-200/50 dark:border-indigo-900/50 shadow-md shadow-indigo-500/10 hover:shadow-lg transition-all active:scale-[0.98] select-none cursor-pointer max-w-full ${
         fullWidth ? "w-full" : ""
       } ${className}`}
       title={`Click to copy code and open ${deal.storeName}`}
     >
-      {/* Left Action Button (dominates width, covers and hides the coupon code) */}
-      <div className="flex-1 min-w-0 bg-primary group-hover/btn:bg-primary/90 text-primary-foreground font-bold text-xs uppercase tracking-wide px-3 flex items-center justify-center gap-1.5 transition-colors">
-        <Copy className="h-3.5 w-3.5 shrink-0" />
-        <span className="truncate">
+      {/* Left Action Button (vibrant royal indigo-blue) */}
+      <div className="flex-1 min-w-0 bg-[#3f38d6] hover:bg-[#352fc4] text-white font-bold text-xs sm:text-sm uppercase tracking-wider px-3 sm:px-4 flex items-center justify-center gap-2 transition-colors">
+        <Copy className="h-4 w-4 stroke-[2.2] text-white shrink-0 group-hover/stub:scale-105 transition-transform" />
+        <span className="truncate font-sans font-bold">
           {discountLabel !== "DEAL" ? `REDEEM ${discountLabel}` : "REDEEM CODE"}
         </span>
       </div>
 
-      {/* Right Code Peek Stub: cleanly contained inside the button with a dashed divider */}
-      <div className="w-12 shrink-0 border-l border-dashed border-primary-foreground/30 bg-black/15 dark:bg-black/30 flex items-center justify-center font-mono text-xs font-black text-primary-foreground tracking-widest select-none">
-        <span>{codePeek || "***"}</span>
+      {/* Right Teaser Tab: Solid light silver background with bold white spaced digits (e.g. 2  6) */}
+      <div className="w-14 sm:w-16 shrink-0 bg-[#d4d4d8] dark:bg-zinc-700 border-l border-white/20 flex items-center justify-center font-sans font-extrabold text-sm sm:text-base text-white tracking-widest select-none drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]">
+        <span>{codePeek || "**"}</span>
       </div>
     </a>
   );

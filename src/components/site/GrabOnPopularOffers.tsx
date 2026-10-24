@@ -243,10 +243,10 @@ export function GrabOnPopularOffers() {
                       target="_blank"
                       rel="noopener sponsored nofollow"
                       onClick={(e) => handleCopy(deal.couponCode, deal.brandName, deal.affiliateUrl, e)}
-                      className={`flex-1 inline-flex items-stretch h-9 sm:h-10 rounded-lg sm:rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all active:scale-[0.98] cursor-pointer min-w-0 ${
+                      className={`flex-1 inline-flex items-stretch h-9 sm:h-10 rounded-xl sm:rounded-2xl overflow-hidden border border-indigo-200/50 dark:border-indigo-900/50 shadow-xs hover:shadow-md transition-all active:scale-[0.98] cursor-pointer min-w-0 select-none ${
                         isCopied
-                          ? "bg-emerald-600 text-white"
-                          : "bg-primary text-white hover:brightness-105"
+                          ? "bg-emerald-600 text-white ring-2 ring-emerald-500/30"
+                          : "bg-[#3f38d6] dark:bg-indigo-600 hover:bg-[#352fc4] text-white"
                       }`}
                       title={`Copy ${deal.couponCode} and open ${deal.brandName}`}
                     >
@@ -254,13 +254,13 @@ export function GrabOnPopularOffers() {
                       <div className="flex-1 flex items-center justify-center gap-1.5 px-2 text-[11px] sm:text-xs font-bold tracking-wide">
                         {isCopied ? (
                           <>
-                            <Check className="w-3.5 h-3.5 animate-bounce shrink-0" />
+                            <Check className="w-3.5 h-3.5 animate-bounce shrink-0 stroke-[2.5]" />
                             <span className="truncate">COPIED!</span>
                           </>
                         ) : (
                           <>
-                            <Copy className="w-3.5 h-3.5 shrink-0" />
-                            <span className="truncate uppercase font-display">
+                            <Copy className="w-3.5 h-3.5 shrink-0 stroke-[2.2]" />
+                            <span className="truncate uppercase font-sans font-bold tracking-wider">
                               {deal.discountText && deal.discountText !== "Verified Deal"
                                 ? `REDEEM ${deal.discountText}`
                                 : "REDEEM CODE"}
@@ -271,10 +271,10 @@ export function GrabOnPopularOffers() {
 
                       {/* Right Teaser Tab */}
                       <div
-                        className={`w-10 sm:w-12 shrink-0 flex items-center justify-center border-l select-none font-mono font-black text-xs tracking-wider ${
+                        className={`w-11 sm:w-13 shrink-0 flex items-center justify-center border-l select-none font-sans font-extrabold text-xs sm:text-sm tracking-widest ${
                           isCopied
                             ? "bg-emerald-700 text-white border-emerald-500/40"
-                            : "bg-slate-300/85 dark:bg-zinc-700/90 text-white border-white/20 drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]"
+                            : "bg-[#d4d4d8] dark:bg-zinc-700 text-white border-white/20 drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]"
                         }`}
                       >
                         {isCopied ? (

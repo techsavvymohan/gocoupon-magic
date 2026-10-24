@@ -259,24 +259,24 @@ export function MobileHeroInstantFinder() {
                     <button
                       type="button"
                       onClick={() => handleCopyAndOpen(deal)}
-                      className={`group/redeem relative w-full flex items-stretch h-11 sm:h-12 rounded-xl sm:rounded-2xl overflow-hidden shadow-md transition-all active:scale-[0.98] cursor-pointer touch-manipulation ${
+                      className={`group/redeem relative w-full flex items-stretch h-11 sm:h-12 rounded-xl sm:rounded-2xl overflow-hidden border border-indigo-200/50 dark:border-indigo-900/50 shadow-md shadow-indigo-500/10 transition-all active:scale-[0.98] cursor-pointer touch-manipulation select-none ${
                         isCopied
                           ? "bg-emerald-600 shadow-emerald-500/25 ring-2 ring-emerald-500/30"
-                          : "bg-primary shadow-primary/25 hover:shadow-lg hover:brightness-105"
+                          : "bg-[#3f38d6] dark:bg-indigo-600 hover:bg-[#352fc4] shadow-indigo-500/20"
                       }`}
                       aria-label={`Redeem coupon code ${deal.code} on ${deal.storeName}`}
                     >
                       {/* Left Action Strip */}
-                      <div className="flex-1 flex items-center justify-center gap-2 px-3 text-white font-extrabold text-xs sm:text-sm tracking-wide">
+                      <div className="flex-1 flex items-center justify-center gap-2 px-3 text-white font-bold text-xs sm:text-sm tracking-wide">
                         {isCopied ? (
                           <>
-                            <Check className="h-4 w-4 animate-bounce shrink-0" />
+                            <Check className="h-4 w-4 animate-bounce shrink-0 stroke-[2.5]" />
                             <span className="truncate">COPIED! OPENING STORE...</span>
                           </>
                         ) : (
                           <>
-                            <Copy className="h-4 w-4 shrink-0 transition-transform group-hover/redeem:scale-110" />
-                            <span className="truncate uppercase font-display tracking-wider">
+                            <Copy className="h-4 w-4 shrink-0 stroke-[2.2] transition-transform group-hover/redeem:scale-105" />
+                            <span className="truncate uppercase font-sans font-bold tracking-wider">
                               {deal.discountAmount && deal.discountAmount !== "Verified Deal"
                                 ? `REDEEM ${deal.discountAmount}`
                                 : "REDEEM CODE"}
@@ -287,16 +287,16 @@ export function MobileHeroInstantFinder() {
 
                       {/* Right Teaser Tab: Displays spaced last 2 characters of coupon code */}
                       <div
-                        className={`w-14 sm:w-16 shrink-0 flex items-center justify-center border-l transition-colors select-none font-mono font-black text-sm tracking-widest ${
+                        className={`w-14 sm:w-16 shrink-0 flex items-center justify-center border-l transition-colors select-none font-sans font-extrabold text-sm sm:text-base tracking-widest ${
                           isCopied
                             ? "bg-emerald-700/90 text-white border-emerald-500/40"
-                            : "bg-slate-300/85 dark:bg-zinc-700/90 text-white border-white/20 shadow-inner"
+                            : "bg-[#d4d4d8] dark:bg-zinc-700 text-white border-white/20 drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]"
                         }`}
                       >
                         {isCopied ? (
                           <span className="text-xs font-bold font-sans">100%</span>
                         ) : (
-                          <span className="drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]">
+                          <span>
                             {deal.code.length >= 2
                               ? `${deal.code.slice(-2, -1)} ${deal.code.slice(-1)}`
                               : deal.code}

@@ -452,24 +452,52 @@ export function HeroStoreDealSearch() {
 
                       {/* Right: Code & Action Button */}
                       <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                        {isDealCode && (
-                          <div className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                            <span>{deal.code}</span>
-                            {copiedCode === deal.code ? (
-                              <Check className="h-3 w-3 text-emerald-500 stroke-[3]" />
-                            ) : (
-                              <Copy className="h-3 w-3 opacity-70 group-hover:opacity-100" />
-                            )}
+                        {isDealCode ? (
+                          <div
+                            className={`inline-flex items-stretch h-9 rounded-xl overflow-hidden border border-indigo-200/50 dark:border-indigo-900/50 shadow-xs select-none transition-all ${
+                              copiedCode === deal.code
+                                ? "bg-emerald-600 text-white"
+                                : "bg-[#3f38d6] dark:bg-indigo-600 text-white hover:bg-[#352fc4]"
+                            }`}
+                          >
+                            <div className="flex items-center gap-1.5 px-3 py-1 font-bold text-xs">
+                              {copiedCode === deal.code ? (
+                                <>
+                                  <Check className="h-3.5 w-3.5 stroke-[2.5]" />
+                                  <span>COPIED!</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="h-3.5 w-3.5 stroke-[2.2]" />
+                                  <span className="font-sans uppercase">REDEEM</span>
+                                </>
+                              )}
+                            </div>
+                            <div
+                              className={`w-11 shrink-0 border-l border-white/20 flex items-center justify-center font-sans font-extrabold text-xs tracking-wider select-none ${
+                                copiedCode === deal.code
+                                  ? "bg-emerald-700 text-white"
+                                  : "bg-[#d4d4d8] dark:bg-zinc-700 text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]"
+                              }`}
+                            >
+                              <span>
+                                {copiedCode === deal.code
+                                  ? "✓"
+                                  : deal.code.length >= 2
+                                  ? `${deal.code.slice(-2, -1)} ${deal.code.slice(-1)}`
+                                  : deal.code}
+                              </span>
+                            </div>
                           </div>
+                        ) : (
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 text-xs font-bold shadow-2xs transition-all cursor-pointer shrink-0"
+                          >
+                            <span>Redeem Deal</span>
+                            <ArrowRight className="h-3.5 w-3.5" />
+                          </button>
                         )}
-
-                        <button
-                          type="button"
-                          className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 text-xs font-bold shadow-2xs transition-all cursor-pointer shrink-0"
-                        >
-                          <span>Redeem Deal</span>
-                          <ArrowRight className="h-3 w-3" />
-                        </button>
                       </div>
                     </div>
                   );

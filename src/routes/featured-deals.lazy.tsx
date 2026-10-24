@@ -501,51 +501,64 @@ function FeaturedDealsPage() {
                         </p>
                       </div>
 
-                      {/* Coupon Code Block */}
-                      <div className="mt-3 sm:mt-4 rounded-xl border border-dashed border-border/90 bg-muted/30 p-2.5 sm:p-3">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="min-w-0">
-                            <span className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground block">
-                              Coupon Code
-                            </span>
-                            <span className="font-mono text-xs sm:text-sm md:text-base font-bold tracking-wider text-foreground select-all truncate block">
-                              {item.couponCode}
-                            </span>
-                          </div>
-
-                          <a
-                            href={buildDealRedirectUrl({
-                              url: item.affiliateUrl || item.merchantUrl,
-                              dealId: item.id || item.campaignId,
-                              storeName: item.brandName,
-                              storeSlug: item.brandSlug,
-                              title: item.subTitle || item.discountText,
-                              code: item.couponCode,
-                              source: "featured_deals_copy",
-                            })}
-                            target="_blank"
-                            rel="noopener sponsored nofollow"
-                            onClick={(e) => handleCopyCode(item, e)}
-                            className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-1.5 font-mono text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${
-                              isCopied
-                                ? "bg-emerald-600 text-white"
-                                : "bg-primary text-primary-foreground hover:opacity-90 active:scale-95"
-                            }`}
-                            title={`Copy ${item.couponCode} and open ${item.brandName}`}
-                          >
+                      {/* Unified High-Converting Stub Button: [ REDEEM DISCOUNT ] [ 2 6 ] */}
+                      <div className="mt-3 sm:mt-4">
+                        <a
+                          href={buildDealRedirectUrl({
+                            url: item.affiliateUrl || item.merchantUrl,
+                            dealId: item.id || item.campaignId,
+                            storeName: item.brandName,
+                            storeSlug: item.brandSlug,
+                            title: item.subTitle || item.discountText,
+                            code: item.couponCode,
+                            source: "featured_deals_copy",
+                          })}
+                          target="_blank"
+                          rel="noopener sponsored nofollow"
+                          onClick={(e) => handleCopyCode(item, e)}
+                          className={`group/stub relative w-full flex items-stretch h-11 sm:h-12 rounded-xl sm:rounded-2xl overflow-hidden border border-indigo-200/50 dark:border-indigo-900/50 shadow-md shadow-indigo-500/10 hover:shadow-lg transition-all active:scale-[0.98] select-none cursor-pointer ${
+                            isCopied
+                              ? "bg-emerald-600 ring-2 ring-emerald-500/30"
+                              : "bg-[#3f38d6] dark:bg-indigo-600 hover:bg-[#352fc4]"
+                          }`}
+                          title={`Copy ${item.couponCode} and open ${item.brandName}`}
+                        >
+                          {/* Left Action Button (vibrant royal indigo-blue) */}
+                          <div className="flex-1 min-w-0 flex items-center justify-center gap-2 px-3 text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-colors">
                             {isCopied ? (
                               <>
-                                <Check className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                                <span>Copied!</span>
+                                <Check className="h-4 w-4 stroke-[2.5] text-white animate-bounce shrink-0" />
+                                <span className="truncate">COPIED! OPENING STORE...</span>
                               </>
                             ) : (
                               <>
-                                <Copy className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                                <span>Copy</span>
+                                <Copy className="h-4 w-4 stroke-[2.2] text-white shrink-0 group-hover/stub:scale-105 transition-transform" />
+                                <span className="truncate font-sans font-bold">
+                                  {item.discountText && item.discountText !== "Deal"
+                                    ? `REDEEM ${item.discountText.replace(/₹/g, "RS ").toUpperCase()}`
+                                    : "REDEEM CODE"}
+                                </span>
                               </>
                             )}
-                          </a>
-                        </div>
+                          </div>
+
+                          {/* Right Teaser Tab: Solid light silver background with bold white spaced digits (e.g. 2  6) */}
+                          <div
+                            className={`w-14 sm:w-16 shrink-0 border-l border-white/20 flex items-center justify-center font-sans font-extrabold text-sm sm:text-base text-white tracking-widest select-none drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)] ${
+                              isCopied
+                                ? "bg-emerald-700/90 text-white"
+                                : "bg-[#d4d4d8] dark:bg-zinc-700 text-white"
+                            }`}
+                          >
+                            <span>
+                              {isCopied
+                                ? "100%"
+                                : item.couponCode.length >= 2
+                                ? `${item.couponCode.slice(-2, -1)} ${item.couponCode.slice(-1)}`
+                                : item.couponCode}
+                            </span>
+                          </div>
+                        </a>
                       </div>
                     </div>
 

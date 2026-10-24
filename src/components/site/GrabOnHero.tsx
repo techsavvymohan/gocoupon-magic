@@ -422,35 +422,35 @@ export function GrabOnHero() {
                                 target="_blank"
                                 rel="noopener sponsored nofollow"
                                 onClick={(e) => handleCopy(deal.couponCode, deal.brandName, deal.affiliateUrl || deal.merchantUrl, e)}
-                                className={`inline-flex items-stretch h-11 sm:h-12 rounded-xl sm:rounded-2xl overflow-hidden shadow-lg active:scale-95 transition-all group cursor-pointer ${
+                                className={`inline-flex items-stretch h-11 sm:h-12 rounded-xl sm:rounded-2xl overflow-hidden border border-indigo-200/50 dark:border-indigo-900/50 shadow-lg active:scale-95 transition-all group/hero cursor-pointer select-none ${
                                   copiedCode === deal.couponCode
                                     ? "bg-emerald-600 ring-2 ring-emerald-500/40"
-                                    : "bg-primary hover:brightness-105"
+                                    : "bg-[#3f38d6] dark:bg-indigo-600 hover:bg-[#352fc4]"
                                 }`}
                                 title={`Copy ${deal.couponCode} and open ${deal.brandName}`}
                               >
                                 <div className="flex items-center gap-2 px-3 sm:px-4 py-2 font-bold text-xs sm:text-sm text-white">
                                   {copiedCode === deal.couponCode ? (
                                     <>
-                                      <Check className="w-4 h-4 text-white animate-bounce shrink-0" />
+                                      <Check className="w-4 h-4 text-white animate-bounce shrink-0 stroke-[2.5]" />
                                       <span className="font-extrabold tracking-wide">
                                         COPIED! OPENING STORE...
                                       </span>
                                     </>
                                   ) : (
                                     <>
-                                      <Copy className="w-4 h-4 text-white shrink-0" />
-                                      <span className="uppercase font-display tracking-wider">
+                                      <Copy className="w-4 h-4 text-white shrink-0 stroke-[2.2]" />
+                                      <span className="uppercase font-sans font-bold tracking-wider">
                                         {deal.discountText ? `REDEEM ${deal.discountText}` : "REDEEM CODE"}
                                       </span>
                                     </>
                                   )}
                                 </div>
                                 <div
-                                  className={`w-14 sm:w-16 shrink-0 flex items-center justify-center border-l select-none font-mono font-black text-sm tracking-widest ${
+                                  className={`w-14 sm:w-16 shrink-0 flex items-center justify-center border-l select-none font-sans font-extrabold text-sm sm:text-base tracking-widest ${
                                     copiedCode === deal.couponCode
                                       ? "bg-emerald-700 text-white border-emerald-500/30"
-                                      : "bg-slate-300/85 dark:bg-zinc-700/90 text-white border-white/20 shadow-inner"
+                                      : "bg-[#d4d4d8] dark:bg-zinc-700 text-white border-white/20 drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]"
                                   }`}
                                 >
                                   {copiedCode === deal.couponCode ? (
