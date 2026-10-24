@@ -138,6 +138,9 @@ export async function handleDealRedirect(req: Request, res: Response) {
       godaddy: "https://www.godaddy.com",
       kinguin: "https://www.kinguin.net",
       g2a: "https://www.g2a.com",
+      dhgate: "https://www.dhgate.com",
+      alibaba: "https://www.alibaba.com",
+      ashford: "https://www.ashford.com",
     };
 
     let resolvedFallback: string | null = null;
