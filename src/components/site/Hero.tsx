@@ -6,9 +6,11 @@
 import { Link } from "@tanstack/react-router";
 import { ShieldCheck, ArrowRight } from "lucide-react";
 import { useFestiveBanner } from "@/lib/hero-banner";
+import { useLiveStats } from "@/hooks/use-live-stats";
 
 export function Hero() {
   const { banner, isActive, styles } = useFestiveBanner();
+  const liveStats = useLiveStats();
 
   return (
     <section className="relative overflow-hidden pt-8 sm:pt-12 pb-10 sm:pb-14">
@@ -58,7 +60,7 @@ export function Hero() {
             <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
           </span>
           <span>
-            <strong className="font-semibold text-foreground">100% Verified:</strong> 980+ live codes tested today across 240+ partner stores with instant 1-click tracking.
+            <strong className="font-semibold text-foreground">100% Verified:</strong> {liveStats.formattedCount} live codes tested today across {liveStats.formattedStoresCount} partner stores with instant 1-click tracking.
           </span>
         </div>
 
@@ -87,7 +89,7 @@ export function Hero() {
             to="/offers"
             className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-border bg-card/80 px-5 py-2.5 text-xs sm:text-sm font-semibold text-foreground hover:bg-muted active:scale-95 transition-all shadow-2xs touch-manipulation focus-visible:ring-2 focus-visible:ring-primary"
           >
-            <span>Explore All 980+ Deals</span>
+            <span>Explore All {liveStats.formattedCount} Deals</span>
             <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
           </Link>
         </div>

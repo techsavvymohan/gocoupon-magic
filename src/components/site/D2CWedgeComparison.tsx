@@ -5,14 +5,16 @@
  */
 
 import { Check, X, Sparkles } from "lucide-react";
+import { useLiveStats } from "@/hooks/use-live-stats";
 
 export function D2CWedgeComparison() {
+  const liveStats = useLiveStats();
   const rows = [
     {
       feature: "Indian D2C Checkouts",
       honey: "Fails on 80% of local carts",
       blogs: "Broken copy-paste codes",
-      gocoupon: "240+ D2C Brands Supported",
+      gocoupon: `${liveStats.formattedStoresCount} D2C Brands Supported`,
       gocouponDetail: "The Souled Store, boAt, Mamaearth, Snitch & more",
     },
     {

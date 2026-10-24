@@ -20,6 +20,7 @@ import { FEATURED_DEALS_COLLECTION, type FeaturedDealItem } from "@/data/feature
 import { StoreLogo } from "@/components/common/StoreLogo";
 import { useDeals } from "@/hooks/use-deals";
 import { useInternationalDeals } from "@/hooks/use-international-deals";
+import { useLiveStats } from "@/hooks/use-live-stats";
 import { buildDealRedirectUrl } from "@/lib/services/store-registry";
 
 // Signature programmatic CSS gradients for top partner brands (Zero graphic banner required)
@@ -68,6 +69,7 @@ function getCardThemeForBrand(brandSlug: string): string {
 }
 
 export function GrabOnPopularOffers() {
+  const liveStats = useLiveStats();
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   // Live deals hooks from Cuelinks, Admitad & CJ APIs for dynamic auto-updates
@@ -176,7 +178,7 @@ export function GrabOnPopularOffers() {
             to="/offers"
             className="inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-primary hover:text-primary/80 transition-colors group self-start sm:self-auto"
           >
-            <span>Explore All 1,068+ Offers</span>
+            <span>Explore All {liveStats.formattedCount} Offers</span>
             <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:translate-x-1 duration-200" />
           </Link>
         </div>

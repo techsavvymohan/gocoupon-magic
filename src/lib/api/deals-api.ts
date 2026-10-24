@@ -282,6 +282,8 @@ export interface LiveTelemetryStats {
   formattedCount: string;
   dealsUpdatedLabel: string;
   browseButtonLabel: string;
+  totalStores: number;
+  formattedStoresCount: string;
   lastSyncedAt?: string;
 }
 
@@ -294,6 +296,7 @@ export async function fetchLiveStats(): Promise<LiveTelemetryStats> {
     if (res.ok) {
       const data = await res.json();
       if (data && data.totalDeals) {
+        const totalStoresNum = Number(data.totalStores || 382);
         return {
           totalDeals: Number(data.totalDeals),
           verifiedCount: Number(data.verifiedCount || data.totalDeals),
@@ -302,20 +305,25 @@ export async function fetchLiveStats(): Promise<LiveTelemetryStats> {
           formattedCount: String(data.formattedCount || `${Number(data.totalDeals).toLocaleString()}+`),
           dealsUpdatedLabel: String(data.dealsUpdatedLabel || `Updated Today: ${Number(data.totalDeals).toLocaleString()}+ Deals`),
           browseButtonLabel: String(data.browseButtonLabel || `Browse ${Number(data.totalDeals).toLocaleString()}+ Deals →`),
+          totalStores: totalStoresNum,
+          formattedStoresCount: String(data.formattedStoresCount || `${totalStoresNum}+`),
           lastSyncedAt: data.lastSyncedAt,
         };
       }
     }
   } catch {}
 
-  const baseCount = 1625;
+  const baseCount = 1718;
+  const baseStores = 382;
   return {
     totalDeals: baseCount,
-    verifiedCount: 1623,
+    verifiedCount: 1690,
     verificationRate: "96.2%",
     autoApplySpeed: "1.4s",
     formattedCount: `${baseCount.toLocaleString()}+`,
     dealsUpdatedLabel: `Updated Today: ${baseCount.toLocaleString()}+ Deals`,
     browseButtonLabel: `Browse ${baseCount.toLocaleString()}+ Deals →`,
+    totalStores: baseStores,
+    formattedStoresCount: `${baseStores}+`,
   };
 }

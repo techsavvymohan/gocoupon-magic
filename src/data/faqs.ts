@@ -2,7 +2,7 @@ export const couponFaqs = [
   {
     question: "Is GoCoupon really 100% free to use?",
     answer:
-      "Yes, 100% free forever. There are no paid subscriptions, no hidden charges, and no account or credit card required. You get unlimited access to verified promo codes across 240+ partner stores, 1-click auto-apply with our Chrome extension, and bank card discount stacking.",
+      "Yes, 100% free forever. There are no paid subscriptions, no hidden charges, and no account or credit card required. You get unlimited access to verified promo codes across 380+ partner stores, 1-click auto-apply with our Chrome extension, and bank card discount stacking.",
   },
   {
     question: "How does GoCoupon's Smart Store & Deal Search Bar work?",
@@ -12,7 +12,7 @@ export const couponFaqs = [
   {
     question: "How does the 1-click coupon auto-apply Chrome extension work?",
     answer:
-      "When you install the free GoCoupon Chrome extension, it sits quietly in your browser. Whenever you visit the cart or checkout page of Amazon, Flipkart, Myntra, or 240+ supported stores, GoCoupon pops up, tests all verified working promo codes in parallel in under 2 seconds, and automatically applies the single code that saves you the most money.",
+      "When you install the free GoCoupon Chrome extension, it sits quietly in your browser. Whenever you visit the cart or checkout page of Amazon, Flipkart, Myntra, or 380+ supported stores, GoCoupon pops up, tests all verified working promo codes in parallel in under 2 seconds, and automatically applies the single code that saves you the most money.",
   },
   {
     question: "How are deals and promo codes verified on GoCoupon?",
@@ -37,7 +37,7 @@ export const couponFaqs = [
   {
     question: "Is GoCoupon also known as Go Coupon or GoCoupons?",
     answer:
-      "Yes! Whether you search for GoCoupon, Go Coupon, or GoCoupons (gocoupon.io), you reach the official platform. GoCoupon is 100% free forever, aggregating over 980+ live verified deals, 240+ partner stores, and exclusive promo codes updated daily.",
+      "Yes! Whether you search for GoCoupon, Go Coupon, or GoCoupons (gocoupon.io), you reach the official platform. GoCoupon is 100% free forever, aggregating over 1,700+ live verified deals, 380+ partner stores, and exclusive promo codes updated daily.",
   },
 ] as const;
 

@@ -7,6 +7,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { useDeals } from "@/hooks/use-deals";
+import { useLiveStats } from "@/hooks/use-live-stats";
 import { Flame, ArrowRight, X, Tag } from "lucide-react";
 
 const STORAGE_KEY = "gocoupon_offers_announcement_v1";
@@ -16,6 +17,7 @@ export function AnnouncementBar() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const liveStats = useLiveStats();
 
   // Auto-fetch real live deals and live total count from the API
   const { deals, total } = useDeals({ limit: 8, sortBy: "trending" });
@@ -60,7 +62,7 @@ export function AnnouncementBar() {
 
   const isOverview = currentIndex === 0 || !deals || deals.length === 0;
   const currentDeal = !isOverview && deals ? deals[currentIndex - 1] : null;
-  const totalCount = total > 0 ? `${total}+` : "980+";
+  const totalCount = total > 0 ? `${total}+` : (liveStats.formattedCount || "1,700+");
 
   return (
     <div
@@ -92,8 +94,8 @@ export function AnnouncementBar() {
               {/* Dynamic Live Headline */}
               <span className="truncate">
                 <strong className="font-extrabold text-white">{totalCount} Verified Live Deals</strong>
-                <span className="hidden sm:inline"> across 240+ Merchant Stores &amp; Extra 10% Bank Offers</span>
-                <span className="sm:hidden"> &amp; 240+ Stores</span>
+                <span className="hidden sm:inline"> across {liveStats.formattedStoresCount} Merchant Stores &amp; Extra 10% Bank Offers</span>
+                <span className="sm:hidden"> &amp; {liveStats.formattedStoresCount} Stores</span>
               </span>
 
               {/* Action CTA */}

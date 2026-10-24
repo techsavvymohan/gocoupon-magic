@@ -14,6 +14,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useDeals } from "@/hooks/use-deals";
+import { useLiveStats } from "@/hooks/use-live-stats";
 import { buildDealRedirectUrl } from "@/lib/services/store-registry";
 import type { Deal } from "@/lib/api/deals-api";
 import { Tag, Copy, Check, ExternalLink, ArrowRight, ShieldCheck } from "lucide-react";
@@ -184,6 +185,7 @@ function CarouselDealCard({
 }
 
 export function AnimatedDealsCarousel() {
+  const liveStats = useLiveStats();
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   // Fetch real live deals directly from /api/deals
@@ -234,7 +236,7 @@ export function AnimatedDealsCarousel() {
           to="/offers"
           className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider text-primary hover:underline shrink-0"
         >
-          <span>Explore All 980+ Deals</span>
+          <span>Explore All {liveStats.formattedCount} Deals</span>
           <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>

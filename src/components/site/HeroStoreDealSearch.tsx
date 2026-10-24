@@ -21,6 +21,7 @@ import {
   type RegisteredStore,
 } from "@/lib/services/store-registry";
 import { fetchDeals, type Deal } from "@/lib/api/deals-api";
+import { useLiveStats } from "@/hooks/use-live-stats";
 import {
   Search,
   ArrowRight,
@@ -102,6 +103,7 @@ function resolveStoreLogo(store: { name: string; domain?: string; logo?: string 
 
 export function HeroStoreDealSearch() {
   const navigate = useNavigate();
+  const liveStats = useLiveStats();
   const [query, setQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [matchingStores, setMatchingStores] = useState<RegisteredStore[]>([]);
@@ -517,7 +519,7 @@ export function HeroStoreDealSearch() {
                 onClick={() => navigate({ to: "/offers" })}
                 className="mt-2.5 inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline cursor-pointer"
               >
-                <span>Browse all 980+ live offers in Offers Hub</span>
+                <span>Browse all {liveStats.formattedCount} live offers in Offers Hub</span>
                 <ArrowRight className="h-3 w-3" />
               </button>
             </div>
@@ -542,7 +544,7 @@ export function HeroStoreDealSearch() {
                 onClick={() => navigate({ to: "/offers" })}
                 className="font-bold text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
               >
-                <span>View All 980+ Deals</span>
+                <span>View All {liveStats.formattedCount} Deals</span>
                 <ArrowRight className="h-3 w-3" />
               </button>
             </div>

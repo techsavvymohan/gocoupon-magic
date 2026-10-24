@@ -8,13 +8,15 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchLiveStats, type LiveTelemetryStats } from "@/lib/api/deals-api";
 
 const DEFAULT_STATS: LiveTelemetryStats = {
-  totalDeals: 1625,
-  verifiedCount: 1623,
+  totalDeals: 1718,
+  verifiedCount: 1690,
   verificationRate: "96.4%",
   autoApplySpeed: "1.4s",
-  formattedCount: "1,620+",
-  dealsUpdatedLabel: "Updated Today: 1,620+ Deals",
-  browseButtonLabel: "Browse 1,620+ Deals →",
+  formattedCount: "1,700+",
+  dealsUpdatedLabel: "Updated Today: 1,700+ Deals",
+  browseButtonLabel: "Browse 1,700+ Deals →",
+  totalStores: 382,
+  formattedStoresCount: "380+",
 };
 
 export function useLiveStats(): LiveTelemetryStats {

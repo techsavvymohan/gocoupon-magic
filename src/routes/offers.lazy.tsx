@@ -93,7 +93,7 @@ const SORT_OPTIONS: { id: DealSortField; label: string; icon: any; color: string
 const SIDEBAR_TABS: { id: SidebarTab; label: string; icon: any; badge?: string }[] = [
   { id: "categories", label: "Categories", icon: Grid, badge: "8" },
   { id: "brands", label: "Brands", icon: Tag, badge: "Popular" },
-  { id: "stores", label: "Stores", icon: Store, badge: "240+" },
+  { id: "stores", label: "Stores", icon: Store, badge: "380+" },
   { id: "banks", label: "Banks", icon: Landmark, badge: "Extra 10%" },
   { id: "product-deals", label: "Product Deals", icon: ShoppingBag },
 ];
@@ -840,7 +840,7 @@ function OffersHubPage() {
 
               <div className="border-l border-border/80 pl-4 sm:pl-6">
                 <div className="font-mono text-base sm:text-lg font-black text-foreground">
-                  {allDeals.length > 0 ? allDeals.length.toLocaleString() : "966"}
+                  {allDeals.length > 0 ? allDeals.length.toLocaleString() : "1,700+"}
                 </div>
                 <div className="text-[11px] text-muted-foreground font-medium">Total Coupons &amp; Offers</div>
               </div>

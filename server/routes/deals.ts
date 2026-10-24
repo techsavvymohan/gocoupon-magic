@@ -452,6 +452,9 @@ dealsRouter.get("/stats", (_req: Request, res: Response) => {
     : 95.4;
   const verificationRate = `${verificationRateNum.toFixed(1)}%`;
   const formattedCount = `${totalDeals.toLocaleString()}+`;
+  const allStores = typeof (storesDb as any).getAllStores === "function" ? (storesDb as any).getAllStores() : [];
+  const totalStores = allStores.length > 0 ? allStores.length : 382;
+  const formattedStoresCount = `${totalStores}+`;
 
   res.setHeader("Cache-Control", "public, max-age=60, s-maxage=120");
   res.json({
@@ -462,6 +465,8 @@ dealsRouter.get("/stats", (_req: Request, res: Response) => {
     verificationRate,
     autoApplySpeed: "1.4s",
     formattedCount,
+    totalStores,
+    formattedStoresCount,
     dealsUpdatedLabel: `Updated Today: ${formattedCount} Deals`,
     browseButtonLabel: `Browse ${formattedCount} Deals →`,
     is24x7Active: true,

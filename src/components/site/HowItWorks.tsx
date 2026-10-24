@@ -21,45 +21,48 @@ import {
   FileText,
   Zap,
 } from "lucide-react";
+import { useLiveStats } from "@/hooks/use-live-stats";
 
-const SHOPPING_STEPS = [
-  {
-    step: "01",
-    tag: "SMART SEARCH BAR",
-    title: "Instant Store & Deal Finder",
-    summary:
-      "Search any brand or category in 1 second. Type Booking.com, Myntra, or Swiggy, or search deals like Shoes, Hotels, or Flights to instantly see verified promo codes and active discounts with 1-click auto-copy.",
-    proof: "Instant autocomplete across 240+ partner stores and 980+ live API deals.",
-    icon: Search,
-  },
-  {
-    step: "02",
-    tag: "CHROME EXTENSION",
-    title: "1-Click Auto-Apply at Checkout",
-    summary:
-      "Never search for coupon codes manually again. When you reach checkout on Amazon, Flipkart, Myntra, or 240+ stores, GoCoupon's free browser extension tests all active codes in parallel and applies the highest savings automatically.",
-    proof: "Applies working promo codes in under 2 seconds with zero popup spam.",
-    icon: Zap,
-  },
-  {
-    step: "03",
-    tag: "LIVE VERIFIED DEALS",
-    title: "980+ Promo Codes Synced 24/7",
-    summary:
-      "Stop wasting time on expired coupon sites. GoCoupon connects directly to official merchant affiliate networks and checkout endpoints around the clock, testing and verifying every discount code so dead vouchers are purged immediately.",
-    proof: "Live sync every 15 minutes across 240+ stores with zero broken links.",
-    icon: TrendingDown,
-  },
-  {
-    step: "04",
-    tag: "BANK CARD STACKING",
-    title: "Extra 10% Instant Card Savings",
-    summary:
-      "Maximize every purchase by pairing store discount codes with instant bank partner promotions. GoCoupon highlights whether HDFC, ICICI, SBI, Axis, or Amex unlocks an additional 5% to 15% off at final payment.",
-    proof: "Calculates stacked savings before you pay without ever asking for card details.",
-    icon: CreditCard,
-  },
-];
+function getShoppingSteps(stats: { formattedCount: string; formattedStoresCount: string }) {
+  return [
+    {
+      step: "01",
+      tag: "SMART SEARCH BAR",
+      title: "Instant Store & Deal Finder",
+      summary:
+        "Search any brand or category in 1 second. Type Booking.com, Myntra, or Swiggy, or search deals like Shoes, Hotels, or Flights to instantly see verified promo codes and active discounts with 1-click auto-copy.",
+      proof: `Instant autocomplete across ${stats.formattedStoresCount} partner stores and ${stats.formattedCount} live API deals.`,
+      icon: Search,
+    },
+    {
+      step: "02",
+      tag: "CHROME EXTENSION",
+      title: "1-Click Auto-Apply at Checkout",
+      summary:
+        `Never search for coupon codes manually again. When you reach checkout on Amazon, Flipkart, Myntra, or ${stats.formattedStoresCount} stores, GoCoupon's free browser extension tests all active codes in parallel and applies the highest savings automatically.`,
+      proof: "Applies working promo codes in under 2 seconds with zero popup spam.",
+      icon: Zap,
+    },
+    {
+      step: "03",
+      tag: "LIVE VERIFIED DEALS",
+      title: `${stats.formattedCount} Promo Codes Synced 24/7`,
+      summary:
+        "Stop wasting time on expired coupon sites. GoCoupon connects directly to official merchant affiliate networks and checkout endpoints around the clock, testing and verifying every discount code so dead vouchers are purged immediately.",
+      proof: `Live sync every 15 minutes across ${stats.formattedStoresCount} stores with zero broken links.`,
+      icon: TrendingDown,
+    },
+    {
+      step: "04",
+      tag: "BANK CARD STACKING",
+      title: "Extra 10% Instant Card Savings",
+      summary:
+        "Maximize every purchase by pairing store discount codes with instant bank partner promotions. GoCoupon highlights whether HDFC, ICICI, SBI, Axis, or Amex unlocks an additional 5% to 15% off at final payment.",
+      proof: "Calculates stacked savings before you pay without ever asking for card details.",
+      icon: CreditCard,
+    },
+  ];
+}
 
 const SEARCH_INTENT_GUIDES = [
   {
@@ -98,6 +101,9 @@ const POPULAR_SEARCH_TOPICS = [
 ];
 
 export function HowItWorks() {
+  const liveStats = useLiveStats();
+  const shoppingSteps = getShoppingSteps(liveStats);
+
   return (
     <section
       id="how-it-works"
@@ -123,7 +129,7 @@ export function HowItWorks() {
 
         {/* 4 Plain-English Pillars Grid */}
         <div className="mt-8 sm:mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {SHOPPING_STEPS.map((pillar) => {
+          {shoppingSteps.map((pillar) => {
             const Icon = pillar.icon;
             return (
               <article

@@ -20,6 +20,7 @@ import { StoreLogo } from "@/components/common/StoreLogo";
 import { useFestiveBanner } from "@/lib/hero-banner";
 import { useDeals } from "@/hooks/use-deals";
 import { useInternationalDeals } from "@/hooks/use-international-deals";
+import { useLiveStats } from "@/hooks/use-live-stats";
 import { findStoreByNameOrSlug } from "@/lib/services/store-registry";
 
 // Color palettes for hero banner slides to give each brand an authentic, vibrant look
@@ -178,6 +179,7 @@ const SIDE_PICKS = [
 ];
 
 export function GrabOnHero() {
+  const liveStats = useLiveStats();
   const { banner: festiveBanner, isActive: isFestiveBannerActive, styles: festiveStyles } = useFestiveBanner();
   const { deals: liveIndiaDeals } = useDeals({ limit: 40 });
   const { deals: liveIntlDeals } = useInternationalDeals();
@@ -674,7 +676,7 @@ export function GrabOnHero() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              1,084+ Live Verified Deals
+              {liveStats.formattedCount} Live Verified Deals
             </span>
             <span className="text-border">•</span>
             <span className="hidden xs:inline">100% Tested Daily</span>

@@ -157,7 +157,7 @@ export function MobileHeroInstantFinder() {
         <div className="pt-1">
           <div className="relative rounded-2xl border-2 border-primary/30 bg-card p-1.5 shadow-lg shadow-primary/5">
             <NavbarSearch
-              placeholder="Search 240+ stores (boAt, Swiggy, Myntra)..."
+              placeholder={`Search ${stats.formattedStoresCount} stores (boAt, Swiggy, Myntra)...`}
               className="w-full"
             />
           </div>
@@ -174,7 +174,7 @@ export function MobileHeroInstantFinder() {
               to="/stores"
               className="text-primary text-[11px] font-bold hover:underline flex items-center gap-0.5"
             >
-              <span>View All 240+</span>
+              <span>View All {stats.formattedStoresCount}</span>
               <ChevronRight className="h-3 w-3" />
             </Link>
           </div>

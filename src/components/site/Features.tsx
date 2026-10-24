@@ -7,41 +7,47 @@ import {
   Search,
   TrendingDown,
 } from "lucide-react";
+import { useLiveStats } from "@/hooks/use-live-stats";
 
-const features = [
-  {
-    title: "Smart Store & Deal Search Engine",
-    body: "Search across 240+ partner stores (Booking.com, Myntra, Swiggy, Amazon) or find deals by keyword (Shoes, Hotels, Flights) with instant 1-click coupon auto-copy.",
-    icon: Search,
-  },
-  {
-    title: "1-Click Auto-Apply Chrome Extension",
-    body: "Never type coupon codes manually. When you reach checkout on 240+ stores, GoCoupon tests all working codes in parallel and applies the highest savings in under 2 seconds.",
-    icon: Zap,
-  },
-  {
-    title: "24/7 Live Verified Deals Sync",
-    body: "Connected directly to merchant affiliate APIs around the clock. Every deal is tested and timestamped live, automatically purging dead or expired vouchers.",
-    icon: TrendingDown,
-  },
-  {
-    title: "Bank & Credit Card Discount Stacking",
-    body: "Pair merchant coupon codes with exclusive bank partner offers (HDFC, SBI, ICICI, Axis, Amex) to unlock an extra 5% to 15% instant checkout savings.",
-    icon: Ticket,
-  },
-  {
-    title: "Zero 503 Outbound Redirection",
-    body: "Smart failover router guarantees you are never blocked by broken affiliate links or proxy downtime, ensuring seamless 1-click checkout hand-offs every time.",
-    icon: ShieldCheck,
-  },
-  {
-    title: "Bank-Grade Privacy & 100% Free Forever",
-    body: "Operates in a local sandboxed browser environment with zero keystroke logging, zero personal data collection, and no annoying spam popups.",
-    icon: Lock,
-  },
-];
+function getFeatures(stats: { formattedCount: string; formattedStoresCount: string }) {
+  return [
+    {
+      title: "Smart Store & Deal Search Engine",
+      body: `Search across ${stats.formattedStoresCount} partner stores (Booking.com, Myntra, Swiggy, Amazon) or find deals by keyword (Shoes, Hotels, Flights) with instant 1-click coupon auto-copy.`,
+      icon: Search,
+    },
+    {
+      title: "1-Click Auto-Apply Chrome Extension",
+      body: `Never type coupon codes manually. When you reach checkout on ${stats.formattedStoresCount} stores, GoCoupon tests all working codes in parallel and applies the highest savings in under 2 seconds.`,
+      icon: Zap,
+    },
+    {
+      title: "24/7 Live Verified Deals Sync",
+      body: "Connected directly to merchant affiliate APIs around the clock. Every deal is tested and timestamped live, automatically purging dead or expired vouchers.",
+      icon: TrendingDown,
+    },
+    {
+      title: "Bank & Credit Card Discount Stacking",
+      body: "Pair merchant coupon codes with exclusive bank partner offers (HDFC, SBI, ICICI, Axis, Amex) to unlock an extra 5% to 15% instant checkout savings.",
+      icon: Ticket,
+    },
+    {
+      title: "Zero 503 Outbound Redirection",
+      body: "Smart failover router guarantees you are never blocked by broken affiliate links or proxy downtime, ensuring seamless 1-click checkout hand-offs every time.",
+      icon: ShieldCheck,
+    },
+    {
+      title: "Bank-Grade Privacy & 100% Free Forever",
+      body: "Operates in a local sandboxed browser environment with zero keystroke logging, zero personal data collection, and no annoying spam popups.",
+      icon: Lock,
+    },
+  ];
+}
 
 export function Features() {
+  const liveStats = useLiveStats();
+  const featuresList = getFeatures(liveStats);
+
   return (
     <section id="features" className="relative px-4 sm:px-6 py-10 sm:py-14 overflow-hidden border-t border-border">
       <div className="mx-auto max-w-7xl">
@@ -56,7 +62,7 @@ export function Features() {
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((f, i) => {
+          {featuresList.map((f, i) => {
             const Icon = f.icon;
             return (
               <div

@@ -28,7 +28,7 @@ export const Route = createFileRoute("/")({
     createSeoHead({
       title: "GoCoupon — Verified Coupons, Promo Codes & Deals (2026) | 1-Click Auto-Apply Extension",
       description:
-        "Find verified working coupon codes, promo vouchers, and live merchant deals across 240+ online stores. Instant 1-tap coupon finder on mobile and free 1.4s auto-apply extension for desktop checkouts.",
+        "Find verified working coupon codes, promo vouchers, and live merchant deals across 380+ online stores. Instant 1-tap coupon finder on mobile and free 1.4s auto-apply extension for desktop checkouts.",
       path: "/",
       keywords:
         "coupons, promo codes, discount codes, verified coupons, working coupons today, chrome extension auto apply coupons, coupon code extension, amazon promo codes, myntra discount coupons, swiggy coupons, booking.com hotel discount, online shopping deals india 2026, gocoupon",

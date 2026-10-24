@@ -14,6 +14,7 @@ import { Link } from "@tanstack/react-router";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight, ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
 import { StoreLogo } from "@/components/common/StoreLogo";
+import { useLiveStats } from "@/hooks/use-live-stats";
 
 interface StoreItem {
   name: string;
@@ -74,6 +75,7 @@ const STORE_PAGES: StoreItem[][] = [
 ];
 
 export function GrabOnPopularStores() {
+  const liveStats = useLiveStats();
   const [currentPage, setCurrentPage] = useState(0);
   const [spotlight, setSpotlight] = useState<StoreItem>(SPOTLIGHT_STORE);
   const [spotlightBadge, setSpotlightBadge] = useState<string>("MOST POPULAR");
@@ -190,7 +192,7 @@ export function GrabOnPopularStores() {
               to="/stores"
               className="hidden md:inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline ml-2 group"
             >
-              <span>All 240+ Stores</span>
+              <span>All {liveStats.formattedStoresCount} Stores</span>
               <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
@@ -378,7 +380,7 @@ export function GrabOnPopularStores() {
                 to="/stores"
                 className="inline-flex items-center gap-1 text-xs font-bold text-primary"
               >
-                <span>View All 240+ Stores</span>
+                <span>View All {liveStats.formattedStoresCount} Stores</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>

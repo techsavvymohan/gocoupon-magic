@@ -22,6 +22,7 @@ import {
   FEATURED_DEALS_COLLECTION,
   type FeaturedDealItem,
 } from "@/data/featured-deals-campaign";
+import { useLiveStats } from "@/hooks/use-live-stats";
 import {
   ShieldCheck,
   Tag,
@@ -121,6 +122,7 @@ function mapDealToFeaturedItem(d: any, index: number): FeaturedDealItem {
 }
 
 function FeaturedDealsPage() {
+  const liveStats = useLiveStats();
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -764,8 +766,8 @@ function FeaturedDealsPage() {
             Looking for More Store Discounts?
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-            Explore 970+ live everyday deals, trending coupons, and store-specific promos across Flipkart,
-            Amazon, Myntra, Swiggy, and 240+ retail partners.
+            Explore {liveStats.formattedCount} live everyday deals, trending coupons, and store-specific promos across Flipkart,
+            Amazon, Myntra, Swiggy, and {liveStats.formattedStoresCount} retail partners.
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <Link
@@ -779,7 +781,7 @@ function FeaturedDealsPage() {
               to="/stores"
               className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-6 py-3 text-xs font-semibold text-foreground shadow-2xs hover:bg-muted/50"
             >
-              <span>Browse All 200+ Stores</span>
+              <span>Browse All {liveStats.formattedStoresCount} Stores</span>
             </Link>
           </div>
         </div>
