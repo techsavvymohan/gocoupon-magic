@@ -256,11 +256,32 @@ export function MobileHeroInstantFinder() {
 
                   {/* Promo Code & 1-Tap Copy Action Strip */}
                   <div className="flex items-center gap-2 pt-0.5">
-                    {/* Code Display Box */}
-                    <div className="flex items-center gap-1.5 rounded-xl border border-dashed border-primary/40 bg-primary/5 px-3 py-2 font-mono text-xs font-extrabold text-foreground shrink-0 select-all">
-                      <Tag className="h-3 w-3 text-primary" />
-                      <span>{deal.code}</span>
-                    </div>
+                    {/* Creative Masked Code Display Box: reveals only last 2 chars, clicks to copy */}
+                    <button
+                      type="button"
+                      onClick={() => handleCopyAndOpen(deal)}
+                      className={`group/code relative flex items-center gap-1.5 rounded-xl border border-dashed px-3 py-2 font-mono text-xs font-extrabold shrink-0 transition-all cursor-pointer active:scale-95 ${
+                        isCopied
+                          ? "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-2 ring-emerald-500/20"
+                          : "border-primary/40 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 hover:border-primary text-foreground"
+                      }`}
+                      title={isCopied ? "Code Copied!" : "Click to reveal & copy full code"}
+                      aria-label={isCopied ? `Code copied: ${deal.code}` : `Reveal and copy code for ${deal.storeName}`}
+                    >
+                      <Tag className={`h-3 w-3 shrink-0 ${isCopied ? "text-emerald-500 animate-pulse" : "text-primary group-hover/code:scale-110 transition-transform"}`} />
+                      {isCopied ? (
+                        <span className="font-extrabold tracking-wider animate-in fade-in zoom-in-95 duration-200">
+                          {deal.code}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-0.5 tracking-wider select-none font-bold">
+                          <span className="tracking-widest text-muted-foreground/60 font-black">••••</span>
+                          <span className="text-primary font-black bg-primary/10 px-1 py-0.5 rounded text-[11px]">
+                            {deal.code.length > 2 ? deal.code.slice(-2) : deal.code}
+                          </span>
+                        </span>
+                      )}
+                    </button>
 
                     {/* Big Touch-Friendly Copy Button (>=48px height) */}
                     <button
@@ -281,7 +302,7 @@ export function MobileHeroInstantFinder() {
                       ) : (
                         <>
                           <Copy className="h-3.5 w-3.5" />
-                          <span>Tap to Copy &amp; Go</span>
+                          <span>Copy</span>
                         </>
                       )}
                     </button>

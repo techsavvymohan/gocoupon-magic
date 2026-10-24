@@ -253,13 +253,22 @@ export function GrabOnPopularOffers() {
                       {isCopied ? (
                         <>
                           <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-bounce shrink-0" />
-                          <span className="truncate">Copied!</span>
+                          <span className="font-mono font-extrabold text-white truncate">{deal.couponCode}</span>
+                          <span className="text-[10px] font-bold">Copied!</span>
                         </>
                       ) : (
                         <>
                           <Tag className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary shrink-0" />
-                          <span className="font-mono tracking-wider truncate">{deal.couponCode}</span>
-                          <Copy className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-muted-foreground ml-auto shrink-0 hidden xs:inline" />
+                          <span className="font-mono tracking-wider truncate inline-flex items-center gap-0.5 select-none">
+                            <span className="tracking-widest text-muted-foreground/60 font-black">••••</span>
+                            <span className="text-primary font-black bg-primary/10 px-1 py-0.2 rounded">
+                              {deal.couponCode.length > 2 ? deal.couponCode.slice(-2) : deal.couponCode}
+                            </span>
+                          </span>
+                          <span className="ml-auto inline-flex items-center gap-0.5 text-primary font-bold text-[10px] bg-primary/10 px-1.5 py-0.5 rounded">
+                            <Copy className="w-2.5 h-2.5" />
+                            <span>Copy</span>
+                          </span>
                         </>
                       )}
                     </a>

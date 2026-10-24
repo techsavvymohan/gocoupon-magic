@@ -125,11 +125,24 @@ function CarouselDealCard({
             className="flex-1 rounded-xl border border-dashed border-primary/40 bg-primary/5 py-2 px-2 text-center text-xs font-mono font-bold text-primary hover:bg-primary/10 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             title={`Click to copy code and open ${deal.storeName}`}
           >
-            <span>{copiedCode === deal.code ? "Copied!" : deal.code}</span>
             {copiedCode === deal.code ? (
-              <Check className="h-3 w-3 text-emerald-500 stroke-[3]" />
+              <>
+                <span className="font-extrabold text-emerald-600 dark:text-emerald-400">{deal.code}</span>
+                <Check className="h-3 w-3 text-emerald-500 stroke-[3] animate-bounce" />
+              </>
             ) : (
-              <Copy className="h-3 w-3 opacity-60 group-hover:opacity-100" />
+              <>
+                <span className="inline-flex items-center gap-0.5 select-none">
+                  <span className="tracking-widest text-muted-foreground/60 font-black">••••</span>
+                  <span className="text-primary font-black bg-primary/10 px-1 py-0.2 rounded text-[11px]">
+                    {deal.code.length > 2 ? deal.code.slice(-2) : deal.code}
+                  </span>
+                </span>
+                <span className="inline-flex items-center gap-0.5 text-[10px] uppercase font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded ml-1">
+                  <Copy className="h-2.5 w-2.5" />
+                  <span>Copy</span>
+                </span>
+              </>
             )}
           </a>
         ) : (
