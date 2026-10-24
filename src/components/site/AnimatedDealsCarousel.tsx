@@ -122,28 +122,39 @@ function CarouselDealCard({
               e.stopPropagation();
               onCopy(deal.code, deal.storeName, redirectUrl, e);
             }}
-            className="flex-1 rounded-xl border border-dashed border-primary/40 bg-primary/5 py-2 px-2 text-center text-xs font-mono font-bold text-primary hover:bg-primary/10 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+            className={`flex-1 inline-flex items-stretch h-9 rounded-lg sm:rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all active:scale-[0.98] cursor-pointer ${
+              copiedCode === deal.code ? "bg-emerald-600 text-white" : "bg-primary text-white"
+            }`}
             title={`Click to copy code and open ${deal.storeName}`}
           >
-            {copiedCode === deal.code ? (
-              <>
-                <span className="font-extrabold text-emerald-600 dark:text-emerald-400">{deal.code}</span>
-                <Check className="h-3 w-3 text-emerald-500 stroke-[3] animate-bounce" />
-              </>
-            ) : (
-              <>
-                <span className="inline-flex items-center gap-0.5 select-none">
-                  <span className="tracking-widest text-muted-foreground/60 font-black">••••</span>
-                  <span className="text-primary font-black bg-primary/10 px-1 py-0.2 rounded text-[11px]">
-                    {deal.code.length > 2 ? deal.code.slice(-2) : deal.code}
+            <div className="flex-1 flex items-center justify-center gap-1.5 px-2 text-[11px] font-bold">
+              {copiedCode === deal.code ? (
+                <>
+                  <Check className="h-3 w-3 animate-bounce shrink-0" />
+                  <span>COPIED!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="h-3 w-3 shrink-0" />
+                  <span className="uppercase font-display">
+                    {deal.discount && deal.discount !== "Deal" ? `REDEEM ${deal.discount}` : "REDEEM CODE"}
                   </span>
-                </span>
-                <span className="inline-flex items-center gap-0.5 text-[10px] uppercase font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded ml-1">
-                  <Copy className="h-2.5 w-2.5" />
-                  <span>Copy</span>
-                </span>
-              </>
-            )}
+                </>
+              )}
+            </div>
+            <div
+              className={`w-10 shrink-0 flex items-center justify-center border-l select-none font-mono font-black text-xs tracking-wider ${
+                copiedCode === deal.code
+                  ? "bg-emerald-700 text-white border-emerald-500/40"
+                  : "bg-slate-300/85 dark:bg-zinc-700/90 text-white border-white/20 drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]"
+              }`}
+            >
+              {copiedCode === deal.code
+                ? "✓"
+                : deal.code.length >= 2
+                ? `${deal.code.slice(-2, -1)} ${deal.code.slice(-1)}`
+                : deal.code}
+            </div>
           </a>
         ) : (
           <div className="flex-1 rounded-xl bg-muted/60 py-2 px-2 text-center text-[11px] font-mono text-muted-foreground font-semibold">

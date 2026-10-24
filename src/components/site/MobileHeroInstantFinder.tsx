@@ -254,57 +254,55 @@ export function MobileHeroInstantFinder() {
                     </div>
                   </div>
 
-                  {/* Promo Code & 1-Tap Copy Action Strip */}
-                  <div className="flex items-center gap-2 pt-0.5">
-                    {/* Creative Masked Code Display Box: reveals only last 2 chars, clicks to copy */}
+                  {/* Unified High-Converting Stub Button: [ REDEEM DISCOUNT ] [ 2 0 ] */}
+                  <div className="pt-0.5">
                     <button
                       type="button"
                       onClick={() => handleCopyAndOpen(deal)}
-                      className={`group/code relative flex items-center gap-1.5 rounded-xl border border-dashed px-3 py-2 font-mono text-xs font-extrabold shrink-0 transition-all cursor-pointer active:scale-95 ${
+                      className={`group/redeem relative w-full flex items-stretch h-11 sm:h-12 rounded-xl sm:rounded-2xl overflow-hidden shadow-md transition-all active:scale-[0.98] cursor-pointer touch-manipulation ${
                         isCopied
-                          ? "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-2 ring-emerald-500/20"
-                          : "border-primary/40 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 hover:border-primary text-foreground"
+                          ? "bg-emerald-600 shadow-emerald-500/25 ring-2 ring-emerald-500/30"
+                          : "bg-primary shadow-primary/25 hover:shadow-lg hover:brightness-105"
                       }`}
-                      title={isCopied ? "Code Copied!" : "Click to reveal & copy full code"}
-                      aria-label={isCopied ? `Code copied: ${deal.code}` : `Reveal and copy code for ${deal.storeName}`}
+                      aria-label={`Redeem coupon code ${deal.code} on ${deal.storeName}`}
                     >
-                      <Tag className={`h-3 w-3 shrink-0 ${isCopied ? "text-emerald-500 animate-pulse" : "text-primary group-hover/code:scale-110 transition-transform"}`} />
-                      {isCopied ? (
-                        <span className="font-extrabold tracking-wider animate-in fade-in zoom-in-95 duration-200">
-                          {deal.code}
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-0.5 tracking-wider select-none font-bold">
-                          <span className="tracking-widest text-muted-foreground/60 font-black">••••</span>
-                          <span className="text-primary font-black bg-primary/10 px-1 py-0.5 rounded text-[11px]">
-                            {deal.code.length > 2 ? deal.code.slice(-2) : deal.code}
-                          </span>
-                        </span>
-                      )}
-                    </button>
+                      {/* Left Action Strip */}
+                      <div className="flex-1 flex items-center justify-center gap-2 px-3 text-white font-extrabold text-xs sm:text-sm tracking-wide">
+                        {isCopied ? (
+                          <>
+                            <Check className="h-4 w-4 animate-bounce shrink-0" />
+                            <span className="truncate">COPIED! OPENING STORE...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-4 w-4 shrink-0 transition-transform group-hover/redeem:scale-110" />
+                            <span className="truncate uppercase font-display tracking-wider">
+                              {deal.discountAmount && deal.discountAmount !== "Verified Deal"
+                                ? `REDEEM ${deal.discountAmount}`
+                                : "REDEEM CODE"}
+                            </span>
+                          </>
+                        )}
+                      </div>
 
-                    {/* Big Touch-Friendly Copy Button (>=48px height) */}
-                    <button
-                      type="button"
-                      onClick={() => handleCopyAndOpen(deal)}
-                      className={`flex-1 inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold shadow-md transition-all active:scale-95 touch-manipulation cursor-pointer ${
-                        isCopied
-                          ? "bg-emerald-600 text-white shadow-emerald-500/25"
-                          : "bg-primary text-primary-foreground shadow-primary/20 hover:scale-[1.02]"
-                      }`}
-                      aria-label={`Copy code ${deal.code} and open ${deal.storeName}`}
-                    >
-                      {isCopied ? (
-                        <>
-                          <Check className="h-4 w-4 animate-bounce" />
-                          <span>Copied! Opening Store...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="h-3.5 w-3.5" />
-                          <span>Copy</span>
-                        </>
-                      )}
+                      {/* Right Teaser Tab: Displays spaced last 2 characters of coupon code */}
+                      <div
+                        className={`w-14 sm:w-16 shrink-0 flex items-center justify-center border-l transition-colors select-none font-mono font-black text-sm tracking-widest ${
+                          isCopied
+                            ? "bg-emerald-700/90 text-white border-emerald-500/40"
+                            : "bg-slate-300/85 dark:bg-zinc-700/90 text-white border-white/20 shadow-inner"
+                        }`}
+                      >
+                        {isCopied ? (
+                          <span className="text-xs font-bold font-sans">100%</span>
+                        ) : (
+                          <span className="drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]">
+                            {deal.code.length >= 2
+                              ? `${deal.code.slice(-2, -1)} ${deal.code.slice(-1)}`
+                              : deal.code}
+                          </span>
+                        )}
+                      </div>
                     </button>
                   </div>
 

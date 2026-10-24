@@ -237,40 +237,54 @@ export function GrabOnPopularOffers() {
                 {/* Bottom Card Action Footer: Copy Button + Direct Affiliate Launch */}
                 <div className="p-2 sm:p-4 pt-0">
                   <div className="pt-2 sm:pt-3 border-t border-slate-100 dark:border-border/60 flex items-center gap-1.5 sm:gap-2">
-                    {/* Copy Code Button with Bounce Effect & Direct Navigation */}
+                    {/* Unified High-Converting Stub Button: [ REDEEM DISCOUNT ] [ 2 0 ] */}
                     <a
                       href={deal.affiliateUrl}
                       target="_blank"
                       rel="noopener sponsored nofollow"
                       onClick={(e) => handleCopy(deal.couponCode, deal.brandName, deal.affiliateUrl, e)}
-                      className={`flex-1 inline-flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 sm:py-2 px-1.5 sm:px-3 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all duration-200 border active:scale-95 cursor-pointer min-w-0 ${
+                      className={`flex-1 inline-flex items-stretch h-9 sm:h-10 rounded-lg sm:rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all active:scale-[0.98] cursor-pointer min-w-0 ${
                         isCopied
-                          ? "bg-emerald-500 text-white border-emerald-500 shadow-xs"
-                          : "bg-slate-50 dark:bg-muted text-slate-800 dark:text-foreground border-slate-200 dark:border-border hover:bg-slate-100 dark:hover:bg-muted/80 hover:border-primary/40"
+                          ? "bg-emerald-600 text-white"
+                          : "bg-primary text-white hover:brightness-105"
                       }`}
                       title={`Copy ${deal.couponCode} and open ${deal.brandName}`}
                     >
-                      {isCopied ? (
-                        <>
-                          <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-bounce shrink-0" />
-                          <span className="font-mono font-extrabold text-white truncate">{deal.couponCode}</span>
-                          <span className="text-[10px] font-bold">Copied!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Tag className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary shrink-0" />
-                          <span className="font-mono tracking-wider truncate inline-flex items-center gap-0.5 select-none">
-                            <span className="tracking-widest text-muted-foreground/60 font-black">••••</span>
-                            <span className="text-primary font-black bg-primary/10 px-1 py-0.2 rounded">
-                              {deal.couponCode.length > 2 ? deal.couponCode.slice(-2) : deal.couponCode}
+                      {/* Left Action Strip */}
+                      <div className="flex-1 flex items-center justify-center gap-1.5 px-2 text-[11px] sm:text-xs font-bold tracking-wide">
+                        {isCopied ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 animate-bounce shrink-0" />
+                            <span className="truncate">COPIED!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5 shrink-0" />
+                            <span className="truncate uppercase font-display">
+                              {deal.discountText && deal.discountText !== "Verified Deal"
+                                ? `REDEEM ${deal.discountText}`
+                                : "REDEEM CODE"}
                             </span>
-                          </span>
-                          <span className="ml-auto inline-flex items-center gap-0.5 text-primary font-bold text-[10px] bg-primary/10 px-1.5 py-0.5 rounded">
-                            <Copy className="w-2.5 h-2.5" />
-                            <span>Copy</span>
-                          </span>
-                        </>
-                      )}
+                          </>
+                        )}
+                      </div>
+
+                      {/* Right Teaser Tab */}
+                      <div
+                        className={`w-10 sm:w-12 shrink-0 flex items-center justify-center border-l select-none font-mono font-black text-xs tracking-wider ${
+                          isCopied
+                            ? "bg-emerald-700 text-white border-emerald-500/40"
+                            : "bg-slate-300/85 dark:bg-zinc-700/90 text-white border-white/20 drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]"
+                        }`}
+                      >
+                        {isCopied ? (
+                          "✓"
+                        ) : deal.couponCode.length >= 2 ? (
+                          `${deal.couponCode.slice(-2, -1)} ${deal.couponCode.slice(-1)}`
+                        ) : (
+                          deal.couponCode
+                        )}
+                      </div>
                     </a>
 
                     {/* Direct Outbound Visit CTA (Monetized via Cuelinks/EarnKaro) */}
