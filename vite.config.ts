@@ -311,6 +311,42 @@ function searxngDevPlugin() {
         const dataPath = path.resolve(process.cwd(), "src/data/live-deals.json");
         const urlObj = new URL(req.url, "http://localhost:8080");
 
+        if (req.url.startsWith("/api/deals/stats") || req.url.startsWith("/api/offers/stats")) {
+          let snapshotData: any = { deals: [] };
+          if (fs.existsSync(dataPath)) {
+            try { snapshotData = JSON.parse(fs.readFileSync(dataPath, "utf-8")); } catch {}
+          }
+          const allDeals: any[] = Array.isArray(snapshotData.deals) ? snapshotData.deals : [];
+          const totalDeals = allDeals.length || 1710;
+          const verifiedCount = allDeals.filter((d: any) => d.verified || d.verificationStatus === "verified").length || 1680;
+          const roundedCount = Math.floor(totalDeals / 100) * 100;
+          const formattedCount = `${roundedCount.toLocaleString()}+`;
+
+          let totalStores = 382;
+          try {
+            const storesPath = path.resolve(process.cwd(), "src/data/unified-stores.json");
+            if (fs.existsSync(storesPath)) {
+              const rawStores = JSON.parse(fs.readFileSync(storesPath, "utf-8"));
+              totalStores = Array.isArray(rawStores) ? rawStores.length : Object.keys(rawStores).length;
+            }
+          } catch {}
+          const roundedStores = Math.floor(totalStores / 10) * 10;
+          const formattedStoresCount = `${roundedStores}+`;
+
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.setHeader("Access-Control-Allow-Origin", "*");
+          res.end(JSON.stringify({
+            totalDeals,
+            verifiedCount,
+            formattedCount,
+            totalStores,
+            formattedStoresCount,
+            timestamp: new Date().toISOString(),
+          }));
+          return;
+        }
+
         if (req.url.startsWith("/api/deals/sync") || req.url.startsWith("/api/offers/sync")) {
               try {
                 // @ts-ignore

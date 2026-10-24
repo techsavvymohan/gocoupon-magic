@@ -32,7 +32,7 @@ function optimizeTitle(rawTitle, fallbackBrand = " | GoCoupon") {
     return rawTitle;
   }
   let title = rawTitle.replace(/\s*–\s*GoCoupon.*$/i, "").replace(/\s*\|\s*GoCoupon.*$/i, "").trim();
-  const maxTitleLen = 60 - fallbackBrand.length;
+  const maxTitleLen = 58 - fallbackBrand.length;
   if (title.length > maxTitleLen) {
     let trimmed = title.slice(0, maxTitleLen);
     const lastSpace = trimmed.lastIndexOf(" ");
@@ -50,8 +50,8 @@ function optimizeTitle(rawTitle, fallbackBrand = " | GoCoupon") {
     else if (fullTitle.includes("Privacy")) fullTitle = "Privacy Policy & Zero Data Tracking | GoCoupon";
     else fullTitle = `${title}: Verified Promo Codes & Discounts (2026) | GoCoupon`;
   }
-  if (fullTitle.length > 60) {
-    fullTitle = fullTitle.slice(0, 57) + "...";
+  if (fullTitle.length > 58) {
+    fullTitle = fullTitle.slice(0, 55) + "...";
   }
   return fullTitle;
 }

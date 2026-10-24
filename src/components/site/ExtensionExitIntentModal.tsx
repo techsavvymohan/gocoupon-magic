@@ -156,7 +156,7 @@ export function ExtensionExitIntentModal() {
           <strong className="text-foreground">
             Flipkart, Amazon, Hostinger, BoAt, Ajio,
           </strong>{" "}
-          or 1,600+ partner stores, GoCoupon auto-tests every verified voucher and applies the
+          or 380+ partner stores, GoCoupon auto-tests every verified voucher and applies the
           biggest discount in 2 seconds.
         </p>
 
