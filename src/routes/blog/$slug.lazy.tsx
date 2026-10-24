@@ -180,8 +180,11 @@ function PostPage() {
               <img
                 src={getOptimizedImageUrl(post.cover, { width: 1200 })}
                 alt={post.title}
+                width={1200}
+                height={480}
                 className="w-full h-auto max-h-[480px] object-cover"
                 loading="eager"
+                decoding="async"
               />
             </div>
           )}
@@ -379,8 +382,11 @@ function Section({ section }: { section: PostSection }) {
           <img
             src={getOptimizedImageUrl(section.url)}
             alt={section.alt || section.caption || "Blog article image"}
+            width={800}
+            height={450}
             className="w-full object-cover max-h-[500px]"
             loading="lazy"
+            decoding="async"
           />
           {section.caption && (
             <figcaption className="p-3 text-center font-mono text-xs text-muted-foreground border-t border-border/60 bg-muted/20">

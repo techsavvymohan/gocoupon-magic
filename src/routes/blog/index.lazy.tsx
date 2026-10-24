@@ -329,6 +329,9 @@ function BlogIndex() {
               <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
+                  id="blog-search-query"
+                  name="blogSearch"
+                  aria-label="Search savings guides and articles"
                   type="search"
                   placeholder="Search 36+ investigative guides (e.g. Price Comparison, 5-Layer Stacking, Amazon, Buyhatke)…"
                   value={searchQuery}
@@ -722,8 +725,11 @@ function BlogIndex() {
                           <img
                             src={getOptimizedImageUrl(post.cover, { width: 600, height: 340, crop: "fill" })}
                             alt={post.title}
+                            width={600}
+                            height={340}
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                             loading="lazy"
+                            decoding="async"
                           />
                         </div>
                       )}
@@ -792,6 +798,9 @@ function BlogIndex() {
             ) : (
               <form onSubmit={handleNewsletterSubmit} className="mt-8 flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
                 <input
+                  id="newsletter-email"
+                  name="newsletterEmail"
+                  aria-label="Newsletter email address"
                   type="email"
                   required
                   placeholder="Enter your email address…"

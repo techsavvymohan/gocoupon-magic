@@ -145,7 +145,7 @@ export function SubmitCouponModal({
             <form onSubmit={handleSubmit} className="space-y-4 pt-3">
               {/* Store Name Input */}
               <div className="space-y-1">
-                <label className="text-xs font-bold text-foreground flex items-center justify-between">
+                <label htmlFor="submit-coupon-store-name" className="text-xs font-bold text-foreground flex items-center justify-between">
                   <span>
                     Store or Merchant Name <span className="text-rose-500">*</span>
                   </span>
@@ -156,6 +156,8 @@ export function SubmitCouponModal({
                 <div className="relative">
                   <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <input
+                    id="submit-coupon-store-name"
+                    name="storeName"
                     type="text"
                     required
                     placeholder="e.g. Amazon, Myntra, Flipkart, Nike"
@@ -187,7 +189,7 @@ export function SubmitCouponModal({
 
               {/* Coupon Code Input */}
               <div className="space-y-1">
-                <label className="text-xs font-bold text-foreground flex items-center justify-between">
+                <label htmlFor="submit-coupon-code" className="text-xs font-bold text-foreground flex items-center justify-between">
                   <span>
                     Coupon or Promo Code <span className="text-rose-500">*</span>
                   </span>
@@ -198,6 +200,8 @@ export function SubmitCouponModal({
                 <div className="relative">
                   <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary pointer-events-none" />
                   <input
+                    id="submit-coupon-code"
+                    name="code"
                     type="text"
                     required
                     placeholder="e.g. FESTIVE50, SAVE200, FLAT15"
@@ -214,10 +218,12 @@ export function SubmitCouponModal({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Discount */}
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-foreground block">
+                  <label htmlFor="submit-coupon-discount" className="text-xs font-bold text-foreground block">
                     Discount / Savings
                   </label>
                   <input
+                    id="submit-coupon-discount"
+                    name="discount"
                     type="text"
                     placeholder="e.g. 50% OFF, ₹500 off"
                     value={values.discount}
@@ -228,10 +234,12 @@ export function SubmitCouponModal({
 
                 {/* Category Selector */}
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-foreground block">
+                  <label htmlFor="submit-coupon-category" className="text-xs font-bold text-foreground block">
                     Shopping Category
                   </label>
                   <select
+                    id="submit-coupon-category"
+                    name="category"
                     value={values.category}
                     onChange={(e) => setFieldValue("category", e.target.value)}
                     className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground focus:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
@@ -261,13 +269,15 @@ export function SubmitCouponModal({
                 <div className="space-y-3 pt-2 border-t border-border/60 animate-in fade-in-50 duration-200">
                   {/* Store Link */}
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                    <label htmlFor="submit-coupon-url" className="text-xs font-semibold text-foreground flex items-center justify-between">
                       <span>Store Website URL (Optional)</span>
                       {errors.url && (
                         <span className="text-[10px] text-rose-500 font-semibold">{errors.url}</span>
                       )}
                     </label>
                     <input
+                      id="submit-coupon-url"
+                      name="url"
                       type="text"
                       placeholder="https://www.store.com/sale"
                       value={values.url}
@@ -278,10 +288,12 @@ export function SubmitCouponModal({
 
                   {/* Terms & Exclusions */}
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-foreground block">
+                    <label htmlFor="submit-coupon-terms" className="text-xs font-semibold text-foreground block">
                       Terms &amp; Restrictions (Optional)
                     </label>
                     <input
+                      id="submit-coupon-terms"
+                      name="terms"
                       type="text"
                       placeholder="e.g. Min order ₹1,999. Valid for new users only."
                       value={values.terms}
@@ -292,13 +304,15 @@ export function SubmitCouponModal({
 
                   {/* User Email */}
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                    <label htmlFor="submit-coupon-email" className="text-xs font-semibold text-foreground flex items-center justify-between">
                       <span>Your Email (Optional, for contributor credit)</span>
                       {errors.email && (
                         <span className="text-[10px] text-rose-500 font-semibold">{errors.email}</span>
                       )}
                     </label>
                     <input
+                      id="submit-coupon-email"
+                      name="email"
                       type="email"
                       placeholder="yourname@gmail.com"
                       value={values.email}

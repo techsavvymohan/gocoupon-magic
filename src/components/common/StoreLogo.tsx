@@ -12,6 +12,8 @@ interface StoreLogoProps {
   className?: string;
   imageClassName?: string;
   alt?: string;
+  width?: number;
+  height?: number;
 }
 
 export function StoreLogo({
@@ -21,6 +23,8 @@ export function StoreLogo({
   className = "h-8 w-8",
   imageClassName = "max-h-full max-w-full object-contain",
   alt,
+  width = 48,
+  height = 48,
 }: StoreLogoProps) {
   const [hasError, setHasError] = useState(false);
 
@@ -55,6 +59,8 @@ export function StoreLogo({
       <img
         src={resolvedUrl}
         alt={alt || `${storeName} Logo`}
+        width={width}
+        height={height}
         className={imageClassName}
         loading="lazy"
         decoding="async"

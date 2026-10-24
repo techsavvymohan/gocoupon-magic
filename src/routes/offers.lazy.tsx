@@ -1219,6 +1219,9 @@ function OffersHubPage() {
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <input
+                      id="offers-store-search"
+                      name="storeSearch"
+                      aria-label="Search stores and brands"
                       type="text"
                       placeholder={`Search ${allRealStores.length} stores & brands...`}
                       value={storeSearchQuery}
@@ -1394,6 +1397,9 @@ function OffersHubPage() {
                 <div className="relative shrink-0 w-full md:w-72">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                   <input
+                    id="offers-deal-search"
+                    name="dealSearch"
+                    aria-label="Search by brands or offer name"
                     type="text"
                     placeholder="Search by brands or offer name..."
                     value={searchQuery}

@@ -96,8 +96,12 @@ function StoreLogoImg({
     <img
       src={src}
       alt={alt}
+      width={20}
+      height={20}
       className={className || "h-5 w-5 object-contain"}
       onError={() => setError(true)}
+      loading="lazy"
+      decoding="async"
     />
   );
 }
@@ -235,9 +239,12 @@ function ProductCardImg({
     <img
       src={effectiveSrc}
       alt={alt}
+      width={260}
+      height={260}
       referrerPolicy="no-referrer"
       className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
       loading="lazy"
+      decoding="async"
       onError={() => setHasError(true)}
     />
   );
@@ -629,7 +636,7 @@ export function ComparePage() {
         </h4>
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="text-[10px] font-mono text-muted-foreground block mb-1">
+            <label htmlFor="compare-min-price" className="text-[10px] font-mono text-muted-foreground block mb-1">
               Min Price
             </label>
             <div className="relative">
@@ -637,6 +644,9 @@ export function ComparePage() {
                 {symbol}
               </span>
               <input
+                id="compare-min-price"
+                name="minPrice"
+                aria-label="Minimum price"
                 type="number"
                 placeholder={String(priceBounds.min || 0)}
                 value={minPriceInput}
@@ -647,7 +657,7 @@ export function ComparePage() {
             </div>
           </div>
           <div>
-            <label className="text-[10px] font-mono text-muted-foreground block mb-1">
+            <label htmlFor="compare-max-price" className="text-[10px] font-mono text-muted-foreground block mb-1">
               Max Price
             </label>
             <div className="relative">
@@ -655,6 +665,9 @@ export function ComparePage() {
                 {symbol}
               </span>
               <input
+                id="compare-max-price"
+                name="maxPrice"
+                aria-label="Maximum price"
                 type="number"
                 placeholder={String(priceBounds.max || 100000)}
                 value={maxPriceInput}
@@ -731,6 +744,9 @@ export function ComparePage() {
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <input
+                      id={`compare-store-${store.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+                      name={`store_${store.name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`}
+                      aria-label={`Filter by ${store.name}`}
                       type="checkbox"
                       checked={isChecked}
                       onChange={() => togglePlatform(store.name)}
@@ -776,6 +792,9 @@ export function ComparePage() {
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
               <input
+                id="compare-brand-search"
+                name="brandSearch"
+                aria-label="Search brands"
                 type="text"
                 placeholder="Search brands…"
                 value={brandSearch}
@@ -795,6 +814,9 @@ export function ComparePage() {
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <input
+                      id={`compare-brand-${brand.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+                      name={`brand_${brand.name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`}
+                      aria-label={`Filter by ${brand.name}`}
                       type="checkbox"
                       checked={isChecked}
                       onChange={() => toggleBrand(brand.name)}
@@ -849,10 +871,13 @@ export function ComparePage() {
 
         {isCardDiscountApplied && (
           <div className="pt-2 border-t border-border/50">
-            <label className="text-[10px] font-mono text-muted-foreground block mb-1">
+            <label htmlFor="compare-card-select" className="text-[10px] font-mono text-muted-foreground block mb-1">
               Select Specific Card:
             </label>
             <select
+              id="compare-card-select"
+              name="selectedCard"
+              aria-label="Select specific credit card for discount calculation"
               value={selectedCardId}
               onChange={(e) => setSelectedCardId(e.target.value)}
               className="w-full rounded-lg border border-border bg-background py-1 px-2 text-xs text-foreground focus:border-primary focus:outline-none cursor-pointer"
@@ -944,6 +969,9 @@ export function ComparePage() {
                   <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                   <span className="text-muted-foreground font-medium">Sort by:</span>
                   <select
+                    id="compare-sort-by"
+                    name="sortBy"
+                    aria-label="Sort products by"
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as SortOption)}
                     className="bg-transparent font-bold text-foreground focus-visible:outline-none cursor-pointer"

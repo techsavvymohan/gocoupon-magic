@@ -225,6 +225,9 @@ export function MerchantScoreIndexPage() {
             <div className="relative w-full sm:w-72">
               <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
+                id="merchant-score-search"
+                name="merchantSearch"
+                aria-label="Search store or category"
                 type="text"
                 placeholder="Search store or category..."
                 value={searchTerm}

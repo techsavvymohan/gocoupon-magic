@@ -41,8 +41,11 @@ export const PopularBrandCard = React.memo(function PopularBrandCard({
         <img
           src={brand.logo}
           alt={brand.name}
+          width={120}
+          height={48}
           className="max-h-12 max-w-[120px] object-contain drop-shadow-xs group-hover:scale-105 transition-transform"
           loading="lazy"
+          decoding="async"
         />
       </div>
 

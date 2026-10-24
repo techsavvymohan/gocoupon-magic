@@ -250,6 +250,8 @@ export function HeroStoreDealSearch() {
         {/* Text Input */}
         <input
           ref={inputRef}
+          id="hero-store-search"
+          name="heroStoreSearch"
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}

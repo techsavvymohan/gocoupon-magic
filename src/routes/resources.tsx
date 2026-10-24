@@ -341,12 +341,16 @@ function NumberInput({
   max: number;
   step?: number;
 }) {
+  const inputId = `resource-calc-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
   return (
-    <label className="block">
+    <label htmlFor={inputId} className="block">
       <span className="mb-2 block font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
         {label}
       </span>
       <input
+        id={inputId}
+        name={inputId}
+        aria-label={label}
         type="number"
         value={value}
         min={min}

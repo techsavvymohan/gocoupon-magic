@@ -290,6 +290,8 @@ export function NavbarSearch({
         {/* GrabOn-Style Main Input */}
         <input
           ref={inputRef}
+          id="navbar-store-search"
+          name="navbarSearch"
           type="text"
           value={query}
           onChange={(e) => {

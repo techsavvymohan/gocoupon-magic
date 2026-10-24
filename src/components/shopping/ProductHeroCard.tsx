@@ -53,8 +53,11 @@ export function ProductHeroCard({ product }: ProductHeroCardProps) {
             <img
               src={product.imageUrl}
               alt={product.title}
+              width={400}
+              height={275}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
+              decoding="async"
             />
             {/* Lowest Store Pill */}
             {bestDeal && (

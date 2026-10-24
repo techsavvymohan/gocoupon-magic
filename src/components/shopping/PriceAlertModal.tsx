@@ -195,6 +195,8 @@ export function PriceAlertModal({
             </div>
 
             <input
+              id="price-alert-target-price"
+              name="targetPrice"
               type="range"
               min={Math.round(currentPrice * 0.5)}
               max={currentPrice}
@@ -211,10 +213,12 @@ export function PriceAlertModal({
 
           {/* Email Address */}
           <div>
-            <label className="text-xs font-medium text-foreground block mb-1">
+            <label htmlFor="price-alert-email" className="text-xs font-medium text-foreground block mb-1">
               Email for Instant Alerts (Optional):
             </label>
             <input
+              id="price-alert-email"
+              name="alertEmail"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}

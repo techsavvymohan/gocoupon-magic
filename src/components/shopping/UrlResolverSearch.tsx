@@ -503,8 +503,11 @@ export function UrlResolverSearch({
                     <img
                       src={store.logo}
                       alt={store.name}
+                      width={20}
+                      height={20}
                       className="h-4 w-4 sm:h-5 sm:w-5 object-contain"
                       loading="lazy"
+                      decoding="async"
                     />
                   </div>
                 ))}
@@ -581,7 +584,11 @@ export function UrlResolverSearch({
                         <img
                           src={foodComparison.product.image_url}
                           alt={foodComparison.product.product_name}
+                          width={44}
+                          height={44}
                           className="h-full w-full object-contain"
+                          loading="lazy"
+                          decoding="async"
                         />
                       ) : (
                         <Barcode className="h-6 w-6 text-emerald-600" />
@@ -656,8 +663,11 @@ export function UrlResolverSearch({
                             <img
                               src={store.logo}
                               alt={store.name}
+                              width={44}
+                              height={44}
                               className="h-full w-full object-contain"
                               loading="lazy"
+                              decoding="async"
                               onError={(e) => {
                                 (e.target as HTMLElement).style.display = "none";
                               }}

@@ -114,8 +114,11 @@ export function AffiliateProductGrid({
                     <img
                       src={product.imageUrl}
                       alt={product.title}
+                      width={400}
+                      height={250}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
+                      decoding="async"
                     />
                   ) : (
                     <div className="h-full w-full flex items-center justify-center bg-muted text-muted-foreground/30">

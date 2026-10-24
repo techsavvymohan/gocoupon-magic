@@ -79,8 +79,11 @@ export function Blog() {
                   <img
                     src={p.cover}
                     alt={p.title}
+                    width={640}
+                    height={360}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
+                    decoding="async"
                   />
                 </div>
               )}

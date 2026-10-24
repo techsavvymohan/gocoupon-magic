@@ -55,7 +55,10 @@ export const GroceryProductCard: React.FC<GroceryProductCardProps> = ({ comparis
                 <img
                   src={product.image_url}
                   alt={product.product_name}
+                  width={200}
+                  height={200}
                   loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
                 />
               ) : (
@@ -107,7 +110,7 @@ export const GroceryProductCard: React.FC<GroceryProductCardProps> = ({ comparis
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg bg-background border border-border/60 flex items-center justify-center overflow-hidden p-1 flex-shrink-0">
                         {offer.logo ? (
-                          <img src={offer.logo} alt={offer.storeName} className="w-full h-full object-contain" />
+                          <img src={offer.logo} alt={offer.storeName} width={32} height={32} loading="lazy" decoding="async" className="w-full h-full object-contain" />
                         ) : (
                           <span className="text-sm">{offer.fallbackIcon}</span>
                         )}

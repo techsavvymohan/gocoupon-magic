@@ -2914,7 +2914,7 @@ try {
                 return `
                   <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 8px; padding: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                     <div style="display: flex; align-items: center; gap: 14px;">
-                      ${dealLogo ? `<div style="height: 42px; width: 42px; padding: 4px; background: #ffffff; border-radius: 8px; display: flex; align-items: center; justify-content: center; shrink: 0;"><img src="${dealLogo}" alt="${storeName} Logo" style="max-height: 100%; max-width: 100%; object-fit: contain;" /></div>` : ""}
+                      ${dealLogo ? `<div style="height: 42px; width: 42px; padding: 4px; background: #ffffff; border-radius: 8px; display: flex; align-items: center; justify-content: center; shrink: 0;"><img src="${dealLogo}" alt="${storeName} Logo" width="42" height="42" loading="lazy" decoding="async" style="max-height: 100%; max-width: 100%; object-fit: contain;" /></div>` : ""}
                       <div>
                         <span style="display: inline-block; background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-weight: 700; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-bottom: 6px;">${discount}</span>
                         <h4 style="margin: 0; color: #f8fafc; font-size: 15px;">${title}</h4>
@@ -2936,7 +2936,7 @@ try {
 
       const articleHtml = `
         <div style="display: flex; align-items: center; gap: 18px; margin-bottom: 20px;">
-          ${storeLogoUrl ? `<div style="height: 64px; width: 64px; padding: 6px; background: #ffffff; border-radius: 14px; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2);"><img src="${storeLogoUrl}" alt="${storeName} Logo" style="max-height: 100%; max-width: 100%; object-fit: contain;" /></div>` : ""}
+          ${storeLogoUrl ? `<div style="height: 64px; width: 64px; padding: 6px; background: #ffffff; border-radius: 14px; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2);"><img src="${storeLogoUrl}" alt="${storeName} Logo" width="64" height="64" loading="eager" decoding="async" style="max-height: 100%; max-width: 100%; object-fit: contain;" /></div>` : ""}
           <div>
             <h2 style="margin: 0; font-size: 24px; color: #f8fafc;">Verified ${storeName} Coupon Codes, Discounts &amp; Promo Vouchers (2026)</h2>
             <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 14px;">Save money on your next purchase at ${storeName} with GoCoupon. 100% Tested &amp; Working.</p>

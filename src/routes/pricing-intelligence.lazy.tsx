@@ -210,8 +210,10 @@ function PricingIntelligencePage() {
           {/* Playground Form */}
           <form onSubmit={handleTestApi} className="mt-6 grid grid-cols-1 sm:grid-cols-12 gap-3">
             <div className="sm:col-span-6">
-              <label className="block text-xs font-semibold text-muted-foreground mb-1">Target Product / SKU</label>
+              <label htmlFor="pricing-target-sku" className="block text-xs font-semibold text-muted-foreground mb-1">Target Product / SKU</label>
               <input
+                id="pricing-target-sku"
+                name="targetSku"
                 type="text"
                 value={demoQuery}
                 onChange={(e) => setDemoQuery(e.target.value)}
@@ -220,8 +222,10 @@ function PricingIntelligencePage() {
               />
             </div>
             <div className="sm:col-span-4">
-              <label className="block text-xs font-semibold text-muted-foreground mb-1">Approved MAP Price (₹)</label>
+              <label htmlFor="pricing-target-map" className="block text-xs font-semibold text-muted-foreground mb-1">Approved MAP Price (₹)</label>
               <input
+                id="pricing-target-map"
+                name="targetMap"
                 type="number"
                 value={demoMap}
                 onChange={(e) => setDemoMap(e.target.value)}

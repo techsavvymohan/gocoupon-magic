@@ -1,4 +1,4 @@
-﻿import { createLazyFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import { createLazyFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { AdminAuthProvider, useAdminAuth, getAdminAuthHeaders } from "@/context/AdminAuthContext";
 import { AdminThemeProvider } from "@/admin/components/AdminThemeProvider";
@@ -945,9 +945,12 @@ function AdminLoginScreen({ onLoginSuccess }: { onLoginSuccess: () => void }) {
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-zinc-300 mb-1.5">Admin Email</label>
+            <label htmlFor="admin-login-email" className="block text-xs font-semibold text-zinc-300 mb-1.5">Admin Email</label>
             <Input
+              id="admin-login-email"
+              name="adminEmail"
               type="email"
+              autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -957,14 +960,17 @@ function AdminLoginScreen({ onLoginSuccess }: { onLoginSuccess: () => void }) {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-zinc-300 mb-1.5">Password</label>
+            <label htmlFor="admin-login-password" className="block text-xs font-semibold text-zinc-300 mb-1.5">Password</label>
             <Input
+              id="admin-login-password"
+              name="adminPassword"
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               className="bg-zinc-800/80 border-zinc-700 text-white text-xs h-10"
-              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+              placeholder="••••••••"
             />
           </div>
 
