@@ -53,12 +53,28 @@ function DefaultErrorComponent({ error, reset }: { error: Error; reset: () => vo
   );
 }
 
+function RoutePendingComponent() {
+  return (
+    <div className="flex min-h-[55vh] flex-col items-center justify-center p-8 animate-in fade-in duration-200">
+      <div className="relative flex flex-col items-center gap-3.5">
+        <div className="h-10 w-10 animate-spin rounded-full border-[2.5px] border-primary/20 border-t-primary border-r-indigo-500 shadow-[0_0_18px_rgba(99,102,241,0.22)]" />
+        <div className="text-center">
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground/80">Loading Verified Deals...</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export const getRouter = () => {
   const router = createRouter({
     routeTree,
     context: {},
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
+    defaultPendingMs: 0,
+    defaultPendingMinMs: 300,
+    defaultPendingComponent: RoutePendingComponent,
     defaultErrorComponent: DefaultErrorComponent,
   });
 

@@ -16,6 +16,9 @@ function RootComponent() {
 
   useEffect(() => {
     initWebVitalsRum();
+    if (typeof window !== "undefined" && typeof (window as any).dismissSiteLoader === "function") {
+      (window as any).dismissSiteLoader();
+    }
   }, []);
 
   // Dispatch GA4 page_view on every client-side navigation

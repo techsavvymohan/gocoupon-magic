@@ -51,16 +51,33 @@ class RootErrorBoundary extends React.Component<
 
 const rootEl = document.getElementById("root");
 if (rootEl) {
-  const loader = document.getElementById("site-loader");
-  if (loader) {
-    loader.style.opacity = "0";
-    loader.style.pointerEvents = "none";
+  const mountStart = Date.now();
+  const minDisplayMs = 500;
+
+  // Global dismiss hook invoked once React root component has mounted
+  (window as any).dismissSiteLoader = () => {
+    const loader = document.getElementById("site-loader");
+    if (!loader) return;
+    const elapsed = Date.now() - mountStart;
+    const remainingDelay = Math.max(0, minDisplayMs - elapsed);
+
     setTimeout(() => {
-      try {
-        loader.remove();
-      } catch {}
-    }, 250);
-  }
+      loader.style.opacity = "0";
+      loader.style.pointerEvents = "none";
+      setTimeout(() => {
+        try {
+          loader.remove();
+        } catch {}
+      }, 350);
+    }, remainingDelay);
+  };
+
+  // Safety fallback: ensure loader fades out even if route hydration is delayed
+  setTimeout(() => {
+    if (typeof (window as any).dismissSiteLoader === "function") {
+      (window as any).dismissSiteLoader();
+    }
+  }, 2200);
 
   createRoot(rootEl).render(
     <StrictMode>
@@ -70,3 +87,4 @@ if (rootEl) {
     </StrictMode>,
   );
 }
+
