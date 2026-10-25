@@ -12,6 +12,7 @@ import { normalizeCategoryId, CANONICAL_CATEGORIES } from "../services/taxonomy.
 import {
   fetchCuelinksCoupons,
   normalizeCuelinksToStoreCoupon,
+  getLiveDealsPool,
 } from "../services/providers/cuelinks-client.js";
 import { otpService } from "../services/otp-service.js";
 import { recordNewSubmission } from "./admin.js";
@@ -147,6 +148,44 @@ couponsRouter.post("/submit", async (req: Request, res: Response) => {
     });
     return;
   }
+
+  const normStore = String(storeName).trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+  const normCode = String(code).trim().toUpperCase();
+
+  // 1. Check live deals pool for duplicate
+  const livePool = getLiveDealsPool();
+  const existingLive = livePool.find(
+    (d) =>
+      d.code &&
+      d.code.toUpperCase().trim() === normCode &&
+      d.storeName.toLowerCase().replace(/[^a-z0-9]/g, "") === normStore
+  );
+  if (existingLive) {
+    res.status(409).json({
+      success: false,
+      error: `Coupon "${normCode}" for ${storeName} is already live and verified on GoCoupon!`,
+    });
+    return;
+  }
+
+  // 2. Check pending community submissions for duplicate
+  const { getUserCouponSubmissions } = await import("../../src/lib/server-data/deals-db.js");
+  const pendingSubs = getUserCouponSubmissions();
+  const existingPending = pendingSubs.find(
+    (s) =>
+      s.status === "pending" &&
+      s.code &&
+      s.code.toUpperCase().trim() === normCode &&
+      s.storeName.toLowerCase().replace(/[^a-z0-9]/g, "") === normStore
+  );
+  if (existingPending) {
+    res.status(409).json({
+      success: false,
+      error: `Coupon "${normCode}" for ${storeName} has already been submitted and is currently in the verification queue.`,
+    });
+    return;
+  }
+
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim())) {
     res.status(400).json({

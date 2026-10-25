@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import type { CouponSubmissionFormValues, SubmitCouponResult } from "./types";
 import { validateCouponSubmission, validateEmail } from "./validation";
 import { submitCouponToBackend, sendSubmissionOtp, verifySubmissionOtp } from "./api";
+import { resolveStoreAutoFill, type StorePreset } from "./storeAutoFill";
 
 const INITIAL_VALUES: CouponSubmissionFormValues = {
   storeName: "",
@@ -64,12 +65,28 @@ export function useSubmitCoupon(options: UseSubmitCouponOptions = {}) {
 
   const setFieldValue = useCallback((field: keyof CouponSubmissionFormValues, val: string) => {
     setValues((prev) => {
+      const updated = { ...prev, [field]: val };
+
       // If user edits email after verification, reset verified state
       if (field === "email" && val.trim().toLowerCase() !== (verifiedEmail || "").toLowerCase()) {
         setIsEmailVerified(false);
         setVerificationToken(null);
       }
-      return { ...prev, [field]: val };
+
+      // Smart store auto-fill: when storeName is entered, auto-detect domain and category
+      if (field === "storeName" && val.trim().length >= 2) {
+        const auto = resolveStoreAutoFill(val);
+        if (auto) {
+          if (auto.url && !prev.url) {
+            updated.url = auto.url;
+          }
+          if (auto.category && (prev.category === "General" || !prev.category)) {
+            updated.category = auto.category;
+          }
+        }
+      }
+
+      return updated;
     });
 
     setErrors((prev) => {
@@ -79,6 +96,23 @@ export function useSubmitCoupon(options: UseSubmitCouponOptions = {}) {
       return next;
     });
   }, [verifiedEmail]);
+
+  const handleSelectStorePreset = useCallback((preset: StorePreset) => {
+    setValues((prev) => ({
+      ...prev,
+      storeName: preset.name,
+      url: prev.url && !prev.url.includes(preset.domain) ? prev.url : preset.url,
+      category: prev.category === "General" || !prev.category ? preset.category : prev.category,
+    }));
+
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next.storeName;
+      delete next.url;
+      return next;
+    });
+  }, []);
+
 
   const handleSendOtp = useCallback(async () => {
     const emailCheck = validateEmail(values.email);
@@ -260,5 +294,6 @@ export function useSubmitCoupon(options: UseSubmitCouponOptions = {}) {
     handleSendOtp,
     handleVerifyOtp,
     handleChangeEmail,
+    handleSelectStorePreset,
   };
 }

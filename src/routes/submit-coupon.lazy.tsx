@@ -4,6 +4,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema } from "@/lib/seo";
 import { useSubmitCoupon } from "@/components/submit_coupon/useSubmitCoupon";
 import { EmailOtpVerifier } from "@/components/submit_coupon/EmailOtpVerifier";
+import { STORE_PRESETS, searchStorePresets } from "@/components/submit_coupon/storeAutoFill";
 import { ALLOWED_CATEGORIES } from "@/components/submit_coupon/validation";
 import {
   Tag,
@@ -59,7 +60,9 @@ function SubmitCouponPage() {
     handleSendOtp,
     handleVerifyOtp,
     handleChangeEmail,
+    handleSelectStorePreset,
   } = useSubmitCoupon();
+
 
   const breadcrumbs = breadcrumbSchema([
     { name: "Home", path: "/" },
@@ -139,7 +142,14 @@ function SubmitCouponPage() {
                     <button
                       key={store}
                       type="button"
-                      onClick={() => setFieldValue("storeName", store)}
+                      onClick={() => {
+                        const preset = STORE_PRESETS.find((p) => p.name.toLowerCase() === store.toLowerCase());
+                        if (preset) {
+                          handleSelectStorePreset(preset);
+                        } else {
+                          setFieldValue("storeName", store);
+                        }
+                      }}
                       className={`rounded-full px-3 py-1 text-xs font-medium transition-all cursor-pointer ${
                         values.storeName.toLowerCase() === store.toLowerCase()
                           ? "bg-primary text-primary-foreground font-bold shadow-xs"
@@ -155,9 +165,16 @@ function SubmitCouponPage() {
               {/* Grid: Store Name & Promo Code */}
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="storeName" className="block text-xs font-semibold text-foreground mb-1.5">
-                    Store or Brand Name <span className="text-rose-500">*</span>
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label htmlFor="storeName" className="block text-xs font-semibold text-foreground">
+                      Store or Brand Name <span className="text-rose-500">*</span>
+                    </label>
+                    {values.url && (
+                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                        ✓ Auto-filled {values.category} &amp; URL
+                      </span>
+                    )}
+                  </div>
                   <div className="relative">
                     <Building2 className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <input
@@ -171,10 +188,30 @@ function SubmitCouponPage() {
                       }`}
                     />
                   </div>
+                  {/* Live Store Suggestions */}
+                  {values.storeName.trim().length > 1 &&
+                    searchStorePresets(values.storeName, 4).length > 0 &&
+                    !STORE_PRESETS.some((p) => p.name.toLowerCase() === values.storeName.toLowerCase()) && (
+                      <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                        <span className="text-[10px] text-muted-foreground">Auto-fill:</span>
+                        {searchStorePresets(values.storeName, 4).map((p) => (
+                          <button
+                            key={p.name}
+                            type="button"
+                            onClick={() => handleSelectStorePreset(p)}
+                            className="inline-flex items-center gap-1 rounded-md bg-primary/10 border border-primary/20 px-2 py-0.5 text-[11px] font-semibold text-primary hover:bg-primary/20 transition-colors cursor-pointer"
+                          >
+                            <span>{p.name}</span>
+                            <span className="text-[9px] text-muted-foreground font-normal">({p.category})</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   {errors.storeName && (
                     <p className="mt-1 text-xs text-rose-500">{errors.storeName}</p>
                   )}
                 </div>
+
 
                 <div>
                   <label htmlFor="code" className="block text-xs font-semibold text-foreground mb-1.5">

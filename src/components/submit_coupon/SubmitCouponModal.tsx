@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { useSubmitCoupon } from "./useSubmitCoupon";
 import { EmailOtpVerifier } from "./EmailOtpVerifier";
+import { STORE_PRESETS, searchStorePresets } from "./storeAutoFill";
 import { ALLOWED_CATEGORIES } from "./validation";
 import type { SubmitCouponModalProps } from "./types";
 
@@ -68,6 +69,7 @@ export function SubmitCouponModal({
     handleSendOtp,
     handleVerifyOtp,
     handleChangeEmail,
+    handleSelectStorePreset,
   } = useSubmitCoupon({
     defaultStore,
     defaultCategory,
@@ -156,14 +158,19 @@ export function SubmitCouponModal({
             <form onSubmit={handleSubmit} className="space-y-4 pt-3">
               {/* Store Name Input */}
               <div className="space-y-1">
-                <label htmlFor="submit-coupon-store-name" className="text-xs font-bold text-foreground flex items-center justify-between">
-                  <span>
+                <div className="flex items-center justify-between">
+                  <label htmlFor="submit-coupon-store-name" className="text-xs font-bold text-foreground">
                     Store or Merchant Name <span className="text-rose-500">*</span>
-                  </span>
-                  {errors.storeName && (
+                  </label>
+                  {values.url && (
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                      ✓ Auto-filled {values.category} &amp; URL
+                    </span>
+                  )}
+                  {errors.storeName && !values.url && (
                     <span className="text-[10px] text-rose-500 font-semibold">{errors.storeName}</span>
                   )}
-                </label>
+                </div>
                 <div className="relative">
                   <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <input
@@ -180,6 +187,25 @@ export function SubmitCouponModal({
                   />
                 </div>
 
+                {/* Live Store Suggestions while typing */}
+                {values.storeName.trim().length > 1 &&
+                  searchStorePresets(values.storeName, 4).length > 0 &&
+                  !STORE_PRESETS.some((p) => p.name.toLowerCase() === values.storeName.toLowerCase()) && (
+                    <div className="flex flex-wrap items-center gap-1 pt-1">
+                      <span className="text-[10px] text-muted-foreground">Auto-fill:</span>
+                      {searchStorePresets(values.storeName, 4).map((p) => (
+                        <button
+                          key={p.name}
+                          type="button"
+                          onClick={() => handleSelectStorePreset(p)}
+                          className="rounded-md bg-primary/10 border border-primary/20 px-1.5 py-0.5 text-[10px] text-primary font-medium hover:bg-primary/20 transition-colors cursor-pointer"
+                        >
+                          {p.name} ({p.category})
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
                 {/* Quick Store Chips */}
                 {!values.storeName && (
                   <div className="flex flex-wrap items-center gap-1 pt-1">
@@ -188,7 +214,14 @@ export function SubmitCouponModal({
                       <button
                         key={s}
                         type="button"
-                        onClick={() => setFieldValue("storeName", s)}
+                        onClick={() => {
+                          const preset = STORE_PRESETS.find((p) => p.name.toLowerCase() === s.toLowerCase());
+                          if (preset) {
+                            handleSelectStorePreset(preset);
+                          } else {
+                            setFieldValue("storeName", s);
+                          }
+                        }}
                         className="rounded-md bg-muted/60 hover:bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                       >
                         {s}
@@ -197,6 +230,7 @@ export function SubmitCouponModal({
                   </div>
                 )}
               </div>
+
 
               {/* Coupon Code Input */}
               <div className="space-y-1">

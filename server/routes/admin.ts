@@ -18,6 +18,7 @@ import { STORES_DB } from "../../src/lib/server-data/stores-db.js";
 import { globalCache } from "../../src/lib/services/cache-service.js";
 import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
 import { submissionsDb, dealsDb, clicksDb, adminUsersDb, settingsDb, getDatabaseDiagnostics } from "../services/db.js";
+import { sendCouponApprovedEmail } from "../services/email.js";
 
 export const adminRouter = Router();
 
@@ -1061,6 +1062,17 @@ adminRouter.post("/submissions/:id/approve", requireAdminAuth, async (req: Reque
   sub.approvedDealId = dealId;
   saveJson(SUBMISSIONS_FILE, submissions);
   await submissionsDb.updateStatus(id, "approved");
+
+  // Automated notification email to submitter
+  if (sub.email) {
+    sendCouponApprovedEmail({
+      to: sub.email,
+      storeName: sub.storeName,
+      code: sub.code,
+      discount: sub.discount,
+      dealUrl: `https://gocoupon.io/${storeSlug}`,
+    }).catch((err) => console.warn("[Approval Email Dispatch Error]:", err.message));
+  }
 
   res.json({
     success: true,
