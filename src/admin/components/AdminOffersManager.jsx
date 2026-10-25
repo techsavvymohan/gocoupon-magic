@@ -93,46 +93,60 @@ export default function AdminOffersManager() {
   const affiliateEditedRef = useRef(false);
 
   async function loadData() {
-    const [offersResponse, storesResponse, clicksResponse] = await Promise.all([
-      fetch("/api/offers?includeExpired=true", { cache: "no-store" }),
-      fetch("/api/stores", { cache: "no-store" }),
-      fetch("/api/admin/clicks/counts", { headers: getAdminAuthHeaders(), cache: "no-store" }).catch(() => null),
-    ]);
-
-    const [offersPayload, storesPayload] = await Promise.all([offersResponse.json(), storesResponse.json()]);
-    if (clicksResponse && clicksResponse.ok) {
-      try {
-        const clicksPayload = await clicksResponse.json();
-        setClickCounts(clicksPayload.counts || {});
-      } catch {}
-    }
-    setOffers(offersPayload.data || []);
-    setStores(storesPayload.data || storesPayload.stores || []);
-    setSelectedOfferIds((current) => current.filter((id) => (offersPayload.data || []).some((offer) => offer.id === id)));
-  }
-
-  useEffect(() => {
-    let active = true;
-
-    async function hydrateData() {
+    try {
       const [offersResponse, storesResponse, clicksResponse] = await Promise.all([
         fetch("/api/offers?includeExpired=true", { cache: "no-store" }),
         fetch("/api/stores", { cache: "no-store" }),
         fetch("/api/admin/clicks/counts", { headers: getAdminAuthHeaders(), cache: "no-store" }).catch(() => null),
       ]);
 
-      const [offersPayload, storesPayload] = await Promise.all([offersResponse.json(), storesResponse.json()]);
+      const [offersPayload, storesPayload] = await Promise.all([
+        offersResponse.json().catch(() => ({ data: [] })),
+        storesResponse.json().catch(() => ({ data: [] })),
+      ]);
+      if (clicksResponse && clicksResponse.ok) {
+        try {
+          const clicksPayload = await clicksResponse.json();
+          setClickCounts(clicksPayload.counts || {});
+        } catch {}
+      }
+      setOffers(offersPayload?.data || []);
+      setStores(storesPayload?.data || storesPayload?.stores || []);
+      setSelectedOfferIds((current) => current.filter((id) => (offersPayload?.data || []).some((offer) => offer.id === id)));
+    } catch (err) {
+      console.error("Failed to load offers/stores:", err);
+    }
+  }
 
-      if (active) {
-        if (clicksResponse && clicksResponse.ok) {
-          try {
-            const clicksPayload = await clicksResponse.json();
-            setClickCounts(clicksPayload.counts || {});
-          } catch {}
+  useEffect(() => {
+    let active = true;
+
+    async function hydrateData() {
+      try {
+        const [offersResponse, storesResponse, clicksResponse] = await Promise.all([
+          fetch("/api/offers?includeExpired=true", { cache: "no-store" }),
+          fetch("/api/stores", { cache: "no-store" }),
+          fetch("/api/admin/clicks/counts", { headers: getAdminAuthHeaders(), cache: "no-store" }).catch(() => null),
+        ]);
+
+        const [offersPayload, storesPayload] = await Promise.all([
+          offersResponse.json().catch(() => ({ data: [] })),
+          storesResponse.json().catch(() => ({ data: [] })),
+        ]);
+
+        if (active) {
+          if (clicksResponse && clicksResponse.ok) {
+            try {
+              const clicksPayload = await clicksResponse.json();
+              setClickCounts(clicksPayload.counts || {});
+            } catch {}
+          }
+          setOffers(offersPayload?.data || []);
+          setStores(storesPayload?.data || storesPayload?.stores || []);
+          setSelectedOfferIds([]);
         }
-        setOffers(offersPayload.data || []);
-        setStores(storesPayload.data || storesPayload.stores || []);
-        setSelectedOfferIds([]);
+      } catch (err) {
+        console.error("Failed to hydrate offers/stores:", err);
       }
     }
 

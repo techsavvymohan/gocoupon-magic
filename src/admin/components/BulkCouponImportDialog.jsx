@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, useDialogA11yIds } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 
 const TEMPLATE_HEADERS = ["storeSlug", "title", "description", "type", "code", "expiryDate", "status", "source", "affiliateLink"];
 const REQUIRED_FIELDS = ["storeSlug", "title"];
@@ -347,7 +348,10 @@ export default function BulkCouponImportDialog({ open, onOpenChange, stores = []
     try {
       const response = await fetch("/api/offers/bulk", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...getAdminAuthHeaders(),
+        },
         body: JSON.stringify({ rows: rowsToImport }),
       });
       const payload = await response.json();

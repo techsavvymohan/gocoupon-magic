@@ -322,7 +322,10 @@ export default function AdminBlogsManager() {
 
       const res = await fetch(endpoint, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...getAdminAuthHeaders(),
+        },
         body: JSON.stringify(submissionData),
       });
 
@@ -350,6 +353,7 @@ export default function AdminBlogsManager() {
     try {
       const res = await fetch(`/api/blogs/${deleteTarget.slug}`, {
         method: "DELETE",
+        headers: getAdminAuthHeaders(),
       });
       const json = await res.json();
       if (json.success) {

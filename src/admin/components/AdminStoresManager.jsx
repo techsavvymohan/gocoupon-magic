@@ -270,12 +270,14 @@ export default function AdminStoresManager() {
         categoriesResponse.json(),
         countriesResponse.json(),
       ]);
-      setStores(storesPayload.data || []);
-      setCategories(categoriesPayload.data || []);
-      setCountries(sanitizeCountryList(countriesPayload.data || SUPPORTED_COUNTRIES));
+      setStores(storesPayload?.data || []);
+      setCategories(categoriesPayload?.data || []);
+      setCountries(sanitizeCountryList(countriesPayload?.data || SUPPORTED_COUNTRIES));
       setSelectedStoreSlugs((current) =>
-        current.filter((slug) => (storesPayload.data || []).some((store) => store.slug === slug))
+        current.filter((slug) => (storesPayload?.data || []).some((store) => store.slug === slug))
       );
+    } catch (err) {
+      console.error("Failed to load stores/categories/countries:", err);
     } finally {
       setIsHydrating(false);
     }
@@ -294,17 +296,19 @@ export default function AdminStoresManager() {
           fetch("/api/public/countries", { cache: "no-store" }),
         ]);
         const [storesPayload, categoriesPayload, countriesPayload] = await Promise.all([
-          storesResponse.json(),
-          categoriesResponse.json(),
-          countriesResponse.json(),
+          storesResponse.json().catch(() => ({ data: [] })),
+          categoriesResponse.json().catch(() => ({ data: [] })),
+          countriesResponse.json().catch(() => ({ data: [] })),
         ]);
 
         if (active) {
-          setStores(storesPayload.data || []);
-          setCategories(categoriesPayload.data || []);
-          setCountries(sanitizeCountryList(countriesPayload.data || SUPPORTED_COUNTRIES));
+          setStores(storesPayload?.data || []);
+          setCategories(categoriesPayload?.data || []);
+          setCountries(sanitizeCountryList(countriesPayload?.data || SUPPORTED_COUNTRIES));
           setSelectedStoreSlugs([]);
         }
+      } catch (err) {
+        console.error("Failed to hydrate stores:", err);
       } finally {
         if (active) {
           setIsHydrating(false);

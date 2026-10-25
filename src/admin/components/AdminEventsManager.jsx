@@ -102,6 +102,8 @@ export default function AdminEventsManager() {
       const response = await fetch("/api/events", { cache: "no-store" });
       const payload = await response.json();
       setEvents(payload.data || []);
+    } catch (err) {
+      console.error("Failed to load events:", err);
     } finally {
       setIsRefreshing(false);
     }
@@ -145,7 +147,10 @@ export default function AdminEventsManager() {
     const method = editingEvent ? "PUT" : "POST";
     const response = await fetch(endpoint, {
       method,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...getAdminAuthHeaders(),
+      },
       body: JSON.stringify(values),
     });
     const payload = await response.json();

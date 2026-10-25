@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, useDialogA11yIds } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 
 const categorySchema = z.object({
   name: z.string().trim().min(1, "Category name is required."),
@@ -109,6 +110,8 @@ export default function AdminCategoriesManager() {
 
       setCategories(categoriesPayload.data || []);
       setStores(storesPayload.data || []);
+    } catch (err) {
+      console.error("Failed to load categories:", err);
     } finally {
       setIsHydrating(false);
       setIsRefreshing(false);
@@ -149,7 +152,10 @@ export default function AdminCategoriesManager() {
 
     const response = await fetch(endpoint, {
       method,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...getAdminAuthHeaders(),
+      },
       body: JSON.stringify(values),
     });
     const payload = await response.json();
