@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { X } from "lucide-react";
 import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 
@@ -55,37 +56,46 @@ export default function AdminProductsManager() {
   const [error, setError] = useState("");
 
   const visibleProducts = useMemo(() => {
+    const list = Array.isArray(products) ? products : [];
     if (selectedStoreFilter === "all") {
-      return products;
+      return list;
     }
-    return products.filter((product) => product.storeSlug === selectedStoreFilter);
+    return list.filter((product) => product.storeSlug === selectedStoreFilter);
   }, [products, selectedStoreFilter]);
 
   async function loadData() {
-    const [productsResponse, storesResponse] = await Promise.all([
-      fetch("/api/products", { cache: "no-store" }),
-      fetch("/api/stores", { cache: "no-store" }),
-    ]);
-
-    const [productsPayload, storesPayload] = await Promise.all([productsResponse.json(), storesResponse.json()]);
-    setProducts(productsPayload.data || []);
-    setStores(storesPayload.data || []);
-  }
-
-  useEffect(() => {
-    let active = true;
-
-    async function hydrateData() {
+    try {
       const [productsResponse, storesResponse] = await Promise.all([
         fetch("/api/products", { cache: "no-store" }),
         fetch("/api/stores", { cache: "no-store" }),
       ]);
 
       const [productsPayload, storesPayload] = await Promise.all([productsResponse.json(), storesResponse.json()]);
+      setProducts(productsPayload?.data || productsPayload?.products || (Array.isArray(productsPayload) ? productsPayload : []));
+      setStores(storesPayload?.data || storesPayload?.stores || (Array.isArray(storesPayload) ? storesPayload : []));
+    } catch (err) {
+      console.error("Failed to load products/stores:", err);
+    }
+  }
 
-      if (active) {
-        setProducts(productsPayload.data || []);
-        setStores(storesPayload.data || []);
+  useEffect(() => {
+    let active = true;
+
+    async function hydrateData() {
+      try {
+        const [productsResponse, storesResponse] = await Promise.all([
+          fetch("/api/products", { cache: "no-store" }),
+          fetch("/api/stores", { cache: "no-store" }),
+        ]);
+
+        const [productsPayload, storesPayload] = await Promise.all([productsResponse.json(), storesResponse.json()]);
+
+        if (active) {
+          setProducts(productsPayload?.data || productsPayload?.products || (Array.isArray(productsPayload) ? productsPayload : []));
+          setStores(storesPayload?.data || storesPayload?.stores || (Array.isArray(storesPayload) ? storesPayload : []));
+        }
+      } catch (err) {
+        console.error("Failed to hydrate products/stores:", err);
       }
     }
 
@@ -257,7 +267,7 @@ export default function AdminProductsManager() {
               className="h-10 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 text-xs font-semibold text-zinc-800 dark:text-zinc-200 outline-none shadow-2xs"
             >
               <option value="all">All Store Catalogs</option>
-              {stores.map((store) => (
+              {Array.isArray(stores) && stores.map((store) => (
                 <option key={store.slug} value={store.slug}>
                   {store.name}
                 </option>
@@ -420,7 +430,7 @@ export default function AdminProductsManager() {
                     className="h-10 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 text-xs text-zinc-900 dark:text-white outline-none focus:border-emerald-600 cursor-pointer"
                   >
                     <option value="">Select store</option>
-                    {stores.map((store) => (
+                    {Array.isArray(stores) && stores.map((store) => (
                       <option key={store.slug} value={store.slug}>
                         {store.name}
                       </option>
@@ -504,8 +514,9 @@ export default function AdminProductsManager() {
                 <Button type="button" variant="outline" onClick={() => setOpen(false)} className="dark:bg-zinc-800 dark:border-zinc-700 dark:text-white text-xs font-semibold h-9 px-4 cursor-pointer">
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSubmitting || isUploadingImage} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-9 px-5 shadow-xs transition cursor-pointer" leadingIcon={isSubmitting ? <Spinner /> : null}>
-                  {isSubmitting ? "Saving Product..." : editingProduct ? "Update Product" : "Save Product"}
+                <Button type="submit" disabled={isSubmitting || isUploadingImage} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-9 px-5 shadow-xs transition cursor-pointer flex items-center gap-2">
+                  {isSubmitting && <Spinner />}
+                  <span>{isSubmitting ? "Saving Product..." : editingProduct ? "Update Product" : "Save Product"}</span>
                 </Button>
               </div>
             </div>
