@@ -348,12 +348,12 @@ function AdminOverviewDashboard({ onNavigate }: { onNavigate: (tab: string) => v
   const fetchStats = async () => {
     try {
       const [statsRes, offersRes, dbRes, clicksRes] = await Promise.all([
-        fetch("/api/admin/stats"),
+        fetch("/api/admin/stats", { headers: getAdminAuthHeaders() }).catch(() => null),
         fetch("/api/offers?limit=8"),
         fetch("/api/admin/database", { headers: getAdminAuthHeaders() }).catch(() => null),
         fetch("/api/admin/clicks", { headers: getAdminAuthHeaders() }).catch(() => null),
       ]);
-      if (statsRes.ok) {
+      if (statsRes && statsRes.ok) {
         const payload = await statsRes.json();
         setStats(payload?.data);
       }

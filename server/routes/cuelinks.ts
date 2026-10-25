@@ -21,6 +21,7 @@ import {
   getLiveDealsPool,
 } from "../services/providers/cuelinks-client.js";
 import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
+import { requireAdminAuth } from "./admin.js";
 
 export const cuelinksRouter = Router();
 
@@ -161,7 +162,7 @@ cuelinksRouter.post("/link", async (req: Request, res: Response) => {
  * Endpoint: POST /api/cuelinks/sync
  * Flushes cache and forces live re-fetch from Cuelinks API.
  */
-cuelinksRouter.post("/sync", async (_req: Request, res: Response) => {
+cuelinksRouter.post("/sync", requireAdminAuth, async (_req: Request, res: Response) => {
   const status = await testCuelinksConnection();
   const [coupons, campaigns] = await Promise.all([
     fetchCuelinksCoupons({ forceRefresh: true, limit: 30 }),

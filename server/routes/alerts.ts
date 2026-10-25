@@ -9,6 +9,7 @@
 
 import { Router, type Request, type Response } from "express";
 import { sendPriceDropEmail } from "../services/email.js";
+import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
 
 export interface PushAlertRegistration {
   id: string;
@@ -37,6 +38,21 @@ export const memoryAlertRegistrations = new Map<string, PushAlertRegistration>()
 export const alertsRouter = Router();
 
 alertsRouter.post("/register", async (req: Request, res: Response) => {
+  const clientIp =
+    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+    req.socket.remoteAddress ||
+    "127.0.0.1";
+
+  const rateCheck = apiRateLimiter.check(`alert-reg:${clientIp}`, 10, 60 * 1000);
+  if (!rateCheck.allowed) {
+    res.setHeader("Retry-After", String(rateCheck.retryAfterSeconds));
+    res.status(429).json({
+      error: `Too many alert registrations. Please wait ${rateCheck.retryAfterSeconds} seconds.`,
+      retryAfterSeconds: rateCheck.retryAfterSeconds,
+    });
+    return;
+  }
+
   const { subscription, productId, productTitle, targetPrice, currentPrice, store, email } =
     req.body || {};
 

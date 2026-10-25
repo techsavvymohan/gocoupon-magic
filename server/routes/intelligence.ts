@@ -44,12 +44,35 @@ function authenticateEnterprise(req: Request, res: Response, next: NextFunction)
   const authHeader = req.headers.authorization || (req.query.api_key as string);
   const token = typeof authHeader === "string" ? authHeader.replace(/^Bearer\s+/i, "").trim() : "";
 
-  // Allow sandbox/demo for easy testing without friction
-  const isDemo = !token || token === "demo_public_key" || token === "sandbox";
-  const tier = isDemo ? "sandbox" : token.startsWith("gc_ent_") ? "enterprise" : "pro";
-  const rateLimit = isDemo ? 20 : tier === "enterprise" ? 600 : 120; // requests per minute
+  const clientIp =
+    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+    req.socket.remoteAddress ||
+    "127.0.0.1";
 
-  const ipOrKey = token || req.ip || "guest";
+  const configuredEnterpriseKey = (process.env.ENTERPRISE_API_KEY || "").trim();
+
+  // Allow sandbox/demo for easy testing without friction (throttled by IP)
+  const isDemo = !token || token === "demo_public_key" || token === "sandbox";
+  let tier: "sandbox" | "pro" | "enterprise" = "sandbox";
+
+  if (!isDemo) {
+    if (configuredEnterpriseKey && token === configuredEnterpriseKey) {
+      tier = "enterprise";
+    } else if (token.startsWith("gc_ent_") && (!configuredEnterpriseKey || token === configuredEnterpriseKey)) {
+      tier = "enterprise";
+    } else if (token.startsWith("gc_live_")) {
+      tier = "pro";
+    } else {
+      res.status(401).json({
+        error: "Unauthorized: Invalid API key.",
+        message: "Please provide a valid GoCoupon Enterprise or Pro API key.",
+      });
+      return;
+    }
+  }
+
+  const rateLimit = tier === "enterprise" ? 600 : tier === "pro" ? 120 : 20; // requests per minute
+  const ipOrKey = isDemo ? `demo:${clientIp}` : `key:${token}`;
   const now = Date.now();
   const usage = clientRequests.get(ipOrKey) || { count: 0, resetAt: now + 60000 };
 

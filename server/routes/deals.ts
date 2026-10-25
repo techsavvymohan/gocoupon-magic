@@ -179,6 +179,22 @@ dealsRouter.get("/stores", async (_req: Request, res: Response) => {
  * Dispatches a 6-digit OTP from support@gocoupon.io to verify submitter email.
  */
 dealsRouter.post("/send-otp", async (req: Request, res: Response) => {
+  const clientIp =
+    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+    req.socket.remoteAddress ||
+    "127.0.0.1";
+
+  const rateCheck = apiRateLimiter.check(`send-otp:${clientIp}`, 5, 60 * 1000);
+  if (!rateCheck.allowed) {
+    res.setHeader("Retry-After", String(rateCheck.retryAfterSeconds));
+    res.status(429).json({
+      success: false,
+      message: `Too many verification requests. Please wait ${rateCheck.retryAfterSeconds} seconds before requesting again.`,
+      retryAfterSeconds: rateCheck.retryAfterSeconds,
+    });
+    return;
+  }
+
   const { email, storeName } = req.body || {};
   if (!email || typeof email !== "string" || !email.includes("@")) {
     res.status(400).json({
@@ -202,6 +218,22 @@ dealsRouter.post("/send-otp", async (req: Request, res: Response) => {
  * Validates the 6-digit code and returns a verification token.
  */
 dealsRouter.post("/verify-otp", async (req: Request, res: Response) => {
+  const clientIp =
+    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+    req.socket.remoteAddress ||
+    "127.0.0.1";
+
+  const rateCheck = apiRateLimiter.check(`verify-otp:${clientIp}`, 10, 60 * 1000);
+  if (!rateCheck.allowed) {
+    res.setHeader("Retry-After", String(rateCheck.retryAfterSeconds));
+    res.status(429).json({
+      success: false,
+      message: `Too many verification attempts. Please wait ${rateCheck.retryAfterSeconds} seconds.`,
+      retryAfterSeconds: rateCheck.retryAfterSeconds,
+    });
+    return;
+  }
+
   const { email, otp } = req.body || {};
   if (!email || !otp) {
     res.status(400).json({
@@ -355,7 +387,7 @@ dealsRouter.post("/submit", async (req: Request, res: Response) => {
  * GET /api/deals/submissions
  * Retrieves community coupon submissions from PostgreSQL / local cache.
  */
-dealsRouter.get("/submissions", async (_req: Request, res: Response) => {
+dealsRouter.get("/submissions", requireAdminAuth, async (_req: Request, res: Response) => {
   try {
     const submissions = await submissionsDb.getSubmissions();
     res.json({
@@ -521,8 +553,8 @@ async function handleSync(req: Request, res: Response) {
   }
 }
 
-dealsRouter.get("/sync", handleSync);
-dealsRouter.post("/sync", handleSync);
+dealsRouter.get("/sync", requireAdminAuth, handleSync);
+dealsRouter.post("/sync", requireAdminAuth, handleSync);
 
 /**
  * GET /api/deals/stats

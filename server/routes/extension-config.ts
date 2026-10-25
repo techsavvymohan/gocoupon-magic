@@ -8,6 +8,7 @@
 
 import { Router, type Request, type Response } from "express";
 import { dealsDb } from "../services/db.js";
+import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
 
 export const extensionRouter = Router();
 
@@ -412,6 +413,17 @@ extensionRouter.get("/coupons", async (req: Request, res: Response) => {
  */
 extensionRouter.post("/verify-report", async (req: Request, res: Response) => {
   try {
+    const clientIp =
+      (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+      req.socket.remoteAddress ||
+      "127.0.0.1";
+
+    const rateCheck = apiRateLimiter.check(`ext-report:${clientIp}`, 30, 60 * 1000);
+    if (!rateCheck.allowed) {
+      res.status(429).json({ success: false, error: "Rate limit exceeded. Please slow down." });
+      return;
+    }
+
     const { code, store, success, discountApplied, couponId } = req.body || {};
     if (!code || !store) {
       res.status(400).json({ success: false, error: "code and store are required" });

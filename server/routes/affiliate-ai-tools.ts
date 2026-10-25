@@ -18,8 +18,24 @@ import {
   fetchCuelinksCampaigns,
   fetchCuelinksCoupons,
 } from "../services/providers/cuelinks-client.js";
+import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
 
 export const affiliateAiToolsRouter = Router();
+
+affiliateAiToolsRouter.use((req: Request, res: Response, next) => {
+  const clientIp =
+    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+    req.socket.remoteAddress ||
+    "127.0.0.1";
+
+  const rateCheck = apiRateLimiter.check(`ai-tools:${clientIp}`, 60, 60 * 1000);
+  if (!rateCheck.allowed) {
+    res.setHeader("Retry-After", String(rateCheck.retryAfterSeconds));
+    res.status(429).json({ error: "Rate limit exceeded. Please slow down your requests." });
+    return;
+  }
+  next();
+});
 
 /**
  * Tool: @mcp_manifest

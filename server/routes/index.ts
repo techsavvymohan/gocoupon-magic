@@ -67,7 +67,7 @@ admitadRouter.get("/status", async (_req, res) => {
   });
 });
 
-admitadRouter.post("/sync", async (_req, res) => {
+admitadRouter.post("/sync", requireAdminAuth, async (_req, res) => {
   try {
     const result = await syncAdmitadDeals();
     res.json({ success: true, ...result, timestamp: new Date().toISOString() });

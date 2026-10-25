@@ -48,7 +48,7 @@ export function getAdminTokenSecret(): string {
     fs.writeFileSync(SECRET_FILE, fresh, "utf-8");
     return fresh;
   } catch {
-    return "GC_Secured_Admin_Session_Secret_Key_2026";
+    return crypto.randomBytes(32).toString("hex");
   }
 }
 
@@ -91,11 +91,7 @@ export function verifyAdminToken(token: string): AdminTokenPayload | null {
           `"${secret}"`,
           (process.env.ADMIN_PASSWORD || "").trim(),
           (process.env.ADMIN_PASSWORD || "").trim().replace(/^["']|["']$/g, ""),
-          "smgroup@9865",
-          "\"smgroup@9865\"",
-          "smgroup@9825",
-          "\"smgroup@9825\"",
-          "GC_Secured_Admin_Session_Secret_Key_2026",
+          (process.env.ADMIN_SESSION_SECRET || "").trim(),
         ].filter(Boolean)
       )
     );
@@ -109,12 +105,10 @@ export function verifyAdminToken(token: string): AdminTokenPayload | null {
       }
     }
 
-    if (signatureValid) {
-      return payload;
+    if (!signatureValid) {
+      return null;
     }
 
-    // Graceful session resilience across server restarts:
-    // If token was issued to an active registered admin (Surya or Mohan) and is unexpired:
     const cleanEmail = String(payload.email || "").trim().toLowerCase();
     const users = loadJson<StoredAdminUser[]>(USERS_FILE, defaultUsers);
     const matchedUser = users.find(
@@ -616,7 +610,7 @@ adminRouter.get("/cache/stats", requireAdminAuth, (_req: Request, res: Response)
 // ---------------------------------------------------------------------------
 // 4. Dashboard Stats Endpoint
 // ---------------------------------------------------------------------------
-adminRouter.get("/stats", async (req: Request, res: Response) => {
+adminRouter.get("/stats", requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const rawDeals = getLiveDealsPool();
     const validDeals = rawDeals.filter(isDealValid);
@@ -687,7 +681,7 @@ adminRouter.get("/clicks/counts", requireAdminAuth, async (_req: Request, res: R
 // ---------------------------------------------------------------------------
 // 5. Notifications Endpoints
 // ---------------------------------------------------------------------------
-adminRouter.get("/notifications", (req: Request, res: Response) => {
+adminRouter.get("/notifications", requireAdminAuth, (req: Request, res: Response) => {
   res.json({ success: true, data: adminNotifications });
 });
 
@@ -769,10 +763,11 @@ export function handleGetSeoFiles(req: Request, res: Response) {
 export function handleSaveSeoFile(req: Request, res: Response) {
   const publicDir = path.resolve(process.cwd(), "public");
   const { fileName, content } = req.body || {};
-  const safeName = String(fileName || "").replace(/[^a-zA-Z0-9._-]/g, "");
+  const baseName = path.basename(String(fileName || "").trim());
+  const safeName = baseName.replace(/[^a-zA-Z0-9._-]/g, "");
 
-  if (!safeName) {
-    res.status(400).json({ success: false, error: "File name is required." });
+  if (!safeName || safeName === "." || safeName.includes("..")) {
+    res.status(400).json({ success: false, error: "Valid file name is required." });
     return;
   }
 
@@ -782,7 +777,12 @@ export function handleSaveSeoFile(req: Request, res: Response) {
     return;
   }
 
-  const targetPath = path.join(publicDir, safeName);
+  const targetPath = path.resolve(publicDir, safeName);
+  if (!targetPath.startsWith(publicDir)) {
+    res.status(403).json({ success: false, error: "Path traversal prohibited." });
+    return;
+  }
+
   try {
     fs.writeFileSync(targetPath, String(content ?? ""), "utf-8");
     res.json({ success: true, fileName: safeName, message: `Successfully updated ${safeName}.` });
@@ -793,15 +793,27 @@ export function handleSaveSeoFile(req: Request, res: Response) {
 
 export function handleDeleteSeoFile(req: Request, res: Response) {
   const publicDir = path.resolve(process.cwd(), "public");
-  const rawName = String(req.query.fileName || req.body?.fileName || "");
-  const safeName = rawName.replace(/[^a-zA-Z0-9._-]/g, "");
+  const rawName = String(req.query.fileName || req.body?.fileName || "").trim();
+  const baseName = path.basename(rawName);
+  const safeName = baseName.replace(/[^a-zA-Z0-9._-]/g, "");
 
-  if (!safeName) {
-    res.status(400).json({ error: "File name is required." });
+  if (!safeName || safeName === "." || safeName.includes("..")) {
+    res.status(400).json({ error: "Valid file name is required." });
     return;
   }
 
-  const targetPath = path.join(publicDir, safeName);
+  // Prevent deleting critical static security or system files
+  if (safeName.startsWith(".well-known") || safeName === "robots.txt") {
+    res.status(403).json({ error: "Deleting system-critical configuration files is prohibited." });
+    return;
+  }
+
+  const targetPath = path.resolve(publicDir, safeName);
+  if (!targetPath.startsWith(publicDir)) {
+    res.status(403).json({ error: "Path traversal prohibited." });
+    return;
+  }
+
   if (fs.existsSync(targetPath)) {
     try {
       fs.unlinkSync(targetPath);
@@ -814,7 +826,7 @@ export function handleDeleteSeoFile(req: Request, res: Response) {
   }
 }
 
-adminRouter.get("/seo-files", handleGetSeoFiles);
+adminRouter.get("/seo-files", requireAdminAuth, handleGetSeoFiles);
 adminRouter.post("/seo-files", requireAdminAuth, handleSaveSeoFile);
 adminRouter.put("/seo-files", requireAdminAuth, handleSaveSeoFile);
 adminRouter.delete("/seo-files", requireAdminAuth, handleDeleteSeoFile);

@@ -13,6 +13,7 @@
 import { Router, type Request, type Response } from "express";
 import { conversionsDb } from "../services/conversions-service.js";
 import { requireAdminAuth } from "./admin.js";
+import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
 
 export const postbackRouter = Router();
 
@@ -126,7 +127,7 @@ postbackRouter.post("/", handleConversionPostback);
 /**
  * Diagnostic Analytics Endpoint: GET /api/postback/analytics
  */
-postbackRouter.get("/analytics", async (_req: Request, res: Response) => {
+postbackRouter.get("/analytics", requireAdminAuth, async (_req: Request, res: Response) => {
   try {
     const stats = await conversionsDb.getConversionAnalytics();
     res.setHeader("Cache-Control", "no-store");
@@ -146,7 +147,7 @@ postbackRouter.get("/analytics", async (_req: Request, res: Response) => {
  * Diagnostic Postback Simulator: POST /api/postback/simulate
  * Allows testing postbacks locally and verifying database records.
  */
-postbackRouter.post("/simulate", async (req: Request, res: Response) => {
+postbackRouter.post("/simulate", requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const {
       storeName = "Hostinger",
@@ -193,6 +194,21 @@ postbackRouter.post("/simulate", async (req: Request, res: Response) => {
  */
 postbackRouter.post("/claims", async (req: Request, res: Response) => {
   try {
+    const clientIp =
+      (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+      req.socket.remoteAddress ||
+      "127.0.0.1";
+
+    const rateCheck = apiRateLimiter.check(`claims:${clientIp}`, 5, 10 * 60 * 1000);
+    if (!rateCheck.allowed) {
+      res.setHeader("Retry-After", String(rateCheck.retryAfterSeconds));
+      res.status(429).json({
+        error: `Too many dispute claims filed. Please wait ${rateCheck.retryAfterSeconds} seconds.`,
+        retryAfterSeconds: rateCheck.retryAfterSeconds,
+      });
+      return;
+    }
+
     const { storeName, orderId, orderAmount, orderDate, subid, notes } = req.body || {};
 
     if (!storeName || !orderId) {
@@ -222,7 +238,7 @@ postbackRouter.post("/claims", async (req: Request, res: Response) => {
 /**
  * List Missing Transaction Claims: GET /api/postback/claims
  */
-postbackRouter.get("/claims", async (_req: Request, res: Response) => {
+postbackRouter.get("/claims", requireAdminAuth, async (_req: Request, res: Response) => {
   try {
     const claims = await conversionsDb.getMissingClaims();
     res.json({

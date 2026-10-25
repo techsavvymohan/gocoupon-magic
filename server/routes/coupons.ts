@@ -16,6 +16,7 @@ import {
 } from "../services/providers/cuelinks-client.js";
 import { otpService } from "../services/otp-service.js";
 import { recordNewSubmission } from "./admin.js";
+import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
 
 export const couponsRouter = Router();
 
@@ -92,6 +93,22 @@ couponsRouter.get("/", async (req: Request, res: Response) => {
  * Dispatches a 6-digit OTP from support@gocoupon.io to verify submitter email.
  */
 couponsRouter.post("/send-otp", async (req: Request, res: Response) => {
+  const clientIp =
+    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+    req.socket.remoteAddress ||
+    "127.0.0.1";
+
+  const rateCheck = apiRateLimiter.check(`send-otp:${clientIp}`, 5, 60 * 1000);
+  if (!rateCheck.allowed) {
+    res.setHeader("Retry-After", String(rateCheck.retryAfterSeconds));
+    res.status(429).json({
+      success: false,
+      message: `Too many verification requests. Please wait ${rateCheck.retryAfterSeconds} seconds before requesting again.`,
+      retryAfterSeconds: rateCheck.retryAfterSeconds,
+    });
+    return;
+  }
+
   const { email, storeName } = req.body || {};
   if (!email || typeof email !== "string" || !email.includes("@")) {
     res.status(400).json({
@@ -115,6 +132,22 @@ couponsRouter.post("/send-otp", async (req: Request, res: Response) => {
  * Validates the 6-digit code and returns a verification token.
  */
 couponsRouter.post("/verify-otp", async (req: Request, res: Response) => {
+  const clientIp =
+    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+    req.socket.remoteAddress ||
+    "127.0.0.1";
+
+  const rateCheck = apiRateLimiter.check(`verify-otp:${clientIp}`, 10, 60 * 1000);
+  if (!rateCheck.allowed) {
+    res.setHeader("Retry-After", String(rateCheck.retryAfterSeconds));
+    res.status(429).json({
+      success: false,
+      message: `Too many verification attempts. Please wait ${rateCheck.retryAfterSeconds} seconds.`,
+      retryAfterSeconds: rateCheck.retryAfterSeconds,
+    });
+    return;
+  }
+
   const { email, otp } = req.body || {};
   if (!email || !otp) {
     res.status(400).json({
@@ -139,6 +172,22 @@ couponsRouter.post("/verify-otp", async (req: Request, res: Response) => {
  * Strictly requires submitter email verified with OTP from support@gocoupon.io.
  */
 couponsRouter.post("/submit", async (req: Request, res: Response) => {
+  const clientIp =
+    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+    req.socket.remoteAddress ||
+    "127.0.0.1";
+
+  const rateCheck = apiRateLimiter.check(`coupon-submit:${clientIp}`, 10, 10 * 60 * 1000);
+  if (!rateCheck.allowed) {
+    res.setHeader("Retry-After", String(rateCheck.retryAfterSeconds));
+    res.status(429).json({
+      success: false,
+      error: `Too many submissions. Please wait ${rateCheck.retryAfterSeconds} seconds.`,
+      retryAfterSeconds: rateCheck.retryAfterSeconds,
+    });
+    return;
+  }
+
   const { storeName, code, discount, url, terms, category, email, verificationToken } = req.body || {};
 
   if (!storeName || !code) {

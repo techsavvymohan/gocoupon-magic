@@ -11,6 +11,8 @@
  */
 
 import { Router, type Request, type Response } from "express";
+import { requireAdminAuth } from "./admin.js";
+import { apiRateLimiter } from "../../src/lib/services/rate-limiter.js";
 
 export const rumRouter = Router();
 
@@ -32,6 +34,17 @@ const samples: VitalSample[] = [];
  */
 rumRouter.post("/vitals", (req: Request, res: Response) => {
   try {
+    const clientIp =
+      (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+      req.socket.remoteAddress ||
+      "127.0.0.1";
+
+    const rateCheck = apiRateLimiter.check(`rum:${clientIp}`, 60, 60 * 1000);
+    if (!rateCheck.allowed) {
+      res.status(429).end();
+      return;
+    }
+
     const data = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
     if (data && data.metric && typeof data.value === "number") {
       samples.unshift({
@@ -58,7 +71,7 @@ rumRouter.post("/vitals", (req: Request, res: Response) => {
  * GET /api/rum/vitals
  * Serves aggregated Core Web Vitals health metrics for admin dashboards.
  */
-rumRouter.get("/vitals", (_req: Request, res: Response) => {
+rumRouter.get("/vitals", requireAdminAuth, (_req: Request, res: Response) => {
   const metrics = ["LCP", "INP", "CLS", "FCP", "TTFB"] as const;
   const summary: Record<string, { count: number; avg: number; goodPercent: number; status: string }> = {};
 
