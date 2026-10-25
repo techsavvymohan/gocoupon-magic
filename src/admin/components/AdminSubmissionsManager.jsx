@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/ui/AppModal";
-import { X } from "lucide-react";
+import { X, CheckCircle2, ShieldCheck } from "lucide-react";
 import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 
 function CopyIcon({ className }) {
@@ -404,7 +404,30 @@ export default function AdminSubmissionsManager() {
                         </TableCell>
 
                         <TableCell>
-                          <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{sub.email || "Anonymous Guest"}</p>
+                          {sub.email ? (
+                            <div className="flex flex-col gap-0.5">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 max-w-[210px] truncate" title={sub.email}>
+                                  {sub.email}
+                                </span>
+                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-1.5 py-0.2 text-[9px] font-bold text-emerald-600 dark:text-emerald-400" title="Email verified with OTP via support@gocoupon.io">
+                                  <CheckCircle2 className="h-2.5 w-2.5" />
+                                  Verified
+                                </span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col gap-0.5">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 italic">
+                                  Anonymous Guest
+                                </span>
+                                <span className="inline-flex items-center rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-1.5 py-0.2 text-[9px] font-medium text-zinc-500">
+                                  Unverified
+                                </span>
+                              </div>
+                            </div>
+                          )}
                           <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
                             {new Date(sub.submittedAt).toLocaleDateString("en-US", {
                               month: "short",

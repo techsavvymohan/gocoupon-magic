@@ -13,6 +13,8 @@ import {
   fetchCuelinksCoupons,
   normalizeCuelinksToStoreCoupon,
 } from "../services/providers/cuelinks-client.js";
+import { otpService } from "../services/otp-service.js";
+import { recordNewSubmission } from "./admin.js";
 
 export const couponsRouter = Router();
 
@@ -85,16 +87,83 @@ couponsRouter.get("/", async (req: Request, res: Response) => {
 });
 
 /**
+ * POST /api/coupons/send-otp
+ * Dispatches a 6-digit OTP from support@gocoupon.io to verify submitter email.
+ */
+couponsRouter.post("/send-otp", async (req: Request, res: Response) => {
+  const { email, storeName } = req.body || {};
+  if (!email || typeof email !== "string" || !email.includes("@")) {
+    res.status(400).json({
+      success: false,
+      message: "A valid email address is required to receive the verification code.",
+    });
+    return;
+  }
+
+  const result = await otpService.sendOtp(email, storeName);
+  if (!result.success) {
+    res.status(400).json(result);
+    return;
+  }
+
+  res.json(result);
+});
+
+/**
+ * POST /api/coupons/verify-otp
+ * Validates the 6-digit code and returns a verification token.
+ */
+couponsRouter.post("/verify-otp", async (req: Request, res: Response) => {
+  const { email, otp } = req.body || {};
+  if (!email || !otp) {
+    res.status(400).json({
+      success: false,
+      message: "Email and 6-digit OTP code are required.",
+    });
+    return;
+  }
+
+  const result = otpService.verifyOtp(email, otp);
+  if (!result.success) {
+    res.status(400).json(result);
+    return;
+  }
+
+  res.json(result);
+});
+
+/**
  * POST /api/coupons/submit
  * Community verified coupon submission endpoint.
+ * Strictly requires submitter email verified with OTP from support@gocoupon.io.
  */
 couponsRouter.post("/submit", async (req: Request, res: Response) => {
-  const { storeName, code, discount, url, terms, category, email } = req.body || {};
+  const { storeName, code, discount, url, terms, category, email, verificationToken } = req.body || {};
 
   if (!storeName || !code) {
     res.status(400).json({
       success: false,
       error: "Store name and coupon code are required.",
+    });
+    return;
+  }
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim())) {
+    res.status(400).json({
+      success: false,
+      error: "A valid submitter email address is required.",
+    });
+    return;
+  }
+
+  const cleanEmail = String(email).trim().toLowerCase();
+
+  // Validate OTP verification status
+  const isVerified = otpService.isEmailVerified(cleanEmail, verificationToken);
+  if (!isVerified) {
+    res.status(403).json({
+      success: false,
+      error: "Email verification required. Please verify your email with the 6-digit code sent from support@gocoupon.io before submitting.",
     });
     return;
   }
@@ -108,15 +177,29 @@ couponsRouter.post("/submit", async (req: Request, res: Response) => {
       url: url ? String(url).trim() : undefined,
       terms: terms ? String(terms).trim() : undefined,
       category: category ? String(category).trim() : undefined,
-      email: email ? String(email).trim() : undefined,
+      email: cleanEmail,
     });
+
+    // Also persist in the Admin Submissions review queue
+    recordNewSubmission({
+      storeName: String(storeName).trim(),
+      code: String(code).trim().toUpperCase(),
+      discount: discount ? String(discount).trim() : undefined,
+      url: url ? String(url).trim() : undefined,
+      terms: terms ? String(terms).trim() : undefined,
+      category: category ? String(category).trim() : undefined,
+      email: cleanEmail,
+    });
+
+    otpService.consumeVerification(cleanEmail);
 
     res.status(201).json({
       success: true,
-      message: "Thank you! Your coupon has been recorded and submitted for validation.",
+      message: `Thank you! Your coupon has been verified and submitted for ${cleanEmail}.`,
       submission,
     });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
+

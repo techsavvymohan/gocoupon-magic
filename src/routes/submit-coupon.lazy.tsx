@@ -3,6 +3,7 @@ import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema } from "@/lib/seo";
 import { useSubmitCoupon } from "@/components/submit_coupon/useSubmitCoupon";
+import { EmailOtpVerifier } from "@/components/submit_coupon/EmailOtpVerifier";
 import { ALLOWED_CATEGORIES } from "@/components/submit_coupon/validation";
 import {
   Tag,
@@ -15,6 +16,7 @@ import {
   ShieldCheck,
   Zap,
   Globe2,
+  Lock,
 } from "lucide-react";
 
 export const Route = createLazyFileRoute("/submit-coupon")({
@@ -48,6 +50,15 @@ function SubmitCouponPage() {
     setFieldValue,
     handleSubmit,
     resetForm,
+    isSendingOtp,
+    isOtpSent,
+    isVerifyingOtp,
+    isEmailVerified,
+    verifiedEmail,
+    cooldown,
+    handleSendOtp,
+    handleVerifyOtp,
+    handleChangeEmail,
   } = useSubmitCoupon();
 
   const breadcrumbs = breadcrumbSchema([
@@ -231,7 +242,27 @@ function SubmitCouponPage() {
                 </div>
               </div>
 
-              {/* Deal URL & Submitter Email */}
+              {/* Submitter Email & OTP Verification (Mandatory) */}
+              <EmailOtpVerifier
+                email={values.email}
+                otp={values.otp}
+                emailError={errors.email}
+                otpError={errors.otp}
+                isSendingOtp={isSendingOtp}
+                isOtpSent={isOtpSent}
+                isVerifyingOtp={isVerifyingOtp}
+                isEmailVerified={isEmailVerified}
+                verifiedEmail={verifiedEmail}
+                cooldown={cooldown}
+                onEmailChange={(val) => setFieldValue("email", val)}
+                onOtpChange={(val) => setFieldValue("otp", val)}
+                onSendOtp={handleSendOtp}
+                onVerifyOtp={handleVerifyOtp}
+                onChangeEmail={handleChangeEmail}
+                disabled={isSubmitting}
+              />
+
+              {/* Deal URL & Terms */}
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
                   <label htmlFor="url" className="block text-xs font-semibold text-foreground mb-1.5">
@@ -248,53 +279,47 @@ function SubmitCouponPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-xs font-semibold text-foreground mb-1.5">
-                    Your Email (Optional, for contributor credit)
+                  <label htmlFor="terms" className="block text-xs font-semibold text-foreground mb-1.5">
+                    Terms or Restrictions (Optional)
                   </label>
                   <input
-                    id="email"
-                    type="email"
-                    placeholder="shopper@domain.com"
-                    value={values.email || ""}
-                    onChange={(e) => setFieldValue("email", e.target.value)}
+                    id="terms"
+                    type="text"
+                    placeholder="e.g. Valid on minimum order of $50."
+                    value={values.terms || ""}
+                    onChange={(e) => setFieldValue("terms", e.target.value)}
                     className="w-full rounded-2xl border border-border bg-background/80 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-hidden focus:ring-2 focus:ring-primary"
                   />
                 </div>
-              </div>
-
-              {/* Terms / Conditions */}
-              <div>
-                <label htmlFor="terms" className="block text-xs font-semibold text-foreground mb-1.5">
-                  Terms or Restrictions (Optional)
-                </label>
-                <textarea
-                  id="terms"
-                  rows={2}
-                  placeholder="e.g. Valid on minimum order of $50. Applies to first-time orders only."
-                  value={values.terms || ""}
-                  onChange={(e) => setFieldValue("terms", e.target.value)}
-                  className="w-full rounded-2xl border border-border bg-background/80 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-hidden focus:ring-2 focus:ring-primary"
-                />
               </div>
 
               {/* Trust Callout */}
               <div className="flex items-center gap-3 rounded-2xl border border-border/80 bg-muted/30 p-3.5 text-xs text-muted-foreground">
                 <ShieldCheck className="h-5 w-5 shrink-0 text-emerald-500" />
                 <span>
-                  All submissions are automatically scanned for spam and verified against store checkout forms before appearing on the public deals feed.
+                  All community submissions are verified via OTP from <strong>support@gocoupon.io</strong> to guarantee genuine coupons and prevent spam.
                 </span>
               </div>
 
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="inline-flex w-full min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-transform hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 cursor-pointer"
+                disabled={isSubmitting || !isEmailVerified}
+                className={`inline-flex w-full min-h-[48px] items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold shadow-lg transition-transform hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 cursor-pointer ${
+                  isEmailVerified
+                    ? "bg-primary text-primary-foreground shadow-primary/25"
+                    : "bg-muted text-muted-foreground border border-border cursor-not-allowed"
+                }`}
               >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Verifying and Submitting...</span>
+                    <span>Submitting Verified Coupon...</span>
+                  </>
+                ) : !isEmailVerified ? (
+                  <>
+                    <Lock className="h-4 w-4" />
+                    <span>Verify Email with OTP to Submit</span>
                   </>
                 ) : (
                   <>
@@ -306,6 +331,7 @@ function SubmitCouponPage() {
             </form>
           )}
         </div>
+
 
         {/* Global Impact Highlights */}
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3 text-center">

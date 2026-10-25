@@ -11,7 +11,20 @@ export interface SubmitCouponPayload {
   url?: string;
   terms?: string;
   expiryDate?: string;
-  email?: string;
+  email: string;
+  verificationToken?: string;
+}
+
+export interface SendOtpResult {
+  success: boolean;
+  message: string;
+  cooldownSeconds?: number;
+}
+
+export interface VerifyOtpResult {
+  success: boolean;
+  message: string;
+  verificationToken?: string;
 }
 
 export interface SubmitCouponResult {
@@ -37,6 +50,7 @@ export interface CouponSubmissionFormValues {
   terms: string;
   expiryDate: string;
   email: string;
+  otp: string;
 }
 
 export interface SubmitCouponModalProps {

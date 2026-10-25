@@ -68,11 +68,11 @@ export function normalizeAndValidateUrl(rawUrl?: string): {
 }
 
 /**
- * Validates optional email format.
+ * Validates required submitter email format.
  */
 export function validateEmail(email?: string): { isValid: boolean; error?: string } {
   if (!email || !email.trim()) {
-    return { isValid: true };
+    return { isValid: false, error: "Submitter email address is required." };
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -122,10 +122,10 @@ export function validateCouponSubmission(values: CouponSubmissionFormValues): {
     errors.url = urlCheck.error || "Invalid URL.";
   }
 
-  // 5. Email Validation
+  // 5. Email Validation (Mandatory for verified submission)
   const emailCheck = validateEmail(values.email);
   if (!emailCheck.isValid) {
-    errors.email = emailCheck.error || "Invalid email format.";
+    errors.email = emailCheck.error || "Submitter email address is required.";
   }
 
   // 6. Discount Validation (optional, max 100 chars)
@@ -148,8 +148,9 @@ export function validateCouponSubmission(values: CouponSubmissionFormValues): {
           url: urlCheck.url || undefined,
           terms: values.terms.trim() || undefined,
           expiryDate: values.expiryDate.trim() || undefined,
-          email: values.email.trim() || undefined,
+          email: values.email.trim().toLowerCase(),
         }
       : undefined,
   };
 }
+

@@ -9,3 +9,4 @@ export * from "./api";
 export * from "./useSubmitCoupon";
 export * from "./SubmitCouponModal";
 export * from "./SubmitCouponButton";
+export * from "./EmailOtpVerifier";
