@@ -334,38 +334,17 @@ dealsRouter.post("/submit", async (req: Request, res: Response) => {
     // Consume or acknowledge OTP session
     otpService.consumeVerification(cleanEmail);
 
-    // Ingest into active deals pool
-    const newDeal: DealRecord = {
-      id: `cue_user_${submission.id}`,
+    broadcastRealtimeEvent("deal:submitted", {
       storeName: submission.storeName,
-      storeSlug: submission.storeName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") + "-coupons",
-      storeLogo: resolveStoreLogo(submission.storeName, submission.url) || brandAssetsService.getLogoUrl(submission.storeName) || "https://res.cloudinary.com/pgzfcjir/image/upload/v1790745770/gocoupon/brands/brand_default.png",
-      category: (submission.category as any) || "General",
-      title: submission.discount ? `${submission.discount} at ${submission.storeName}` : `Verified Offer at ${submission.storeName}`,
       code: submission.code,
-      discount: submission.discount || "Verified Deal",
-      badge: "Verified",
-      verifiedDate: "Live Verified",
-      expiresIn: "30 days left",
-      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      terms: submission.terms || `Community verified offer for ${submission.storeName}.`,
-      link: submission.url || `https://${submission.storeName.toLowerCase().replace(/[^a-z0-9]/g, "")}.com`,
-      usesCount: 50,
-      source: "community",
-      verified: true,
-      status: "pending",
-      type: "coupon",
-    };
-    addDealToPool(newDeal);
-    broadcastRealtimeEvent("deal:submitted", { storeName: submission.storeName, code: submission.code, title: newDeal.title, email: cleanEmail });
-    dealsDb.upsertDeals([newDeal]).catch((e) => console.warn("[Deals DB Upsert Warning]:", e.message));
-    await globalCache.deletePrefix("deals:");
+      title: submission.discount ? `${submission.discount} at ${submission.storeName}` : `Verified Offer at ${submission.storeName}`,
+      email: cleanEmail,
+    });
 
     res.status(201).json({
       success: true,
-      message: `Thank you! Your coupon has been verified and submitted for ${cleanEmail}.`,
+      message: `Thank you! Your coupon has been verified and submitted for ${cleanEmail}. It will be published upon admin verification.`,
       submission,
-      deal: newDeal,
     });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });

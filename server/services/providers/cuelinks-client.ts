@@ -682,18 +682,20 @@ export function isDealValid(deal: {
   campaignSource?: string;
   id?: string;
 }): boolean {
-  if (deal.status === "inactive" || deal.status === "expired") return false;
-  if (deal.expiresIn === "Expired") return false;
+  if (deal.status === "inactive" || deal.status === "expired" || deal.status === "pending") return false;
 
-  // Strict expiration date check with end-of-day accuracy
-  const endMs = parseExpiryTimestamp(deal.endDate);
-  if (endMs !== null && endMs < Date.now()) {
-    // Only true custom admin-created coupons (not affiliate feeds) are exempt
-    const isAdminCustom =
-      deal.source === "admin" &&
-      deal.id &&
-      (String(deal.id).startsWith("ac-") || String(deal.id).startsWith("admin-"));
-    if (!isAdminCustom) {
+  // Only true custom admin-created coupons (not affiliate feeds) are exempt from automatic expiration
+  const isAdminCustom =
+    deal.source === "admin" &&
+    deal.id &&
+    (String(deal.id).startsWith("ac-") || String(deal.id).startsWith("admin-"));
+
+  if (!isAdminCustom) {
+    if (deal.expiresIn === "Expired") return false;
+
+    // Strict expiration date check with end-of-day accuracy
+    const endMs = parseExpiryTimestamp(deal.endDate);
+    if (endMs !== null && endMs < Date.now()) {
       return false; // Automatically prune expired affiliate deal
     }
   }

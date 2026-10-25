@@ -190,7 +190,7 @@ export default function AdminSettingsPanel() {
 
   async function fetchSeoFiles() {
     try {
-      const res = await fetch("/api/admin/seo-files", { cache: "no-store" });
+      const res = await fetch("/api/admin/seo-files", { headers: getAdminAuthHeaders(), cache: "no-store" });
       const data = await res.json();
       if (res.ok && data.files) {
         setSeoFiles(data.files);

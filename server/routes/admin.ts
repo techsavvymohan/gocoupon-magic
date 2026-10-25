@@ -12,6 +12,7 @@ import {
   syncLiveCuelinksDeals,
   getLiveDealsPool,
   addDealToPool,
+  deleteDealFromPool,
   isDealValid,
 } from "../services/providers/cuelinks-client.js";
 import { STORES_DB } from "../../src/lib/server-data/stores-db.js";
@@ -1152,14 +1153,21 @@ adminRouter.put("/submissions/:id", requireAdminAuth, (req: Request, res: Respon
 adminRouter.delete("/submissions/:id", requireAdminAuth, async (req: Request, res: Response) => {
   const id = String(req.params.id);
   let submissions = loadJson(SUBMISSIONS_FILE, defaultSubmissions);
-  const initialLen = submissions.length;
-  submissions = submissions.filter((s) => s.id !== id);
+  const target = submissions.find((s) => s.id === id);
 
-  if (submissions.length === initialLen) {
+  if (!target) {
     res.status(404).json({ success: false, error: `Submission '${id}' not found.` });
     return;
   }
 
+  // If this submission was approved into the live pool, clean up the deal as well
+  if (target.approvedDealId) {
+    deleteDealFromPool(target.approvedDealId);
+    dealsDb.deleteDeal(target.approvedDealId).catch(() => {});
+    await globalCache.deletePrefix("deals:");
+  }
+
+  submissions = submissions.filter((s) => s.id !== id);
   saveJson(SUBMISSIONS_FILE, submissions);
   await submissionsDb.deleteSubmission(id);
   res.json({ success: true, message: `Submission '${id}' deleted.` });

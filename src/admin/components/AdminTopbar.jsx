@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { useAdminTheme } from "./AdminThemeProvider";
 import { Link } from "@/admin/compat";
+import { getAdminAuthHeaders } from "@/context/AdminAuthContext";
 
 function ChevronRightIcon() {
   return (
@@ -67,7 +68,7 @@ export default function AdminTopbar({ title, breadcrumbTrail = [], onToggleMobil
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const res = await fetch("/api/admin/notifications", { cache: "no-store" });
+      const res = await fetch("/api/admin/notifications", { headers: getAdminAuthHeaders(), cache: "no-store" });
       const json = await res.json();
       if (json?.data) {
         setNotifications(json.data);
@@ -79,14 +80,14 @@ export default function AdminTopbar({ title, breadcrumbTrail = [], onToggleMobil
 
   async function markAllAsRead() {
     try {
-      await fetch("/api/admin/notifications", { method: "POST" });
+      await fetch("/api/admin/notifications", { method: "POST", headers: getAdminAuthHeaders() });
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     } catch {}
   }
 
   async function handleClearAll() {
     try {
-      await fetch("/api/admin/notifications", { method: "DELETE" });
+      await fetch("/api/admin/notifications", { method: "DELETE", headers: getAdminAuthHeaders() });
       setNotifications([]);
     } catch {}
   }
@@ -95,7 +96,7 @@ export default function AdminTopbar({ title, breadcrumbTrail = [], onToggleMobil
     let active = true;
 
     function loadNotifications() {
-      fetch("/api/admin/notifications", { cache: "no-store" })
+      fetch("/api/admin/notifications", { headers: getAdminAuthHeaders(), cache: "no-store" })
         .then((res) => res.json())
         .then((json) => {
           if (active && json?.data) {

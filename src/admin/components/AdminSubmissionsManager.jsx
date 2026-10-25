@@ -100,6 +100,7 @@ export default function AdminSubmissionsManager() {
     try {
       const res = await fetch(`/api/admin/submissions/${sub.id}/approve`, {
         method: "POST",
+        headers: getAdminAuthHeaders(),
       });
       const json = await res.json();
       if (json.success) {
@@ -132,7 +133,10 @@ export default function AdminSubmissionsManager() {
     try {
       const res = await fetch(`/api/admin/submissions/${editingSub.id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          ...getAdminAuthHeaders(),
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(editForm),
       });
       const json = await res.json();
@@ -157,7 +161,10 @@ export default function AdminSubmissionsManager() {
     try {
       const res = await fetch(`/api/admin/submissions/${rejectTarget.id}/reject`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          ...getAdminAuthHeaders(),
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ reason: rejectReason }),
       });
       const json = await res.json();
@@ -179,12 +186,15 @@ export default function AdminSubmissionsManager() {
     try {
       const res = await fetch(`/api/admin/submissions/${deleteTarget.id}`, {
         method: "DELETE",
+        headers: getAdminAuthHeaders(),
       });
       const json = await res.json();
       if (json.success) {
         toast.success("Submission removed.");
         setDeleteTarget(null);
         fetchSubmissions();
+      } else {
+        toast.error(json.error || "Delete failed.");
       }
     } catch {
       toast.error("Error deleting submission.");
