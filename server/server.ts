@@ -90,6 +90,23 @@ app.use((_req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
+// Subdomain Isolation Guard: mta-sts.gocoupon.io is ONLY for RFC 8461 mail policy
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const host = (req.hostname || (req.headers.host || "")).toLowerCase();
+  if (host.startsWith("mta-sts.")) {
+    if (req.path === "/.well-known/mta-sts.txt") {
+      return next();
+    }
+    if (req.path === "/robots.txt") {
+      res.setHeader("Content-Type", "text/plain");
+      return res.send("User-agent: *\nDisallow: /\n");
+    }
+    res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
+    return res.status(404).send("Not Found");
+  }
+  next();
+});
+
 // Standard Middlewares
 app.use(
   cors({
@@ -226,7 +243,14 @@ if (fs.existsSync(distDir)) {
       return res.redirect(301, `https://gocoupon.io${req.url}`);
     }
 
-    // 2. Trailing-slash normalization: 301 redirect /path/ -> /path (except root "/")
+    // 2. Case normalization: 301 redirect uppercase URLs to lowercase (e.g. /Flipkart -> /flipkart)
+    // Eliminates 404s on Linux case-sensitive ext4 filesystem and consolidates SERP authority
+    if (/[A-Z]/.test(req.path) && !req.path.startsWith("/assets/")) {
+      const queryString = req.url.slice(req.path.length);
+      return res.redirect(301, req.path.toLowerCase() + queryString);
+    }
+
+    // 3. Trailing-slash normalization: 301 redirect /path/ -> /path (except root "/")
     if (req.path.length > 1 && req.path.endsWith("/")) {
       const cleanTrailing = req.path.replace(/\/+$/, "");
       const queryString = req.url.slice(req.path.length);
@@ -235,15 +259,40 @@ if (fs.existsSync(distDir)) {
 
     const cleanPath = req.path.replace(/\/+$/, "") || "/";
 
-    // 3. Clean 301 redirect for legacy/subpath store links: /stores/:slug -> /:slug-coupons
-    if (cleanPath.startsWith("/stores/") && cleanPath.length > 8) {
-      const rawStoreSlug = cleanPath.slice(8).replace(/-coupons$/, "").trim();
+    // 4. Clean 301 redirect for legacy/subpath store links: /stores/:slug or /store/:slug -> /:slug-coupons
+    if ((cleanPath.startsWith("/stores/") && cleanPath.length > 8) || (cleanPath.startsWith("/store/") && cleanPath.length > 7)) {
+      const rawStoreSlug = cleanPath.replace(/^\/(?:stores|store)\//, "").replace(/-coupons$/, "").trim();
       if (rawStoreSlug) {
         return res.redirect(301, `/${rawStoreSlug}-coupons`);
       }
     }
 
-    // 4. Clean 301 redirects for all known duplicate/alias store slugs
+    // 5. Clean 301 redirect for plural category paths: /categories/:slug -> /category/:slug
+    if (cleanPath.startsWith("/categories/") && cleanPath.length > 12) {
+      const catSlug = cleanPath.slice(12).trim();
+      if (catSlug) {
+        return res.redirect(301, `/category/${catSlug}`);
+      }
+    }
+
+    // 6. Clean 301 redirect for duplicate suffix: /:slug-coupons-coupons -> /:slug-coupons
+    if (cleanPath.endsWith("-coupons-coupons")) {
+      const corrected = cleanPath.replace(/-coupons-coupons$/, "-coupons");
+      const queryString = req.url.slice(req.path.length);
+      return res.redirect(301, `${corrected}${queryString}`);
+    }
+
+    // 7. Dynamic store slug normalization: if base store name is requested (e.g. /flipkart, /amazon, /myntra)
+    // and the pre-rendered /flipkart-coupons.html exists in dist/, issue instant canonical 301 redirect!
+    if (!cleanPath.endsWith("-coupons") && !cleanPath.includes(".") && cleanPath.length > 1) {
+      const candidateCouponsHtml = path.join(distDir, `${cleanPath}-coupons.html`);
+      if (fs.existsSync(candidateCouponsHtml) && fs.statSync(candidateCouponsHtml).isFile()) {
+        const queryString = req.url.slice(req.path.length);
+        return res.redirect(301, `${cleanPath}-coupons${queryString}`);
+      }
+    }
+
+    // 8. Clean 301 redirects for all known duplicate/alias store slugs
     const CANONICAL_SLUG_REDIRECTS: Record<string, string> = {
       "/tatacliq-coupons": "/tata-cliq-coupons",
       "/tatacliq": "/tata-cliq-coupons",

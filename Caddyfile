@@ -26,11 +26,29 @@ https://gocoupon.io {
 
 mta-sts.gocoupon.io {
 	encode gzip zstd
-	reverse_proxy 127.0.0.1:3000
+
+	# RFC 8461 MTA-STS policy file only
+	@mta path /.well-known/mta-sts.txt
+	handle @mta {
+		reverse_proxy 127.0.0.1:3000
+	}
+
+	# Tell all search engines to never crawl this mail-only subdomain
+	@robots path /robots.txt
+	handle @robots {
+		header Content-Type "text/plain"
+		respond "User-agent: *\nDisallow: /\n" 200
+	}
+
+	# Disallow and 404 all web/deal/API traffic on mta-sts
+	handle {
+		header X-Robots-Tag "noindex, nofollow, noarchive"
+		respond "Not Found" 404
+	}
 }
 
+# Canonical 301 Redirect: Direct IP -> https://gocoupon.io
 http://50.6.37.40 {
-	encode gzip zstd
-	reverse_proxy 127.0.0.1:3000
+	redir https://gocoupon.io{uri} permanent
 }
 

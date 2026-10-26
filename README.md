@@ -15,7 +15,7 @@
 [![Audit](https://img.shields.io/badge/Production_Audit-40%2F40_PASSED_(100%25)-10b981?style=flat-square)](#-production-audit-scores)
 [![Security](https://img.shields.io/badge/Security_Suite-8%2F8_PASSED-blue?style=flat-square)](#-security--threat-mitigation)
 
-[Live Platform](https://www.gocoupon.io) • [Exclusive Offers](https://www.gocoupon.io/offers) • [Explore Stores](https://www.gocoupon.io/stores) • [Compare Prices](https://www.gocoupon.io/compare) • [Chrome Extension](https://www.gocoupon.io/chrome-extension) • [Blog Guides](https://www.gocoupon.io/blog)
+[Live Platform](https://gocoupon.io) • [Exclusive Offers](https://gocoupon.io/offers) • [Explore Stores](https://gocoupon.io/stores) • [Compare Prices](https://gocoupon.io/compare) • [Chrome Extension](https://gocoupon.io/chrome-extension) • [Blog Guides](https://gocoupon.io/blog)
 
 </div>
 

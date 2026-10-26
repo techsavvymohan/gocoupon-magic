@@ -347,6 +347,7 @@ export async function handleDealRedirect(req: Request, res: Response) {
     });
 
   // 3. Issue clean 302 redirect with security headers to the monetized affiliate link
+  res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
   res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");

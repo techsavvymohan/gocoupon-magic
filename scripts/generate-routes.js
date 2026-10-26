@@ -3685,13 +3685,13 @@ notFoundHtml = notFoundHtml.replace(
   '<meta name="description" content="The coupon page, retailer deal, or shopping tool you were looking for could not be found. Browse working discount codes and price trackers on GoCoupon."'
 );
 notFoundHtml = notFoundHtml.replace(
-  /<meta\s+name="robots"\s+content="[^"]*"/i,
-  '<meta name="robots" content="noindex, follow"'
+  /<meta\s+name="robots"[\s\S]*?>/i,
+  '<meta name="robots" content="noindex, nofollow" />'
 );
-notFoundHtml = notFoundHtml.replace(
-  /<link\s+rel="canonical"\s+href="[^"]*"/i,
-  '<link rel="canonical" href="https://gocoupon.io/404"'
-);
+// Remove canonical and hreflang tags from 404 pages (RFC & Google best practice: 404s must not have canonicals)
+notFoundHtml = notFoundHtml.replace(/<link\s+rel="canonical"[\s\S]*?\/>/i, "");
+notFoundHtml = notFoundHtml.replace(/<link\s+rel="alternate"\s+hreflang="[^"]*"[\s\S]*?\/>/gi, "");
+
 
 const notFoundMarkup = `
   <div id="root">
