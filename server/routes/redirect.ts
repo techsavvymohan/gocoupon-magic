@@ -304,11 +304,15 @@ export async function handleDealRedirect(req: Request, res: Response) {
     const tag = process.env.VITE_AMAZON_US_PARTNER_TAG || "gocouponus-20";
     targetUrl = `${rawUrl}${sep}tag=${tag}&ascsubtag=${encodeURIComponent(clickId)}`;
   } else if (isCuelinks) {
-    targetUrl = rawUrl;
-    if (!targetUrl.includes("subid4=")) {
-      const sep = targetUrl.includes("?") ? "&" : "?";
-      targetUrl = `${targetUrl}${sep}subid4=${encodeURIComponent(clickId)}`;
-    }
+    targetUrl = buildCuelinksRedirectUrl({
+      merchantUrl: rawUrl,
+      subId: subid1,
+      subid1,
+      subid2,
+      subid3,
+      subid4: clickId,
+      subid5,
+    });
   } else if (/^https?:\/\//i.test(targetUrl)) {
     // Universal Cuelinks fallback with full 5-tier subID attribution
     targetUrl = buildCuelinksRedirectUrl({

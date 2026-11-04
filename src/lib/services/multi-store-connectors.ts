@@ -210,7 +210,7 @@ export async function searchFlipkart(query: string): Promise<StoreSearchResult[]
         item.product_link ||
         item.link ||
         `https://www.flipkart.com/search?q=${encodeURIComponent(query)}`;
-      const affiliateUrl = `https://clnk.in/r?pub=${CUELINKS_PUBLISHER_ID}&url=${encodeURIComponent(baseLink)}`;
+      const affiliateUrl = wrapAffiliateTracking(baseLink);
 
       return {
         storeId: "flipkart",

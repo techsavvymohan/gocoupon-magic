@@ -167,14 +167,40 @@ export function buildCuelinksRedirectUrl(options: CuelinksLinkOptions): string {
   const subid3 = options.subid3 || "";
   const subid4 = options.subid4 || "";
   const subid5 = options.subid5 || "";
+  const effectiveChannelId = options.channelId || (channelId ? Number(channelId) : 318931);
 
-  // Already a tracking redirect
+  // If already a tracking redirect, ensure critical publisher and channel attribution are never dropped
   if (targetUrl.includes("linksredirect.com") || targetUrl.includes("clnk.in")) {
-    return targetUrl;
+    try {
+      const parsed = new URL(targetUrl);
+      if (!parsed.searchParams.has("pub_id") && !parsed.searchParams.has("pub")) {
+        parsed.searchParams.set("pub_id", publisherId);
+      }
+      if (!parsed.searchParams.has("cid")) {
+        parsed.searchParams.set("cid", String(effectiveChannelId));
+      }
+      if (!parsed.searchParams.has("subid") && subid1) {
+        parsed.searchParams.set("subid", subid1);
+      }
+      if (!parsed.searchParams.has("subid2") && subid2) {
+        parsed.searchParams.set("subid2", subid2);
+      }
+      if (!parsed.searchParams.has("subid3") && subid3) {
+        parsed.searchParams.set("subid3", subid3);
+      }
+      if (subid4 && !parsed.searchParams.has("subid4")) {
+        parsed.searchParams.set("subid4", subid4);
+      }
+      if (!parsed.searchParams.has("subid5") && subid5) {
+        parsed.searchParams.set("subid5", subid5);
+      }
+      return parsed.toString();
+    } catch {
+      return targetUrl;
+    }
   }
 
   const encoded = encodeURIComponent(targetUrl);
-  const effectiveChannelId = options.channelId || (channelId ? Number(channelId) : 318931);
   let redirectUrl = `https://linksredirect.com/?pub_id=${publisherId}&cid=${effectiveChannelId}&subid=${encodeURIComponent(subid1)}`;
   if (subid2) redirectUrl += `&subid2=${encodeURIComponent(subid2)}`;
   if (subid3) redirectUrl += `&subid3=${encodeURIComponent(subid3)}`;

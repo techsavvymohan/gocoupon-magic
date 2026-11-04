@@ -51,14 +51,25 @@ const tests = [
     expectedPublisherTag: "272970",
   },
   {
-    name: "5. EarnKaro Direct Partner Store (Myntra)",
+    name: "5. EarnKaro Direct Partner Store (Flipkart)",
+    input: {
+      url: "https://www.flipkart.com/sale",
+      store: "Flipkart",
+      slug: "flipkart",
+      code: "FLIPEXTRA",
+    },
+    expectedDomain: "fktr.in",
+  },
+  {
+    name: "6. Cuelinks Approved Live Partner (Myntra)",
     input: {
       url: "https://www.myntra.com/sale",
       store: "Myntra",
       slug: "myntra",
       code: "MYNTRA500",
     },
-    expectedDomain: "myntr.it",
+    expectedDomain: "linksredirect.com",
+    expectedPublisherTag: "272970",
   },
   {
     name: "6. Amazon India Partner Tag",

@@ -326,9 +326,22 @@ export async function runCuelinksSync(maxPages = 0) {
     const code = hasCoupon ? rawCode.toUpperCase() : "";
     const discount = extractDiscount(o);
     const category = mapCategory(o.categories, o.title);
-    const trackingUrl =
-      o.tracking_url ||
-      `https://linksredirect.com/?pub_id=${pubId}&subid=gocoupon_live&url=${encodeURIComponent(o.url || "https://gocoupon.io")}`;
+    let trackingUrl = o.tracking_url || "";
+    if (trackingUrl && trackingUrl.includes("linksredirect.com")) {
+      try {
+        const u = new URL(trackingUrl);
+        if (!u.searchParams.has("pub_id") && !u.searchParams.has("pub")) {
+          u.searchParams.set("pub_id", pubId);
+        }
+        if (!u.searchParams.has("cid")) {
+          u.searchParams.set("cid", process.env.CUELINKS_CHANNEL_ID || "318931");
+        }
+        trackingUrl = u.toString();
+      } catch {}
+    }
+    if (!trackingUrl) {
+      trackingUrl = `https://linksredirect.com/?pub_id=${pubId}&cid=${process.env.CUELINKS_CHANNEL_ID || "318931"}&subid=gocoupon_live&url=${encodeURIComponent(o.url || "https://gocoupon.io")}`;
+    }
     const storeLogo = resolveStoreLogo(storeName, trackingUrl, o.domain);
 
     let expiresIn = "Limited Time";
