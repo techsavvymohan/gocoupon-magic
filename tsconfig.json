@@ -34,6 +34,7 @@
     "src/**/*.d.ts",
     "server/**/*.ts",
     "scripts/**/*.ts",
+    "api/**/*.ts",
     "vite.config.ts",
     "eslint.config.js"
   ],

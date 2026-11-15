@@ -1,5 +1,18 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 
+export interface VercelApiRequest extends IncomingMessage {
+  query?: Record<string, string | string[] | undefined>;
+  cookies?: Record<string, string>;
+  body?: unknown;
+}
+
+export interface VercelApiResponse extends ServerResponse {
+  status?: (code: number) => VercelApiResponse;
+  json?: (body: unknown) => void;
+  send?: (body: unknown) => void;
+  redirect?: (statusOrUrl: string | number, url?: string) => void;
+}
+
 const CUELINKS_PUB_ID = process.env.CUELINKS_PUBLISHER_ID || process.env.VITE_CUELINKS_PUB_ID || "272970";
 const CUELINKS_CHANNEL_ID = process.env.CUELINKS_CHANNEL_ID || process.env.VITE_CUELINKS_CHANNEL_ID || "318931";
 const AMAZON_IN_TAG = process.env.VITE_AMAZON_IN_PARTNER_TAG || "gocoupon0e-21";
@@ -42,7 +55,9 @@ function extractMerchantDestination(rawUrl: string): string {
       if (embeddedUrl && /^https?:\/\//i.test(embeddedUrl)) {
         cleanUrl = decodeURIComponent(embeddedUrl);
       }
-    } catch {}
+    } catch {
+      // Ignore URL parsing failure and fall back to raw URL
+    }
   }
   if (!/^https?:\/\//i.test(cleanUrl)) cleanUrl = `https://${cleanUrl}`;
   return cleanUrl;
@@ -132,8 +147,8 @@ function buildSmartDeepLink(merchantUrl: string, storeOrSlug = "", dealTitle = "
   return merchantUrl;
 }
 
-export default async function handler(req: any, res: any) {
-  const query = req.query || {};
+export default async function handler(req: VercelApiRequest, res: VercelApiResponse): Promise<void> {
+  const query = req.query || (req.url ? Object.fromEntries(new URL(req.url, "http://localhost").searchParams.entries()) : {});
   let rawUrl = String(query.url || query.target || query.link || query.to || query.dest || "").trim();
   const dealId = String(query.dealId || query.id || "unknown").trim();
   const title = String(query.title || "GoCoupon Deal").trim();
@@ -147,7 +162,8 @@ export default async function handler(req: any, res: any) {
       rawUrl = `https://www.${slug.replace(/^www\./, "")}.com`;
     } else {
       res.writeHead(302, { Location: "/offers" });
-      return res.end();
+      res.end();
+      return;
     }
   }
 
