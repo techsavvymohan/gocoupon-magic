@@ -114,7 +114,7 @@ export const DealCard = React.memo(function DealCard({
                 <Clock className="h-3 w-3 text-sky-400" />
                 <span>{deal.expiresIn}</span>
               </span>
-              {Boolean(deal.usesCount && deal.usesCount > 0) ? (
+              {deal.usesCount && deal.usesCount > 0 ? (
                 <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
                   <Users className="h-3 w-3" />
                   <span>{deal.usesCount.toLocaleString()} shoppers saved</span>

@@ -1367,12 +1367,12 @@ export function ComparePage() {
                         Reset All Filters
                       </button>
                       {searchResult?.query &&
-                        searchResult.query.split(/[\(\[\-\|]/)[0].trim() !== searchResult.query && (
+                        searchResult.query.split(/[([|-]/)[0].trim() !== searchResult.query && (
                           <button
                             type="button"
                             onClick={() => {
                               resetFilters();
-                              const simplified = searchResult.query.split(/[\(\[\-\|]/)[0].trim();
+                              const simplified = searchResult.query.split(/[([|-]/)[0].trim();
                               if (simplified) {
                                 navigate({
                                   to: "/compare",
@@ -1382,7 +1382,7 @@ export function ComparePage() {
                             }}
                             className="rounded-xl border border-border bg-card px-4 py-2 text-xs font-bold text-foreground hover:bg-muted transition-colors"
                           >
-                            Search &ldquo;{searchResult.query.split(/[\(\[\-\|]/)[0].trim()}&rdquo; instead
+                            Search &ldquo;{searchResult.query.split(/[([|-]/)[0].trim()}&rdquo; instead
                           </button>
                         )}
                     </div>

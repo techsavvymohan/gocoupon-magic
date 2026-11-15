@@ -237,7 +237,7 @@ function searxngDevPlugin() {
         }
 
         // GET /api/stores: merge baseline stores with live custom stores
-        // @ts-ignore
+        // @ts-expect-error dynamic ts import in vite config
         const { STORES_DATA } = await import("./src/data/storesData.ts");
         let allStores: any[] = [...diskStores];
         for (const s of STORES_DATA) {
@@ -349,7 +349,7 @@ function searxngDevPlugin() {
 
         if (req.url.startsWith("/api/deals/sync") || req.url.startsWith("/api/offers/sync")) {
               try {
-                // @ts-ignore
+
                 const { runCuelinksSync } = (await import("./scripts/sync-cuelinks-live.mjs")) as any;
                 const syncRes = await runCuelinksSync(0);
                 res.statusCode = 200;
@@ -609,7 +609,7 @@ function searxngDevPlugin() {
             if (featured === "true" || featured === "1") {
               deals = deals.filter((d: any) => Boolean(d.isFeatured) || (d.id && String(d.id).startsWith("ac-")));
             } else if (featured === "false" || featured === "0") {
-              deals = deals.filter((d: any) => !Boolean(d.isFeatured) && (!d.id || !String(d.id).startsWith("ac-")));
+              deals = deals.filter((d: any) => !d.isFeatured && (!d.id || !String(d.id).startsWith("ac-")));
             }
 
             if (category && category !== "all") {

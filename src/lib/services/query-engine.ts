@@ -169,7 +169,7 @@ export function extractCoreProductQuery(rawQuery: string): string {
   text = text.replace(/[-–—_]/g, " ");
 
   // 6. Remove quotes, commas, brackets, colons, slashes
-  text = text.replace(/[\(\)\[\]\{\}\"\'\`,:;\/\\]/g, " ");
+  text = text.replace(/[()[\]{}"'`,:;\x2F\\]/g, " ");
 
   // 7. Normalize spaces
   text = text.replace(/\s+/g, " ").trim();
@@ -202,7 +202,7 @@ export function analyzeQueryIntent(rawQuery: string): QueryIntent {
   // 2. Clean Search Term (Strip search operator noise, brackets, hyphens, noise words)
   const cleanSearchTerm = normalizedQuery
     .replace(/[-–—_]/g, " ")
-    .replace(/[\(\)\[\]\{\}\"\'\`,:;\/\\]/g, " ")
+    .replace(/[()[\]{}"'`,:;\x2F\\]/g, " ")
     .replace(NOISE_WORDS, " ")
     .replace(/\s+/g, " ")
     .trim();

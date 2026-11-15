@@ -53,7 +53,7 @@ internationalDealsRouter.get("/", async (req: Request, res: Response) => {
   try {
     const rawDeals = await fetchLiveInternationalDeals();
 
-    let filtered = rawDeals.filter((deal) => {
+    const filtered = rawDeals.filter((deal) => {
       if (category && category !== "all" && deal.category.toLowerCase() !== category) {
         return false;
       }

@@ -72,7 +72,7 @@ export function NavbarSearch({
     const timer = setTimeout(async () => {
       try {
         const res = await fetchDeals({ q: queryToUse, limit: 5 });
-        let deals = (res.deals || []).map((d) => ({
+        const deals = (res.deals || []).map((d) => ({
           id: d.id,
           storeName: d.storeName,
           storeSlug: d.storeSlug || d.storeName.toLowerCase().replace(/[^a-z0-9]+/g, "-"),

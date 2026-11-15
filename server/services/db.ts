@@ -408,7 +408,7 @@ export const dealsDb = {
       deals = deals.filter((d) =>
         options.featured
           ? Boolean(d.isFeatured) || String(d.id).startsWith("ac-")
-          : !Boolean(d.isFeatured) && !String(d.id).startsWith("ac-")
+          : !d.isFeatured && !String(d.id).startsWith("ac-")
       );
     }
     if (options?.storeSlug) {
@@ -578,7 +578,7 @@ export const dealsDb = {
                   let discountVal = 10;
                   let discountType = "percent";
                   const pct = rawDiscount.match(/(\d+)%/);
-                  const amt = rawDiscount.match(/(?:[\$\u00A3\u20AC\u20B9]|Rs\.?|INR)\s*(\d+(?:\.\d+)?)/i) || rawDiscount.match(/(\d+)\s*(?:OFF|FLAT)/i);
+                  const amt = rawDiscount.match(/(?:[$£€₹]|Rs\.?|INR)\s*(\d+(?:\.\d+)?)/i) || rawDiscount.match(/(\d+)\s*(?:OFF|FLAT)/i);
                   if (pct) {
                     discountType = "percent";
                     discountVal = parseFloat(pct[1]);

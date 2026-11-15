@@ -288,7 +288,7 @@ export function extractMerchantDomain(
       if (targetUrl) {
         const decoded = decodeURIComponent(targetUrl);
         const u = new URL(decoded);
-        let host = u.hostname.toLowerCase().replace(/^www\./, "").replace(/^m\./, "").replace(/^shop\./, "");
+        const host = u.hostname.toLowerCase().replace(/^www\./, "").replace(/^m\./, "").replace(/^shop\./, "");
         if (host && host.includes(".")) {
           return host;
         }

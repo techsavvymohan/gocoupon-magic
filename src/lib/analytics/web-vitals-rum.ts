@@ -118,8 +118,8 @@ export function initWebVitalsRum(): void {
   // Initialize dataLayer and gtag shim
   window.dataLayer = window.dataLayer || [];
   if (typeof window.gtag !== "function") {
-    window.gtag = function () {
-      window.dataLayer.push(arguments);
+    window.gtag = function (...args: unknown[]) {
+      window.dataLayer.push(args);
     };
     window.gtag("js", new Date());
     window.gtag("config", GA_MEASUREMENT_ID, {

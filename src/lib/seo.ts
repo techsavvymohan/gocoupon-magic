@@ -52,7 +52,7 @@ export function normalizeSeoTitle(rawTitle: string, fallbackBrand = " | GoCoupon
 export function normalizeSeoDescription(rawDesc: string): string {
   let desc = rawDesc.replace(/\s+/g, " ").trim();
   if (desc.length > 155) {
-    let trimmed = desc.slice(0, 152);
+    const trimmed = desc.slice(0, 152);
     const lastPeriod = trimmed.lastIndexOf(".");
     if (lastPeriod > 118) {
       desc = trimmed.slice(0, lastPeriod + 1);

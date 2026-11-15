@@ -133,7 +133,7 @@ export function HeroStoreDealSearch() {
     const timer = setTimeout(async () => {
       try {
         const res = await fetchDeals({ q: trimmed, limit: 4 });
-        let deals = res.deals || [];
+        const deals = res.deals || [];
         if (deals.length < 3) {
           try {
             const { fetchInternationalDeals } = await import("@/lib/api/international-deals-api");

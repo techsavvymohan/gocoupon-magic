@@ -68,7 +68,7 @@ function extractMerchantDomain(trackingUrl?: string, storeName?: string): string
       const targetUrl = parsed.searchParams.get("url");
       if (targetUrl) {
         const u = new URL(decodeURIComponent(targetUrl));
-        let host = u.hostname.toLowerCase().replace(/^www\./, "").replace(/^m\./, "").replace(/^shop\./, "");
+        const host = u.hostname.toLowerCase().replace(/^www\./, "").replace(/^m\./, "").replace(/^shop\./, "");
         if (host && host.includes(".")) {
           return host;
         }

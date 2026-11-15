@@ -45,6 +45,50 @@ const ADMITAD_DIRECT_CAMPAIGNS: Record<string, string> = {
   hellomolly: "https://ntzgd.com/g/v4mbsetakj9fa8ccb5385fd6c9cc83/",
 };
 
+const KNOWN_MERCHANT_HOMEPAGES: Record<string, string> = {
+  boat: "https://www.boat-lifestyle.com",
+  "boat-lifestyle": "https://www.boat-lifestyle.com",
+  hostinger: "https://www.hostinger.in",
+  meesho: "https://www.meesho.com",
+  croma: "https://www.croma.com",
+  "tata-cliq": "https://www.tatacliq.com",
+  tatacliq: "https://www.tatacliq.com",
+  "1mg": "https://www.1mg.com",
+  tata1mg: "https://www.1mg.com",
+  nykaa: "https://www.nykaa.com",
+  myntra: "https://www.myntra.com",
+  flipkart: "https://www.flipkart.com",
+  amazon: "https://www.amazon.in",
+  ajio: "https://www.ajio.com",
+  swiggy: "https://www.swiggy.com",
+  zomato: "https://www.zomato.com",
+  dominos: "https://www.dominos.co.in",
+  pizzahut: "https://www.pizzahut.co.in",
+  mamaearth: "https://www.mamaearth.in",
+  makemytrip: "https://www.makemytrip.com",
+  goibibo: "https://www.goibibo.com",
+  easemytrip: "https://www.easemytrip.com",
+  booking: "https://www.booking.com",
+  agoda: "https://www.agoda.com",
+  dell: "https://www.dell.com",
+  samsung: "https://www.samsung.com",
+  lenovo: "https://www.lenovo.com",
+  hp: "https://www.hp.com",
+  puma: "https://in.puma.com",
+  adidas: "https://www.adidas.co.in",
+  nike: "https://www.nike.com/in",
+  aliexpress: "https://www.aliexpress.com",
+  udemy: "https://www.udemy.com",
+  coursera: "https://www.coursera.org",
+  namecheap: "https://www.namecheap.com",
+  godaddy: "https://www.godaddy.com",
+  kinguin: "https://www.kinguin.net",
+  g2a: "https://www.g2a.com",
+  dhgate: "https://www.dhgate.com",
+  alibaba: "https://www.alibaba.com",
+  ashford: "https://www.ashford.com",
+};
+
 function extractMerchantDestination(rawUrl: string): string {
   if (!rawUrl || rawUrl === "#" || rawUrl.startsWith("javascript:")) return "https://gocoupon.io";
   let cleanUrl = rawUrl.trim();
@@ -158,7 +202,18 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
   const source = String(query.source || "offers").trim();
 
   if (!rawUrl || rawUrl === "#" || rawUrl === "about:blank" || rawUrl.startsWith("javascript:")) {
-    if (slug && /^[a-z0-9-]+$/i.test(slug)) {
+    const storeQuery = `${slug} ${store}`.toLowerCase().trim();
+    let resolvedFallback: string | null = null;
+    for (const [key, homeUrl] of Object.entries(KNOWN_MERCHANT_HOMEPAGES)) {
+      if (storeQuery.includes(key)) {
+        resolvedFallback = homeUrl;
+        break;
+      }
+    }
+
+    if (resolvedFallback) {
+      rawUrl = resolvedFallback;
+    } else if (slug && /^[a-z0-9-]+$/i.test(slug)) {
       rawUrl = `https://www.${slug.replace(/^www\./, "")}.com`;
     } else {
       res.writeHead(302, { Location: "/offers" });

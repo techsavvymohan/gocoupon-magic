@@ -427,7 +427,7 @@ export function queryDeals(
     results = results.filter((d) =>
       options.featured
         ? Boolean(d.isFeatured) || (d.id && String(d.id).startsWith("ac-"))
-        : !Boolean(d.isFeatured) && (!d.id || !String(d.id).startsWith("ac-"))
+        : !d.isFeatured && (!d.id || !String(d.id).startsWith("ac-"))
     );
   }
 
