@@ -172,7 +172,7 @@ export function CardApplicationModal({
           <a
             href={card.affiliateApplyUrl}
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener sponsored nofollow"
             onClick={() => {
               // Close modal after initiating click
               setTimeout(onClose, 500);

@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
+import { buildDealRedirectUrl } from "@/lib/services/store-registry";
 import {
   CheckCircle2,
   Pin,
@@ -262,33 +263,57 @@ function WelcomePage() {
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <a
-              href="https://www.flipkart.com"
+              href={buildDealRedirectUrl({
+                url: "https://www.flipkart.com",
+                storeName: "Flipkart",
+                storeSlug: "flipkart",
+                title: "Flipkart Deals & Discounts",
+                source: "welcome_onboarding",
+              })}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener sponsored nofollow"
               className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card px-6 py-3.5 text-sm font-semibold text-foreground shadow-sm transition-all hover:border-primary hover:scale-105"
             >
               <span>🛍️ Open Flipkart</span>
             </a>
             <a
-              href="https://www.amazon.in"
+              href={buildDealRedirectUrl({
+                url: "https://www.amazon.in/?tag=gocoupon0e-21",
+                storeName: "Amazon",
+                storeSlug: "amazon",
+                title: "Amazon India Verified Shopping",
+                source: "welcome_onboarding",
+              })}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener sponsored nofollow"
               className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card px-6 py-3.5 text-sm font-semibold text-foreground shadow-sm transition-all hover:border-primary hover:scale-105"
             >
               <span>📦 Open Amazon India</span>
             </a>
             <a
-              href="https://www.myntra.com"
+              href={buildDealRedirectUrl({
+                url: "https://www.myntra.com",
+                storeName: "Myntra",
+                storeSlug: "myntra",
+                title: "Myntra Fashion Deals",
+                source: "welcome_onboarding",
+              })}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener sponsored nofollow"
               className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card px-6 py-3.5 text-sm font-semibold text-foreground shadow-sm transition-all hover:border-primary hover:scale-105"
             >
               <span>👗 Open Myntra</span>
             </a>
             <a
-              href="https://www.meesho.com"
+              href={buildDealRedirectUrl({
+                url: "https://www.meesho.com",
+                storeName: "Meesho",
+                storeSlug: "meesho",
+                title: "Meesho Budget Fashion & Home",
+                source: "welcome_onboarding",
+              })}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener sponsored nofollow"
               className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card px-6 py-3.5 text-sm font-semibold text-foreground shadow-sm transition-all hover:border-primary hover:scale-105"
             >
               <span>🏷️ Open Meesho</span>

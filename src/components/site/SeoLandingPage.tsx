@@ -131,11 +131,15 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
     navigator.clipboard.writeText(code).catch(() => {});
     setCopiedCode(code);
 
+    const isMobile =
+      typeof window !== "undefined" &&
+      (window.innerWidth < 768 || /mobile|android|iphone|ipad/i.test(navigator.userAgent));
+
     // Track click intent beacon in background
     try {
       if (typeof navigator !== "undefined" && navigator.sendBeacon) {
         navigator.sendBeacon(
-          "/api/redirect/deals/click",
+          "/api/deals/click",
           JSON.stringify({
             dealId: code,
             dealTitle: `Coupon ${code} Copied`,
@@ -150,10 +154,17 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
       // Beacon fallback
     }
 
-    toast.success(`Coupon code "${code}" copied!`, {
-      description: "Opening store with verified tracking. ⚠️ Tip: Disable third-party extensions (Honey, Coupert) at checkout so discounts & cashback track properly.",
-      duration: 4500,
-    });
+    if (isMobile) {
+      toast.success(`Coupon code "${code}" copied!`, {
+        description: "📱 Mobile Tip: Complete checkout in this browser tab to secure your verified discount and prevent app tracking drops.",
+        duration: 5500,
+      });
+    } else {
+      toast.success(`Coupon code "${code}" copied!`, {
+        description: "🔒 Pro Tip: Apply code directly at checkout to lock in your discount and prevent extension overrides.",
+        duration: 5000,
+      });
+    }
 
     const dest = targetAffiliateUrl || storeAffiliateUrl;
     const isAnchor = Boolean(e?.currentTarget && (e.currentTarget as HTMLElement).tagName === "A");

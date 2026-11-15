@@ -27,8 +27,10 @@ import {
   Box,
   Flame,
   ArrowUpDown,
+  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
+import { buildDealRedirectUrl } from "@/lib/services/store-registry";
 
 export const Route = createLazyFileRoute("/stores")({
   component: StoresPage,
@@ -76,14 +78,55 @@ function StoresPage() {
     });
   }, [searchQuery, selectedCategory, allStores]);
 
-  const handleCopy = (code: string, e: React.MouseEvent) => {
+  const handleCopy = (store: Store, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!code) return;
-    navigator.clipboard.writeText(code);
-    setCopiedCode(code);
-    toast.success(`Coupon code ${code} copied!`);
-    setTimeout(() => setCopiedCode(null), 2500);
+
+    const isMobile =
+      typeof window !== "undefined" &&
+      (window.innerWidth < 768 || /mobile|android|iphone|ipad/i.test(navigator.userAgent));
+
+    const rawCode = store.popularCoupon?.code || "";
+    const hasRealCode = Boolean(rawCode && rawCode !== "DEALACTIVATED" && rawCode !== "ACTIVATEOFFER");
+
+    if (hasRealCode) {
+      navigator.clipboard.writeText(rawCode).catch(() => {});
+      setCopiedCode(rawCode);
+      if (isMobile) {
+        toast.success(`Coupon "${rawCode}" copied! Opening ${store.name}...`, {
+          description: "📱 Mobile Tip: Complete checkout in this browser tab to secure your verified discount.",
+          duration: 5000,
+        });
+      } else {
+        toast.success(`Coupon "${rawCode}" copied! Opening ${store.name}...`, {
+          description: "🔒 Pro Tip: Apply code directly at checkout to lock in your discount and prevent extension overrides.",
+          duration: 4500,
+        });
+      }
+      setTimeout(() => setCopiedCode(null), 3000);
+    } else {
+      if (isMobile) {
+        toast.success(`Opening ${store.name} verified store...`, {
+          description: "📱 Mobile Tip: Complete purchase in this browser tab to secure store discounts.",
+          duration: 4000,
+        });
+      } else {
+        toast.success(`Opening ${store.name} verified store...`);
+      }
+    }
+
+    const redirectUrl = buildDealRedirectUrl({
+      url: store.link || "",
+      storeName: store.name,
+      storeSlug: store.slug || store.id,
+      code: hasRealCode ? rawCode : "",
+      title: store.popularCoupon?.description || `${store.name} Verified Store Offers`,
+      source: "stores_directory_card",
+    });
+
+    if (redirectUrl && redirectUrl !== "#") {
+      window.open(redirectUrl, "_blank", "noopener");
+    }
   };
 
   const breadcrumb = breadcrumbSchema([
@@ -481,12 +524,14 @@ function StoreCard({
   formatPriceString,
 }: {
   store: Store;
-  onCopy: (code: string, e: React.MouseEvent) => void;
+  onCopy: (store: Store, e: React.MouseEvent) => void;
   isCopied: boolean;
   formatPriceString: (str: string) => string;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const couponCode = store.popularCoupon?.code || "DEALACTIVATED";
+  const rawCode = store.popularCoupon?.code || "";
+  const hasRealCode = Boolean(rawCode && rawCode !== "DEALACTIVATED" && rawCode !== "ACTIVATEOFFER");
+  const couponCode = hasRealCode ? rawCode : "DIRECT DEAL";
   const couponDiscount = store.popularCoupon?.discount || store.maxDiscount || "Verified Deal";
   const couponDesc = store.popularCoupon?.description || store.description || "Click to redeem verified store discount";
   const formattedDiscount = formatPriceString(couponDiscount);
@@ -563,27 +608,32 @@ function StoreCard({
               </p>
             </div>
 
-            {/* 1-Click Tactile Copy Button */}
+            {/* 1-Click Tactile Copy & Open Button */}
             <button
               type="button"
-              onClick={(e) => onCopy(couponCode, e)}
-              className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl px-3 py-2 min-h-[38px] min-w-[68px] text-xs font-bold transition-all duration-200 touch-manipulation active:scale-95 ${
+              onClick={(e) => onCopy(store, e)}
+              className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl px-3 py-2 min-h-[38px] min-w-[76px] text-xs font-bold transition-all duration-200 touch-manipulation active:scale-95 ${
                 isCopied
                   ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/25"
                   : "border border-primary/40 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground hover:shadow-xs shadow-2xs"
               }`}
-              title="Copy Coupon Code"
-              aria-label={`Copy coupon code ${couponCode}`}
+              title={hasRealCode ? "Copy Code & Open Store" : "Open Store Deals"}
+              aria-label={hasRealCode ? `Copy coupon code ${couponCode} and open store` : `Open ${store.name} deals`}
             >
               {isCopied ? (
                 <>
                   <Check className="h-3.5 w-3.5" />
                   <span>Copied!</span>
                 </>
-              ) : (
+              ) : hasRealCode ? (
                 <>
                   <Copy className="h-3.5 w-3.5" />
                   <span>Copy</span>
+                </>
+              ) : (
+                <>
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  <span>Shop</span>
                 </>
               )}
             </button>

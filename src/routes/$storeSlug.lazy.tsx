@@ -78,7 +78,7 @@ function DynamicStoreCouponsPage() {
   // Dynamic Live-Sync Coupon Ingestion Engine
   const dynamicCoupons: VerifiedCoupon[] = liveDeals && liveDeals.length > 0
     ? liveDeals.map((d, idx) => ({
-        code: d.code || "ACTIVATEOFFER",
+        code: (d.code && !["ACTIVATEOFFER", "DEALACTIVATED"].includes(d.code.toUpperCase())) ? d.code : "",
         discount: d.discount || (d.code ? "Verified Code" : "Instant Deal"),
         description: (d as any).description || d.title,
         minSpend: "No minimum spend",
@@ -91,7 +91,7 @@ function DynamicStoreCouponsPage() {
 
   const staticCoupons: VerifiedCoupon[] = store?.deals && store.deals.length > 0
     ? store.deals.slice(0, 15).map((d, idx) => ({
-        code: d.code || "DEALACTIVATED",
+        code: (d.code && !["ACTIVATEOFFER", "DEALACTIVATED"].includes(d.code.toUpperCase())) ? d.code : "",
         discount: d.discount || (d.code ? "Exclusive Code" : "Instant Deal"),
         description: d.description || d.title,
         minSpend: d.minSpend || "No minimum order",
@@ -105,7 +105,9 @@ function DynamicStoreCouponsPage() {
   const seenCodes = new Set<string>();
   const combinedCoupons: VerifiedCoupon[] = [];
   for (const item of [...dynamicCoupons, ...staticCoupons]) {
-    const key = (item.code || "").trim().toUpperCase();
+    const codeKey = (item.code || "").trim().toUpperCase();
+    const descKey = (item.description || item.discount || "").trim().toLowerCase();
+    const key = codeKey ? `code:${codeKey}` : `desc:${descKey}`;
     if (key && !seenCodes.has(key)) {
       seenCodes.add(key);
       combinedCoupons.push(item);
@@ -116,7 +118,7 @@ function DynamicStoreCouponsPage() {
     ? combinedCoupons
     : [
         {
-          code: "CASHBACKACTIVE",
+          code: "",
           discount: "Verified Store Offer",
           description: `Unlock automatic verified savings and cashback on ${storeName} checkout cart.`,
           minSpend: "No minimum spend",

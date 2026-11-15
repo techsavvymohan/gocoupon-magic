@@ -8,6 +8,7 @@ import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, faqSchema } from "@/lib/seo";
 import { CATEGORIES_TAXONOMY } from "@/data/categoriesData";
+import { buildDealRedirectUrl } from "@/lib/services/store-registry";
 import {
   Tag,
   ShieldCheck,
@@ -183,9 +184,14 @@ function CategorySlugPage() {
                   </Link>
                 ) : (
                   <a
-                    href={`https://${store.domain}`}
+                    href={buildDealRedirectUrl({
+                      url: `https://${store.domain.replace(/^https?:\/\//, "")}`,
+                      storeName: store.name,
+                      title: `${store.name} ${category.name} Deals`,
+                      source: "category_store_card",
+                    })}
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel="noopener sponsored nofollow"
                     className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border py-2.5 text-xs font-semibold text-foreground transition-colors hover:border-primary"
                   >
                     <span>Visit Official Store</span>

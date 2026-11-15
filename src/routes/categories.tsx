@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { breadcrumbSchema, createSeoHead } from "@/lib/seo";
+import { buildDealRedirectUrl } from "@/lib/services/store-registry";
 import {
   Smartphone,
   Shirt,
@@ -270,9 +271,14 @@ function CategoriesPage() {
                       ) : (
                         <a
                           key={st.name}
-                          href={st.href}
+                          href={buildDealRedirectUrl({
+                            url: st.href || "",
+                            storeName: st.name,
+                            title: `${st.name} Online Offers`,
+                            source: "categories_popular_store",
+                          })}
                           target="_blank"
-                          rel="noopener noreferrer"
+                          rel="noopener sponsored nofollow"
                           className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-primary hover:text-primary"
                         >
                           <span>{st.name}</span>
