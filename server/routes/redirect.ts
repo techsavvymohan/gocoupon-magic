@@ -14,6 +14,10 @@ import { Router, type Request, type Response } from "express";
 import { clicksDb } from "../services/db.js";
 import { requireAdminAuth } from "./admin.js";
 import { buildCuelinksRedirectUrl } from "../services/providers/cuelinks-client.js";
+import {
+  isHomepageUrl,
+  buildSmartMerchantDeepLink,
+} from "../../src/lib/services/store-registry.js";
 
 export const redirectRouter = Router();
 
@@ -227,6 +231,15 @@ export async function handleDealRedirect(req: Request, res: Response) {
   const cleanMerchant = extractMerchantDestination(rawUrl);
   const normTarget = `${slug} ${store} ${cleanMerchant} ${rawUrl}`.toLowerCase();
 
+  // Smart Deep-Linking: Upgrade generic homepage destinations to targeted product search pages
+  let smartMerchant = cleanMerchant;
+  if (isHomepageUrl(cleanMerchant) && title) {
+    const deep = buildSmartMerchantDeepLink(cleanMerchant, slug || store, title);
+    if (deep && deep !== cleanMerchant) {
+      smartMerchant = deep;
+    }
+  }
+
   // High-commission direct networks mapping
   const EARNKARO_DIRECT_LINKS: Record<string, string> = {
     flipkart: "https://fktr.in/xL95eGk",
@@ -296,16 +309,19 @@ export async function handleDealRedirect(req: Request, res: Response) {
   } else if (isEarnKaro || isImpact) {
     targetUrl = rawUrl;
   } else if (rawUrl.includes("amazon.in") || cleanMerchant.includes("amazon.in")) {
-    const sep = rawUrl.includes("?") ? "&" : "?";
+    const dest = smartMerchant.includes("amazon.in") ? smartMerchant : rawUrl;
+    const sep = dest.includes("?") ? "&" : "?";
     const tag = process.env.VITE_AMAZON_IN_PARTNER_TAG || "gocoupon0e-21";
-    targetUrl = `${rawUrl}${sep}tag=${tag}&ascsubtag=${encodeURIComponent(clickId)}`;
+    targetUrl = `${dest}${sep}tag=${tag}&ascsubtag=${encodeURIComponent(clickId)}`;
   } else if (rawUrl.includes("amazon.com") || cleanMerchant.includes("amazon.com")) {
-    const sep = rawUrl.includes("?") ? "&" : "?";
+    const dest = smartMerchant.includes("amazon.com") ? smartMerchant : rawUrl;
+    const sep = dest.includes("?") ? "&" : "?";
     const tag = process.env.VITE_AMAZON_US_PARTNER_TAG || "gocouponus-20";
-    targetUrl = `${rawUrl}${sep}tag=${tag}&ascsubtag=${encodeURIComponent(clickId)}`;
+    targetUrl = `${dest}${sep}tag=${tag}&ascsubtag=${encodeURIComponent(clickId)}`;
   } else if (isCuelinks) {
+    const effectiveDest = smartMerchant !== cleanMerchant ? smartMerchant : rawUrl;
     targetUrl = buildCuelinksRedirectUrl({
-      merchantUrl: rawUrl,
+      merchantUrl: effectiveDest,
       subId: subid1,
       subid1,
       subid2,
@@ -315,8 +331,9 @@ export async function handleDealRedirect(req: Request, res: Response) {
     });
   } else if (/^https?:\/\//i.test(targetUrl)) {
     // Universal Cuelinks fallback with full 5-tier subID attribution
+    const effectiveDest = smartMerchant !== cleanMerchant ? smartMerchant : targetUrl;
     targetUrl = buildCuelinksRedirectUrl({
-      merchantUrl: targetUrl,
+      merchantUrl: effectiveDest,
       subId: subid1,
       subid1,
       subid2,
@@ -335,7 +352,7 @@ export async function handleDealRedirect(req: Request, res: Response) {
       storeName: store,
       storeSlug: slug,
       couponCode: code,
-      destinationUrl: cleanMerchant,
+      destinationUrl: smartMerchant,
       source,
       device,
       ip: clientIp,

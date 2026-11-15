@@ -71,6 +71,40 @@ export interface DealsApiResponse {
   };
 }
 
+export const HIGH_CONVERTING_APPROVED_STORES = new Set([
+  "tatacliq",
+  "tata-cliq",
+  "nykaa",
+  "croma",
+  "firstcry",
+  "pepperfry",
+  "myntra",
+  "makemytrip",
+  "boat",
+  "boat-lifestyle",
+  "flipkart",
+  "ajio",
+  "bewakoof",
+  "1mg",
+  "tata1mg",
+  "coursera",
+]);
+
+export function getDealTrendingScore(d: Deal): number {
+  let score = Number(d.usesCount) || 0;
+  const s = `${d.storeSlug || ""} ${d.storeName || ""}`.toLowerCase().replace(/[^a-z0-9]/g, "");
+  for (const highStore of HIGH_CONVERTING_APPROVED_STORES) {
+    const cleanStore = highStore.replace(/[^a-z0-9]/g, "");
+    if (s.includes(cleanStore) || cleanStore.includes(s)) {
+      score += 250;
+      break;
+    }
+  }
+  if (d.badge === "Trending" || d.badge === "Exclusive") score += 50;
+  if (d.code && d.code.trim().length > 1 && d.code !== "DEALACTIVATED") score += 30;
+  return score;
+}
+
 export type DealSortField = "discount" | "trending" | "verified" | "expiry" | "store";
 
 export interface FetchDealsOptions {
@@ -149,7 +183,7 @@ async function getStaticDeals(options: FetchDealsOptions = {}): Promise<DealsApi
   filtered.sort((a, b) => {
     let diff = 0;
     if (sortBy === "trending") {
-      diff = (b.usesCount || 0) - (a.usesCount || 0);
+      diff = getDealTrendingScore(b) - getDealTrendingScore(a);
     } else if (sortBy === "discount") {
       const getDiscVal = (d: Deal) => {
         const num = parseInt(d.discount.replace(/[^\d]/g, ""), 10);

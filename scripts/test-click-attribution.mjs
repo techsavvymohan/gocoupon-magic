@@ -72,7 +72,7 @@ const tests = [
     expectedPublisherTag: "272970",
   },
   {
-    name: "6. Amazon India Partner Tag",
+    name: "7. Amazon India Partner Tag",
     input: {
       url: "https://www.amazon.in/dp/B09G9FPHY6",
       store: "Amazon",
@@ -82,6 +82,32 @@ const tests = [
     expectedDomain: "amazon.in",
     expectedPublisherTag: "gocoupon0e-21",
     forbiddenWrapper: "linksredirect.com",
+  },
+  {
+    name: "8. Smart Deep-Linking for Tata CLiQ (Homepage -> Search Deep Link)",
+    input: {
+      url: "https://www.tatacliq.com/",
+      store: "Tata CLiQ",
+      slug: "tata-cliq",
+      title: "Flat ₹500 Off on Audio & Earbuds at Tata CLiQ",
+      code: "AUDIO500",
+    },
+    expectedDomain: "linksredirect.com",
+    expectedPublisherTag: "272970",
+    expectedKeyword: "searchCategory%3Dall%26text%3DAudio%2520Earbuds",
+  },
+  {
+    name: "9. Smart Deep-Linking for Croma (Homepage -> Search Deep Link)",
+    input: {
+      url: "https://www.croma.com",
+      store: "Croma",
+      slug: "croma",
+      title: "Save up to 40% on Sony Headphones at Croma",
+      code: "SONY40",
+    },
+    expectedDomain: "linksredirect.com",
+    expectedPublisherTag: "272970",
+    expectedKeyword: "searchB%3Fq%3DSony%2520Headphones",
   },
 ];
 
@@ -110,8 +136,9 @@ for (const t of tests) {
   const domainMatch = redirectedTo.includes(t.expectedDomain);
   const pubMatch = !t.expectedPublisherTag || redirectedTo.includes(t.expectedPublisherTag);
   const wrapperClean = !t.forbiddenWrapper || !redirectedTo.includes(t.forbiddenWrapper);
+  const keywordMatch = !t.expectedKeyword || redirectedTo.includes(t.expectedKeyword);
 
-  if (statusCode === 302 && domainMatch && pubMatch && wrapperClean) {
+  if (statusCode === 302 && domainMatch && pubMatch && wrapperClean && keywordMatch) {
     console.log(`✅ [PASS] ${t.name}`);
     console.log(`    ↳ Destination: ${redirectedTo}\n`);
   } else {
@@ -123,6 +150,7 @@ for (const t of tests) {
 
 if (allPassed) {
   console.log("🎉 ALL MULTI-NETWORK ATTRIBUTION TESTS PASSED (100% RELIABILITY)");
+  process.exit(0);
 } else {
   process.exit(1);
 }

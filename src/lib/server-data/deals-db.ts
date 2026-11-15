@@ -338,6 +338,45 @@ export function getPopularBrandsFromPool(customDeals?: DealRecord[]): PopularBra
  * Returns deals, optionally filtered by category, search query, badge, letter, brand, festive status, and pagination,
  * sorted by discount, trending (popularity), verified status, expiry, or store name.
  */
+export const HIGH_CONVERTING_APPROVED_STORES = new Set([
+  "tatacliq",
+  "tata-cliq",
+  "nykaa",
+  "croma",
+  "firstcry",
+  "pepperfry",
+  "myntra",
+  "makemytrip",
+  "boat",
+  "boat-lifestyle",
+  "flipkart",
+  "ajio",
+  "bewakoof",
+  "1mg",
+  "tata1mg",
+  "coursera",
+]);
+
+export function getDealTrendingScore(d: DealRecord): number {
+  let score = Number(d.usesCount) || 0;
+  const s = `${d.storeSlug || ""} ${d.storeName || ""}`.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+  // Priority boost for approved, long-cookie, realtime tracking merchants
+  for (const highStore of HIGH_CONVERTING_APPROVED_STORES) {
+    const cleanStore = highStore.replace(/[^a-z0-9]/g, "");
+    if (s.includes(cleanStore) || cleanStore.includes(s)) {
+      score += 250;
+      break;
+    }
+  }
+
+  // Boost verified badges & high-converting promo codes
+  if (d.badge === "Trending" || d.badge === "Exclusive") score += 50;
+  if (d.code && d.code.trim().length > 1 && d.code !== "DEALACTIVATED") score += 30;
+
+  return score;
+}
+
 export function queryDeals(
   options: {
     category?: string;
@@ -486,7 +525,7 @@ export function queryDeals(
         break;
       case "trending":
       default:
-        comp = a.usesCount - b.usesCount;
+        comp = getDealTrendingScore(a) - getDealTrendingScore(b);
         break;
     }
     return order === "asc" ? comp : -comp;

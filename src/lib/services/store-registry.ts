@@ -160,6 +160,172 @@ export function isAffiliateNetworkUrl(url?: string | null): boolean {
   );
 }
 
+export function isHomepageUrl(url?: string | null): boolean {
+  if (!url) return true;
+  try {
+    const parsed = new URL(url);
+    const p = parsed.pathname.trim().toLowerCase();
+    return (
+      p === "" ||
+      p === "/" ||
+      p === "/index.html" ||
+      p === "/home" ||
+      p === "/home/" ||
+      p === "/in" ||
+      p === "/in/"
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Extracts high-intent product/category search keywords from deal titles by stripping
+ * promo discount noise, currencies, and merchant brand names.
+ *
+ * Example: "Flat ₹500 Off on Premium Smartwatches & Wearables at Tata CLiQ"
+ *       => "Smartwatches Wearables"
+ */
+export function extractSearchQueryFromDealTitle(title?: string | null, storeName = ""): string {
+  if (!title) return "";
+  let clean = title.trim();
+
+  // 1. Remove store name if present
+  if (storeName && storeName.length > 2) {
+    const escapedStore = storeName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    clean = clean.replace(new RegExp(`\\b${escapedStore}\\b`, "gi"), " ");
+  }
+
+  // 2. Remove common merchant brand names
+  clean = clean.replace(
+    /\b(tatacliq|tata\s*cliq|croma|nykaa|myntra|firstcry|pepperfry|bewakoof|flipkart|amazon|boat|meesho|coursera|makemytrip)\b/gi,
+    " "
+  );
+
+  // 3. Remove discount amounts, percentages, currencies
+  clean = clean.replace(
+    /\b(flat|extra|save|upto|up\s+to|get|min|minimum|max|maximum)\s*(₹|rs\.?|inr|\$)?\s*\d+(\s*(%|percent|k|lac|lakh))?(\s*off)?\b/gi,
+    " "
+  );
+  clean = clean.replace(/(\b|\d+)%\s*off\b/gi, " ");
+  clean = clean.replace(/\b(₹|rs\.?|inr|\$)\s*\d+(\s*off)?\b/gi, " ");
+  clean = clean.replace(/\b\d+%\b/gi, " ");
+  clean = clean.replace(/\b\d+\s*(off|discount|cashback)\b/gi, " ");
+
+  // 4. Remove order/spend thresholds: "above ₹999", "on orders above 1999"
+  clean = clean.replace(
+    /\b(above|orders?\s*above|min\s*order|purchase\s*above|worth)\s*(₹|rs\.?|inr|\$)?\s*\d+\b/gi,
+    " "
+  );
+
+  // 5. Remove marketing promo filler words & action verbs
+  clean = clean.replace(
+    /\b(save|saving|savings|extra|upto|up\s*to|flat|get|enjoy|avail|buy|coupon|deal|deals|code|offers?|promo|voucher|exclusive|fest|festival|sale|today|verified|instant|discount|cashback|free\s*shipping|free\s*delivery)\b/gi,
+    " "
+  );
+  clean = clean.replace(
+    /\b(first\s*order|first\s*purchase|first\s*user|sitewide|storewide|selected\s*products?|all\s*orders?|with\s+neupass|with\s+card)\b/gi,
+    " "
+  );
+
+  // 6. Remove filler prepositions & conjunctions
+  clean = clean.replace(/\b(on|at|with|for|and|or|in|to|from|by|your|across|eligible)\b/gi, " ");
+
+  // 7. Remove non-alphanumeric characters except spaces
+  clean = clean.replace(/[^\w\s-]/g, " ").replace(/\s+/g, " ").trim();
+
+  // If remaining tokens are too short or just 1 character, reject
+  const tokens = clean.split(/\s+/).filter((w) => w.length >= 2);
+  if (tokens.length === 0) return "";
+
+  // Take top 4 most descriptive tokens
+  return tokens.slice(0, 4).join(" ");
+}
+
+/**
+ * Upgrades generic homepage URLs into targeted merchant search/category deep links
+ * so shoppers land directly on the relevant product category instead of a blank root homepage.
+ */
+export function buildSmartMerchantDeepLink(
+  merchantUrl: string,
+  storeOrSlug = "",
+  dealTitle = ""
+): string {
+  if (!merchantUrl) return merchantUrl;
+  if (!isHomepageUrl(merchantUrl)) {
+    // Already a specific deep link! Preserve it.
+    return merchantUrl;
+  }
+
+  const query = extractSearchQueryFromDealTitle(dealTitle, storeOrSlug);
+  if (!query || query.length < 3) {
+    return merchantUrl;
+  }
+
+  const qNorm = encodeURIComponent(query);
+  const sNorm = `${storeOrSlug} ${merchantUrl}`.toLowerCase();
+
+  if (sNorm.includes("tatacliq")) {
+    return `https://www.tatacliq.com/search/?searchCategory=all&text=${qNorm}`;
+  }
+  if (sNorm.includes("croma")) {
+    return `https://www.croma.com/searchB?q=${qNorm}`;
+  }
+  if (sNorm.includes("nykaa")) {
+    return `https://www.nykaa.com/search/result/?q=${qNorm}`;
+  }
+  if (sNorm.includes("firstcry")) {
+    return `https://www.firstcry.com/search?q=${qNorm}`;
+  }
+  if (sNorm.includes("pepperfry")) {
+    return `https://www.pepperfry.com/site_product/search?q=${qNorm}`;
+  }
+  if (sNorm.includes("boat")) {
+    return `https://www.boat-lifestyle.com/search?q=${qNorm}`;
+  }
+  if (sNorm.includes("bewakoof")) {
+    return `https://www.bewakoof.com/search/${qNorm}`;
+  }
+  if (sNorm.includes("1mg")) {
+    return `https://www.1mg.com/search/all?name=${qNorm}`;
+  }
+  if (sNorm.includes("netmeds")) {
+    return `https://www.netmeds.com/catalogsearch/result?q=${qNorm}`;
+  }
+  if (sNorm.includes("lenovo")) {
+    return `https://www.lenovo.com/in/en/search?fq=&text=${qNorm}`;
+  }
+  if (sNorm.includes("meesho")) {
+    return `https://www.meesho.com/search?q=${qNorm}`;
+  }
+  if (sNorm.includes("coursera")) {
+    return `https://www.coursera.org/search?query=${qNorm}`;
+  }
+  if (sNorm.includes("myntra")) {
+    return `https://www.myntra.com/${encodeURIComponent(query.toLowerCase().replace(/\s+/g, "-"))}`;
+  }
+  if (sNorm.includes("flipkart")) {
+    return `https://www.flipkart.com/search?q=${qNorm}`;
+  }
+  if (sNorm.includes("ajio")) {
+    return `https://www.ajio.com/search/?text=${qNorm}`;
+  }
+  if (sNorm.includes("amazon.in")) {
+    return `https://www.amazon.in/s?k=${qNorm}`;
+  }
+
+  // Fallback to store registry custom search url generator if available
+  const matched = findStoreByNameOrSlug(storeOrSlug);
+  if (matched?.buildSearchUrl) {
+    try {
+      const generated = matched.buildSearchUrl(query);
+      if (generated && generated !== "#") return generated;
+    } catch {}
+  }
+
+  return merchantUrl;
+}
+
 export function buildDealRedirectUrl(options: {
   url: string;
   dealId?: string;
@@ -189,6 +355,14 @@ export function buildDealRedirectUrl(options: {
       targetUrl = fallbackStore.storeUrl;
     } else {
       return "#";
+    }
+  }
+
+  // If targetUrl is a homepage URL and title is present, upgrade to targeted smart deep link
+  if (options.title && isHomepageUrl(targetUrl) && !isAlreadyAffiliate) {
+    const deep = buildSmartMerchantDeepLink(targetUrl, options.storeSlug || options.storeName, options.title);
+    if (deep && deep !== targetUrl) {
+      targetUrl = deep;
     }
   }
 

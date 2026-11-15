@@ -44,11 +44,12 @@ interface QuickPill {
 }
 
 const QUICK_PILLS: QuickPill[] = [
-  { label: "Booking.com", query: "Booking.com", badge: "🔥" },
-  { label: "Myntra", query: "Myntra", badge: "👗" },
-  { label: "Amazon Deals", query: "Amazon", badge: "📦" },
-  { label: "Swiggy", query: "Swiggy", badge: "🍕" },
-  { label: "Hotels", query: "Hotel", badge: "🏨" },
+  { label: "Tata CLiQ", query: "Tata CLiQ", badge: "🔥 70% Off" },
+  { label: "Croma Tech", query: "Croma", badge: "⚡ Deals" },
+  { label: "Nykaa Beauty", query: "Nykaa", badge: "💄 Verified" },
+  { label: "Myntra", query: "Myntra", badge: "👗 Fashion" },
+  { label: "FirstCry", query: "FirstCry", badge: "👶 Baby" },
+  { label: "Pepperfry", query: "Pepperfry", badge: "🛋️ Home" },
 ];
 
 /**
@@ -175,15 +176,34 @@ export function HeroStoreDealSearch() {
       e.stopPropagation();
       e.preventDefault();
 
+      const isMobile =
+        typeof window !== "undefined" &&
+        (window.innerWidth < 768 || /mobile|android|iphone|ipad/i.test(navigator.userAgent));
+
       if (code && code !== "DEALACTIVATED") {
         navigator.clipboard.writeText(code).catch(() => {});
         setCopiedCode(code);
-        toast.success(`Coupon code "${code}" copied to clipboard!`, {
-          description: `Opening ${storeName} with discount applied…`,
-        });
-        setTimeout(() => setCopiedCode(null), 3000);
+        if (isMobile) {
+          toast.success(`Coupon code "${code}" copied! Opening ${storeName}...`, {
+            description: "📱 Mobile Tip: Complete checkout in this browser tab to secure your verified discount and prevent app tracking drops.",
+            duration: 5500,
+          });
+        } else {
+          toast.success(`Coupon code "${code}" copied! Opening ${storeName}...`, {
+            description: "🔒 Pro Tip: Apply code directly at checkout to lock in your discount and prevent extension overrides.",
+            duration: 5000,
+          });
+        }
+        setTimeout(() => setCopiedCode(null), 4000);
       } else {
-        toast.success(`Opening ${storeName} deal…`);
+        if (isMobile) {
+          toast.success(`Opening ${storeName} deal...`, {
+            description: "📱 Mobile Tip: Complete purchase in this browser tab to secure direct discount.",
+            duration: 4500,
+          });
+        } else {
+          toast.success(`Opening ${storeName} deal...`);
+        }
       }
 
       // Safe, tracked redirect URL

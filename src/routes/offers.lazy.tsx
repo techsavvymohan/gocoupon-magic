@@ -569,19 +569,40 @@ function OffersHubPage() {
   };
 
   const handleRedeemDeal = (deal: Deal, e?: React.MouseEvent) => {
+    const isMobile =
+      typeof window !== "undefined" &&
+      (window.innerWidth < 768 || /mobile|android|iphone|ipad/i.test(navigator.userAgent));
+
     const hasCode = Boolean(deal.code && deal.code.trim().length > 1);
     if (hasCode) {
       const code = deal.code.trim();
-      navigator.clipboard.writeText(code);
+      navigator.clipboard.writeText(code).catch(() => {});
       setCopiedCode(code);
-      toast.success(`Coupon code "${code}" copied! Opening ${deal.storeName} to auto-apply...`, {
-        description: "Tip: Apply this code directly to secure your direct partner discount and prevent 3rd-party extension overrides.",
-        duration: 4500,
-      });
+      if (isMobile) {
+        toast.success(`Coupon code "${code}" copied! Opening ${deal.storeName}...`, {
+          description: "📱 Mobile Tip: Complete checkout in this browser tab to secure your verified discount and prevent app tracking drops.",
+          duration: 5500,
+        });
+      } else {
+        toast.success(`Coupon code "${code}" copied! Opening ${deal.storeName}...`, {
+          description: "🔒 Pro Tip: Apply this code directly at checkout to lock in your discount and prevent 3rd-party extension overrides.",
+          duration: 5000,
+        });
+      }
       setTimeout(() => setCopiedCode((curr) => (curr === code ? null : curr)), 5000);
     } else {
       setCopiedCode(deal.id);
-      toast.success(`Activating ${deal.discount}! Opening ${deal.storeName}...`);
+      if (isMobile) {
+        toast.success(`Activating ${deal.discount}! Opening ${deal.storeName}...`, {
+          description: "📱 Mobile Tip: Complete checkout in this browser tab to ensure your verified discount is tracked.",
+          duration: 4500,
+        });
+      } else {
+        toast.success(`Activating ${deal.discount}! Opening ${deal.storeName}...`, {
+          description: "Tip: Apply at checkout in this browser window to secure direct partner discount.",
+          duration: 4000,
+        });
+      }
       setTimeout(() => setCopiedCode((curr) => (curr === deal.id ? null : curr)), 5000);
     }
 

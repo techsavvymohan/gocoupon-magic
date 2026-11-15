@@ -48,6 +48,90 @@ function extractMerchantDestination(rawUrl: string): string {
   return cleanUrl;
 }
 
+function isHomepageUrl(url?: string | null): boolean {
+  if (!url) return true;
+  try {
+    const parsed = new URL(url);
+    const p = parsed.pathname.trim().toLowerCase();
+    return (
+      p === "" ||
+      p === "/" ||
+      p === "/index.html" ||
+      p === "/home" ||
+      p === "/home/" ||
+      p === "/in" ||
+      p === "/in/"
+    );
+  } catch {
+    return false;
+  }
+}
+
+function extractSearchQuery(title?: string | null, storeName = ""): string {
+  if (!title) return "";
+  let clean = title.trim();
+  if (storeName && storeName.length > 2) {
+    const escaped = storeName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    clean = clean.replace(new RegExp(`\\b${escaped}\\b`, "gi"), " ");
+  }
+  clean = clean.replace(
+    /\b(tatacliq|tata\s*cliq|croma|nykaa|myntra|firstcry|pepperfry|bewakoof|flipkart|amazon|boat|meesho|coursera|makemytrip)\b/gi,
+    " "
+  );
+  clean = clean.replace(
+    /\b(flat|extra|save|upto|up\s+to|get|min|minimum|max|maximum)\s*(₹|rs\.?|inr|\$)?\s*\d+(\s*(%|percent|k|lac|lakh))?(\s*off)?\b/gi,
+    " "
+  );
+  clean = clean.replace(/(\b|\d+)%\s*off\b/gi, " ");
+  clean = clean.replace(/\b(₹|rs\.?|inr|\$)\s*\d+(\s*off)?\b/gi, " ");
+  clean = clean.replace(/\b\d+%\b/gi, " ");
+  clean = clean.replace(/\b\d+\s*(off|discount|cashback)\b/gi, " ");
+  clean = clean.replace(
+    /\b(above|orders?\s*above|min\s*order|purchase\s*above|worth)\s*(₹|rs\.?|inr|\$)?\s*\d+\b/gi,
+    " "
+  );
+  clean = clean.replace(
+    /\b(save|saving|savings|extra|upto|up\s*to|flat|get|enjoy|avail|buy|coupon|deal|deals|code|offers?|promo|voucher|exclusive|fest|festival|sale|today|verified|instant|discount|cashback|free\s*shipping|free\s*delivery)\b/gi,
+    " "
+  );
+  clean = clean.replace(
+    /\b(first\s*order|first\s*purchase|first\s*user|sitewide|storewide|selected\s*products?|all\s*orders?|with\s+neupass|with\s+card)\b/gi,
+    " "
+  );
+  clean = clean.replace(/\b(on|at|with|for|and|or|in|to|from|by|your|across|eligible)\b/gi, " ");
+  clean = clean.replace(/[^\w\s-]/g, " ").replace(/\s+/g, " ").trim();
+  const tokens = clean.split(/\s+/).filter((w) => w.length >= 2);
+  if (tokens.length === 0) return "";
+  return tokens.slice(0, 4).join(" ");
+}
+
+function buildSmartDeepLink(merchantUrl: string, storeOrSlug = "", dealTitle = ""): string {
+  if (!merchantUrl || !isHomepageUrl(merchantUrl)) return merchantUrl;
+  const query = extractSearchQuery(dealTitle, storeOrSlug);
+  if (!query || query.length < 3) return merchantUrl;
+  const qNorm = encodeURIComponent(query);
+  const sNorm = `${storeOrSlug} ${merchantUrl}`.toLowerCase();
+
+  if (sNorm.includes("tatacliq")) return `https://www.tatacliq.com/search/?searchCategory=all&text=${qNorm}`;
+  if (sNorm.includes("croma")) return `https://www.croma.com/searchB?q=${qNorm}`;
+  if (sNorm.includes("nykaa")) return `https://www.nykaa.com/search/result/?q=${qNorm}`;
+  if (sNorm.includes("firstcry")) return `https://www.firstcry.com/search?q=${qNorm}`;
+  if (sNorm.includes("pepperfry")) return `https://www.pepperfry.com/site_product/search?q=${qNorm}`;
+  if (sNorm.includes("boat")) return `https://www.boat-lifestyle.com/search?q=${qNorm}`;
+  if (sNorm.includes("bewakoof")) return `https://www.bewakoof.com/search/${qNorm}`;
+  if (sNorm.includes("1mg")) return `https://www.1mg.com/search/all?name=${qNorm}`;
+  if (sNorm.includes("netmeds")) return `https://www.netmeds.com/catalogsearch/result?q=${qNorm}`;
+  if (sNorm.includes("lenovo")) return `https://www.lenovo.com/in/en/search?fq=&text=${qNorm}`;
+  if (sNorm.includes("meesho")) return `https://www.meesho.com/search?q=${qNorm}`;
+  if (sNorm.includes("coursera")) return `https://www.coursera.org/search?query=${qNorm}`;
+  if (sNorm.includes("myntra")) return `https://www.myntra.com/${encodeURIComponent(query.toLowerCase().replace(/\s+/g, "-"))}`;
+  if (sNorm.includes("flipkart")) return `https://www.flipkart.com/search?q=${qNorm}`;
+  if (sNorm.includes("ajio")) return `https://www.ajio.com/search/?text=${qNorm}`;
+  if (sNorm.includes("amazon.in")) return `https://www.amazon.in/s?k=${qNorm}`;
+
+  return merchantUrl;
+}
+
 export default async function handler(req: any, res: any) {
   const query = req.query || {};
   let rawUrl = String(query.url || query.target || query.link || query.to || query.dest || "").trim();
@@ -69,6 +153,9 @@ export default async function handler(req: any, res: any) {
 
   const cleanMerchant = extractMerchantDestination(rawUrl);
   const normTarget = `${slug} ${store} ${cleanMerchant} ${rawUrl}`.toLowerCase();
+  const smartMerchant = isHomepageUrl(cleanMerchant) && title
+    ? buildSmartDeepLink(cleanMerchant, slug || store, title)
+    : cleanMerchant;
   const clickId = `clk_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   const subid1 = source || "gocoupon_web";
   const subid2 = slug || store.toLowerCase().replace(/\s+/g, "-");
@@ -130,14 +217,23 @@ export default async function handler(req: any, res: any) {
     const sep = rawUrl.includes("?") ? "&" : "?";
     targetUrl = `${rawUrl}${sep}sid=${encodeURIComponent(clickId)}`;
   } else if (rawUrl.includes("amazon.in") || cleanMerchant.includes("amazon.in")) {
-    const sep = rawUrl.includes("?") ? "&" : "?";
-    targetUrl = `${rawUrl}${sep}tag=${AMAZON_IN_TAG}&ascsubtag=${encodeURIComponent(clickId)}`;
+    const dest = smartMerchant.includes("amazon.in") ? smartMerchant : rawUrl;
+    const sep = dest.includes("?") ? "&" : "?";
+    targetUrl = `${dest}${sep}tag=${AMAZON_IN_TAG}&ascsubtag=${encodeURIComponent(clickId)}`;
   } else if (rawUrl.includes("amazon.com") || cleanMerchant.includes("amazon.com")) {
-    const sep = rawUrl.includes("?") ? "&" : "?";
-    targetUrl = `${rawUrl}${sep}tag=${AMAZON_US_TAG}&ascsubtag=${encodeURIComponent(clickId)}`;
+    const dest = smartMerchant.includes("amazon.com") ? smartMerchant : rawUrl;
+    const sep = dest.includes("?") ? "&" : "?";
+    targetUrl = `${dest}${sep}tag=${AMAZON_US_TAG}&ascsubtag=${encodeURIComponent(clickId)}`;
   } else if (isCuelinks) {
     try {
-      const u = new URL(rawUrl);
+      const effectiveDest = smartMerchant !== cleanMerchant ? smartMerchant : rawUrl;
+      const u = new URL(effectiveDest);
+      if (smartMerchant !== cleanMerchant) {
+        // If it was linksredirect, set the url param to the smart deep link
+        if (u.searchParams.has("url")) {
+          u.searchParams.set("url", smartMerchant);
+        }
+      }
       if (!u.searchParams.has("pub_id") && !u.searchParams.has("pub")) {
         u.searchParams.set("pub_id", CUELINKS_PUB_ID);
       }
@@ -153,7 +249,8 @@ export default async function handler(req: any, res: any) {
       targetUrl = rawUrl;
     }
   } else if (/^https?:\/\//i.test(targetUrl)) {
-    const encoded = encodeURIComponent(targetUrl);
+    const effectiveDest = smartMerchant !== cleanMerchant ? smartMerchant : targetUrl;
+    const encoded = encodeURIComponent(effectiveDest);
     targetUrl = `https://linksredirect.com/?pub_id=${CUELINKS_PUB_ID}&cid=${CUELINKS_CHANNEL_ID}&subid=${encodeURIComponent(subid1)}&subid2=${encodeURIComponent(subid2)}&subid3=${encodeURIComponent(subid3)}&subid4=${encodeURIComponent(clickId)}&url=${encoded}`;
   }
 
