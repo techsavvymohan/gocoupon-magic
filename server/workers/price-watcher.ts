@@ -144,7 +144,7 @@ export function startBackgroundWorkers(intervalMs: number = 6 * 60 * 60 * 1000) 
   // Telegram Automated Deal Broadcast
   setTimeout(async () => {
     try {
-      const { getTelegramConfig, postNextTopDeal } = await import("../services/telegram-bot.js");
+      const { getTelegramConfig, postNextTopDeal } = await import("../telegram-bot/index.js");
       const tgConfig = getTelegramConfig();
       if (tgConfig.isConfigured && tgConfig.autoPostEnabled) {
         console.log(`📢 [TelegramBot] Automated deal broadcaster active (channel: ${tgConfig.channelId}, interval: ${tgConfig.intervalMinutes}m)`);

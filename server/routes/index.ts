@@ -48,7 +48,7 @@ import { intelligenceRouter } from "./intelligence.js";
 import { redirectRouter } from "./redirect.js";
 import { postbackRouter } from "./postback.js";
 import { affiliateAiToolsRouter } from "./affiliate-ai-tools.js";
-import { telegramRouter } from "./telegram.js";
+import { telegramRouter } from "../telegram-bot/routes.js";
 import { rumRouter } from "./rum.js";
 import { Router as ExpressRouter } from "express";
 
