@@ -22,7 +22,7 @@ import { syncCjDeals, getCjConfig } from "../services/providers/cj-client.js";
 let watcherInterval: NodeJS.Timeout | null = null;
 let admitadTickCount = 0; // Run Admitad sync every 4th Cuelinks tick (~60 min)
 
-export function startBackgroundWorkers(intervalMs: number = 15 * 60 * 1000) {
+export function startBackgroundWorkers(intervalMs: number = 6 * 60 * 60 * 1000) {
   if (watcherInterval) {
     return;
   }

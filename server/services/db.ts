@@ -329,6 +329,8 @@ function writeJsonFallback<T>(filename: string, data: T): void {
 // =============================================================================
 // 1. DEALS DATABASE SERVICE
 // =============================================================================
+let lastUpsertedDealsHash = "";
+
 export const dealsDb = {
   /**
    * Retrieves active, non-expired deals with optional store, category, or search filter.
@@ -521,6 +523,17 @@ export const dealsDb = {
     // 3. Supabase REST Upsert via Service Role Key (bypasses RLS — primary persistence layer)
     if (supabaseAdmin) {
       try {
+        // Fingerprint check to prevent redundant writes to Supabase (preserves Disk IO budget)
+        const currentHash = crypto
+          .createHash("md5")
+          .update(deals.map((d) => `${d.id}:${d.code || ""}:${d.endDate || ""}:${d.status || ""}:${d.discount || ""}`).join("|"))
+          .digest("hex");
+
+        if (currentHash === lastUpsertedDealsHash) {
+          console.log(`ℹ️ [Database] Deals unchanged since last sync (${deals.length} deals). Skipping Supabase cloud writes to protect Disk IO budget.`);
+          return deals.length;
+        }
+
         const BATCH_SIZE = 50;
         let totalUpserted = 0;
 
@@ -631,6 +644,7 @@ export const dealsDb = {
             }
           }
         }
+        lastUpsertedDealsHash = currentHash;
         console.log(`✅ [Database] Supabase upsert complete: ${totalUpserted} deals saved to cloud DB.`);
         return totalUpserted;
       } catch (err: any) {
@@ -1827,17 +1841,21 @@ export async function getDatabaseDiagnostics(): Promise<{
   };
 }
 
+let lastPrunedCloudTimestamp = 0;
+
 /**
  * Automatically purges and deactivates expired coupons from Supabase and in-memory pool.
- * Called every 15 minutes by the price-watcher daemon.
+ * Throttled to run cloud updates only once every 24 hours to conserve Supabase Disk IO budget.
  */
 export async function pruneExpiredCoupons(): Promise<{ prunedDeals: number; prunedCoupons: number }> {
   let prunedDeals = 0;
   let prunedCoupons = 0;
-  const nowIso = new Date().toISOString();
+  const now = Date.now();
+  const nowIso = new Date(now).toISOString();
 
-  // 1. Prune expired deals and coupons from Supabase cloud DB
-  if (supabaseAdmin) {
+  // 1. Only run Supabase cloud DB updates once every 24 hours to preserve Disk IOPS
+  const shouldPruneCloud = now - lastPrunedCloudTimestamp > 24 * 60 * 60 * 1000;
+  if (supabaseAdmin && shouldPruneCloud) {
     try {
       const { data: dData, error: dErr } = await supabaseAdmin
         .from("gocoupon_deals")
@@ -1857,6 +1875,15 @@ export async function pruneExpiredCoupons(): Promise<{ prunedDeals: number; prun
 
       if (!cErr && cData) prunedCoupons = cData.length;
 
+      // Also clean up ancient click logs (> 90 days) to prevent table bloat and disk consumption
+      const ninetyDaysAgo = new Date(now - 90 * 24 * 60 * 60 * 1000).toISOString();
+      await supabaseAdmin
+        .from("gocoupon_clicks")
+        .delete()
+        .lt("created_at", ninetyDaysAgo);
+
+      lastPrunedCloudTimestamp = now;
+
       if (prunedDeals > 0 || prunedCoupons > 0) {
         console.log(`🧹 [Cleaner] Pruned ${prunedDeals} expired deals and ${prunedCoupons} coupons from Supabase.`);
       }
@@ -1865,7 +1892,7 @@ export async function pruneExpiredCoupons(): Promise<{ prunedDeals: number; prun
     }
   }
 
-  // 2. Prune expired deals from in-memory pool & sync to disk
+  // 2. Prune expired deals from in-memory pool & sync to disk (zero Supabase IOPS, keeps site fast)
   try {
     const current = getLiveDeals();
     const nowTime = Date.now();
