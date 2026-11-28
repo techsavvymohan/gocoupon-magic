@@ -89,6 +89,12 @@ jobs:
             cd /var/www/gocoupon
             tar -xzf build-artifacts.tar.gz
             rm -f build-artifacts.tar.gz
+            if [ -f /var/www/gocoupon/.env ]; then
+              sed -i 's/CUELINKS_PUBLISHER_ID=.*/CUELINKS_PUBLISHER_ID=272970/g' /var/www/gocoupon/.env
+              sed -i 's/VITE_CUELINKS_PUB_ID=.*/VITE_CUELINKS_PUB_ID=272970/g' /var/www/gocoupon/.env
+              sed -i 's/CUELINKS_CHANNEL_ID=.*/CUELINKS_CHANNEL_ID=318931/g' /var/www/gocoupon/.env
+              sed -i 's/VITE_CUELINKS_CHANNEL_ID=.*/VITE_CUELINKS_CHANNEL_ID=318931/g' /var/www/gocoupon/.env
+            fi
             npm install --omit=dev --no-audit --no-fund
             pm2 reload gocoupon-web --update-env || pm2 start ecosystem.config.cjs
             pm2 status

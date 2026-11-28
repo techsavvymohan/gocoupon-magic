@@ -124,10 +124,17 @@ function setCached<T>(key: string, data: T, ttlMs: number): void {
 }
 
 export function getCuelinksConfig() {
-  const publisherId =
+  let publisherId = (
     process.env.CUELINKS_PUBLISHER_ID ||
     process.env.VITE_CUELINKS_PUB_ID ||
-    "272970";
+    "272970"
+  ).trim();
+
+  // Guard against stale/deprecated legacy publisher ID (148920) on VPS
+  if (publisherId === "148920" || !publisherId) {
+    publisherId = "272970";
+  }
+
   const apiKey = (process.env.CUELINKS_API_KEY || "").trim();
   const channelId = (process.env.CUELINKS_CHANNEL_ID || process.env.VITE_CUELINKS_CHANNEL_ID || "318931").trim();
 
@@ -174,6 +181,8 @@ export function buildCuelinksRedirectUrl(options: CuelinksLinkOptions): string {
     try {
       const parsed = new URL(targetUrl);
       if (!parsed.searchParams.has("pub_id") && !parsed.searchParams.has("pub")) {
+        parsed.searchParams.set("pub_id", publisherId);
+      } else if (parsed.searchParams.get("pub_id") === "148920" || parsed.searchParams.get("pub") === "148920") {
         parsed.searchParams.set("pub_id", publisherId);
       }
       if (!parsed.searchParams.has("cid")) {
