@@ -99,13 +99,14 @@ Merchant product page
 
 ## Provider Capabilities
 
-| Provider | Search | Details | Links | Promotions | Cashback |
+| Provider | Search | Details | Links | Promotions | Live Status |
 |---|---|---|---|---|---|
-| Amazon | ✅ | ✅ | ✅ | ❌ (Phase 1) | ❌ (not planned) |
-| Mock | ✅ | ✅ | ✅ | ❌ | ❌ |
-| Impact | 🔲 stub | 🔲 stub | 🔲 stub | 🔲 stub | 🔲 stub |
-| Awin | 🔲 stub | 🔲 stub | 🔲 stub | 🔲 stub | 🔲 stub |
-| CJ | 🔲 stub | 🔲 stub | 🔲 stub | 🔲 stub | 🔲 stub |
+| **Cuelinks API v3** | ✅ | ✅ | ✅ | ✅ | Active (`pub_id=272970`, `cid=318931`, 1,712 live deals) |
+| **EarnKaro** | ✅ | ✅ | ✅ | ✅ | Active (Flipkart, Ajio, Dot & Key, Plum, mCaffeine, Shopsy) |
+| **Admitad** | ✅ | ✅ | ✅ | ✅ | Active (Palmonas, Bewakoof, Mivi, Acer, Asus, Walmart) |
+| **Amazon Associates** | ✅ | ✅ | ✅ | ✅ | Active (`tag=gocoupon0e-21`, `gocouponus-20`) |
+| **CJ Affiliate** | ✅ | ✅ | ✅ | ✅ | Active (`101896072-17186809`) |
+| Mock Provider | ✅ | ✅ | ✅ | ❌ | Dev fallback only |
 
 ## Security Rules
 

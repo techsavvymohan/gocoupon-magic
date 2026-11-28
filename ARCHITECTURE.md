@@ -12,7 +12,7 @@ GoCoupon is built as a **persistent three-tier web platform** with an accompanyi
 graph TD
     subgraph Clients ["Client Layer"]
         WebSPA["React 19 Web SPA<br/>(TanStack Router + Tailwind v4)"]
-        PreRendered["145+ Pre-Rendered SEO HTML Pages<br/>(SSR Route Generator)"]
+        PreRendered["497 Pre-Rendered SEO HTML Pages<br/>(993 Standalone Static Files)"]
         Extension["Chrome Extension Companion<br/>(Auto-Apply DOM Selectors)"]
     end
 
@@ -21,12 +21,13 @@ graph TD
     end
 
     subgraph ApplicationTier ["Application Tier (Node.js + Express VPS)"]
-        ExpressServer["server.ts Gateway<br/>• Double-Decoded Path Traversal Guard<br/>• OWASP Security Headers (CSP, HSTS)<br/>• Sliding-Window Rate Limiters"]
+        ExpressServer["server.ts Gateway<br/>• PM2 Systemd Daemon (Auto-Resurrection on Reboot)<br/>• Double-Decoded Path Traversal Guard<br/>• OWASP Security Headers (CSP, HSTS)<br/>• Sliding-Window Rate Limiters"]
         
         subgraph APIRouters ["20 Modular API Controllers (/api/*)"]
             DealsRouter["deals.ts (Search, Filter, Categories)"]
             StoresRouter["stores.ts (250+ Merchants & Cashback)"]
             CompareRouter["compare.ts (Multi-Store Price Engine)"]
+            RedirectRouter["redirect.ts (Multi-Network S2S Attribution)"]
             ShoppingRouter["shopping.ts (SearXNG Google Aggregator)"]
             BlogsRouter["blogs.ts (Editorial CMS & Views Counter)"]
             AdminRouter["admin.ts (HMAC-SHA256 Auth & Desk)"]
@@ -36,17 +37,19 @@ graph TD
         end
 
         InMemCache["globalCache<br/>(In-Memory TTL & Prefix Invalidation)"]
-        PriceWatcher["price-watcher.ts<br/>(24/7 Persistent Background Daemon)"]
+        PriceWatcher["price-watcher.ts<br/>(24/7 Persistent Background Daemon · 6h Cycle)"]
     end
 
     subgraph PersistenceTier ["Dual-Engine Persistence Tier"]
-        PostgreSQL[("Primary: PostgreSQL (Supabase Pool)<br/>• gocoupon_deals (960+ rows)<br/>• gocoupon_stores (28 rows)<br/>• gocoupon_blogs (5 rows)<br/>• gocoupon_submissions (5 rows)<br/>• gocoupon_alerts (6 rows)<br/>• gocoupon_price_snapshots (23 rows)")]
+        PostgreSQL[("Primary: PostgreSQL (Supabase Pool)<br/>• Cryptographic MD5 Dirty Checking<br/>• gocoupon_deals (1,712+ rows)<br/>• gocoupon_stores (28 rows)<br/>• gocoupon_blogs (5 rows)<br/>• gocoupon_submissions (5 rows)<br/>• gocoupon_alerts (6 rows)<br/>• gocoupon_price_snapshots (23 rows)")]
         LocalFallback[("Secondary: Local JSON & Memory Failover<br/>• server/data/live-deals.json<br/>• server/data/blogs.json<br/>• server/data/admin-submissions.json")]
     end
 
     subgraph ExternalServices ["External Providers & Ingestion Engines"]
-        CuelinksAPI["Cuelinks API v3<br/>(980+ Live Merchant Offers)"]
+        CuelinksAPI["Cuelinks API v3<br/>(pub_id=272970, cid=318931)"]
+        EarnKaro["EarnKaro Network<br/>(Flipkart, Ajio, D2C Brands)"]
         AdmitadAPI["Admitad OAuth2 API<br/>(International Deals)"]
+        AmazonAPI["Amazon Direct Associates<br/>(tag=gocoupon0e-21)"]
         SearXNGDaemon["SearXNG Metasearch Daemon :8888<br/>(Shopping Engine Proxy)"]
         SerpAPI["Google Shopping SerpAPI<br/>(Real-Time Merchant Rates)"]
         SMTPHost["SpaceMail SMTP<br/>(Transactional Alerts & Contact)"]

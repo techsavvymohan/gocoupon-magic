@@ -86,30 +86,27 @@ The build script compiles client-side assets into `dist/` and runs `scripts/gene
 
 ---
 
-## 4. Running the Process Daemon (PM2)
+## 4. Running the Process Daemon (PM2 & Systemd Resurrection)
 
-Using **PM2** ensures the Express server runs 24/7, restarts automatically on crash, and launches on system reboots:
+Using **PM2** ensures the Express server runs 24/7, restarts automatically on crash, and launches automatically on system reboots:
 
 ```bash
 # Install PM2 globally
 npm install -g pm2
 
-# Start GoCoupon Express Server
-pm2 start "node --env-file=.env server/server.ts" --name "gocoupon-engine"
+# Start GoCoupon Express Server on Bluehost VPS
+pm2 start "node --env-file=.env server/server.ts" --name "gocoupon-web"
 
-# (Optional) Start SearXNG metasearch daemon if running locally
-pm2 start "python3 -m searx.webapp" --name "searxng-engine" --cwd "./services/searxng"
-
-# Save PM2 process list and configure system startup
+# Enable systemd startup service for auto-resurrection on reboot
+pm2 startup systemd
 pm2 save
-pm2 startup
 ```
 
-### Useful PM2 Commands
+### Operational PM2 Commands
 ```bash
-pm2 status                  # View status and memory usage
-pm2 logs gocoupon-engine    # View live server logs
-pm2 reload gocoupon-engine  # Zero-downtime reload
+pm2 status                  # View status, uptime, and memory usage
+pm2 logs gocoupon-web       # View live server output and error logs
+pm2 reload gocoupon-web     # Zero-downtime hot reload
 ```
 
 ---

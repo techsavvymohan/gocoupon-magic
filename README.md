@@ -72,14 +72,22 @@ GoCoupon operates a sovereign, high-concurrency deal ingestion pipeline bridging
                                      └──────────────────────────────┘
 ```
 
-### 1. Dual-Engine Persistence
+### 1. Dual-Engine Persistence & Disk IO Conservation
 - **Primary Engine**: Cloud PostgreSQL connection pool (`pg.Pool`) via Supabase with 6 core tables: `gocoupon_deals`, `gocoupon_stores`, `gocoupon_blogs`, `gocoupon_submissions`, `gocoupon_alerts`, and `gocoupon_price_snapshots`.
+- **Cryptographic Dirty Checking**: Computes MD5 dataset fingerprint prior to executing cloud batch writes. If deals are unchanged, 0 writes are sent to Supabase, eliminating 99% of Disk IO and preserving Free Tier budget forever.
 - **Secondary Failover Engine**: If the cloud database is paused or unreachable, `queryPg()` automatically fails over to local disk JSON (`server/data/live-deals.json`) and memory cache with 0% downtime.
 
 ### 2. 24/7 Background Workers
 - Running persistently inside Node.js ([server/workers/price-watcher.ts](server/workers/price-watcher.ts)).
 - Staggered boot: Cuelinks at +2s, Admitad at +10s.
-- Automatic deal pruning drops dead vouchers (`end_date < NOW()`) every 15 minutes.
+- Background sync cycle throttled to 6 hours (`21,600s`) to avoid redundant API polling and DB write churn.
+- Daily automated pruner purges expired vouchers and cleans up click logs older than 90 days.
+
+### 3. Multi-Network Outbound Monetization Engine
+- **EarnKaro Direct Routing**: High-margin commission links for Flipkart (`fktr.in`), Ajio (`ajiio.in`), Dot & Key, Plum, mCaffeine, Shopsy, and The Man Company.
+- **Admitad International Campaigns**: Clean deep-linking for Bewakoof, Palmonas, Mivi, Acer, Asus, Walmart, Alibaba, and AliExpress with complete sub-id attribution.
+- **Amazon Associates**: Direct store attribution via `tag=gocoupon0e-21` (India) and `tag=gocouponus-20` (Global).
+- **Cuelinks API v3**: Verified publisher identity (`pub_id=272970`, `cid=318931`) covering 1,000+ national and global retailers.
 
 ---
 
