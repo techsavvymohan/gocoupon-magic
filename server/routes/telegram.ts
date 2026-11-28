@@ -61,7 +61,14 @@ telegramRouter.post("/test", async (req: Request, res: Response) => {
 
   const testMessage = `🚀 <b>GoCoupon Bot Connection Test</b>\n\n✅ <b>@Gocouponsupportbot</b> is successfully connected and authorized to post automated deals to this channel!\n\n🌐 <i>Website: <a href="https://gocoupon.io">GoCoupon.io</a></i>`;
 
-  const result = await sendTelegramMessage(testMessage, channel);
+  const result = await sendTelegramMessage(testMessage, channel, {
+    disableWebPreview: true,
+    replyMarkup: {
+      inline_keyboard: [
+        [{ text: "🌐 Visit GoCoupon.io ➔", url: "https://gocoupon.io" }],
+      ],
+    },
+  });
   if (result.success) {
     res.json({
       success: true,

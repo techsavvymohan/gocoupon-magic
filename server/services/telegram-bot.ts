@@ -84,36 +84,58 @@ export function getTelegramConfig() {
 }
 
 /**
- * Formats a deal into an eye-catching, high-converting Telegram HTML post.
+ * Formats a deal into an eye-catching, high-converting Telegram HTML post
+ * with clear attribution call-to-actions.
  */
-export function formatDealTelegramHtml(deal: DealRecord): string {
+export function formatDealTelegram(deal: DealRecord): {
+  html: string;
+  redirectUrl: string;
+  buttonText: string;
+} {
   const store = escapeHtml(deal.storeName || "Partner Store");
   const title = escapeHtml(deal.title || "Exclusive Verified Deal");
   const discount = escapeHtml(deal.discount || "Special Offer");
   const code = deal.code ? escapeHtml(deal.code.trim().toUpperCase()) : "";
   const rating = deal.rating ? `⭐ <b>Rating:</b> ${deal.rating}/5 (Verified)\n` : "";
-  const uses = deal.usesCount ? `👥 <b>Used:</b> ${deal.usesCount}+ times today\n` : "";
+  const uses = deal.usesCount ? `👥 <b>Used:</b> ${deal.usesCount}+ shoppers today\n` : "";
 
   const appUrl = (process.env.APP_URL || "https://gocoupon.io").replace(/\/$/, "");
   const redirectUrl = `${appUrl}/api/redirect/deal?dealId=${encodeURIComponent(deal.id)}&source=telegram`;
+
+  const hasCode = Boolean(code && code !== "NO CODE" && code !== "DIRECT DEAL");
 
   let msg = `🔥 <b>LOOT DEAL: ${title}</b>\n`;
   msg += `━━━━━━━━━━━━━━━━━━━━━━\n`;
   msg += `🏬 <b>Store:</b> ${store}\n`;
   msg += `💰 <b>Discount:</b> <b>${discount}</b>\n`;
 
-  if (code && code !== "NO CODE" && code !== "DIRECT DEAL") {
+  if (hasCode) {
     msg += `🎟️ <b>Coupon Code:</b> <code>${code}</code>\n`;
     msg += `<i>(Tap code to copy)</i>\n`;
   }
 
   msg += rating;
   msg += uses;
-  msg += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-  msg += `👉 <a href="${redirectUrl}"><b>GRAB THIS DEAL NOW ➔</b></a>\n\n`;
+  msg += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+  msg += `🛍️ <b>How to Avail Discount:</b>\n`;
+  if (hasCode) {
+    msg += `1️⃣ Tap <b>"Claim Deal & Activate Code"</b> button below\n`;
+    msg += `2️⃣ Paste coupon code <code>${code}</code> at checkout\n\n`;
+  } else {
+    msg += `1️⃣ Tap <b>"Claim Deal & Activate Offer"</b> button below\n`;
+    msg += `2️⃣ Discount will be automatically applied on the store\n\n`;
+  }
   msg += `⚡ <i>Verified & Hand-Picked by <a href="${appUrl}">GoCoupon.io</a></i>`;
 
-  return msg;
+  return {
+    html: msg,
+    redirectUrl,
+    buttonText: hasCode ? `🛒 Claim Deal & Activate Code ➔` : `🛒 Grab Deal Now ➔`,
+  };
+}
+
+export function formatDealTelegramHtml(deal: DealRecord): string {
+  return formatDealTelegram(deal).html;
 }
 
 function escapeHtml(str: string): string {
@@ -129,7 +151,13 @@ function escapeHtml(str: string): string {
 export async function sendTelegramMessage(
   text: string,
   targetChatId?: string,
-  options?: { parseMode?: "HTML" | "Markdown"; disableWebPreview?: boolean }
+  options?: {
+    parseMode?: "HTML" | "Markdown";
+    disableWebPreview?: boolean;
+    replyMarkup?: {
+      inline_keyboard: Array<Array<{ text: string; url?: string; callback_data?: string }>>;
+    };
+  }
 ): Promise<{ success: boolean; messageId?: number; error?: string }> {
   const { token, channelId } = getTelegramConfig();
   const chat = targetChatId || channelId;
@@ -147,18 +175,24 @@ export async function sendTelegramMessage(
   const shouldDisablePreview = options?.disableWebPreview !== undefined ? options.disableWebPreview : true;
 
   try {
+    const payload: any = {
+      chat_id: chat.startsWith("@") || chat.startsWith("-") ? chat : `@${chat}`,
+      text,
+      parse_mode: options?.parseMode || "HTML",
+      disable_web_page_preview: shouldDisablePreview,
+      link_preview_options: {
+        is_disabled: shouldDisablePreview,
+      },
+    };
+
+    if (options?.replyMarkup) {
+      payload.reply_markup = options.replyMarkup;
+    }
+
     const res = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: chat.startsWith("@") || chat.startsWith("-") ? chat : `@${chat}`,
-        text,
-        parse_mode: options?.parseMode || "HTML",
-        disable_web_page_preview: shouldDisablePreview,
-        link_preview_options: {
-          is_disabled: shouldDisablePreview,
-        },
-      }),
+      body: JSON.stringify(payload),
     });
 
     const data: any = await res.json();
@@ -231,8 +265,20 @@ export async function postNextTopDeal(specificDealId?: string): Promise<{
     return { success: false, error: "No eligible deal found to post." };
   }
 
-  const postHtml = formatDealTelegramHtml(dealToPost);
-  const result = await sendTelegramMessage(postHtml);
+  const formatted = formatDealTelegram(dealToPost);
+  const result = await sendTelegramMessage(formatted.html, undefined, {
+    disableWebPreview: true,
+    replyMarkup: {
+      inline_keyboard: [
+        [
+          {
+            text: formatted.buttonText,
+            url: formatted.redirectUrl,
+          },
+        ],
+      ],
+    },
+  });
 
   if (result.success) {
     persistRecentPost(String(dealToPost.id), dealToPost.title);
