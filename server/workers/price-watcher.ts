@@ -20,6 +20,7 @@ import { syncAdmitadDeals, getAdmitadConfig } from "../services/providers/admita
 import { syncCjDeals, getCjConfig } from "../services/providers/cj-client.js";
 
 let watcherInterval: NodeJS.Timeout | null = null;
+let telegramInterval: NodeJS.Timeout | null = null;
 let admitadTickCount = 0; // Run Admitad sync every 4th Cuelinks tick (~60 min)
 
 export function startBackgroundWorkers(intervalMs: number = 6 * 60 * 60 * 1000) {
@@ -140,6 +141,26 @@ export function startBackgroundWorkers(intervalMs: number = 6 * 60 * 60 * 1000) 
     }
   }, 10000);
 
+  // Telegram Automated Deal Broadcast
+  setTimeout(async () => {
+    try {
+      const { getTelegramConfig, postNextTopDeal } = await import("../services/telegram-bot.js");
+      const tgConfig = getTelegramConfig();
+      if (tgConfig.isConfigured && tgConfig.autoPostEnabled) {
+        console.log(`📢 [TelegramBot] Automated deal broadcaster active (channel: ${tgConfig.channelId}, interval: ${tgConfig.intervalMinutes}m)`);
+        setTimeout(() => {
+          postNextTopDeal().catch((e) => console.warn("[TelegramBot] Initial post error:", e.message));
+        }, 30000);
+        telegramInterval = setInterval(() => {
+          postNextTopDeal().catch((e) => console.warn("[TelegramBot] Periodic post error:", e.message));
+        }, tgConfig.intervalMinutes * 60 * 1000);
+        if (telegramInterval.unref) telegramInterval.unref();
+      }
+    } catch (err: any) {
+      console.warn("[TelegramBot] Worker init notice:", err?.message);
+    }
+  }, 5000);
+
   watcherInterval = setInterval(async () => {
     admitadTickCount++;
 
@@ -221,5 +242,10 @@ export function stopBackgroundWorkers() {
     clearInterval(watcherInterval);
     watcherInterval = null;
     console.log("🛑 [Worker] Background Price Watcher stopped.");
+  }
+  if (telegramInterval) {
+    clearInterval(telegramInterval);
+    telegramInterval = null;
+    console.log("🛑 [Worker] Telegram auto-poster stopped.");
   }
 }

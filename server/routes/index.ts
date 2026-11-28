@@ -48,6 +48,7 @@ import { intelligenceRouter } from "./intelligence.js";
 import { redirectRouter } from "./redirect.js";
 import { postbackRouter } from "./postback.js";
 import { affiliateAiToolsRouter } from "./affiliate-ai-tools.js";
+import { telegramRouter } from "./telegram.js";
 import { rumRouter } from "./rum.js";
 import { Router as ExpressRouter } from "express";
 
@@ -151,6 +152,7 @@ apiRouter.use("/redirect", redirectRouter);
 apiRouter.use("/postback", postbackRouter);
 apiRouter.use("/affiliates/postback", postbackRouter);
 apiRouter.use("/affiliates/tools", affiliateAiToolsRouter);
+apiRouter.use("/telegram", telegramRouter);
 apiRouter.use("/mcp", affiliateAiToolsRouter);
 apiRouter.use(redirectRouter);
 
