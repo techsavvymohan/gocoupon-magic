@@ -295,33 +295,10 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
     const dest = smartMerchant.includes("amazon.com") ? smartMerchant : rawUrl;
     const sep = dest.includes("?") ? "&" : "?";
     targetUrl = `${dest}${sep}tag=${AMAZON_US_TAG}&ascsubtag=${encodeURIComponent(clickId)}`;
-  } else if (isCuelinks) {
-    try {
-      const effectiveDest = smartMerchant !== cleanMerchant ? smartMerchant : rawUrl;
-      const u = new URL(effectiveDest);
-      if (smartMerchant !== cleanMerchant) {
-        // If it was linksredirect, set the url param to the smart deep link
-        if (u.searchParams.has("url")) {
-          u.searchParams.set("url", smartMerchant);
-        }
-      }
-      if (!u.searchParams.has("pub_id") && !u.searchParams.has("pub")) {
-        u.searchParams.set("pub_id", CUELINKS_PUB_ID);
-      }
-      if (!u.searchParams.has("cid")) {
-        u.searchParams.set("cid", CUELINKS_CHANNEL_ID);
-      }
-      if (!u.searchParams.has("subid") && subid1) u.searchParams.set("subid", subid1);
-      if (!u.searchParams.has("subid2") && subid2) u.searchParams.set("subid2", subid2);
-      if (!u.searchParams.has("subid3") && subid3) u.searchParams.set("subid3", subid3);
-      u.searchParams.set("subid4", clickId);
-      targetUrl = u.toString();
-    } catch {
-      targetUrl = rawUrl;
-    }
-  } else if (/^https?:\/\//i.test(targetUrl)) {
-    const effectiveDest = smartMerchant !== cleanMerchant ? smartMerchant : targetUrl;
-    const encoded = encodeURIComponent(effectiveDest);
+  } else if (isCuelinks || /^https?:\/\//i.test(targetUrl)) {
+    // Universal Cuelinks wrapping: ALWAYS redirect to linksredirect.com with destination
+    const destination = smartMerchant || cleanMerchant;
+    const encoded = encodeURIComponent(destination);
     targetUrl = `https://linksredirect.com/?pub_id=${CUELINKS_PUB_ID}&cid=${CUELINKS_CHANNEL_ID}&subid=${encodeURIComponent(subid1)}&subid2=${encodeURIComponent(subid2)}&subid3=${encodeURIComponent(subid3)}&subid4=${encodeURIComponent(clickId)}&url=${encoded}`;
   }
 
@@ -329,7 +306,7 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
   res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");
-  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Referrer-Policy", "no-referrer-when-downgrade");
   res.writeHead(302, { Location: targetUrl });
   res.end();
 }

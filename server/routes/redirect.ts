@@ -318,27 +318,16 @@ export async function handleDealRedirect(req: Request, res: Response) {
     const sep = dest.includes("?") ? "&" : "?";
     const tag = process.env.VITE_AMAZON_US_PARTNER_TAG || "gocouponus-20";
     targetUrl = `${dest}${sep}tag=${tag}&ascsubtag=${encodeURIComponent(clickId)}`;
-  } else if (isCuelinks) {
-    const effectiveDest = smartMerchant !== cleanMerchant ? smartMerchant : rawUrl;
+  } else if (isCuelinks || /^https?:\/\//i.test(targetUrl)) {
+    // Universal Cuelinks wrapping: always use clean merchant destination (or smart deep-link)
+    const destination = smartMerchant || cleanMerchant;
     targetUrl = buildCuelinksRedirectUrl({
-      merchantUrl: effectiveDest,
+      merchantUrl: destination,
       subId: subid1,
       subid1,
       subid2,
       subid3,
       subid4: clickId,
-      subid5,
-    });
-  } else if (/^https?:\/\//i.test(targetUrl)) {
-    // Universal Cuelinks fallback with full 5-tier subID attribution
-    const effectiveDest = smartMerchant !== cleanMerchant ? smartMerchant : targetUrl;
-    targetUrl = buildCuelinksRedirectUrl({
-      merchantUrl: effectiveDest,
-      subId: subid1,
-      subid1,
-      subid2,
-      subid3,
-      subid4,
       subid5,
     });
   }
@@ -372,7 +361,7 @@ export async function handleDealRedirect(req: Request, res: Response) {
   res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");
-  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Referrer-Policy", "no-referrer-when-downgrade");
   res.redirect(302, targetUrl);
 }
 
