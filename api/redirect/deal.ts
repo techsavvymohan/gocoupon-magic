@@ -211,7 +211,7 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
   const code = String(query.code || "").trim();
   const source = String(query.source || "offers").trim();
 
-  if (!rawUrl || rawUrl === "#" || rawUrl === "about:blank" || rawUrl.startsWith("javascript:")) {
+  if (!rawUrl || rawUrl === "#" || rawUrl === "about:blank" || /^(javascript|data|vbscript|file):/i.test(rawUrl)) {
     const storeQuery = `${slug} ${store}`.toLowerCase().trim();
     let resolvedFallback: string | null = null;
     for (const [key, homeUrl] of Object.entries(KNOWN_MERCHANT_HOMEPAGES)) {
@@ -329,6 +329,10 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
     const destination = smartMerchant || cleanMerchant;
     const encoded = encodeURIComponent(destination);
     targetUrl = `https://linksredirect.com/?pub_id=${CUELINKS_PUB_ID}&cid=${CUELINKS_CHANNEL_ID}&subid=${encodeURIComponent(subid1)}&subid2=${encodeURIComponent(subid2)}&subid3=${encodeURIComponent(subid3)}&subid4=${encodeURIComponent(clickId)}&url=${encoded}`;
+  }
+
+  if (!/^https?:\/\//i.test(targetUrl)) {
+    targetUrl = "https://gocoupon.io";
   }
 
   res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");

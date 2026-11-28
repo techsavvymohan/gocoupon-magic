@@ -101,7 +101,7 @@ export async function handleDealRedirect(req: Request, res: Response) {
   const source = String(req.query.source || "offers").trim();
 
   // If rawUrl is missing, "#", or blank, fallback to known merchant homepage
-  if (!rawUrl || rawUrl === "#" || rawUrl === "about:blank" || rawUrl.startsWith("javascript:")) {
+  if (!rawUrl || rawUrl === "#" || rawUrl === "about:blank" || /^(javascript|data|vbscript|file):/i.test(rawUrl)) {
     const storeQuery = `${slug} ${store}`.toLowerCase().trim();
     const KNOWN_MERCHANT_HOMEPAGES: Record<string, string> = {
       boat: "https://www.boat-lifestyle.com",
@@ -384,6 +384,10 @@ export async function handleDealRedirect(req: Request, res: Response) {
     .catch((err) => {
       console.warn("[ClickTracker] Background logging notice:", err?.message);
     });
+
+  if (!/^https?:\/\//i.test(targetUrl)) {
+    targetUrl = "https://gocoupon.io";
+  }
 
   // 3. Issue clean 302 redirect with security headers to the monetized affiliate link
   res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
