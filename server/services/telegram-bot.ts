@@ -143,6 +143,9 @@ export async function sendTelegramMessage(
 
   const endpoint = `https://api.telegram.org/bot${token}/sendMessage`;
 
+  // Default to disabling web preview so large link banners/cards do NOT clutter the channel
+  const shouldDisablePreview = options?.disableWebPreview !== undefined ? options.disableWebPreview : true;
+
   try {
     const res = await fetch(endpoint, {
       method: "POST",
@@ -151,7 +154,10 @@ export async function sendTelegramMessage(
         chat_id: chat.startsWith("@") || chat.startsWith("-") ? chat : `@${chat}`,
         text,
         parse_mode: options?.parseMode || "HTML",
-        disable_web_page_preview: options?.disableWebPreview ?? false,
+        disable_web_page_preview: shouldDisablePreview,
+        link_preview_options: {
+          is_disabled: shouldDisablePreview,
+        },
       }),
     });
 
