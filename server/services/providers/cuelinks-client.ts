@@ -471,11 +471,11 @@ export async function fetchCuelinksCoupons(options: {
   const filtered = !store
     ? mockCoupons
     : mockCoupons.filter(
-        (c) =>
-          c.storeName.toLowerCase().includes(store) ||
-          c.storeDomain.toLowerCase().includes(store) ||
-          store.includes(c.storeName.toLowerCase().split(" ")[0])
-      );
+      (c) =>
+        c.storeName.toLowerCase().includes(store) ||
+        c.storeDomain.toLowerCase().includes(store) ||
+        store.includes(c.storeName.toLowerCase().split(" ")[0])
+    );
 
   setCached(cacheKey, filtered, 5 * 60 * 1000);
   return filtered;
@@ -547,9 +547,9 @@ export async function fetchCuelinksCampaigns(options: {
   const filtered = !search
     ? mockCampaigns
     : mockCampaigns.filter((c) =>
-        c.name.toLowerCase().includes(search.toLowerCase()) ||
-        c.domain.toLowerCase().includes(search.toLowerCase())
-      );
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      c.domain.toLowerCase().includes(search.toLowerCase())
+    );
 
   setCached(cacheKey, filtered, 30 * 60 * 1000);
   return filtered;
@@ -629,7 +629,7 @@ export function normalizeCuelinksToDealRecord(offer: CuelinksCouponOffer): DealR
     } else {
       expiresIn = "Active Offer";
     }
-  } catch {}
+  } catch { }
 
   const hasCoupon = offer.code && offer.code.length > 1;
   let badge: DealBadge = "Trending";
@@ -773,7 +773,7 @@ function atomicWriteDealsFile(filePath: string, payload: any): void {
     fs.writeFileSync(filePath, serialized, "utf-8");
     try {
       if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
-    } catch {}
+    } catch { }
   }
 }
 
