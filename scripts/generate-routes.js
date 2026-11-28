@@ -3022,8 +3022,8 @@ for (const route of allRoutes) {
   const finalTitle = optimizeTitle(route.title);
   const finalDesc = optimizeDescription(route.description);
 
-  // 1. Update Title
-  let pageHtml = baseIndexHtml.replace(/<title>.*?<\/title>/i, `<title>${finalTitle}</title>`);
+  // 1. Update Title (using [\s\S]*? to handle any multi-line tags in base index.html)
+  let pageHtml = baseIndexHtml.replace(/<title>[\s\S]*?<\/title>/i, `<title>${finalTitle}</title>`);
 
   // 2. Update Meta Description
   pageHtml = pageHtml.replace(
