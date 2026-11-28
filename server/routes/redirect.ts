@@ -42,6 +42,17 @@ export function extractMerchantDestination(rawUrl: string): string {
 
   let cleanUrl = rawUrl.trim();
 
+  // If this is an internal redirect wrapper (/api/redirect/deal or /out), unwrap the target URL
+  if (cleanUrl.startsWith("/api/redirect/deal") || cleanUrl.startsWith("/out") || cleanUrl.includes("/api/redirect/deal?")) {
+    try {
+      const parsed = new URL(cleanUrl, "https://gocoupon.io");
+      const embeddedUrl = parsed.searchParams.get("url") || parsed.searchParams.get("target") || parsed.searchParams.get("dest");
+      if (embeddedUrl && /^https?:\/\//i.test(embeddedUrl)) {
+        cleanUrl = decodeURIComponent(embeddedUrl);
+      }
+    } catch {}
+  }
+
   // If this is a Cuelinks linksredirect.com wrapper, extract the embedded destination `url` parameter
   if (cleanUrl.includes("linksredirect.com") || cleanUrl.includes("clnk.in")) {
     try {
@@ -106,6 +117,7 @@ export async function handleDealRedirect(req: Request, res: Response) {
     const KNOWN_MERCHANT_HOMEPAGES: Record<string, string> = {
       boat: "https://www.boat-lifestyle.com",
       "boat-lifestyle": "https://www.boat-lifestyle.com",
+      boatlifestyle: "https://www.boat-lifestyle.com",
       hostinger: "https://www.hostinger.in",
       meesho: "https://www.meesho.com",
       croma: "https://www.croma.com",
@@ -113,6 +125,7 @@ export async function handleDealRedirect(req: Request, res: Response) {
       tatacliq: "https://www.tatacliq.com",
       "1mg": "https://www.1mg.com",
       tata1mg: "https://www.1mg.com",
+      "tata-1mg": "https://www.1mg.com",
       nykaa: "https://www.nykaa.com",
       myntra: "https://www.myntra.com",
       flipkart: "https://www.flipkart.com",
@@ -155,6 +168,54 @@ export async function handleDealRedirect(req: Request, res: Response) {
       gonoise: "https://www.gonoise.com",
       noise: "https://www.gonoise.com",
       jockey: "https://www.jockey.in",
+      // EarnKaro stores
+      "dot-and-key": "https://www.dotandkey.com",
+      dotandkey: "https://www.dotandkey.com",
+      mcaffeine: "https://www.mcaffeine.com",
+      "m-caffeine": "https://www.mcaffeine.com",
+      shopsy: "https://www.shopsy.in",
+      themancompany: "https://www.themancompany.com",
+      "the-man-company": "https://www.themancompany.com",
+      plum: "https://plumgoodness.com",
+      plumgoodness: "https://plumgoodness.com",
+      "plum-goodness": "https://plumgoodness.com",
+      // Admitad campaigns
+      acer: "https://www.acer.com",
+      asus: "https://www.asus.com",
+      walmart: "https://www.walmart.com",
+      raynatours: "https://www.raynatours.com",
+      "rayna-tours": "https://www.raynatours.com",
+      chicme: "https://www.chicme.com",
+      wondershare: "https://www.wondershare.com",
+      hellomolly: "https://www.hellomolly.com",
+      "hello-molly": "https://www.hellomolly.com",
+      // Popular brands & merchants
+      lenskart: "https://www.lenskart.com",
+      purplle: "https://www.purplle.com",
+      sugar: "https://in.sugarcosmetics.com",
+      beyoung: "https://www.beyoung.in",
+      snitch: "https://www.snitch.co.in",
+      xyxx: "https://xyxxcrew.com",
+      marksandspencer: "https://www.marksandspencer.in",
+      lifestyle: "https://www.lifestylestores.com",
+      shoppersstop: "https://www.shoppersstop.com",
+      titan: "https://www.titan.co.in",
+      fastrack: "https://www.fastrack.in",
+      casio: "https://www.casioindiashop.com",
+      boult: "https://www.boultaudio.com",
+      hammer: "https://hammeronline.in",
+      portronics: "https://www.portronics.com",
+      zepto: "https://www.zeptonow.com",
+      blinkit: "https://www.blinkit.com",
+      bigbasket: "https://www.bigbasket.com",
+      reliancedigital: "https://www.reliancedigital.in",
+      vijaysales: "https://www.vijaysales.com",
+      wakefit: "https://www.wakefit.co",
+      urbanladder: "https://www.urbanladder.com",
+      semrush: "https://www.semrush.com",
+      envato: "https://elements.envato.com",
+      sephora: "https://sephora.nnnow.com",
+      crocs: "https://www.crocs.in",
     };
 
     let resolvedFallback: string | null = null;
@@ -167,14 +228,20 @@ export async function handleDealRedirect(req: Request, res: Response) {
 
     if (resolvedFallback) {
       rawUrl = resolvedFallback;
-    } else if (slug && /^[a-z0-9-]+$/i.test(slug)) {
-      const cleanSlug = slug
-        .replace(/^www\./, "")
-        .replace(/-(coupons?|offers?|deals?|store|shop|online)$/i, "");
-      rawUrl = `https://www.${cleanSlug}.com`;
     } else {
-      res.redirect(302, "/offers");
-      return;
+      const candidateName = (slug || store)
+        .toLowerCase()
+        .replace(/^www\./, "")
+        .replace(/-(coupons?|offers?|deals?|store|shop|online)$/i, "")
+        .replace(/[^a-z0-9]/g, "")
+        .trim();
+
+      if (candidateName && candidateName !== "unknown" && candidateName !== "partnerstore" && candidateName.length >= 2) {
+        rawUrl = `https://www.${candidateName}.com`;
+      } else {
+        res.redirect(302, "/offers");
+        return;
+      }
     }
   }
 
@@ -249,7 +316,7 @@ export async function handleDealRedirect(req: Request, res: Response) {
   if (isHomepageUrl(cleanMerchant) && title) {
     const deep = buildSmartMerchantDeepLink(cleanMerchant, slug || store, title);
     if (deep && deep !== cleanMerchant) {
-      smartMerchant = deep;
+      smartMerchant = extractMerchantDestination(deep);
     }
   }
 

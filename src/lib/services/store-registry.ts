@@ -319,7 +319,16 @@ export function buildSmartMerchantDeepLink(
   if (matched?.buildSearchUrl) {
     try {
       const generated = matched.buildSearchUrl(query);
-      if (generated && generated !== "#") return generated;
+      if (generated && generated !== "#") {
+        if (generated.startsWith("/api/redirect/deal") || generated.startsWith("/out") || generated.includes("url=")) {
+          try {
+            const u = new URL(generated, "https://gocoupon.io");
+            const emb = u.searchParams.get("url") || u.searchParams.get("target") || u.searchParams.get("dest");
+            if (emb && /^https?:\/\//i.test(emb)) return decodeURIComponent(emb);
+          } catch {}
+        }
+        return generated;
+      }
     } catch {}
   }
 
