@@ -145,6 +145,16 @@ export async function handleDealRedirect(req: Request, res: Response) {
       dhgate: "https://www.dhgate.com",
       alibaba: "https://www.alibaba.com",
       ashford: "https://www.ashford.com",
+      firstcry: "https://www.firstcry.com",
+      pepperfry: "https://www.pepperfry.com",
+      bewakoof: "https://www.bewakoof.com",
+      netmeds: "https://www.netmeds.com",
+      pharmeasy: "https://www.pharmeasy.in",
+      mivi: "https://www.mivi.in",
+      palmonas: "https://www.palmonas.com",
+      gonoise: "https://www.gonoise.com",
+      noise: "https://www.gonoise.com",
+      jockey: "https://www.jockey.in",
     };
 
     let resolvedFallback: string | null = null;
@@ -158,7 +168,10 @@ export async function handleDealRedirect(req: Request, res: Response) {
     if (resolvedFallback) {
       rawUrl = resolvedFallback;
     } else if (slug && /^[a-z0-9-]+$/i.test(slug)) {
-      rawUrl = `https://www.${slug.replace(/^www\./, "")}.com`;
+      const cleanSlug = slug
+        .replace(/^www\./, "")
+        .replace(/-(coupons?|offers?|deals?|store|shop|online)$/i, "");
+      rawUrl = `https://www.${cleanSlug}.com`;
     } else {
       res.redirect(302, "/offers");
       return;
@@ -295,10 +308,12 @@ export async function handleDealRedirect(req: Request, res: Response) {
   } else if (isAdmitad || (!isCj && matchedAdmitadCampaign && !rawUrl.includes("myntr.it"))) {
     const baseGotolink = isAdmitad ? rawUrl : matchedAdmitadCampaign!;
     const sep = baseGotolink.includes("?") ? "&" : "?";
+    const dest = smartMerchant || cleanMerchant;
+    const ulpParam = dest && !baseGotolink.includes("ulp=") ? `&ulp=${encodeURIComponent(dest)}` : "";
     if (!baseGotolink.includes("subid=")) {
-      targetUrl = `${baseGotolink}${sep}subid=${encodeURIComponent(clickId)}&subid1=${encodeURIComponent(subid1)}&subid2=${encodeURIComponent(subid2)}&subid3=${encodeURIComponent(subid3)}&subid4=${encodeURIComponent(subid5)}`;
+      targetUrl = `${baseGotolink}${sep}subid=${encodeURIComponent(clickId)}&subid1=${encodeURIComponent(subid1)}&subid2=${encodeURIComponent(subid2)}&subid3=${encodeURIComponent(subid3)}&subid4=${encodeURIComponent(subid5)}${ulpParam}`;
     } else {
-      targetUrl = baseGotolink;
+      targetUrl = `${baseGotolink}${ulpParam}`;
     }
   } else if (isCj) {
     targetUrl = rawUrl;
@@ -310,14 +325,28 @@ export async function handleDealRedirect(req: Request, res: Response) {
     targetUrl = rawUrl;
   } else if (rawUrl.includes("amazon.in") || cleanMerchant.includes("amazon.in")) {
     const dest = smartMerchant.includes("amazon.in") ? smartMerchant : rawUrl;
-    const sep = dest.includes("?") ? "&" : "?";
     const tag = process.env.VITE_AMAZON_IN_PARTNER_TAG || "gocoupon0e-21";
-    targetUrl = `${dest}${sep}tag=${tag}&ascsubtag=${encodeURIComponent(clickId)}`;
+    try {
+      const u = new URL(dest);
+      u.searchParams.set("tag", tag);
+      u.searchParams.set("ascsubtag", clickId);
+      targetUrl = u.toString();
+    } catch {
+      const sep = dest.includes("?") ? "&" : "?";
+      targetUrl = `${dest}${sep}tag=${tag}&ascsubtag=${encodeURIComponent(clickId)}`;
+    }
   } else if (rawUrl.includes("amazon.com") || cleanMerchant.includes("amazon.com")) {
     const dest = smartMerchant.includes("amazon.com") ? smartMerchant : rawUrl;
-    const sep = dest.includes("?") ? "&" : "?";
     const tag = process.env.VITE_AMAZON_US_PARTNER_TAG || "gocouponus-20";
-    targetUrl = `${dest}${sep}tag=${tag}&ascsubtag=${encodeURIComponent(clickId)}`;
+    try {
+      const u = new URL(dest);
+      u.searchParams.set("tag", tag);
+      u.searchParams.set("ascsubtag", clickId);
+      targetUrl = u.toString();
+    } catch {
+      const sep = dest.includes("?") ? "&" : "?";
+      targetUrl = `${dest}${sep}tag=${tag}&ascsubtag=${encodeURIComponent(clickId)}`;
+    }
   } else if (isCuelinks || /^https?:\/\//i.test(targetUrl)) {
     // Universal Cuelinks wrapping: always use clean merchant destination (or smart deep-link)
     const destination = smartMerchant || cleanMerchant;

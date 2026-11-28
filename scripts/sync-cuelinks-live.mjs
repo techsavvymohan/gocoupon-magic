@@ -507,6 +507,15 @@ export async function runCuelinksSync(maxPages = 0) {
   fs.writeFileSync(targetPath, JSON.stringify(payload, null, 2), "utf-8");
   console.log(`[Cuelinks Sync] Saved ${accumulatedDeals.length} accumulated live deals to ${targetPath} (Pruned ${expiredCount} expired).`);
 
+  // Also mirror to public/data/live-deals.json
+  const publicPath = path.join(projectRoot, "public/data/live-deals.json");
+  try {
+    fs.writeFileSync(publicPath, JSON.stringify(payload, null, 2), "utf-8");
+    console.log("[Cuelinks Sync] Also mirrored to public/data/live-deals.json");
+  } catch (err) {
+    console.warn("[Cuelinks Sync] Warning writing to public/data/live-deals.json:", err.message);
+  }
+
   // If dist/ exists, also update dist/data/live-deals.json
   const distDir = path.join(projectRoot, "dist/data");
   if (fs.existsSync(distDir)) {

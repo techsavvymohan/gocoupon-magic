@@ -102,9 +102,12 @@ export default async function handler(req: any, res: any) {
 
   try {
     const filePath = path.resolve(process.cwd(), "src/data/live-deals.json");
+    const publicPath = path.resolve(process.cwd(), "public/data/live-deals.json");
     let snapshot: { updatedAt?: string; deals?: DealRecord[] } = {};
     if (fs.existsSync(filePath)) {
       snapshot = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    } else if (fs.existsSync(publicPath)) {
+      snapshot = JSON.parse(fs.readFileSync(publicPath, "utf-8"));
     }
 
     function parseExpiryTimestamp(endDate?: string): number | null {

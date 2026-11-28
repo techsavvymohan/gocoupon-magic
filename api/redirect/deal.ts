@@ -77,6 +77,16 @@ const KNOWN_MERCHANT_HOMEPAGES: Record<string, string> = {
   puma: "https://in.puma.com",
   adidas: "https://www.adidas.co.in",
   nike: "https://www.nike.com/in",
+  firstcry: "https://www.firstcry.com",
+  pepperfry: "https://www.pepperfry.com",
+  bewakoof: "https://www.bewakoof.com",
+  netmeds: "https://www.netmeds.com",
+  pharmeasy: "https://www.pharmeasy.in",
+  mivi: "https://www.mivi.in",
+  palmonas: "https://palmonas.com",
+  gonoise: "https://www.gonoise.com",
+  noise: "https://www.gonoise.com",
+  jockey: "https://www.jockey.in",
   aliexpress: "https://www.aliexpress.com",
   udemy: "https://www.udemy.com",
   coursera: "https://www.coursera.org",
@@ -214,7 +224,10 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
     if (resolvedFallback) {
       rawUrl = resolvedFallback;
     } else if (slug && /^[a-z0-9-]+$/i.test(slug)) {
-      rawUrl = `https://www.${slug.replace(/^www\./, "")}.com`;
+      const cleanSlug = slug
+        .replace(/^www\./, "")
+        .replace(/-(coupons?|offers?|deals?|store|shop|online)$/i, "");
+      rawUrl = `https://www.${cleanSlug}.com`;
     } else {
       res.writeHead(302, { Location: "/offers" });
       res.end();
@@ -283,18 +296,34 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
   } else if (isAdmitad || matchedAdmitad) {
     const base = isAdmitad ? rawUrl : matchedAdmitad!;
     const sep = base.includes("?") ? "&" : "?";
-    targetUrl = `${base}${sep}subid=${encodeURIComponent(clickId)}&subid1=${encodeURIComponent(subid1)}&subid2=${encodeURIComponent(subid2)}&subid3=${encodeURIComponent(subid3)}`;
+    const dest = smartMerchant || cleanMerchant;
+    const ulpParam = dest && !base.includes("ulp=") ? `&ulp=${encodeURIComponent(dest)}` : "";
+    targetUrl = `${base}${sep}subid=${encodeURIComponent(clickId)}&subid1=${encodeURIComponent(subid1)}&subid2=${encodeURIComponent(subid2)}&subid3=${encodeURIComponent(subid3)}${ulpParam}`;
   } else if (isCj) {
     const sep = rawUrl.includes("?") ? "&" : "?";
     targetUrl = `${rawUrl}${sep}sid=${encodeURIComponent(clickId)}`;
   } else if (rawUrl.includes("amazon.in") || cleanMerchant.includes("amazon.in")) {
     const dest = smartMerchant.includes("amazon.in") ? smartMerchant : rawUrl;
-    const sep = dest.includes("?") ? "&" : "?";
-    targetUrl = `${dest}${sep}tag=${AMAZON_IN_TAG}&ascsubtag=${encodeURIComponent(clickId)}`;
+    try {
+      const u = new URL(dest);
+      u.searchParams.set("tag", AMAZON_IN_TAG);
+      u.searchParams.set("ascsubtag", clickId);
+      targetUrl = u.toString();
+    } catch {
+      const sep = dest.includes("?") ? "&" : "?";
+      targetUrl = `${dest}${sep}tag=${AMAZON_IN_TAG}&ascsubtag=${encodeURIComponent(clickId)}`;
+    }
   } else if (rawUrl.includes("amazon.com") || cleanMerchant.includes("amazon.com")) {
     const dest = smartMerchant.includes("amazon.com") ? smartMerchant : rawUrl;
-    const sep = dest.includes("?") ? "&" : "?";
-    targetUrl = `${dest}${sep}tag=${AMAZON_US_TAG}&ascsubtag=${encodeURIComponent(clickId)}`;
+    try {
+      const u = new URL(dest);
+      u.searchParams.set("tag", AMAZON_US_TAG);
+      u.searchParams.set("ascsubtag", clickId);
+      targetUrl = u.toString();
+    } catch {
+      const sep = dest.includes("?") ? "&" : "?";
+      targetUrl = `${dest}${sep}tag=${AMAZON_US_TAG}&ascsubtag=${encodeURIComponent(clickId)}`;
+    }
   } else if (isCuelinks || /^https?:\/\//i.test(targetUrl)) {
     // Universal Cuelinks wrapping: ALWAYS redirect to linksredirect.com with destination
     const destination = smartMerchant || cleanMerchant;

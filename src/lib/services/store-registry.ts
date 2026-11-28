@@ -152,7 +152,7 @@ export function isAffiliateNetworkUrl(url?: string | null): boolean {
     lower.includes("ali.click") ||
     lower.includes("fas.st") ||
     lower.includes("artfut.com") ||
-    lower.includes("tag=") ||
+    ((lower.includes("amazon.") || lower.includes("amzn.to")) && lower.includes("tag=")) ||
     lower.includes("myntr.it") ||
     lower.includes("fktr.in") ||
     lower.includes("ajiio.in") ||

@@ -114,11 +114,12 @@ export function SeoLandingPage(props: SeoLandingPageProps) {
     const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   const resolvedStoreSlug = (storeName || "store").toLowerCase().replace(/[^\w]/g, "-");
+  const cleanStoreDomain = resolvedStoreSlug.replace(/-(coupons?|offers?|deals?|store|shop|online)$/i, "").replace(/-+/g, "");
   const registeredStore = findStoreByNameOrSlug(storeName || (breadcrumb && breadcrumb[breadcrumb.length - 1]?.name) || "");
   const effectiveStoreName = storeName || registeredStore?.name || "Partner Store";
   const effectiveStoreUrl = (storeUrl && /^https?:\/\//i.test(storeUrl))
     ? storeUrl
-    : (registeredStore?.storeUrl || getStoreEarnKaroLink(storeName || resolvedStoreSlug) || `https://${resolvedStoreSlug.replace(/-+/g, "")}.com`);
+    : (registeredStore?.storeUrl || getStoreEarnKaroLink(storeName || resolvedStoreSlug) || `https://${cleanStoreDomain}.com`);
 
   const storeAffiliateUrl = buildDealRedirectUrl({
     url: effectiveStoreUrl,
