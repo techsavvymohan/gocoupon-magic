@@ -100,7 +100,26 @@ export function formatDealTelegram(deal: DealRecord): {
   const uses = deal.usesCount ? `👥 <b>Used:</b> ${deal.usesCount}+ shoppers today\n` : "";
 
   const appUrl = (process.env.APP_URL || "https://gocoupon.io").replace(/\/$/, "");
-  const redirectUrl = `${appUrl}/api/redirect/deal?dealId=${encodeURIComponent(deal.id)}&source=telegram`;
+  const destinationUrl = ((deal as any).link || (deal as any).url || (deal as any).affiliateUrl || "").trim();
+
+  // Construct high-precision parameters so the redirect engine knows the exact merchant destination
+  const params = new URLSearchParams();
+  params.set("dealId", String(deal.id));
+  if (destinationUrl) {
+    params.set("url", destinationUrl);
+  }
+  if (deal.storeName) {
+    params.set("store", deal.storeName);
+  }
+  if (deal.storeSlug) {
+    params.set("slug", deal.storeSlug);
+  }
+  if (deal.code) {
+    params.set("code", deal.code);
+  }
+  params.set("source", "telegram");
+
+  const redirectUrl = `${appUrl}/api/redirect/deal?${params.toString()}`;
 
   const hasCode = Boolean(code && code !== "NO CODE" && code !== "DIRECT DEAL");
 

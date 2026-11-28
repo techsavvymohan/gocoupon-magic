@@ -267,11 +267,32 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
   const query = req.query || (req.url ? Object.fromEntries(new URL(req.url, "http://localhost").searchParams.entries()) : {});
   let rawUrl = String(query.url || query.target || query.link || query.to || query.dest || "").trim();
   const dealId = String(query.dealId || query.id || "unknown").trim();
-  const title = String(query.title || "GoCoupon Deal").trim();
-  const store = String(query.store || query.storeName || "Partner Store").trim();
-  const slug = String(query.slug || query.storeSlug || "").trim();
-  const code = String(query.code || "").trim();
+  let title = String(query.title || "GoCoupon Deal").trim();
+  let store = String(query.store || query.storeName || "Partner Store").trim();
+  let slug = String(query.slug || query.storeSlug || "").trim();
+  let code = String(query.code || "").trim();
   const source = String(query.source || "offers").trim();
+
+  // If rawUrl is missing, attempt to resolve directly from dealId in live pool
+  if ((!rawUrl || rawUrl === "#" || rawUrl === "about:blank" || /^(javascript|data|vbscript|file):/i.test(rawUrl)) && dealId && dealId !== "unknown") {
+    try {
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const dealsPath = path.resolve(process.cwd(), "src/data/live-deals.json");
+      if (fs.existsSync(dealsPath)) {
+        const payload = JSON.parse(fs.readFileSync(dealsPath, "utf-8"));
+        const deals = Array.isArray(payload) ? payload : payload.deals || [];
+        const matched = deals.find((d: any) => String(d.id) === String(dealId));
+        if (matched) {
+          rawUrl = (matched.link || matched.affiliateUrl || matched.targetUrl || matched.url || "").trim();
+          if (!store || store === "Partner Store") store = matched.storeName || store;
+          if (!slug) slug = matched.storeSlug || slug;
+          if (!code) code = matched.code || code;
+          if (!title || title === "GoCoupon Deal") title = matched.title || title;
+        }
+      }
+    } catch {}
+  }
 
   if (!rawUrl || rawUrl === "#" || rawUrl === "about:blank" || /^(javascript|data|vbscript|file):/i.test(rawUrl)) {
     const storeQuery = `${slug} ${store}`.toLowerCase().trim();

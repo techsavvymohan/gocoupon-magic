@@ -13,7 +13,7 @@
 import { Router, type Request, type Response } from "express";
 import { clicksDb } from "../services/db.js";
 import { requireAdminAuth } from "./admin.js";
-import { buildCuelinksRedirectUrl } from "../services/providers/cuelinks-client.js";
+import { buildCuelinksRedirectUrl, getLiveDealsPool } from "../services/providers/cuelinks-client.js";
 import {
   isHomepageUrl,
   buildSmartMerchantDeepLink,
@@ -105,13 +105,38 @@ export async function handleDealRedirect(req: Request, res: Response) {
     ""
   ).trim();
   const dealId = String(req.query.dealId || req.query.id || "unknown").trim();
-  const title = String(req.query.title || "GoCoupon Deal").trim();
-  const store = String(req.query.store || req.query.storeName || "Partner Store").trim();
-  const slug = String(req.query.slug || req.query.storeSlug || "").trim();
-  const code = String(req.query.code || "").trim();
+  let title = String(req.query.title || "GoCoupon Deal").trim();
+  let store = String(req.query.store || req.query.storeName || "Partner Store").trim();
+  let slug = String(req.query.slug || req.query.storeSlug || "").trim();
+  let code = String(req.query.code || "").trim();
   const source = String(req.query.source || "offers").trim();
 
-  // If rawUrl is missing, "#", or blank, fallback to known merchant homepage
+  // If rawUrl is missing, attempt to hydrate directly from dealId in live deals pool
+  if ((!rawUrl || rawUrl === "#" || rawUrl === "about:blank" || /^(javascript|data|vbscript|file):/i.test(rawUrl)) && dealId && dealId !== "unknown") {
+    try {
+      const deals = getLiveDealsPool();
+      const matched = deals.find((d: any) => String(d.id) === String(dealId));
+      if (matched) {
+        rawUrl = ((matched as any).link || (matched as any).url || (matched as any).affiliateUrl || "").trim();
+        if (!store || store === "Partner Store") {
+          store = matched.storeName || store;
+        }
+        if (!slug) {
+          slug = matched.storeSlug || slug;
+        }
+        if (!code) {
+          code = matched.code || code;
+        }
+        if (!title || title === "GoCoupon Deal") {
+          title = matched.title || title;
+        }
+      }
+    } catch (err: any) {
+      console.warn("[DealRedirect] Error resolving deal by dealId:", err.message);
+    }
+  }
+
+  // If rawUrl is still missing, "#", or blank, fallback to known merchant homepage
   if (!rawUrl || rawUrl === "#" || rawUrl === "about:blank" || /^(javascript|data|vbscript|file):/i.test(rawUrl)) {
     const storeQuery = `${slug} ${store}`.toLowerCase().trim();
     const KNOWN_MERCHANT_HOMEPAGES: Record<string, string> = {
